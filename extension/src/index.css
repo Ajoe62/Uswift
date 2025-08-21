@@ -1,0 +1,58 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap");
+
+body {
+  font-family: "Inter", sans-serif;
+  background: #ffffff;
+  color: #111827;
+  margin: 0;
+}
+
+.uswift-gradient {
+  background: linear-gradient(90deg, #6d28d9 0%, #2563eb 100%);
+}
+
+.uswift-btn {
+  background: #6d28d9;
+  color: #fff;
+  border-radius: 9999px;
+  padding: 0.75rem 2rem;
+  font-weight: 700;
+  font-size: 1rem;
+  border: none;
+  transition: background 0.2s;
+}
+.uswift-btn:hover {
+  background: #5b21b6;
+}
+
+.uswift-card {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 1rem;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+  color: #1f2937;
+  margin-bottom: 1rem;
+}
+
+.uswift-badge {
+  background: #ede9fe;
+  color: #6d28d9;
+  border-radius: 0.5rem;
+  padding: 0.25rem 0.75rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  margin-right: 0.5rem;
+}
+
+.uswift-trust {
+  display: flex;
+  gap: 1rem;
+  margin: 1.5rem 0;
+}
+
+.uswift-icon {
+  width: 2.5rem;
+  height: 2.5rem;
+  margin-bottom: 0.5rem;
+}

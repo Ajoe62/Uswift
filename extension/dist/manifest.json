@@ -1,0 +1,22 @@
+{
+  "manifest_version": 3,
+  "name": "Uswift",
+  "version": "1.0.0",
+  "description": "Auto-apply to job boards using saved profiles.",
+  "action": { "default_popup": "popup.html" },
+  "permissions": ["storage", "activeTab", "scripting", "identity"],
+  "host_permissions": ["https://*.supabase.co/*", "http://*/*", "https://*/*"],
+  "background": { "service_worker": "background.js" },
+  "content_scripts": [
+    {
+      "matches": ["https://*/*"],
+      "js": ["content.js"]
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": ["config.js"],
+      "matches": ["<all_urls>"]
+    }
+  ]
+}
