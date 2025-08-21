@@ -2,17 +2,17 @@
 
 body {
   font-family: "Inter", sans-serif;
-  background: #ffffff;
+  background: linear-gradient(90deg, #1cb5e0 0%, #000851 100%);
   color: #111827;
   margin: 0;
 }
 
 .uswift-gradient {
-  background: linear-gradient(90deg, #6d28d9 0%, #2563eb 100%);
+  background: linear-gradient(90deg, #1cb5e0 0%, #000851 100%);
 }
 
 .uswift-btn {
-  background: #6d28d9;
+  background: linear-gradient(90deg, #1cb5e0 0%, #000851 100%);
   color: #fff;
   border-radius: 9999px;
   padding: 0.75rem 2rem;
@@ -22,11 +22,11 @@ body {
   transition: background 0.2s;
 }
 .uswift-btn:hover {
-  background: #5b21b6;
+  background: linear-gradient(90deg, #1cb5e0 0%, #000851 100%);
 }
 
 .uswift-card {
-  background: #fff;
+  background: linear-gradient(90deg, #1cb5e0 0%, #000851 100%);
   border: 1px solid #e5e7eb;
   border-radius: 1rem;
   padding: 1.5rem;
@@ -36,7 +36,7 @@ body {
 }
 
 .uswift-badge {
-  background: #ede9fe;
+  background: linear-gradient(90deg, #1cb5e0 0%, #000851 100%);
   color: #6d28d9;
   border-radius: 0.5rem;
   padding: 0.25rem 0.75rem;

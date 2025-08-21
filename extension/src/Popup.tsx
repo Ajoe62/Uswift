@@ -5,7 +5,7 @@ declare const supabase: any;
 import React, { useState, useEffect } from 'react';
 import './index.css';
 import ProfileVault from './ProfileVault';
-import JobTrackerNew from './JobTrackerNew';
+import JobTracker from './JobTracker';
 import { useAuth } from './hooks/useAuth';
 import Auth from './Auth';
 
@@ -109,7 +109,7 @@ export default function Popup() {
             Sign Out
           </button>
         </div>
-        <JobTrackerNew />
+        <JobTracker/>
       </div>
     );
   }
