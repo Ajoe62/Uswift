@@ -3,7 +3,7 @@
   "name": "Uswift",
   "version": "1.0",
   "description": "Auto-apply to job boards using saved profiles.",
-  "action": { "default_popup": "index.html" },
+  "action": { "default_popup": "popup.html" },
   "permissions": ["storage", "activeTab", "scripting", "identity"],
   "host_permissions": [
     "https://*.supabase.co/*"
@@ -20,10 +20,5 @@
       "resources": ["config.js"],
       "matches": ["<all_urls>"]
     }
-  ],
-  "icons": {
-    "16": "icon16.png",
-    "48": "icon48.png",
-    "128": "icon128.png"
-  }
+  ]
 }
