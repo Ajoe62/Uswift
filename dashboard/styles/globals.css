@@ -1,3 +1,8 @@
+/* stylelint-disable */
+/* eslint-disable */
+/* Allow Tailwind's at-rules and PostCSS processing */
+@import './theme.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
