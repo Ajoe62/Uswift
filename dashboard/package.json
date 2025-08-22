@@ -2,25 +2,65 @@
   "name": "uswift-dashboard",
   "version": "0.1.0",
   "private": true,
-  "scripts": {
-    "dev": "next dev",
-    "start": "npm run dev"
-  },
-  "description": "Uswift dashboard (static landing)",
-  "author": "",
+  "description": "Uswift dashboard - Chrome extension for job application automation",
+  "author": "Uswift Team",
   "license": "MIT",
+  "keywords": [
+    "nextjs",
+    "chrome-extension",
+    "job-automation",
+    "dashboard"
+  ],
+  "scripts": {
+    "dev": "next dev --turbo",
+    "dev:webpack": "next dev",
+    "dev:fast": "cross-env NODE_OPTIONS=--max-old-space-size=8192 next dev --turbo",
+    "dev:debug": "next dev --inspect",
+    "dev:https": "next dev --turbo --experimental-https",
+    "build": "next build",
+    "build:analyze": "cross-env ANALYZE=true next build",
+    "build:production": "cross-env NODE_ENV=production next build",
+    "start": "next start",
+    "start:dev": "npm run dev",
+    "lint": "next lint",
+    "type-check": "tsc --noEmit",
+    "clean": "rimraf .next",
+    "clean:install": "rimraf node_modules package-lock.json && npm install"
+  },
   "dependencies": {
     "@supabase/supabase-js": "^2.56.0",
-    "autoprefixer": "^10.4.21",
     "next": "^15.5.0",
-    "postcss": "^8.5.6",
     "react": "^19.1.1",
-    "react-dom": "^19.1.1",
-    "tailwindcss": "^4.1.12"
+    "react-dom": "^19.1.1"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.1.12",
     "@types/node": "^24.3.0",
-    "typescript": "5.9.2"
+    "@types/react": "^19.1.1",
+    "@types/react-dom": "^19.1.1",
+    "autoprefixer": "^10.4.21",
+    "cross-env": "^7.0.3",
+    "eslint": "^9.17.0",
+    "eslint-config-next": "^15.5.0",
+    "postcss": "^8.5.6",
+    "rimraf": "^6.0.1",
+    "tailwindcss": "^4.1.12",
+    "typescript": "^5.9.2"
+  },
+  "engines": {
+    "node": ">=18.17.0",
+    "npm": ">=9.0.0"
+  },
+  "browserslist": {
+    "production": [
+      ">0.3%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
   }
 }

@@ -1,12 +1,10 @@
-/* stylelint-disable */
-/* eslint-disable */
-/* Allow Tailwind's at-rules and PostCSS processing */
+/* Import Tailwind v4 - NEW SYNTAX */
+@import "tailwindcss";
+
+/* Keep your theme import */
 @import './theme.css';
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
+/* Your custom styles */
 body {
   background: linear-gradient(90deg, #1cb5e0 0%, #000851 100%);
   color: #fff;

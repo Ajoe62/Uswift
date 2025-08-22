@@ -8,6 +8,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
+      <head>
+        <link rel="icon" href="/icon16.png" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+      </head>
       <body className="bg-uswift-gradient min-h-screen">
         <Navbar />
         {children}
