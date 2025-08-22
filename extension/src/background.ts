@@ -10,3 +10,19 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     sendResponse({ status: "queued" });
   }
 });
+
+// Initialize supabase client in background (if configured)
+try {
+  // dynamic import to avoid window references in worker context when not needed
+  import("./supabaseClient")
+    .then(({ getSupabaseClient }) => {
+      try {
+        getSupabaseClient();
+      } catch (e) {
+        console.warn("Supabase background init skipped:", e);
+      }
+    })
+    .catch(() => {});
+} catch (e) {
+  /* ignore */
+}

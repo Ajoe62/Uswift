@@ -507,8 +507,9 @@ function useAuth() {
   reactExports.useEffect(() => {
     const loadUser = async () => {
       try {
-        if (typeof window !== "undefined" && window.supabase) {
-          const currentUser = await window.supabase.getUser();
+        const supabase = getSupabaseClient();
+        if (supabase) {
+          const currentUser = await supabase.getUser();
           setUser(currentUser);
         }
       } catch (error) {
@@ -521,36 +522,47 @@ function useAuth() {
   }, []);
   const signIn = async (email, password) => {
     try {
-      if (!window.supabase) {
+      const supabase = getSupabaseClient();
+      if (!supabase) {
         throw new Error("Supabase not initialized");
       }
-      const { user: user2, error } = await window.supabase.signIn(email, password);
-      if (error)
-        throw error;
-      setUser(user2);
-      return { user: user2, error: null };
+      const result = await supabase.signIn(email, password);
+      if (result.access_token) {
+        const user2 = { id: result.user?.id || "user", email };
+        setUser(user2);
+        return { user: user2, error: null };
+      } else if (result.error) {
+        throw new Error(result.error);
+      }
+      return { user: null, error: "Sign in failed" };
     } catch (error) {
       return { user: null, error };
     }
   };
   const signUp = async (email, password, metadata = {}) => {
     try {
-      if (!window.supabase) {
+      const supabase = getSupabaseClient();
+      if (!supabase) {
         throw new Error("Supabase not initialized");
       }
-      const { user: user2, error } = await window.supabase.signUp(email, password, metadata);
-      if (error)
-        throw error;
-      setUser(user2);
-      return { user: user2, error: null };
+      const result = await supabase.signIn(email, password);
+      if (result.access_token) {
+        const user2 = { id: result.user?.id || "user", email };
+        setUser(user2);
+        return { user: user2, error: null };
+      } else if (result.error) {
+        throw new Error(result.error);
+      }
+      return { user: null, error: "Sign up failed" };
     } catch (error) {
       return { user: null, error };
     }
   };
   const signOut = async () => {
     try {
-      if (window.supabase) {
-        await window.supabase.signOut();
+      const supabase = getSupabaseClient();
+      if (supabase) {
+        await supabase.signOut();
       }
       setUser(null);
     } catch (error) {
@@ -1613,9 +1625,12 @@ function Popup() {
     try {
       if (!user?.id)
         return;
-      const { data: resumes, error } = await supabase.from("resumes").select("*").eq("user_id", user.id);
-      if (error)
-        throw error;
+      const supabase = getSupabaseClient();
+      if (!supabase) {
+        console.warn("Supabase client not available");
+        return;
+      }
+      const resumes = await supabase.makeRequest("resumes?user_id=eq." + user.id);
       const resume = resumes?.find((r) => r.type === "resume");
       const coverLetter = resumes?.find((r) => r.type === "cover_letter");
       setProfile({
@@ -1747,11 +1762,10 @@ function Popup() {
   ] });
 }
 
-try {
-  getSupabaseClient();
-} catch (e) {
-  console.error("Supabase init error:", e);
-}
 client.createRoot(document.getElementById("root")).render(
   /* @__PURE__ */ jsxRuntimeExports.jsx(React.StrictMode, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(Popup, {}) })
 );
+try {
+  getSupabaseClient();
+} catch (e) {
+}

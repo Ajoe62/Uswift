@@ -5,10 +5,36 @@ class SupabaseClient {
     this.config = config;
   }
   async signIn(email, password) {
-    const res = await fetch(`${this.config.url}/auth/v1/token?grant_type=password`, {
+    const res = await fetch(
+      `${this.config.url}/auth/v1/token?grant_type=password`,
+      {
+        method: "POST",
+        headers: {
+          apikey: this.config.anonKey,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ email, password })
+      }
+    );
+    const data = await res.json();
+    if (data.access_token) {
+      this.authToken = data.access_token;
+      await this.saveSession(data);
+    }
+    return data;
+  }
+  async signUp(email, password, options = {}) {
+    const res = await fetch(`${this.config.url}/auth/v1/signup`, {
       method: "POST",
-      headers: { "apikey": this.config.anonKey, "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password })
+      headers: {
+        apikey: this.config.anonKey,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        email,
+        password,
+        data: options
+      })
     });
     const data = await res.json();
     if (data.access_token) {
@@ -17,12 +43,38 @@ class SupabaseClient {
     }
     return data;
   }
+  async getUser() {
+    if (!this.authToken) {
+      const session = await this.loadSession();
+      if (!session || !session.access_token)
+        return null;
+      this.authToken = session.access_token;
+    }
+    try {
+      const res = await fetch(`${this.config.url}/auth/v1/user`, {
+        method: "GET",
+        headers: {
+          apikey: this.config.anonKey,
+          Authorization: `Bearer ${this.authToken}`
+        }
+      });
+      if (!res.ok)
+        return null;
+      return await res.json();
+    } catch (error) {
+      console.error("Error getting user:", error);
+      return null;
+    }
+  }
   async signOut() {
     if (!this.authToken)
       return;
     await fetch(`${this.config.url}/auth/v1/logout`, {
       method: "POST",
-      headers: { "apikey": this.config.anonKey, "Authorization": `Bearer ${this.authToken}` }
+      headers: {
+        apikey: this.config.anonKey,
+        Authorization: `Bearer ${this.authToken}`
+      }
     });
     this.authToken = null;
     await this.clearSession();
@@ -30,7 +82,10 @@ class SupabaseClient {
   async saveSession(session) {
     return new Promise((resolve) => {
       if (typeof chrome !== "undefined" && chrome.storage && chrome.storage.local) {
-        chrome.storage.local.set({ supabase_session: session }, () => resolve());
+        chrome.storage.local.set(
+          { supabase_session: session },
+          () => resolve()
+        );
       } else {
         try {
           localStorage.setItem("supabase_session", JSON.stringify(session));
@@ -43,11 +98,14 @@ class SupabaseClient {
   async loadSession() {
     return new Promise((resolve) => {
       if (typeof chrome !== "undefined" && chrome.storage && chrome.storage.local) {
-        chrome.storage.local.get(["supabase_session"], (result) => {
-          if (result && result.supabase_session)
-            this.authToken = result.supabase_session.access_token;
-          resolve(result && result.supabase_session);
-        });
+        chrome.storage.local.get(
+          ["supabase_session"],
+          (result) => {
+            if (result && result.supabase_session)
+              this.authToken = result.supabase_session.access_token;
+            resolve(result && result.supabase_session);
+          }
+        );
       } else {
         try {
           const v = localStorage.getItem("supabase_session");
@@ -66,7 +124,10 @@ class SupabaseClient {
   async clearSession() {
     return new Promise((resolve) => {
       if (typeof chrome !== "undefined" && chrome.storage && chrome.storage.local) {
-        chrome.storage.local.remove(["supabase_session"], () => resolve());
+        chrome.storage.local.remove(
+          ["supabase_session"],
+          () => resolve()
+        );
       } else {
         try {
           localStorage.removeItem("supabase_session");
@@ -79,7 +140,7 @@ class SupabaseClient {
   async makeRequest(endpoint, options = {}) {
     const url = `${this.config.url}/rest/v1/${endpoint}`;
     const headers = {
-      "apikey": this.config.anonKey,
+      apikey: this.config.anonKey,
       "Content-Type": "application/json",
       ...options.headers || {}
     };
@@ -107,7 +168,10 @@ function getSupabaseClient() {
     return singleton;
   const cfg = resolveConfig();
   if (!cfg) {
-    throw new Error("Supabase configuration missing: set VITE_SUPABASE_URL / VITE_SUPABASE_ANON_KEY or window.SUPABASE_CONFIG");
+    console.warn(
+      "Supabase configuration missing: set VITE_SUPABASE_URL / VITE_SUPABASE_ANON_KEY or window.SUPABASE_CONFIG"
+    );
+    return null;
   }
   singleton = new SupabaseClient(cfg);
   singleton.loadSession().catch(() => {

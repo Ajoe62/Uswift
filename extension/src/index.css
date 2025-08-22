@@ -56,3 +56,57 @@ body {
   height: 2.5rem;
   margin-bottom: 0.5rem;
 }
+
+/* Loading and animation styles */
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* Improved button interactions */
+.uswift-btn {
+  transition: all 0.2s ease;
+  transform: translateY(0);
+}
+
+.uswift-btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.uswift-btn:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+/* Input focus states */
+input:focus {
+  outline: none;
+  border-color: #6d28d9 !important;
+  box-shadow: 0 0 0 3px rgba(109, 40, 217, 0.1);
+  transition: all 0.2s ease;
+}

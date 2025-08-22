@@ -1,4 +1,5 @@
 {
+  "$schema": "https://json.schemastore.org/package",
   "name": "uswift-chrome-extension",
   "version": "1.0.0",
   "description": "Uswift - Auto-apply to jobs on multiple job boards",

@@ -1,10 +1,12 @@
 // Authentication hook for React components
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from "react";
+import { getSupabaseClient } from "../supabaseClient";
 
 // Extend window interface for TypeScript
 declare global {
   interface Window {
     supabase: any;
+    supabaseClient: any;
   }
 }
 
@@ -21,30 +23,44 @@ export function useAuth() {
     // Load existing session
     const loadUser = async () => {
       try {
-        if (typeof window !== 'undefined' && window.supabase) {
-          const currentUser = await window.supabase.getUser();
-          setUser(currentUser);
+        // Get supabase client using our singleton
+        const supabase = getSupabaseClient();
+        if (supabase) {
+          const currentUser = await supabase.getUser();
+          if (currentUser) {
+            setUser(currentUser);
+          }
         }
       } catch (error) {
-        console.error('Error loading user:', error);
+        console.error("Error loading user:", error);
       } finally {
         setLoading(false);
       }
     };
 
-    // Wait a bit for supabase to initialize
-    setTimeout(loadUser, 500);
+    // Try immediate load, then fallback with delay
+    loadUser().catch(() => {
+      // If immediate load fails, try again after config loads
+      setTimeout(loadUser, 300);
+    });
   }, []);
 
   const signIn = async (email: string, password: string) => {
     try {
-      if (!window.supabase) {
-        throw new Error('Supabase not initialized');
+      const supabase = getSupabaseClient();
+      if (!supabase) {
+        throw new Error("Supabase not initialized");
       }
-      const { user, error } = await window.supabase.signIn(email, password);
-      if (error) throw error;
-      setUser(user);
-      return { user, error: null };
+      const result = await supabase.signIn(email, password);
+      if (result.access_token) {
+        // Extract user info from the result
+        const user = { id: result.user?.id || "user", email: email };
+        setUser(user);
+        return { user, error: null };
+      } else if (result.error) {
+        throw new Error(result.error);
+      }
+      return { user: null, error: "Sign in failed" };
     } catch (error) {
       return { user: null, error };
     }
@@ -52,13 +68,20 @@ export function useAuth() {
 
   const signUp = async (email: string, password: string, metadata = {}) => {
     try {
-      if (!window.supabase) {
-        throw new Error('Supabase not initialized');
+      const supabase = getSupabaseClient();
+      if (!supabase) {
+        throw new Error("Supabase not initialized");
       }
-      const { user, error } = await window.supabase.signUp(email, password, metadata);
-      if (error) throw error;
-      setUser(user);
-      return { user, error: null };
+      // Use the signUp method from the client
+      const result = await supabase.signUp(email, password, metadata);
+      if (result.access_token) {
+        const user = { id: result.user?.id || "user", email: email };
+        setUser(user);
+        return { user, error: null };
+      } else if (result.error) {
+        throw new Error(result.error);
+      }
+      return { user: null, error: "Sign up failed" };
     } catch (error) {
       return { user: null, error };
     }
@@ -66,12 +89,13 @@ export function useAuth() {
 
   const signOut = async () => {
     try {
-      if (window.supabase) {
-        await window.supabase.signOut();
+      const supabase = getSupabaseClient();
+      if (supabase) {
+        await supabase.signOut();
       }
       setUser(null);
     } catch (error) {
-      console.error('Error signing out:', error);
+      console.error("Error signing out:", error);
     }
   };
 
@@ -81,6 +105,6 @@ export function useAuth() {
     signIn,
     signUp,
     signOut,
-    isAuthenticated: !!user
+    isAuthenticated: !!user,
   };
 }

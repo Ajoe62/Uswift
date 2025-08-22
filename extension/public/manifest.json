@@ -5,9 +5,7 @@
   "description": "Auto-apply to job boards using saved profiles.",
   "action": { "default_popup": "popup.html" },
   "permissions": ["storage", "activeTab", "scripting", "identity"],
-  "host_permissions": [
-    "https://*.supabase.co/*"
-  ],
+  "host_permissions": ["https://*.supabase.co/*"],
   "background": { "service_worker": "background.js" },
   "content_scripts": [
     {
