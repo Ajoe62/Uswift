@@ -12,13 +12,10 @@
         overflow-y: auto;
       }
     </style>
-  <!-- Supabase Client (bundled locally) -->
-  <!-- Reference Vite entry module so it can be bundled: -->
-  
-  
-    <script type="module" crossorigin src="/popup.js"></script>
-    <link rel="modulepreload" crossorigin href="/supabaseClient.js">
-    <link rel="stylesheet" href="/popup.css">
+    <!-- Supabase Client (bundled locally) -->
+    <!-- Load built popup bundle and styles (used when loaded from dist/) -->
+    <script type="module" crossorigin src="./popup.js"></script>
+    <link rel="stylesheet" href="./popup.css" />
   </head>
   <body>
     <div id="root"></div>
