@@ -1,0 +1,9 @@
+:root {
+  --uswift-blue: #1cb5e0;
+  --uswift-navy: #000851;
+  --uswift-purple: #6d28d9;
+}
+
+.bg-uswift-gradient {
+  background: linear-gradient(90deg, var(--uswift-blue) 0%, var(--uswift-navy) 100%);
+}
