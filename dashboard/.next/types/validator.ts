@@ -36,6 +36,12 @@ type LayoutConfig<Route extends LayoutRoutes = LayoutRoutes> = {
 }
 
 
+// Validate ..\..\app\auth\reset-password\page.tsx
+{
+  const handler = {} as typeof import("..\\..\\app\\auth\\reset-password\\page.js")
+  handler satisfies AppPageConfig<"/auth/reset-password">
+}
+
 // Validate ..\..\app\dashboard\jobs\page.tsx
 {
   const handler = {} as typeof import("..\\..\\app\\dashboard\\jobs\\page.js")
