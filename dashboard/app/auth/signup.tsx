@@ -55,7 +55,7 @@ export default function SignUpPage() {
         </Button>
       </form>
 
-      {message && <div className="mt-4 text-center text-uswift-purple">{message}</div>}
+  {message && <div className="mt-4 text-center text-uswift-accent">{message}</div>}
       <div className="mt-6 text-center">
         <a href="/auth/signin" className="text-uswift-blue hover:underline">Already have an account?</a>
       </div>

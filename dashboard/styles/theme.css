@@ -1,9 +1,70 @@
 :root {
   --uswift-blue: #1cb5e0;
   --uswift-navy: #000851;
-  --uswift-purple: #6d28d9;
+  --uswift-accent: #14b8a6;
 }
 
 .bg-uswift-gradient {
   background: linear-gradient(90deg, var(--uswift-blue) 0%, var(--uswift-navy) 100%);
+}
+
+/* Magical card hover effect: subtle swell + springy transition */
+.card-magic {
+  transition: transform 400ms cubic-bezier(.2,.9,.2,1), box-shadow 300ms ease;
+  will-change: transform, box-shadow;
+}
+.card-magic:hover {
+  transform: translateY(-6px) scale(1.02);
+  box-shadow: 0 20px 30px -10px rgba(0,0,0,0.15), 0 6px 12px -6px rgba(0,0,0,0.08);
+}
+.card-magic:active {
+  transform: translateY(-2px) scale(0.995);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card-magic,
+  .card-magic:hover,
+  .card-magic:active {
+    transition: none;
+    transform: none;
+  }
+}
+
+/* Glowing border variant using pseudo-element */
+.card-magic--glow {
+  position: relative;
+  overflow: visible;
+}
+.card-magic--glow::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: 12px;
+  /* subtle two-stop gradient blending the new accent into the existing purple for depth */
+  background: linear-gradient(90deg, rgba(20,184,166,0.12), rgba(124,58,237,0.08));
+  filter: blur(8px);
+  opacity: 0.65;
+  transition: opacity 300ms ease, transform 400ms cubic-bezier(.2,.9,.2,1);
+  transform: scale(0.985);
+  animation: pulseGlow 3.5s ease-in-out infinite;
+  pointer-events: none;
+}
+.card-magic--glow:hover::before {
+  opacity: 1;
+  transform: scale(1);
+  animation-duration: 2s;
+}
+
+@keyframes pulseGlow {
+  0% { opacity: 0.55; transform: scale(0.985); }
+  50% { opacity: 0.75; transform: scale(0.995); }
+  100% { opacity: 0.55; transform: scale(0.985); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card-magic--glow::before,
+  .card-magic--glow:hover::before {
+    transition: none;
+    transform: none;
+  }
 }

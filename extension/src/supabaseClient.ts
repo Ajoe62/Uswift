@@ -17,44 +17,119 @@ class SupabaseClient {
   }
 
   async signIn(email: string, password: string) {
-    const res = await fetch(
-      `${this.config.url}/auth/v1/token?grant_type=password`,
-      {
+    try {
+      const res = await fetch(
+        `${this.config.url}/auth/v1/token?grant_type=password`,
+        {
+          method: "POST",
+          headers: {
+            apikey: this.config.anonKey,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ email, password }),
+          // ensure CORS mode for clarity (host_permissions should allow this)
+          mode: "cors",
+        }
+      );
+
+      // If network-level failure, fetch will throw and be caught below
+      const data = await res.json().catch(async () => {
+        // If response is not JSON, return raw text
+        const txt = await res.text().catch(() => "");
+        return { error: `HTTP ${res.status} - ${txt}` };
+      });
+
+      // success with token
+      if (res.ok && data && data.access_token) {
+        this.authToken = data.access_token;
+        try {
+          if (data.expires_in)
+            data.expires_at = Date.now() + data.expires_in * 1000;
+        } catch {}
+        await this.saveSession(data);
+        return {
+          ok: true,
+          user: data.user || null,
+          access_token: data.access_token,
+        };
+      }
+
+      // case: sign-in failed or returned structured error
+      const errObj = {
+        status: res.status,
+        message:
+          data?.error || data?.message || data?.msg || `HTTP ${res.status}`,
+        payload: data,
+      };
+      return { ok: false, error: errObj };
+    } catch (err: any) {
+      // Network or CORS error
+      return { ok: false, error: { message: err?.message || String(err) } };
+    }
+  }
+
+  async signUp(email: string, password: string, options: any = {}) {
+    try {
+      const res = await fetch(`${this.config.url}/auth/v1/signup`, {
         method: "POST",
         headers: {
           apikey: this.config.anonKey,
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ email, password }),
-      }
-    );
-    const data = await res.json();
-    if (data.access_token) {
-      this.authToken = data.access_token;
-      await this.saveSession(data);
-    }
-    return data;
-  }
+        body: JSON.stringify({
+          email,
+          password,
+          data: options,
+        }),
+        mode: "cors",
+      });
 
-  async signUp(email: string, password: string, options: any = {}) {
-    const res = await fetch(`${this.config.url}/auth/v1/signup`, {
-      method: "POST",
-      headers: {
-        apikey: this.config.anonKey,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        email,
-        password,
-        data: options,
-      }),
-    });
-    const data = await res.json();
-    if (data.access_token) {
-      this.authToken = data.access_token;
-      await this.saveSession(data);
+      const data = await res.json().catch(async () => {
+        const txt = await res.text().catch(() => "");
+        return { error: `HTTP ${res.status} - ${txt}` };
+      });
+
+      // success with token
+      if (res.ok && data && data.access_token) {
+        this.authToken = data.access_token;
+        try {
+          if (data.expires_in)
+            data.expires_at = Date.now() + data.expires_in * 1000;
+        } catch {}
+        await this.saveSession(data);
+        return {
+          ok: true,
+          user: data.user || null,
+          access_token: data.access_token,
+        };
+      }
+
+      // success but no token (common when email confirmation is required)
+      if (res.ok && data && data.user && !data.access_token) {
+        // Persist a minimal session if available
+        try {
+          await this.saveSession({ user: data.user });
+        } catch {}
+        return {
+          ok: true,
+          user: data.user,
+          message:
+            data?.message ||
+            "Account created. Please check your email to confirm your account.",
+        };
+      }
+
+      // failure
+      const errObj = {
+        status: res.status,
+        message:
+          data?.error || data?.message || data?.msg || `HTTP ${res.status}`,
+        payload: data,
+      };
+      return { ok: false, error: errObj };
+    } catch (err: any) {
+      return { ok: false, error: { message: err?.message || String(err) } };
     }
-    return data;
   }
 
   async getUser() {
@@ -72,14 +147,98 @@ class SupabaseClient {
           apikey: this.config.anonKey,
           Authorization: `Bearer ${this.authToken}`,
         },
+        mode: "cors",
       });
 
-      if (!res.ok) return null;
+      if (!res.ok) {
+        const txt = await res.text().catch(() => "");
+        // parse payload if JSON
+        let payload: any = txt;
+        try {
+          payload = txt ? JSON.parse(txt) : txt;
+        } catch (e) {
+          // leave payload as raw text
+        }
+
+        // try to refresh token on auth errors
+        if (
+          res.status === 401 ||
+          res.status === 403 ||
+          /expired|bad_jwt|invalid token/i.test(txt)
+        ) {
+          const refreshed = await this.tryRefresh();
+          if (refreshed) {
+            const retry = await fetch(`${this.config.url}/auth/v1/user`, {
+              method: "GET",
+              headers: {
+                apikey: this.config.anonKey,
+                Authorization: `Bearer ${this.authToken}`,
+              },
+              mode: "cors",
+            });
+            if (retry.ok) return await retry.json();
+            const rtxt = await retry.text().catch(() => "");
+            console.warn("getUser retry failed", retry.status, rtxt);
+            return {
+              error: {
+                status: retry.status,
+                message: `HTTP ${retry.status}`,
+                payload: rtxt,
+              },
+            };
+          }
+        }
+
+        console.warn("getUser HTTP error", res.status, txt);
+        const msg =
+          (payload && (payload.error || payload.message || payload.msg)) ||
+          `HTTP ${res.status}`;
+        return { error: { status: res.status, message: msg, payload } };
+      }
       return await res.json();
-    } catch (error) {
-      console.error("Error getting user:", error);
+    } catch (error: any) {
+      console.error("Error getting user:", error?.message || error);
       return null;
     }
+  }
+
+  async tryRefresh() {
+    // load session to get refresh token
+    const session = await this.loadSession();
+    const refreshToken = session?.refresh_token;
+    if (!refreshToken) return false;
+    try {
+      const res = await fetch(
+        `${this.config.url}/auth/v1/token?grant_type=refresh_token`,
+        {
+          method: "POST",
+          headers: {
+            apikey: this.config.anonKey,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ refresh_token: refreshToken }),
+          mode: "cors",
+        }
+      );
+      const data = await res.json().catch(async () => {
+        const txt = await res.text().catch(() => "");
+        return { error: `HTTP ${res.status} - ${txt}` };
+      });
+      if (res.ok && data && data.access_token) {
+        this.authToken = data.access_token;
+        try {
+          if (data.expires_in)
+            data.expires_at = Date.now() + data.expires_in * 1000;
+        } catch {}
+        await this.saveSession(data);
+        return true;
+      }
+    } catch (e) {
+      // ignore
+    }
+    await this.clearSession();
+    this.authToken = null;
+    return false;
   }
 
   async signOut() {
@@ -93,6 +252,45 @@ class SupabaseClient {
     });
     this.authToken = null;
     await this.clearSession();
+  }
+
+  async resetPassword(email: string) {
+    try {
+      const res = await fetch(`${this.config.url}/auth/v1/recover`, {
+        method: "POST",
+        headers: {
+          apikey: this.config.anonKey,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email }),
+        mode: "cors",
+      });
+
+      const data = await res.json().catch(async () => {
+        const txt = await res.text().catch(() => "");
+        return { error: `HTTP ${res.status} - ${txt}` };
+      });
+
+      if (res.ok) {
+        return {
+          ok: true,
+          message:
+            data?.message ||
+            "If an account exists, a password reset email has been sent.",
+        };
+      }
+
+      return {
+        ok: false,
+        error: {
+          status: res.status,
+          message: data?.error || data?.message || `HTTP ${res.status}`,
+          payload: data,
+        },
+      };
+    } catch (err: any) {
+      return { ok: false, error: { message: err?.message || String(err) } };
+    }
   }
 
   async saveSession(session: any) {
@@ -171,9 +369,16 @@ class SupabaseClient {
       ...((options.headers as Record<string, string>) || {}),
     };
     if (this.authToken) headers["Authorization"] = `Bearer ${this.authToken}`;
-    const res = await fetch(url, { ...options, headers });
-    if (!res.ok) throw new Error(`Supabase error ${res.status}`);
-    return res.json();
+    try {
+      const res = await fetch(url, { ...options, headers, mode: "cors" });
+      if (!res.ok) {
+        const txt = await res.text().catch(() => "");
+        throw new Error(`Supabase error ${res.status}: ${txt}`);
+      }
+      return await res.json();
+    } catch (err: any) {
+      throw new Error(err?.message || String(err));
+    }
   }
 }
 

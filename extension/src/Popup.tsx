@@ -11,6 +11,19 @@ import { getSupabaseClient } from "./supabaseClient";
 
 export default function Popup() {
   const { user, signOut, isAuthenticated } = useAuth();
+  
+  // Toggle a body class so CSS can change colors for authenticated state
+  useEffect(() => {
+    try {
+      if (isAuthenticated) document.body.classList.add('is-auth');
+      else document.body.classList.remove('is-auth');
+    } catch (e) {
+      // ignore in non-browser environments
+    }
+    return () => {
+      try { document.body.classList.remove('is-auth'); } catch (e) {}
+    };
+  }, [isAuthenticated]);
   const [page, setPage] = useState<"home" | "profile" | "tracker">("home");
   const [profile, setProfile] = useState({
     resume: "",
@@ -68,23 +81,31 @@ export default function Popup() {
   };
 
   // Handler for auto-apply (sends profile data to content script)
+  const [autoStatus, setAutoStatus] = useState<null | { status: string; message?: string; details?: any }>(null);
+  const [lastAutoDetails, setLastAutoDetails] = useState<any>(null);
+
   const handleAutoApply = () => {
+    setAutoStatus({ status: 'pending' });
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs: any) => {
       if (tabs[0]?.id) {
         chrome.tabs.sendMessage(
           tabs[0].id,
-          {
-            type: "AUTO_APPLY",
-            profile,
-          },
+          { type: "AUTO_APPLY", profile },
           (response: any) => {
+            if (!response) {
+              setAutoStatus({ status: 'error', message: 'No response from page (content script missing or blocked).' });
+              return;
+            }
+            setLastAutoDetails(response.details || null);
             if (response?.status === "success") {
-              alert("Auto-apply triggered!");
+              setAutoStatus({ status: 'success', message: `Applied on ${response.jobBoard || 'site'}` , details: response.details});
             } else {
-              alert("Failed to auto-apply.");
+              setAutoStatus({ status: 'error', message: response?.message || 'Auto-apply failed', details: response.details });
             }
           }
         );
+      } else {
+        setAutoStatus({ status: 'error', message: 'No active tab found.' });
       }
     });
   };
@@ -251,6 +272,21 @@ export default function Popup() {
         >
           Auto-Apply to Job
         </button>
+        {autoStatus && (
+          <div style={{ marginTop: 12, textAlign: 'center' }}>
+            {autoStatus.status === 'pending' && <div style={{ color: '#6B7280' }}>Applying…</div>}
+            {autoStatus.status === 'success' && <div style={{ color: '#10B981' }}>{autoStatus.message}</div>}
+            {autoStatus.status === 'error' && (
+              <div>
+                <div style={{ color: '#DC2626' }}>{autoStatus.message}</div>
+                <button className="uswift-btn" style={{ marginTop: 8 }} onClick={handleAutoApply}>Retry</button>
+                {lastAutoDetails && (
+                  <pre style={{ textAlign: 'left', maxHeight: 120, overflow: 'auto', fontSize: 11, background: '#F3F4F6', padding: 8, borderRadius: 6, marginTop: 8 }}>{JSON.stringify(lastAutoDetails, null, 2)}</pre>
+                )}
+              </div>
+            )}
+          </div>
+        )}
         <div style={{ display: "flex", gap: 8, marginTop: 8 }}>
           <button
             className="uswift-btn"

@@ -7,9 +7,10 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        uswiftBlue: '#1cb5e0',
-        uswiftNavy: '#000851',
-        uswiftPurple: '#6d28d9',
+  uswiftBlue: '#1cb5e0',
+  uswiftNavy: '#000851',
+  uswiftPurple: '#6d28d9',
+  "uswift-accent": '#14b8a6',
       },
       backgroundImage: {
         'uswift-gradient': 'linear-gradient(90deg, #1cb5e0 0%, #000851 100%)',

@@ -3,6 +3,8 @@
 
 console.log("Uswift content script loaded");
 
+import { ADAPTERS } from "./adapters";
+
 // Define interface for job board selectors
 interface JobBoardSelectors {
   applyButton: string;
@@ -87,6 +89,8 @@ function autoFillForm(profile: Profile, jobBoard: string): boolean {
   if (!selectors) return false;
 
   try {
+    // Debug: log which selectors are available and whether they match
+    debugSelectors(selectors);
     // Fill name fields
     if (selectors.nameField && profile.firstName) {
       const nameField = document.querySelector(
@@ -152,9 +156,89 @@ async function handleFileUploads(
   console.log("File upload handling would go here");
 }
 
+// Debug helper: test whether selectors match and log results
+function debugSelectors(selectors: JobBoardSelectors) {
+  try {
+    console.log("debugSelectors:", selectors);
+    [
+      "nameField",
+      "lastNameField",
+      "emailField",
+      "phoneField",
+      "resumeField",
+      "coverLetterField",
+      "applyButton",
+    ].forEach((k: any) => {
+      const sel = (selectors as any)[k];
+      if (!sel) {
+        console.log(k, "no selector");
+        return;
+      }
+      try {
+        const el = document.querySelector(sel);
+        console.log(k, sel, !!el, el);
+      } catch (e) {
+        console.warn("selector check failed", k, sel, e);
+      }
+    });
+  } catch (e) {
+    console.warn("debugSelectors failed", e);
+  }
+}
+
+// Wait for selector to appear using MutationObserver (timeout in ms)
+function waitForSelector(sel: string, timeout = 3000): Promise<Element | null> {
+  return new Promise((resolve) => {
+    const el = document.querySelector(sel);
+    if (el) return resolve(el);
+    const obs = new MutationObserver((mutations, observer) => {
+      const found = document.querySelector(sel);
+      if (found) {
+        observer.disconnect();
+        resolve(found);
+      }
+    });
+    obs.observe(document.documentElement || document.body, {
+      childList: true,
+      subtree: true,
+    });
+    setTimeout(() => {
+      try {
+        obs.disconnect();
+      } catch (e) {}
+      resolve(null);
+    }, timeout);
+  });
+}
+
+// Attempt to click the apply button if present; returns true if clicked
+async function clickApplyIfPossible(selectors: JobBoardSelectors) {
+  try {
+    const applySel = selectors.applyButton;
+    if (!applySel) return false;
+    let btn = document.querySelector(applySel) as HTMLElement | null;
+    if (!btn) {
+      // Wait briefly for dynamic injection
+      btn = (await waitForSelector(applySel, 2000)) as HTMLElement | null;
+    }
+    if (btn) {
+      try {
+        btn.click();
+      } catch (e) {
+        btn.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+      }
+      console.log("Clicked apply button", applySel, btn);
+      return true;
+    }
+  } catch (e) {
+    console.warn("clickApplyIfPossible failed", e);
+  }
+  return false;
+}
+
 // Listen for messages from popup
 chrome.runtime.onMessage.addListener(
-  (
+  async (
     message: any,
     sender: chrome.runtime.MessageSender,
     sendResponse: (response: any) => void
@@ -169,14 +253,101 @@ chrome.runtime.onMessage.addListener(
       }
 
       // Auto-fill the form
-      const success = autoFillForm(message.profile, jobBoard);
+      // Use adapter if present (more robust board-specific logic)
+      const details: any = {
+        adapter: !!ADAPTERS[jobBoard],
+        clickedApply: false,
+      };
+      let success = false;
+      if (ADAPTERS[jobBoard] && ADAPTERS[jobBoard].fillForm) {
+        try {
+          const r = await ADAPTERS[jobBoard].fillForm!(message.profile);
+          success = !!(r && r.success);
+          details.adapterResult = r;
+        } catch (e) {
+          details.adapterError = e;
+        }
+      }
+
+      // Fallback to generic selector-based autofill
+      if (!success) {
+        const generic = autoFillForm(message.profile, jobBoard);
+        success = generic;
+        details.fallbackUsed = true;
+      }
+
+      if (success) {
+        // Try adapter file upload first
+        if (ADAPTERS[jobBoard] && ADAPTERS[jobBoard].handleFileUpload) {
+          try {
+            details.fileResult = await ADAPTERS[jobBoard].handleFileUpload!(
+              message.profile
+            );
+          } catch (e) {
+            details.fileError = e;
+          }
+        } else {
+          try {
+            await handleFileUploads(message.profile, jobBoard);
+          } catch (e) {
+            console.warn("file upload failed", e);
+            details.fileError = e;
+          }
+        }
+
+        // Attempt to click apply via adapter or generic click
+        if (ADAPTERS[jobBoard] && ADAPTERS[jobBoard].clickApply) {
+          try {
+            const ar = await ADAPTERS[jobBoard].clickApply!();
+            details.clickedApply = !!ar.success;
+            details.adapterClick = ar;
+          } catch (e) {
+            details.adapterClickError = e;
+          }
+        } else {
+          try {
+            const clicked = await clickApplyIfPossible(
+              JOB_BOARD_SELECTORS[jobBoard]
+            );
+            details.clickedApply = clicked;
+          } catch (e) {
+            console.warn("click attempt failed", e);
+            details.clickError = e;
+          }
+        }
+
+        sendResponse({ status: "success", jobBoard, details });
+      } else {
+        sendResponse({
+          status: "error",
+          message: "Failed to auto-fill form",
+          details,
+        });
+      }
 
       if (success) {
         // Handle file uploads if needed
-        handleFileUploads(message.profile, jobBoard);
-        sendResponse({ status: "success", jobBoard });
+        try {
+          await handleFileUploads(message.profile, jobBoard);
+        } catch (e) {
+          console.warn("file upload failed", e);
+        }
+        // Attempt to click apply automatically when possible
+        try {
+          const clicked = await clickApplyIfPossible(
+            JOB_BOARD_SELECTORS[jobBoard]
+          );
+          details.clickedApply = clicked;
+        } catch (e) {
+          console.warn("click attempt failed", e);
+        }
+        sendResponse({ status: "success", jobBoard, details });
       } else {
-        sendResponse({ status: "error", message: "Failed to auto-fill form" });
+        sendResponse({
+          status: "error",
+          message: "Failed to auto-fill form",
+          details,
+        });
       }
     }
   }

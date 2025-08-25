@@ -25,7 +25,7 @@ export default function ForgotPasswordPage() {
   <Input type="email" placeholder="Email" value={email} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)} required />
         <Button type="submit" disabled={loading}>{loading ? 'Sending...' : 'Send Reset Email'}</Button>
       </form>
-      {message && <div className="mt-4 text-center text-uswift-purple">{message}</div>}
+  {message && <div className="mt-4 text-center text-uswift-accent">{message}</div>}
       <div className="mt-6 text-center">
         <a href="/auth/signin" className="text-uswift-blue hover:underline">Back to Sign In</a>
       </div>

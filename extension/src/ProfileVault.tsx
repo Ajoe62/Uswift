@@ -7,6 +7,11 @@ import { useAuth } from './hooks/useAuth';
 declare const supabase: any;
 
 export default function ProfileVault() {
+  // Normalize thrown values so we never throw non-Error values (like Events)
+  const throwNormalized = (err: any) => {
+    if (err instanceof Error) throw err;
+    throw new Error(String(err));
+  };
   const { user, isAuthenticated } = useAuth();
   const [resume, setResume] = useState('');
   const [coverLetter, setCoverLetter] = useState('');
@@ -34,7 +39,7 @@ export default function ProfileVault() {
         .select('*')
         .eq('user_id', user.id);
       
-      if (error) throw error;
+  if (error) throwNormalized(error);
       
       // Find different types of documents
       const resumeDoc = resumes?.find((r: any) => r.type === 'resume');
@@ -102,7 +107,7 @@ export default function ProfileVault() {
             onConflict: 'user_id,type'
           });
         
-        if (resumeError) throw resumeError;
+    if (resumeError) throwNormalized(resumeError);
       }
       
       // Save cover letter
@@ -119,7 +124,7 @@ export default function ProfileVault() {
             onConflict: 'user_id,type'
           });
         
-        if (coverError) throw coverError;
+  if (coverError) throwNormalized(coverError);
       }
       
       // Save Q&A profile in user preferences
@@ -134,7 +139,7 @@ export default function ProfileVault() {
             onConflict: 'user_id'
           });
         
-        if (qaError) throw qaError;
+  if (qaError) throwNormalized(qaError);
       }
       
       alert('Profile saved to cloud!');

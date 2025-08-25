@@ -18,6 +18,11 @@ interface JobApplication {
 }
 
 const JobTracker: React.FC = () => {
+  // Normalize thrown values so we never throw non-Error values (like Events)
+  const throwNormalized = (err: any) => {
+    if (err instanceof Error) throw err;
+    throw new Error(String(err));
+  };
   const { user, isAuthenticated } = useAuth
     ? useAuth()
     : { user: null, isAuthenticated: false };
@@ -54,7 +59,7 @@ const JobTracker: React.FC = () => {
         .select("*")
         .eq("user_id", user.id)
         .order("applied_date", { ascending: false });
-      if (error) throw error;
+      if (error) throwNormalized(error);
       const formattedApps =
         apps?.map((app: any) => ({
           id: app.id,
@@ -108,14 +113,14 @@ const JobTracker: React.FC = () => {
           .from("job_applications")
           .update(appData)
           .eq("id", application.id);
-        if (error) throw error;
+        if (error) throwNormalized(error);
       } else {
         const { data, error } = await supabase
           .from("job_applications")
           .insert([appData])
           .select()
           .single();
-        if (error) throw error;
+        if (error) throwNormalized(error);
         return data.id;
       }
       return true;
@@ -193,7 +198,7 @@ const JobTracker: React.FC = () => {
           .from("job_applications")
           .delete()
           .eq("id", id);
-        if (error) throw error;
+        if (error) throwNormalized(error);
       } catch (error) {
         console.error("Error deleting from Supabase:", error);
       }

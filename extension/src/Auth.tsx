@@ -3,8 +3,15 @@ import { useAuth } from "./hooks/useAuth";
 import "./index.css";
 
 export default function Auth() {
-  const { signIn, signUp, loading: authLoading } = useAuth();
+  const {
+    signIn,
+    signUp,
+    loading: authLoading,
+    pending,
+    resetPassword,
+  } = useAuth();
   const [isSignUp, setIsSignUp] = useState(false);
+  const [isForgot, setIsForgot] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
@@ -19,37 +26,47 @@ export default function Auth() {
     setSubmitting(true);
 
     try {
-      let result;
+      let result: any;
       if (isSignUp) {
         result = await signUp(email, password, { full_name: fullName });
+      } else if (isForgot) {
+        result = await resetPassword(email);
       } else {
         result = await signIn(email, password);
       }
 
-      if (result.error) {
-        let errorMessage = "An error occurred";
-        if (typeof result.error === "string") {
-          errorMessage = result.error;
-        } else if (result.error && typeof result.error === "object") {
-          errorMessage =
-            (result.error as any).message || result.error.toString();
+      if (result && result.error) {
+        // Prefer structured payload messages when available
+        let errorMessage = "An error occurred. Please try again.";
+        if (typeof result.error === "string") errorMessage = result.error;
+        else if (result.error.message) errorMessage = result.error.message;
+        else if (result.error.payload) {
+          const p = result.error.payload;
+          if (typeof p === "string") errorMessage = p;
+          else if (p?.errors && Array.isArray(p.errors))
+            errorMessage = p.errors.map((x: any) => x.message || x).join("; ");
+          else if (p?.details) errorMessage = p.details;
+          else errorMessage = JSON.stringify(p);
         }
-        setError(errorMessage);
-      } else if (result.user) {
-        // Success! Show green notification
-        setSuccess(
-          isSignUp
-            ? "✅ Account created successfully!"
-            : "✅ Signed in successfully!"
-        );
-        // Clear form
+        setError(errorMessage || "An error occurred. Please try again.");
+      } else if (result && (result.user || result.message)) {
+        // Show server-provided message if present (useful for 'check your email')
+        if (result.message) setSuccess(result.message);
+        else
+          setSuccess(
+            isSignUp
+              ? "\u2705 Account created successfully!"
+              : "\u2705 Signed in successfully!"
+          );
+        // Clear form fields
         setEmail("");
         setPassword("");
         setFullName("");
-        // The useAuth hook will automatically update and redirect to main app
+      } else {
+        setError("An unexpected error occurred. Please try again.");
       }
     } catch (err: any) {
-      setError(err.message || "An error occurred");
+      setError(err?.message || "An error occurred. Please try again.");
     } finally {
       setSubmitting(false);
     }
@@ -160,22 +177,33 @@ export default function Auth() {
           required
         />
 
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          style={{
-            width: "100%",
-            marginBottom: 16,
-            borderRadius: 8,
-            border: "1px solid #E5E7EB",
-            padding: 12,
-            fontSize: "1rem",
-            transition: "all 0.2s ease",
-          }}
-          required
-        />
+        {!isForgot && (
+          <input
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            style={{
+              width: "100%",
+              marginBottom: 16,
+              borderRadius: 8,
+              border: "1px solid #E5E7EB",
+              padding: 12,
+              fontSize: "1rem",
+              transition: "all 0.2s ease",
+            }}
+            required
+          />
+        )}
+
+        {isForgot && (
+          <div
+            style={{ fontSize: "0.9rem", color: "#6B7280", marginBottom: 12 }}
+          >
+            Enter your email and we'll send a password reset link if an account
+            exists.
+          </div>
+        )}
 
         {error && (
           <div
@@ -207,6 +235,13 @@ export default function Auth() {
             }}
           >
             {success}
+            {pending && (
+              <div
+                style={{ fontSize: "0.85rem", color: "#065F46", marginTop: 8 }}
+              >
+                Verifying account... this may take a few seconds.
+              </div>
+            )}
           </div>
         )}
 
@@ -246,6 +281,46 @@ export default function Auth() {
             ? "Sign Up"
             : "Sign In"}
         </button>
+
+        <div style={{ textAlign: "center", marginTop: 8 }}>
+          {!isForgot ? (
+            <button
+              type="button"
+              onClick={() => {
+                setIsForgot(true);
+                setError("");
+                setSuccess("");
+              }}
+              style={{
+                background: "none",
+                border: "none",
+                color: "#6D28D9",
+                cursor: "pointer",
+                textDecoration: "underline",
+              }}
+            >
+              Forgot password?
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={() => {
+                setIsForgot(false);
+                setError("");
+                setSuccess("");
+              }}
+              style={{
+                background: "none",
+                border: "none",
+                color: "#6D28D9",
+                cursor: "pointer",
+                textDecoration: "underline",
+              }}
+            >
+              Back to sign in
+            </button>
+          )}
+        </div>
       </form>
 
       <p style={{ textAlign: "center", color: "#4B5563" }}>

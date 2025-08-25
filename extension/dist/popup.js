@@ -504,13 +504,19 @@ const index = '';
 function useAuth() {
   const [user, setUser] = reactExports.useState(null);
   const [loading, setLoading] = reactExports.useState(true);
+  const [pending, setPending] = reactExports.useState(false);
   reactExports.useEffect(() => {
     const loadUser = async () => {
       try {
         const supabase = getSupabaseClient();
         if (supabase) {
           const currentUser = await supabase.getUser();
-          setUser(currentUser);
+          if (currentUser && !currentUser.error) {
+            setUser(currentUser);
+          } else if (currentUser?.error) {
+            console.warn("loadUser - getUser error", currentUser.error);
+            setUser(null);
+          }
         }
       } catch (error) {
         console.error("Error loading user:", error);
@@ -518,44 +524,116 @@ function useAuth() {
         setLoading(false);
       }
     };
-    setTimeout(loadUser, 500);
+    loadUser().catch(() => {
+      setTimeout(loadUser, 300);
+    });
   }, []);
   const signIn = async (email, password) => {
+    if (!email || !password)
+      return { user: null, error: "Please enter your email and password." };
     try {
       const supabase = getSupabaseClient();
       if (!supabase) {
-        throw new Error("Supabase not initialized");
+        return { user: null, error: "Auth service unavailable. Try again later." };
       }
       const result = await supabase.signIn(email, password);
-      if (result.access_token) {
-        const user2 = { id: result.user?.id || "user", email };
-        setUser(user2);
-        return { user: user2, error: null };
-      } else if (result.error) {
-        throw new Error(result.error);
+      if (result.ok) {
+        setPending(true);
+        for (let i = 0; i < 6; i++) {
+          const userProfile = await supabase.getUser();
+          if (userProfile && !userProfile.error) {
+            setUser(userProfile);
+            setPending(false);
+            return { user: userProfile, error: null };
+          }
+          if (userProfile?.error) {
+            const e = userProfile.error;
+            setPending(false);
+            const friendly = e?.message || e?.payload && JSON.stringify(e.payload) || "Authentication failed. Please sign in again.";
+            return { user: null, error: friendly };
+          }
+          await new Promise((r) => setTimeout(r, 500));
+        }
+        setPending(false);
+        return { user: null, error: "Signed in, but verification timed out. Please try again." };
       }
-      return { user: null, error: "Sign in failed" };
+      if (result.error) {
+        const payload = result.error.payload;
+        const rawMsg = result.error.message || result.error.msg || String(result.error);
+        const candidate = function extract() {
+          if (!payload)
+            return rawMsg;
+          if (typeof payload === "string")
+            return payload;
+          if (Array.isArray(payload?.errors))
+            return payload.errors.map((x) => x?.message || x).join("; ");
+          return payload?.error || payload?.message || payload?.msg || JSON.stringify(payload);
+        }();
+        const msg = candidate || rawMsg;
+        if (/invalid/i.test(msg) || /password/i.test(msg))
+          return { user: null, error: "Invalid email or password." };
+        if (/not found|user not found/i.test(msg))
+          return { user: null, error: "No account found for that email." };
+        return { user: null, error: msg || "Sign in failed. Please try again." };
+      }
+      return { user: null, error: "Sign in failed. Please try again." };
     } catch (error) {
-      return { user: null, error };
+      return { user: null, error: error?.message || "Sign in failed. Please try again." };
     }
   };
   const signUp = async (email, password, metadata = {}) => {
+    if (!email || !password)
+      return { user: null, error: "Please enter an email and a password." };
+    if (password.length < 6)
+      return { user: null, error: "Password must be at least 6 characters." };
     try {
       const supabase = getSupabaseClient();
-      if (!supabase) {
-        throw new Error("Supabase not initialized");
+      if (!supabase)
+        return { user: null, error: "Auth service unavailable. Try again later." };
+      const result = await supabase.signUp(email, password, metadata);
+      if (result.ok) {
+        if (result.access_token) {
+          setPending(true);
+          for (let i = 0; i < 6; i++) {
+            const userProfile = await supabase.getUser();
+            if (userProfile) {
+              setUser(userProfile);
+              setPending(false);
+              return { user: userProfile, error: null };
+            }
+            await new Promise((r) => setTimeout(r, 500));
+          }
+          setPending(false);
+          return { user: null, error: "Account created, but verification timed out. Please check your email." };
+        }
+        return { user: result.user || null, error: null, message: result.message || "Account created. Check your email to confirm." };
       }
-      const result = await supabase.signIn(email, password);
-      if (result.access_token) {
-        const user2 = { id: result.user?.id || "user", email };
-        setUser(user2);
-        return { user: user2, error: null };
-      } else if (result.error) {
-        throw new Error(result.error);
+      if (result.error) {
+        const payload = result.error.payload;
+        const rawMsg = result.error.message || result.error.msg || String(result.error);
+        const candidate = function extract() {
+          if (!payload)
+            return rawMsg;
+          if (typeof payload === "string")
+            return payload;
+          if (Array.isArray(payload?.errors))
+            return payload.errors.map((x) => x?.message || x).join("; ");
+          if (payload?.details)
+            return payload.details;
+          return payload?.error || payload?.message || payload?.msg || JSON.stringify(payload);
+        }();
+        const msg = candidate || rawMsg;
+        if (/invalid email/i.test(msg) || /email/i.test(msg) && /invalid/i.test(msg))
+          return { user: null, error: "Please provide a valid email address." };
+        if (/password/i.test(msg) && /weak|short/i.test(msg))
+          return { user: null, error: "Password is too weak. Try a longer password." };
+        if (/already exists|duplicate|user exists/i.test(msg))
+          return { user: null, error: "An account with that email already exists. Try signing in." };
+        return { user: null, error: msg || "Sign up failed. Please try again." };
       }
-      return { user: null, error: "Sign up failed" };
+      return { user: null, error: "Sign up failed. Please try again." };
     } catch (error) {
-      return { user: null, error };
+      return { user: null, error: error?.message || "Sign up failed. Please try again." };
     }
   };
   const signOut = async () => {
@@ -569,17 +647,43 @@ function useAuth() {
       console.error("Error signing out:", error);
     }
   };
+  const resetPassword = async (email) => {
+    if (!email)
+      return { ok: false, error: "Please enter your email." };
+    try {
+      const supabase = getSupabaseClient();
+      if (!supabase)
+        return { ok: false, error: "Auth service unavailable. Try again later." };
+      const result = await supabase.resetPassword(email);
+      if (result.ok)
+        return { ok: true, message: result.message };
+      if (result.error) {
+        const msg = result.error.message || JSON.stringify(result.error.payload || result.error);
+        return { ok: false, error: msg };
+      }
+      return { ok: false, error: "Failed to request password reset." };
+    } catch (error) {
+      return { ok: false, error: error?.message || "Failed to request password reset." };
+    }
+  };
   return {
     user,
     loading,
+    pending,
     signIn,
     signUp,
+    resetPassword,
     signOut,
     isAuthenticated: !!user
   };
 }
 
 function ProfileVault() {
+  const throwNormalized = (err) => {
+    if (err instanceof Error)
+      throw err;
+    throw new Error(String(err));
+  };
   const { user, isAuthenticated } = useAuth();
   const [resume, setResume] = reactExports.useState("");
   const [coverLetter, setCoverLetter] = reactExports.useState("");
@@ -599,7 +703,7 @@ function ProfileVault() {
       setLoading(true);
       const { data: resumes, error } = await supabase.from("resumes").select("*").eq("user_id", user.id);
       if (error)
-        throw error;
+        throwNormalized(error);
       const resumeDoc = resumes?.find((r) => r.type === "resume");
       const coverLetterDoc = resumes?.find((r) => r.type === "cover_letter");
       if (resumeDoc)
@@ -652,7 +756,7 @@ function ProfileVault() {
           onConflict: "user_id,type"
         });
         if (resumeError)
-          throw resumeError;
+          throwNormalized(resumeError);
       }
       if (coverLetter.trim()) {
         const { error: coverError } = await supabase.from("resumes").upsert({
@@ -665,7 +769,7 @@ function ProfileVault() {
           onConflict: "user_id,type"
         });
         if (coverError)
-          throw coverError;
+          throwNormalized(coverError);
       }
       if (qaProfile.trim()) {
         const { error: qaError } = await supabase.from("user_preferences").upsert({
@@ -676,7 +780,7 @@ function ProfileVault() {
           onConflict: "user_id"
         });
         if (qaError)
-          throw qaError;
+          throwNormalized(qaError);
       }
       alert("Profile saved to cloud!");
     } catch (error) {
@@ -779,6 +883,11 @@ function ProfileVault() {
 }
 
 const JobTracker = () => {
+  const throwNormalized = (err) => {
+    if (err instanceof Error)
+      throw err;
+    throw new Error(String(err));
+  };
   const { user, isAuthenticated } = useAuth ? useAuth() : { user: null, isAuthenticated: false };
   const [applications, setApplications] = reactExports.useState([]);
   const [searchTerm, setSearchTerm] = reactExports.useState("");
@@ -809,7 +918,7 @@ const JobTracker = () => {
       setLoading(true);
       const { data: apps, error } = await supabase.from("job_applications").select("*").eq("user_id", user.id).order("applied_date", { ascending: false });
       if (error)
-        throw error;
+        throwNormalized(error);
       const formattedApps = apps?.map((app) => ({
         id: app.id,
         company: app.company,
@@ -855,11 +964,11 @@ const JobTracker = () => {
       if (application.id) {
         const { error } = await supabase.from("job_applications").update(appData).eq("id", application.id);
         if (error)
-          throw error;
+          throwNormalized(error);
       } else {
         const { data, error } = await supabase.from("job_applications").insert([appData]).select().single();
         if (error)
-          throw error;
+          throwNormalized(error);
         return data.id;
       }
       return true;
@@ -928,7 +1037,7 @@ const JobTracker = () => {
       try {
         const { error } = await supabase.from("job_applications").delete().eq("id", id);
         if (error)
-          throw error;
+          throwNormalized(error);
       } catch (error) {
         console.error("Error deleting from Supabase:", error);
       }
@@ -1517,108 +1626,369 @@ const JobTracker = () => {
 };
 
 function Auth() {
-  const { signIn, signUp, loading } = useAuth();
+  const { signIn, signUp, loading: authLoading, pending, resetPassword } = useAuth();
   const [isSignUp, setIsSignUp] = reactExports.useState(false);
+  const [isForgot, setIsForgot] = reactExports.useState(false);
   const [email, setEmail] = reactExports.useState("");
   const [password, setPassword] = reactExports.useState("");
   const [fullName, setFullName] = reactExports.useState("");
   const [error, setError] = reactExports.useState("");
+  const [success, setSuccess] = reactExports.useState("");
+  const [submitting, setSubmitting] = reactExports.useState(false);
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
+    setSuccess("");
+    setSubmitting(true);
     try {
       let result;
       if (isSignUp) {
         result = await signUp(email, password, { full_name: fullName });
+      } else if (isForgot) {
+        result = await resetPassword(email);
       } else {
         result = await signIn(email, password);
       }
-      if (result.error) {
-        let errorMessage = "An error occurred";
-        if (typeof result.error === "string") {
+      if (result && result.error) {
+        let errorMessage = "An error occurred. Please try again.";
+        if (typeof result.error === "string")
           errorMessage = result.error;
-        } else if (result.error && typeof result.error === "object") {
-          errorMessage = result.error.message || result.error.toString();
+        else if (result.error.message)
+          errorMessage = result.error.message;
+        else if (result.error.payload) {
+          const p = result.error.payload;
+          if (typeof p === "string")
+            errorMessage = p;
+          else if (p?.errors && Array.isArray(p.errors))
+            errorMessage = p.errors.map((x) => x.message || x).join("; ");
+          else if (p?.details)
+            errorMessage = p.details;
+          else
+            errorMessage = JSON.stringify(p);
         }
-        setError(errorMessage);
+        setError(errorMessage || "An error occurred. Please try again.");
+      } else if (result && (result.user || result.message)) {
+        if (result.message)
+          setSuccess(result.message);
+        else
+          setSuccess(isSignUp ? "✅ Account created successfully!" : "✅ Signed in successfully!");
+        setEmail("");
+        setPassword("");
+        setFullName("");
+      } else {
+        setError("An unexpected error occurred. Please try again.");
       }
     } catch (err) {
-      setError(err.message || "An error occurred");
+      setError(err?.message || "An error occurred. Please try again.");
+    } finally {
+      setSubmitting(false);
     }
   };
-  if (loading) {
-    return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { style: { padding: "2rem", textAlign: "center" }, children: /* @__PURE__ */ jsxRuntimeExports.jsx("p", { children: "Loading..." }) });
+  if (authLoading) {
+    return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { style: { padding: "2rem", textAlign: "center" }, children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
+      "div",
+      {
+        style: {
+          background: "#FFFFFF",
+          borderRadius: "1.5rem",
+          padding: "2rem",
+          minWidth: 350
+        },
+        children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            "div",
+            {
+              className: "uswift-gradient",
+              style: { height: 8, borderRadius: 8, marginBottom: 24 }
+            }
+          ),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(
+            "div",
+            {
+              style: {
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: 12
+              },
+              children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  "div",
+                  {
+                    style: {
+                      width: 20,
+                      height: 20,
+                      border: "2px solid #6D28D9",
+                      borderTop: "2px solid transparent",
+                      borderRadius: "50%",
+                      animation: "spin 1s linear infinite"
+                    }
+                  }
+                ),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("p", { style: { margin: 0, color: "#6D28D9", fontWeight: 600 }, children: "Initializing..." })
+              ]
+            }
+          )
+        ]
+      }
+    ) });
   }
-  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { background: "#FFFFFF", borderRadius: "1.5rem", padding: "2rem", minWidth: 350 }, children: [
-    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "uswift-gradient", style: { height: 8, borderRadius: 8, marginBottom: 24 } }),
-    /* @__PURE__ */ jsxRuntimeExports.jsx("h2", { style: { fontSize: "1.4rem", fontWeight: 700, color: "#111827", marginBottom: 16, textAlign: "center" }, children: isSignUp ? "Sign Up for Uswift" : "Sign In to Uswift" }),
-    /* @__PURE__ */ jsxRuntimeExports.jsxs("form", { onSubmit: handleSubmit, children: [
-      isSignUp && /* @__PURE__ */ jsxRuntimeExports.jsx(
-        "input",
-        {
-          type: "text",
-          placeholder: "Full Name",
-          value: fullName,
-          onChange: (e) => setFullName(e.target.value),
-          style: { width: "100%", marginBottom: 12, borderRadius: 8, border: "1px solid #E5E7EB", padding: 12 },
-          required: true
-        }
-      ),
-      /* @__PURE__ */ jsxRuntimeExports.jsx(
-        "input",
-        {
-          type: "email",
-          placeholder: "Email",
-          value: email,
-          onChange: (e) => setEmail(e.target.value),
-          style: { width: "100%", marginBottom: 12, borderRadius: 8, border: "1px solid #E5E7EB", padding: 12 },
-          required: true
-        }
-      ),
-      /* @__PURE__ */ jsxRuntimeExports.jsx(
-        "input",
-        {
-          type: "password",
-          placeholder: "Password",
-          value: password,
-          onChange: (e) => setPassword(e.target.value),
-          style: { width: "100%", marginBottom: 16, borderRadius: 8, border: "1px solid #E5E7EB", padding: 12 },
-          required: true
-        }
-      ),
-      error && /* @__PURE__ */ jsxRuntimeExports.jsx("p", { style: { color: "#DC2626", fontSize: "0.9rem", marginBottom: 12 }, children: error }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx("button", { type: "submit", className: "uswift-btn", style: { width: "100%", marginBottom: 16 }, children: isSignUp ? "Sign Up" : "Sign In" })
-    ] }),
-    /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { style: { textAlign: "center", color: "#4B5563" }, children: [
-      isSignUp ? "Already have an account?" : "Don't have an account?",
-      " ",
-      /* @__PURE__ */ jsxRuntimeExports.jsx(
-        "button",
-        {
-          onClick: () => setIsSignUp(!isSignUp),
-          style: { background: "none", border: "none", color: "#6D28D9", textDecoration: "underline", cursor: "pointer" },
-          children: isSignUp ? "Sign In" : "Sign Up"
-        }
-      )
-    ] })
-  ] });
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs(
+    "div",
+    {
+      style: {
+        background: "#FFFFFF",
+        borderRadius: "1.5rem",
+        padding: "2rem",
+        minWidth: 350
+      },
+      children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          "div",
+          {
+            className: "uswift-gradient",
+            style: { height: 8, borderRadius: 8, marginBottom: 24 }
+          }
+        ),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          "h2",
+          {
+            style: {
+              fontSize: "1.4rem",
+              fontWeight: 700,
+              color: "#111827",
+              marginBottom: 16,
+              textAlign: "center"
+            },
+            children: isSignUp ? "Sign Up for Uswift" : "Sign In to Uswift"
+          }
+        ),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("form", { onSubmit: handleSubmit, children: [
+          isSignUp && /* @__PURE__ */ jsxRuntimeExports.jsx(
+            "input",
+            {
+              type: "text",
+              placeholder: "Full Name",
+              value: fullName,
+              onChange: (e) => setFullName(e.target.value),
+              style: {
+                width: "100%",
+                marginBottom: 12,
+                borderRadius: 8,
+                border: "1px solid #E5E7EB",
+                padding: 12,
+                fontSize: "1rem",
+                transition: "all 0.2s ease"
+              },
+              required: true
+            }
+          ),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            "input",
+            {
+              type: "email",
+              placeholder: "Email",
+              value: email,
+              onChange: (e) => setEmail(e.target.value),
+              style: {
+                width: "100%",
+                marginBottom: 12,
+                borderRadius: 8,
+                border: "1px solid #E5E7EB",
+                padding: 12,
+                fontSize: "1rem",
+                transition: "all 0.2s ease"
+              },
+              required: true
+            }
+          ),
+          !isForgot && /* @__PURE__ */ jsxRuntimeExports.jsx(
+            "input",
+            {
+              type: "password",
+              placeholder: "Password",
+              value: password,
+              onChange: (e) => setPassword(e.target.value),
+              style: {
+                width: "100%",
+                marginBottom: 16,
+                borderRadius: 8,
+                border: "1px solid #E5E7EB",
+                padding: 12,
+                fontSize: "1rem",
+                transition: "all 0.2s ease"
+              },
+              required: true
+            }
+          ),
+          isForgot && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { style: { fontSize: "0.9rem", color: "#6B7280", marginBottom: 12 }, children: "Enter your email and we'll send a password reset link if an account exists." }),
+          error && /* @__PURE__ */ jsxRuntimeExports.jsx(
+            "div",
+            {
+              style: {
+                color: "#DC2626",
+                fontSize: "0.9rem",
+                marginBottom: 12,
+                padding: "8px 12px",
+                background: "#FEF2F2",
+                border: "1px solid #FECACA",
+                borderRadius: 6
+              },
+              children: error
+            }
+          ),
+          success && /* @__PURE__ */ jsxRuntimeExports.jsxs(
+            "div",
+            {
+              style: {
+                color: "#059669",
+                fontSize: "0.9rem",
+                marginBottom: 12,
+                padding: "8px 12px",
+                background: "#ECFDF5",
+                border: "1px solid #A7F3D0",
+                borderRadius: 6,
+                animation: "fadeIn 0.3s ease-in"
+              },
+              children: [
+                success,
+                pending && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { style: { fontSize: "0.85rem", color: "#065F46", marginTop: 8 }, children: "Verifying account... this may take a few seconds." })
+              ]
+            }
+          ),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(
+            "button",
+            {
+              type: "submit",
+              className: "uswift-btn",
+              disabled: submitting,
+              style: {
+                width: "100%",
+                marginBottom: 16,
+                opacity: submitting ? 0.7 : 1,
+                cursor: submitting ? "not-allowed" : "pointer",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: 8,
+                transition: "all 0.2s ease"
+              },
+              children: [
+                submitting && /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  "div",
+                  {
+                    style: {
+                      width: 16,
+                      height: 16,
+                      border: "2px solid #ffffff",
+                      borderTop: "2px solid transparent",
+                      borderRadius: "50%",
+                      animation: "spin 1s linear infinite"
+                    }
+                  }
+                ),
+                submitting ? isSignUp ? "Creating Account..." : "Signing In..." : isSignUp ? "Sign Up" : "Sign In"
+              ]
+            }
+          ),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { style: { textAlign: "center", marginTop: 8 }, children: !isForgot ? /* @__PURE__ */ jsxRuntimeExports.jsx(
+            "button",
+            {
+              type: "button",
+              onClick: () => {
+                setIsForgot(true);
+                setError("");
+                setSuccess("");
+              },
+              style: { background: "none", border: "none", color: "#6D28D9", cursor: "pointer", textDecoration: "underline" },
+              children: "Forgot password?"
+            }
+          ) : /* @__PURE__ */ jsxRuntimeExports.jsx(
+            "button",
+            {
+              type: "button",
+              onClick: () => {
+                setIsForgot(false);
+                setError("");
+                setSuccess("");
+              },
+              style: { background: "none", border: "none", color: "#6D28D9", cursor: "pointer", textDecoration: "underline" },
+              children: "Back to sign in"
+            }
+          ) })
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { style: { textAlign: "center", color: "#4B5563" }, children: [
+          isSignUp ? "Already have an account?" : "Don't have an account?",
+          " ",
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            "button",
+            {
+              onClick: () => {
+                setIsSignUp(!isSignUp);
+                setError("");
+                setSuccess("");
+              },
+              style: {
+                background: "none",
+                border: "none",
+                color: "#6D28D9",
+                textDecoration: "underline",
+                cursor: "pointer",
+                fontSize: "inherit",
+                transition: "color 0.2s ease"
+              },
+              onMouseEnter: (e) => {
+                e.currentTarget.style.color = "#5B21B6";
+              },
+              onMouseLeave: (e) => {
+                e.currentTarget.style.color = "#6D28D9";
+              },
+              children: isSignUp ? "Sign In" : "Sign Up"
+            }
+          )
+        ] })
+      ]
+    }
+  );
 }
 
 function Popup() {
   const { user, signOut, isAuthenticated } = useAuth();
+  reactExports.useEffect(() => {
+    try {
+      if (isAuthenticated)
+        document.body.classList.add("is-auth");
+      else
+        document.body.classList.remove("is-auth");
+    } catch (e) {
+    }
+    return () => {
+      try {
+        document.body.classList.remove("is-auth");
+      } catch (e) {
+      }
+    };
+  }, [isAuthenticated]);
   const [page, setPage] = reactExports.useState("home");
-  const [profile, setProfile] = reactExports.useState({ resume: "", coverLetter: "", qaProfile: "" });
+  const [profile, setProfile] = reactExports.useState({
+    resume: "",
+    coverLetter: "",
+    qaProfile: ""
+  });
   reactExports.useEffect(() => {
     if (isAuthenticated) {
       loadProfileFromSupabase();
     } else {
-      chrome.storage.sync.get(["resume", "coverLetter", "qaProfile"], (result) => {
-        setProfile({
-          resume: result.resume || "",
-          coverLetter: result.coverLetter || "",
-          qaProfile: result.qaProfile || ""
-        });
-      });
+      chrome.storage.sync.get(
+        ["resume", "coverLetter", "qaProfile"],
+        (result) => {
+          setProfile({
+            resume: result.resume || "",
+            coverLetter: result.coverLetter || "",
+            qaProfile: result.qaProfile || ""
+          });
+        }
+      );
     }
   }, [page, isAuthenticated]);
   const loadProfileFromSupabase = async () => {
@@ -1630,7 +2000,9 @@ function Popup() {
         console.warn("Supabase client not available");
         return;
       }
-      const resumes = await supabase.makeRequest("resumes?user_id=eq." + user.id);
+      const resumes = await supabase.makeRequest(
+        "resumes?user_id=eq." + user.id
+      );
       const resume = resumes?.find((r) => r.type === "resume");
       const coverLetter = resumes?.find((r) => r.type === "cover_letter");
       setProfile({
@@ -1643,19 +2015,30 @@ function Popup() {
       console.error("Error loading profile from Supabase:", error);
     }
   };
+  const [autoStatus, setAutoStatus] = reactExports.useState(null);
+  const [lastAutoDetails, setLastAutoDetails] = reactExports.useState(null);
   const handleAutoApply = () => {
+    setAutoStatus({ status: "pending" });
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
       if (tabs[0]?.id) {
-        chrome.tabs.sendMessage(tabs[0].id, {
-          type: "AUTO_APPLY",
-          profile
-        }, (response) => {
-          if (response?.status === "success") {
-            alert("Auto-apply triggered!");
-          } else {
-            alert("Failed to auto-apply.");
+        chrome.tabs.sendMessage(
+          tabs[0].id,
+          { type: "AUTO_APPLY", profile },
+          (response) => {
+            if (!response) {
+              setAutoStatus({ status: "error", message: "No response from page (content script missing or blocked)." });
+              return;
+            }
+            setLastAutoDetails(response.details || null);
+            if (response?.status === "success") {
+              setAutoStatus({ status: "success", message: `Applied on ${response.jobBoard || "site"}`, details: response.details });
+            } else {
+              setAutoStatus({ status: "error", message: response?.message || "Auto-apply failed", details: response.details });
+            }
           }
-        });
+        );
+      } else {
+        setAutoStatus({ status: "error", message: "No active tab found." });
       }
     });
   };
@@ -1664,102 +2047,305 @@ function Popup() {
   }
   if (page === "profile") {
     return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", margin: "1rem" }, children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx("button", { className: "uswift-btn", onClick: () => setPage("home"), children: "← Back" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(
-          "button",
-          {
-            onClick: signOut,
-            style: { background: "#EDE9FE", color: "#6D28D9", border: "none", borderRadius: 8, padding: "8px 12px", cursor: "pointer" },
-            children: "Sign Out"
-          }
-        )
-      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs(
+        "div",
+        {
+          style: {
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            margin: "1rem"
+          },
+          children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("button", { className: "uswift-btn", onClick: () => setPage("home"), children: "← Back" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "button",
+              {
+                onClick: signOut,
+                style: {
+                  background: "#EDE9FE",
+                  color: "#6D28D9",
+                  border: "none",
+                  borderRadius: 8,
+                  padding: "8px 12px",
+                  cursor: "pointer"
+                },
+                children: "Sign Out"
+              }
+            )
+          ]
+        }
+      ),
       /* @__PURE__ */ jsxRuntimeExports.jsx(ProfileVault, {})
     ] });
   }
   if (page === "tracker") {
     return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", margin: "1rem" }, children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx("button", { className: "uswift-btn", onClick: () => setPage("home"), children: "← Back" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(
-          "button",
-          {
-            onClick: signOut,
-            style: { background: "#EDE9FE", color: "#6D28D9", border: "none", borderRadius: 8, padding: "8px 12px", cursor: "pointer" },
-            children: "Sign Out"
-          }
-        )
-      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs(
+        "div",
+        {
+          style: {
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            margin: "1rem"
+          },
+          children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("button", { className: "uswift-btn", onClick: () => setPage("home"), children: "← Back" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "button",
+              {
+                onClick: signOut,
+                style: {
+                  background: "#EDE9FE",
+                  color: "#6D28D9",
+                  border: "none",
+                  borderRadius: 8,
+                  padding: "8px 12px",
+                  cursor: "pointer"
+                },
+                children: "Sign Out"
+              }
+            )
+          ]
+        }
+      ),
       /* @__PURE__ */ jsxRuntimeExports.jsx(JobTracker, {})
     ] });
   }
-  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { minWidth: 350, minHeight: 520, background: "#FFFFFF", borderRadius: "1.5rem", boxShadow: "0 4px 24px rgba(0,0,0,0.07)", padding: "2rem" }, children: [
-    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }, children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { style: { color: "#4B5563", fontSize: "0.9rem" }, children: [
-        "Welcome, ",
-        user?.email || "User"
-      ] }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx(
-        "button",
-        {
-          onClick: signOut,
-          style: { background: "#EDE9FE", color: "#6D28D9", border: "none", borderRadius: 8, padding: "6px 10px", cursor: "pointer", fontSize: "0.8rem" },
-          children: "Sign Out"
-        }
-      )
-    ] }),
-    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "uswift-gradient", style: { height: 8, borderRadius: 8, marginBottom: 24 } }),
-    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { textAlign: "center", marginBottom: 24 }, children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx("h1", { style: { fontSize: "1.7rem", fontWeight: 700, color: "#111827", marginBottom: 8 }, children: "Uswift Chrome Extension" }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx("p", { style: { color: "#4B5563", fontSize: "1rem", marginBottom: 16 }, children: "Auto-apply to jobs on top boards. Save time, get more interviews." }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { style: { width: 80, height: 80, margin: "0 auto 16px", borderRadius: "50%", background: "linear-gradient(135deg, #EDE9FE 0%, #6D28D9 100%)", display: "flex", alignItems: "center", justifyContent: "center", animation: "pulse 2s infinite" }, children: /* @__PURE__ */ jsxRuntimeExports.jsxs("svg", { className: "uswift-icon", fill: "none", viewBox: "0 0 32 32", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx("circle", { cx: "16", cy: "16", r: "14", stroke: "#6D28D9", strokeWidth: "2" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("path", { d: "M10 16h12M16 10v12", stroke: "#6D28D9", strokeWidth: "2", strokeLinecap: "round" })
-      ] }) }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx("button", { className: "uswift-btn", style: { marginTop: 8 }, onClick: handleAutoApply, children: "Auto-Apply to Job" }),
-      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { display: "flex", gap: 8, marginTop: 8 }, children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx("button", { className: "uswift-btn", style: { background: "#EDE9FE", color: "#6D28D9" }, onClick: () => setPage("profile"), children: "Profile Vault" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("button", { className: "uswift-btn", style: { background: "#EDE9FE", color: "#6D28D9" }, onClick: () => setPage("tracker"), children: "Job Tracker" })
-      ] })
-    ] }),
-    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "uswift-trust", style: { justifyContent: "center", marginBottom: 24 }, children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "uswift-badge", children: "Secure" }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "uswift-badge", children: "Fast" }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "uswift-badge", children: "Private" })
-    ] }),
-    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "uswift-card", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsxs("svg", { className: "uswift-icon", fill: "none", viewBox: "0 0 32 32", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "6", y: "10", width: "20", height: "12", rx: "3", stroke: "#6D28D9", strokeWidth: "2" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("path", { d: "M16 14v4", stroke: "#6D28D9", strokeWidth: "2", strokeLinecap: "round" })
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs(
+    "div",
+    {
+      style: {
+        minWidth: 350,
+        minHeight: 520,
+        background: "#FFFFFF",
+        borderRadius: "1.5rem",
+        boxShadow: "0 4px 24px rgba(0,0,0,0.07)",
+        padding: "2rem"
+      },
+      children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(
+          "div",
+          {
+            style: {
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              marginBottom: 16
+            },
+            children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { style: { color: "#4B5563", fontSize: "0.9rem" }, children: [
+                "Welcome, ",
+                user?.email || "User"
+              ] }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "button",
+                {
+                  onClick: signOut,
+                  style: {
+                    background: "#EDE9FE",
+                    color: "#6D28D9",
+                    border: "none",
+                    borderRadius: 8,
+                    padding: "6px 10px",
+                    cursor: "pointer",
+                    fontSize: "0.8rem"
+                  },
+                  children: "Sign Out"
+                }
+              )
+            ]
+          }
+        ),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          "div",
+          {
+            className: "uswift-gradient",
+            style: { height: 8, borderRadius: 8, marginBottom: 24 }
+          }
+        ),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { textAlign: "center", marginBottom: 24 }, children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            "h1",
+            {
+              style: {
+                fontSize: "1.7rem",
+                fontWeight: 700,
+                color: "#111827",
+                marginBottom: 8
+              },
+              children: "Uswift Chrome Extension"
+            }
+          ),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { style: { color: "#4B5563", fontSize: "1rem", marginBottom: 16 }, children: "Auto-apply to jobs on top boards. Save time, get more interviews." }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            "div",
+            {
+              style: {
+                width: 80,
+                height: 80,
+                margin: "0 auto 16px",
+                borderRadius: "50%",
+                background: "linear-gradient(135deg, #EDE9FE 0%, #6D28D9 100%)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                animation: "pulse 2s infinite"
+              },
+              children: /* @__PURE__ */ jsxRuntimeExports.jsxs("svg", { className: "uswift-icon", fill: "none", viewBox: "0 0 32 32", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx("circle", { cx: "16", cy: "16", r: "14", stroke: "#6D28D9", strokeWidth: "2" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  "path",
+                  {
+                    d: "M10 16h12M16 10v12",
+                    stroke: "#6D28D9",
+                    strokeWidth: "2",
+                    strokeLinecap: "round"
+                  }
+                )
+              ] })
+            }
+          ),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            "button",
+            {
+              className: "uswift-btn",
+              style: { marginTop: 8 },
+              onClick: handleAutoApply,
+              children: "Auto-Apply to Job"
+            }
+          ),
+          autoStatus && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { marginTop: 12, textAlign: "center" }, children: [
+            autoStatus.status === "pending" && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { style: { color: "#6B7280" }, children: "Applying…" }),
+            autoStatus.status === "success" && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { style: { color: "#10B981" }, children: autoStatus.message }),
+            autoStatus.status === "error" && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { style: { color: "#DC2626" }, children: autoStatus.message }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("button", { className: "uswift-btn", style: { marginTop: 8 }, onClick: handleAutoApply, children: "Retry" }),
+              lastAutoDetails && /* @__PURE__ */ jsxRuntimeExports.jsx("pre", { style: { textAlign: "left", maxHeight: 120, overflow: "auto", fontSize: 11, background: "#F3F4F6", padding: 8, borderRadius: 6, marginTop: 8 }, children: JSON.stringify(lastAutoDetails, null, 2) })
+            ] })
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { display: "flex", gap: 8, marginTop: 8 }, children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "button",
+              {
+                className: "uswift-btn",
+                style: { background: "#EDE9FE", color: "#6D28D9" },
+                onClick: () => setPage("profile"),
+                children: "Profile Vault"
+              }
+            ),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "button",
+              {
+                className: "uswift-btn",
+                style: { background: "#EDE9FE", color: "#6D28D9" },
+                onClick: () => setPage("tracker"),
+                children: "Job Tracker"
+              }
+            )
+          ] })
         ] }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { style: { fontWeight: 700, fontSize: "1.1rem", marginBottom: 4 }, children: "Profile Vault" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { style: { color: "#4B5563", fontSize: "0.95rem" }, children: "Store resumes, cover letters, and Q&A profiles securely." })
-      ] }),
-      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "uswift-card", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx("svg", { className: "uswift-icon", fill: "none", viewBox: "0 0 32 32", children: /* @__PURE__ */ jsxRuntimeExports.jsx("path", { d: "M8 16h16M16 8v16", stroke: "#6D28D9", strokeWidth: "2", strokeLinecap: "round" }) }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { style: { fontWeight: 700, fontSize: "1.1rem", marginBottom: 4 }, children: "Auto-Apply" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { style: { color: "#4B5563", fontSize: "0.95rem" }, children: "Automatically apply to jobs on Greenhouse, Lever, and more." })
-      ] }),
-      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "uswift-card", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsxs("svg", { className: "uswift-icon", fill: "none", viewBox: "0 0 32 32", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx("circle", { cx: "16", cy: "16", r: "10", stroke: "#6D28D9", strokeWidth: "2" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("path", { d: "M16 12v4l2 2", stroke: "#6D28D9", strokeWidth: "2", strokeLinecap: "round" })
-        ] }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { style: { fontWeight: 700, fontSize: "1.1rem", marginBottom: 4 }, children: "Job Tracker" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { style: { color: "#4B5563", fontSize: "0.95rem" }, children: "Track your applications and interview progress in one place." })
-      ] }),
-      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "uswift-card", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsxs("svg", { className: "uswift-icon", fill: "none", viewBox: "0 0 32 32", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "8", y: "8", width: "16", height: "16", rx: "4", stroke: "#6D28D9", strokeWidth: "2" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("path", { d: "M12 16h8", stroke: "#6D28D9", strokeWidth: "2", strokeLinecap: "round" })
-        ] }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { style: { fontWeight: 700, fontSize: "1.1rem", marginBottom: 4 }, children: "Privacy First" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { style: { color: "#4B5563", fontSize: "0.95rem" }, children: "Your data is encrypted and never shared without consent." })
-      ] })
-    ] })
-  ] });
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(
+          "div",
+          {
+            className: "uswift-trust",
+            style: { justifyContent: "center", marginBottom: 24 },
+            children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "uswift-badge", children: "Secure" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "uswift-badge", children: "Fast" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "uswift-badge", children: "Private" })
+            ]
+          }
+        ),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "uswift-card", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("svg", { className: "uswift-icon", fill: "none", viewBox: "0 0 32 32", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "rect",
+                {
+                  x: "6",
+                  y: "10",
+                  width: "20",
+                  height: "12",
+                  rx: "3",
+                  stroke: "#6D28D9",
+                  strokeWidth: "2"
+                }
+              ),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "path",
+                {
+                  d: "M16 14v4",
+                  stroke: "#6D28D9",
+                  strokeWidth: "2",
+                  strokeLinecap: "round"
+                }
+              )
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { style: { fontWeight: 700, fontSize: "1.1rem", marginBottom: 4 }, children: "Profile Vault" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { style: { color: "#4B5563", fontSize: "0.95rem" }, children: "Store resumes, cover letters, and Q&A profiles securely." })
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "uswift-card", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("svg", { className: "uswift-icon", fill: "none", viewBox: "0 0 32 32", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "path",
+              {
+                d: "M8 16h16M16 8v16",
+                stroke: "#6D28D9",
+                strokeWidth: "2",
+                strokeLinecap: "round"
+              }
+            ) }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { style: { fontWeight: 700, fontSize: "1.1rem", marginBottom: 4 }, children: "Auto-Apply" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { style: { color: "#4B5563", fontSize: "0.95rem" }, children: "Automatically apply to jobs on Greenhouse, Lever, and more." })
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "uswift-card", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("svg", { className: "uswift-icon", fill: "none", viewBox: "0 0 32 32", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("circle", { cx: "16", cy: "16", r: "10", stroke: "#6D28D9", strokeWidth: "2" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "path",
+                {
+                  d: "M16 12v4l2 2",
+                  stroke: "#6D28D9",
+                  strokeWidth: "2",
+                  strokeLinecap: "round"
+                }
+              )
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { style: { fontWeight: 700, fontSize: "1.1rem", marginBottom: 4 }, children: "Job Tracker" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { style: { color: "#4B5563", fontSize: "0.95rem" }, children: "Track your applications and interview progress in one place." })
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "uswift-card", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("svg", { className: "uswift-icon", fill: "none", viewBox: "0 0 32 32", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "rect",
+                {
+                  x: "8",
+                  y: "8",
+                  width: "16",
+                  height: "16",
+                  rx: "4",
+                  stroke: "#6D28D9",
+                  strokeWidth: "2"
+                }
+              ),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "path",
+                {
+                  d: "M12 16h8",
+                  stroke: "#6D28D9",
+                  strokeWidth: "2",
+                  strokeLinecap: "round"
+                }
+              )
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { style: { fontWeight: 700, fontSize: "1.1rem", marginBottom: 4 }, children: "Privacy First" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { style: { color: "#4B5563", fontSize: "0.95rem" }, children: "Your data is encrypted and never shared without consent." })
+          ] })
+        ] })
+      ]
+    }
+  );
 }
 
 client.createRoot(document.getElementById("root")).render(

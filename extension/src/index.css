@@ -110,3 +110,26 @@ input:focus {
   box-shadow: 0 0 0 3px rgba(109, 40, 217, 0.1);
   transition: all 0.2s ease;
 }
+
+/* When the extension is opened and the user is authenticated, ensure
+   body text inside cards and key sections is white to match the
+   darker gradient background used in the popup. We use !important to
+   override inline color styles applied in the JSX. */
+.is-auth .uswift-card,
+.is-auth .uswift-card p,
+.is-auth .uswift-card h3,
+.is-auth h2,
+.is-auth p,
+.is-auth label,
+.is-auth .uswift-card label,
+.is-auth textarea,
+.is-auth input {
+  color: #ffffff !important;
+}
+
+/* Small adjustments so inputs and textareas remain readable */
+.is-auth textarea,
+.is-auth input {
+  background: rgba(255,255,255,0.06) !important;
+  border-color: rgba(255,255,255,0.12) !important;
+}

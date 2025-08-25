@@ -6,7 +6,7 @@ export default function PricingTable() {
         <p>Basic job tracking and profile vault.</p>
         <span className="font-bold text-2xl">$0</span>
       </div>
-      <div className="bg-white text-black rounded-lg shadow p-6 border-2 border-uswift-purple">
+  <div className="bg-white text-black rounded-lg shadow p-6 border-2 border-uswift-accent card-magic card-magic--glow">
         <h3 className="font-bold text-lg mb-2">Pro</h3>
         <p>Auto apply, advanced analytics, priority support.</p>
         <span className="font-bold text-2xl">$9/mo</span>
