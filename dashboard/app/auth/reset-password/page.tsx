@@ -94,7 +94,7 @@ export default function ResetPasswordPage() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             placeholder="At least 8 characters"
-            className="mt-1 block w-full rounded-lg border border-gray-200 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#14b8a6]"
+            className="mt-1 block w-full rounded-lg border border-gray-200 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-uswift-accent"
             required
           />
         </label>
@@ -106,7 +106,7 @@ export default function ResetPasswordPage() {
             value={confirm}
             onChange={(e) => setConfirm(e.target.value)}
             placeholder="Repeat your password"
-            className="mt-1 block w-full rounded-lg border border-gray-200 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#14b8a6]"
+            className="mt-1 block w-full rounded-lg border border-gray-200 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-uswift-accent"
             required
           />
         </label>
@@ -114,13 +114,13 @@ export default function ResetPasswordPage() {
         <button
           type="submit"
           disabled={loading}
-          className="mt-2 inline-flex w-full items-center justify-center rounded-lg bg-[#14b8a6] text-white px-4 py-2 font-semibold hover:brightness-95 disabled:opacity-60"
+          className="mt-2 inline-flex w-full items-center justify-center rounded-lg bg-uswift-accent text-white px-4 py-2 font-semibold hover:brightness-95 disabled:opacity-60"
         >
           {loading ? "Updating..." : "Update password"}
         </button>
       </form>
 
-      {message && <div className="mt-4 text-center text-[#14b8a6]">{message}</div>}
+  {message && <div className="mt-4 text-center text-uswift-accent">{message}</div>}
 
       {!token && (
         <div className="mt-4 text-sm text-gray-500">

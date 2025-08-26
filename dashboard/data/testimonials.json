@@ -3,40 +3,40 @@
     "id": "t1",
     "name": "Aisha Rahman",
     "role": "Undergrad, Computer Science",
-    "quote": "NexScholar found scholarships I never knew existed — I landed two awards that covered my tuition. The application tips saved me hours.",
-    "avatar": "/avatars/avatar1.svg",
+    "quote": "Uswift found scholarships I never knew existed — I landed two awards that covered my tuition. The application tips saved me hours.",
+    "avatar": "/avatars/testimonial-1.jpg",
     "rating": 5
   },
   {
     "id": "t8",
     "name": "Omar El-Sayed",
     "role": "Undergrad, Mathematics",
-    "quote": "Clear deadlines, relevant matches, and helpful tips — NexScholar helped me stay organized and win multiple small awards that added up.",
-    "avatar": "/avatars/avatar8.svg",
+    "quote": "Clear deadlines, relevant matches, and helpful tips — Uswift helped me stay organized and win multiple small awards that added up.",
+    "avatar": "/avatars/testimonial-2.jpg",
     "rating": 4
   },
   {
     "id": "t9",
     "name": "Jenna Lee",
     "role": "Graduate, Public Health",
-    "quote": "NexScholar connected me with grants I never would have found. The reminders and resources made the process stress-free and successful.",
-    "avatar": "/avatars/avatar1.svg",
+    "quote": "Uswift connected me with grants I never would have found. The reminders and resources made the process stress-free and successful.",
+    "avatar": "/avatars/testimonial-3.jpg",
     "rating": 5
   },
   {
     "id": "t3",
     "name": "Sofia Kim",
     "role": "Graduate, Data Science",
-    "quote": "Thanks to NexScholar I secured funding for my masters. The recommendations felt personal and the deadline reminders were lifesavers.",
-    "avatar": "/avatars/avatar3.svg",
+    "quote": "Thanks to Uswift I secured funding for my masters. The recommendations felt personal and the deadline reminders were lifesavers.",
+    "avatar": "/avatars/testimonial-4.jpg",
     "rating": 5
   },
   {
     "id": "t4",
     "name": "Liam O'Connor",
     "role": "Undergrad, Economics",
-    "quote": "I found niche scholarships I never would have found on my own. NexScholar turned applying from guesswork into a clear plan.",
-    "avatar": "/avatars/avatar4.svg",
+    "quote": "I found niche scholarships I never would have found on my own. Uswift turned applying from guesswork into a clear plan.",
+    "avatar": "/avatars/testimonial-5.jpg",
     "rating": 4
   },
   {
@@ -51,7 +51,7 @@
     "id": "t6",
     "name": "Ethan Brooks",
     "role": "Community College Student",
-    "quote": "NexScholar made a confusing process simple. I especially loved the matched list and the one-click save feature.",
+    "quote": "Uswift made a confusing process simple. I especially loved the matched list and the one-click save feature.",
     "avatar": "/avatars/avatar6.svg",
     "rating": 4
   },
@@ -59,7 +59,7 @@
     "id": "t7",
     "name": "Maya Singh",
     "role": "Undergrad, Graphic Design",
-    "quote": "I used NexScholar to fund my portfolio project — the platform connected me with creative grants I wouldn't have found elsewhere.",
+    "quote": "I used Uswift to fund my portfolio project — the platform connected me with creative grants I wouldn't have found elsewhere.",
     "avatar": "/avatars/avatar7.svg",
     "rating": 5
   },

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "./index.css";
 import { useAuth } from "./hooks/useAuth";
+import { getSupabaseClient } from "./supabaseClient";
 
 declare const supabase: any;
 
@@ -54,23 +55,53 @@ const JobTracker: React.FC = () => {
     try {
       if (!user?.id) return;
       setLoading(true);
-      const { data: apps, error } = await supabase
-        .from("job_applications")
-        .select("*")
-        .eq("user_id", user.id)
-        .order("applied_date", { ascending: false });
-      if (error) throwNormalized(error);
-      const formattedApps =
-        apps?.map((app: any) => ({
-          id: app.id,
-          company: app.company,
-          position: app.position,
-          status: app.status,
-          dateApplied: app.applied_date,
-          jobUrl: app.job_url,
-          notes: app.notes,
-          tags: app.tags || [],
-        })) || [];
+      const client = getSupabaseClient();
+      let formattedApps: any[] = [];
+      if (client) {
+        try {
+          const apps = await client.makeRequest(
+            `job_applications?user_id=eq.${user.id}&order=applied_date.desc`
+          );
+          formattedApps =
+            apps?.map((app: any) => ({
+              id: app.id,
+              company: app.company,
+              position: app.position,
+              status: app.status,
+              dateApplied: app.applied_date,
+              jobUrl: app.job_url,
+              notes: app.notes,
+              tags: app.tags || [],
+            })) || [];
+        } catch (err) {
+          console.warn("Supabase REST load failed, falling back to client lib", err);
+        }
+      }
+
+      // Fallback to legacy global `supabase` client if available
+      if (formattedApps.length === 0 && typeof (window as any).supabase !== "undefined") {
+        try {
+          const { data: apps, error } = await (window as any).supabase
+            .from("job_applications")
+            .select("*")
+            .eq("user_id", user.id)
+            .order("applied_date", { ascending: false });
+          if (error) throwNormalized(error);
+          formattedApps =
+            apps?.map((app: any) => ({
+              id: app.id,
+              company: app.company,
+              position: app.position,
+              status: app.status,
+              dateApplied: app.applied_date,
+              jobUrl: app.job_url,
+              notes: app.notes,
+              tags: app.tags || [],
+            })) || [];
+        } catch (e) {
+          console.error("Legacy supabase load failed", e);
+        }
+      }
       setApplications(formattedApps);
     } catch (error) {
       console.error("Error loading from Supabase:", error);
@@ -97,6 +128,7 @@ const JobTracker: React.FC = () => {
   const saveToSupabase = async (application: JobApplication) => {
     try {
       if (!user?.id) return false;
+      const client = getSupabaseClient();
       const appData = {
         user_id: user.id,
         company: application.company,
@@ -108,22 +140,43 @@ const JobTracker: React.FC = () => {
         tags: application.tags,
         updated_at: new Date().toISOString(),
       };
-      if (application.id) {
-        const { error } = await supabase
-          .from("job_applications")
-          .update(appData)
-          .eq("id", application.id);
-        if (error) throwNormalized(error);
-      } else {
-        const { data, error } = await supabase
-          .from("job_applications")
-          .insert([appData])
-          .select()
-          .single();
-        if (error) throwNormalized(error);
-        return data.id;
+
+      if (client) {
+        if (application.id) {
+          await client.makeRequest(`job_applications?id=eq.${application.id}`, {
+            method: "PATCH",
+            body: JSON.stringify(appData),
+          });
+          return true;
+        } else {
+          const inserted = await client.makeRequest("job_applications", {
+            method: "POST",
+            body: JSON.stringify([appData]),
+          });
+          return inserted?.[0]?.id || true;
+        }
       }
-      return true;
+
+      // Fallback to legacy global supabase instance
+      if (typeof (window as any).supabase !== "undefined") {
+        if (application.id) {
+          const { error } = await (window as any).supabase
+            .from("job_applications")
+            .update(appData)
+            .eq("id", application.id);
+          if (error) throwNormalized(error);
+        } else {
+          const { data, error } = await (window as any).supabase
+            .from("job_applications")
+            .insert([appData])
+            .select()
+            .single();
+          if (error) throwNormalized(error);
+          return data.id;
+        }
+        return true;
+      }
+      return false;
     } catch (error) {
       console.error("Error saving to Supabase:", error);
       return false;

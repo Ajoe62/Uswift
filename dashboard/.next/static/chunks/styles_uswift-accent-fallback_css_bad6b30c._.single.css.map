@@ -1,0 +1,6 @@
+{
+  "version": 3,
+  "sources": [],
+  "sections": [
+    {"offset": {"line": 1, "column": 0}, "map": {"version":3,"sources":["turbopack:///[project]/styles/uswift-accent-fallback.css"],"sourcesContent":["/* Fallback utilities for the shared accent color. */\r\n:root {\r\n  --uswift-accent: #14b8a6;\r\n}\r\n\r\n/* Basic utility fallbacks to ensure classes work even if Tailwind doesn't generate them */\r\n.bg-uswift-accent { background-color: var(--uswift-accent) !important; }\r\n.text-uswift-accent { color: var(--uswift-accent) !important; }\r\n.border-uswift-accent { border-color: var(--uswift-accent) !important; }\r\n.focus-visible\\:ring-uswift-accent:focus-visible { --tw-ring-color: var(--uswift-accent); }\r\n"],"names":[],"mappings":"AACA;;;;AAKA;;;;AACA;;;;AACA;;;;AACA"}}]
+}

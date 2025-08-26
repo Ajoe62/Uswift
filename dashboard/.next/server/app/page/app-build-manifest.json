@@ -1,11 +1,11 @@
 {
   "pages": {
     "/page": [
-      "static/chunks/styles_globals_9fb35f7d.css",
+      "static/chunks/styles_f25e8e55._.css",
       "static/chunks/node_modules_next_dist_b47712da._.js",
       "static/chunks/components_ui_0e91bcf2._.js",
       "static/chunks/app_layout_tsx_05c78893._.js",
-      "static/chunks/node_modules_next_dist_client_components_builtin_global-error_7c2f2fe1.js",
+      "static/chunks/node_modules_next_dist_client_components_builtin_global-error_18b209b9.js",
       "static/chunks/[turbopack]_browser_dev_hmr-client_hmr-client_ts_e4e2c227._.js",
       "static/chunks/node_modules_next_dist_compiled_react-dom_1e674e59._.js",
       "static/chunks/node_modules_next_dist_compiled_next-devtools_index_a9cb0712.js",

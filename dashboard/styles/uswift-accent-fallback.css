@@ -1,0 +1,10 @@
+/* Fallback utilities for the shared accent color. */
+:root {
+  --uswift-accent: #14b8a6;
+}
+
+/* Basic utility fallbacks to ensure classes work even if Tailwind doesn't generate them */
+.bg-uswift-accent { background-color: var(--uswift-accent) !important; }
+.text-uswift-accent { color: var(--uswift-accent) !important; }
+.border-uswift-accent { border-color: var(--uswift-accent) !important; }
+.focus-visible\:ring-uswift-accent:focus-visible { --tw-ring-color: var(--uswift-accent); }

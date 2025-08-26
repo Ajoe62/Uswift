@@ -1,0 +1,22 @@
+/* [project]/styles/uswift-accent-fallback.css [app-client] (css) */
+:root {
+  --uswift-accent: #14b8a6;
+}
+
+.bg-uswift-accent {
+  background-color: var(--uswift-accent) !important;
+}
+
+.text-uswift-accent {
+  color: var(--uswift-accent) !important;
+}
+
+.border-uswift-accent {
+  border-color: var(--uswift-accent) !important;
+}
+
+.focus-visible\:ring-uswift-accent:focus-visible {
+  --tw-ring-color: var(--uswift-accent);
+}
+
+/*# sourceMappingURL=styles_uswift-accent-fallback_css_bad6b30c._.single.css.map*/

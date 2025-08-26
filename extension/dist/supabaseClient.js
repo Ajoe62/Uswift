@@ -31,7 +31,11 @@ class SupabaseClient {
         } catch {
         }
         await this.saveSession(data);
-        return { ok: true, user: data.user || null, access_token: data.access_token };
+        return {
+          ok: true,
+          user: data.user || null,
+          access_token: data.access_token
+        };
       }
       const errObj = {
         status: res.status,
@@ -70,7 +74,11 @@ class SupabaseClient {
         } catch {
         }
         await this.saveSession(data);
-        return { ok: true, user: data.user || null, access_token: data.access_token };
+        return {
+          ok: true,
+          user: data.user || null,
+          access_token: data.access_token
+        };
       }
       if (res.ok && data && data.user && !data.access_token) {
         try {
@@ -131,7 +139,13 @@ class SupabaseClient {
               return await retry.json();
             const rtxt = await retry.text().catch(() => "");
             console.warn("getUser retry failed", retry.status, rtxt);
-            return { error: { status: retry.status, message: `HTTP ${retry.status}`, payload: rtxt } };
+            return {
+              error: {
+                status: retry.status,
+                message: `HTTP ${retry.status}`,
+                payload: rtxt
+              }
+            };
           }
         }
         console.warn("getUser HTTP error", res.status, txt);
@@ -150,15 +164,18 @@ class SupabaseClient {
     if (!refreshToken)
       return false;
     try {
-      const res = await fetch(`${this.config.url}/auth/v1/token?grant_type=refresh_token`, {
-        method: "POST",
-        headers: {
-          apikey: this.config.anonKey,
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ refresh_token: refreshToken }),
-        mode: "cors"
-      });
+      const res = await fetch(
+        `${this.config.url}/auth/v1/token?grant_type=refresh_token`,
+        {
+          method: "POST",
+          headers: {
+            apikey: this.config.anonKey,
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ refresh_token: refreshToken }),
+          mode: "cors"
+        }
+      );
       const data = await res.json().catch(async () => {
         const txt = await res.text().catch(() => "");
         return { error: `HTTP ${res.status} - ${txt}` };
@@ -208,9 +225,19 @@ class SupabaseClient {
         return { error: `HTTP ${res.status} - ${txt}` };
       });
       if (res.ok) {
-        return { ok: true, message: data?.message || "If an account exists, a password reset email has been sent." };
+        return {
+          ok: true,
+          message: data?.message || "If an account exists, a password reset email has been sent."
+        };
       }
-      return { ok: false, error: { status: res.status, message: data?.error || data?.message || `HTTP ${res.status}`, payload: data } };
+      return {
+        ok: false,
+        error: {
+          status: res.status,
+          message: data?.error || data?.message || `HTTP ${res.status}`,
+          payload: data
+        }
+      };
     } catch (err) {
       return { ok: false, error: { message: err?.message || String(err) } };
     }

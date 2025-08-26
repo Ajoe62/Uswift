@@ -1,4 +1,5 @@
 import "../styles/globals.css";
+import "../styles/uswift-accent-fallback.css";
 import Navbar from "../components/ui/Navbar";
 
 export default function RootLayout({

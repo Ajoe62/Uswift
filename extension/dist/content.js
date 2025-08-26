@@ -26,6 +26,47 @@ const greenhouseAdapter = {
       return { success: false, details: e };
     }
   },
+  async handleFileUpload(profile) {
+    try {
+      if (!profile || !profile.resume)
+        return { success: false, details: "no resume provided" };
+      const fileInput = document.querySelector('input[type="file"][name*="resume"], input[type="file"][id*="resume"], input[type="file"]');
+      if (!fileInput)
+        return { success: false, details: "no file input found" };
+      async function fetchFile(url) {
+        try {
+          const res = await fetch(url, { mode: "cors" });
+          if (!res.ok)
+            return null;
+          const blob = await res.blob();
+          const disposition = res.headers.get("content-disposition") || "";
+          let filename = "resume";
+          const m = /filename\*=UTF-8''([^;]+)/i.exec(disposition) || /filename="?([^";]+)/i.exec(disposition);
+          if (m && m[1])
+            filename = decodeURIComponent(m[1]);
+          const file2 = new File([blob], filename, { type: blob.type || "application/octet-stream" });
+          return file2;
+        } catch (e) {
+          console.warn("fetchFile failed", e);
+          return null;
+        }
+      }
+      const file = await fetchFile(profile.resume);
+      if (!file)
+        return { success: false, details: "failed to fetch resume" };
+      try {
+        const dt = new DataTransfer();
+        dt.items.add(file);
+        Object.defineProperty(fileInput, "files", { value: dt.files, writable: false });
+        fileInput.dispatchEvent(new Event("change", { bubbles: true }));
+        return { success: true };
+      } catch (e) {
+        return { success: false, details: e };
+      }
+    } catch (e) {
+      return { success: false, details: e };
+    }
+  },
   async clickApply() {
     try {
       const btn = document.querySelector('[data-source="apply_button"], .application-header .btn-primary');
@@ -165,7 +206,15 @@ async function handleFileUploads(profile, jobBoard) {
 function debugSelectors(selectors) {
   try {
     console.log("debugSelectors:", selectors);
-    ["nameField", "lastNameField", "emailField", "phoneField", "resumeField", "coverLetterField", "applyButton"].forEach((k) => {
+    [
+      "nameField",
+      "lastNameField",
+      "emailField",
+      "phoneField",
+      "resumeField",
+      "coverLetterField",
+      "applyButton"
+    ].forEach((k) => {
       const sel = selectors[k];
       if (!sel) {
         console.log(k, "no selector");
@@ -194,7 +243,10 @@ function waitForSelector(sel, timeout = 3e3) {
         resolve(found);
       }
     });
-    obs.observe(document.documentElement || document.body, { childList: true, subtree: true });
+    obs.observe(document.documentElement || document.body, {
+      childList: true,
+      subtree: true
+    });
     setTimeout(() => {
       try {
         obs.disconnect();
@@ -236,7 +288,10 @@ chrome.runtime.onMessage.addListener(
         sendResponse({ status: "error", message: "Unsupported job board" });
         return;
       }
-      const details = { adapter: !!ADAPTERS[jobBoard], clickedApply: false };
+      const details = {
+        adapter: !!ADAPTERS[jobBoard],
+        clickedApply: false
+      };
       let success = false;
       if (ADAPTERS[jobBoard] && ADAPTERS[jobBoard].fillForm) {
         try {
@@ -255,7 +310,9 @@ chrome.runtime.onMessage.addListener(
       if (success) {
         if (ADAPTERS[jobBoard] && ADAPTERS[jobBoard].handleFileUpload) {
           try {
-            details.fileResult = await ADAPTERS[jobBoard].handleFileUpload(message.profile);
+            details.fileResult = await ADAPTERS[jobBoard].handleFileUpload(
+              message.profile
+            );
           } catch (e) {
             details.fileError = e;
           }
@@ -277,7 +334,9 @@ chrome.runtime.onMessage.addListener(
           }
         } else {
           try {
-            const clicked = await clickApplyIfPossible(JOB_BOARD_SELECTORS[jobBoard]);
+            const clicked = await clickApplyIfPossible(
+              JOB_BOARD_SELECTORS[jobBoard]
+            );
             details.clickedApply = clicked;
           } catch (e) {
             console.warn("click attempt failed", e);
@@ -286,7 +345,11 @@ chrome.runtime.onMessage.addListener(
         }
         sendResponse({ status: "success", jobBoard, details });
       } else {
-        sendResponse({ status: "error", message: "Failed to auto-fill form", details });
+        sendResponse({
+          status: "error",
+          message: "Failed to auto-fill form",
+          details
+        });
       }
       if (success) {
         try {
@@ -295,14 +358,20 @@ chrome.runtime.onMessage.addListener(
           console.warn("file upload failed", e);
         }
         try {
-          const clicked = await clickApplyIfPossible(JOB_BOARD_SELECTORS[jobBoard]);
+          const clicked = await clickApplyIfPossible(
+            JOB_BOARD_SELECTORS[jobBoard]
+          );
           details.clickedApply = clicked;
         } catch (e) {
           console.warn("click attempt failed", e);
         }
         sendResponse({ status: "success", jobBoard, details });
       } else {
-        sendResponse({ status: "error", message: "Failed to auto-fill form", details });
+        sendResponse({
+          status: "error",
+          message: "Failed to auto-fill form",
+          details
+        });
       }
     }
   }
