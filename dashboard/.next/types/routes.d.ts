@@ -3,7 +3,7 @@
 
 type AppRoutes = "/" | "/auth/reset-password" | "/dashboard" | "/dashboard/jobs" | "/dashboard/profile" | "/dashboard/settings" | "/features" | "/pricing"
 type AppRouteHandlerRoutes = "/api/mistral/chat" | "/api/mistral/embeddings" | "/api/mistral/files"
-type PageRoutes = never
+type PageRoutes = "/Analytics" | "/Dashboard" | "/Dashboard_New" | "/JobTracker" | "/LandingPage" | "/Pricing" | "/Profile" | "/Support"
 type LayoutRoutes = "/" | "/dashboard"
 type RedirectRoutes = never
 type RewriteRoutes = never
@@ -12,16 +12,24 @@ type Routes = AppRoutes | PageRoutes | LayoutRoutes | RedirectRoutes | RewriteRo
 
 interface ParamMap {
   "/": {}
+  "/Analytics": {}
   "/api/mistral/chat": {}
   "/api/mistral/embeddings": {}
   "/api/mistral/files": {}
   "/auth/reset-password": {}
   "/dashboard": {}
+  "/Dashboard": {}
+  "/Dashboard_New": {}
   "/dashboard/jobs": {}
   "/dashboard/profile": {}
   "/dashboard/settings": {}
   "/features": {}
+  "/JobTracker": {}
+  "/LandingPage": {}
   "/pricing": {}
+  "/Pricing": {}
+  "/Profile": {}
+  "/Support": {}
 }
 
 
