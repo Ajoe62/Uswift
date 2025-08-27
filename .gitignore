@@ -3,3 +3,8 @@
 .env
 *.env
 extension/nul
+node_modules/
+dashboard/node_modules/
+node_modules/
+*/node_modules/
+**node_modules**
