@@ -1,21 +1,21 @@
-import { useState, ChangeEvent, FormEvent } from 'react';
-import { supabase } from '../../lib/supabaseClient';
-import Button from '../../components/ui/Button';
-import Input from '../../components/ui/Input';
+import { useState, ChangeEvent, FormEvent } from "react";
+import { supabase } from "@/lib/supabaseClient";
+import Button from "@/components/ui/Button";
+import Input from "@/components/ui/Input";
 
 export default function SignUpPage() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [message, setMessage] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
 
   async function handleSignUp(e: FormEvent) {
     e.preventDefault();
     setLoading(true);
-    setMessage('');
+    setMessage("");
     const { error } = await supabase.auth.signUp({ email, password });
     if (error) setMessage(error.message);
-    else setMessage('Signup successful! Check your email for confirmation.');
+    else setMessage("Signup successful! Check your email for confirmation.");
     setLoading(false);
   }
 
@@ -51,13 +51,17 @@ export default function SignUpPage() {
           required
         />
         <Button type="submit" disabled={loading}>
-          {loading ? 'Signing up...' : 'Sign Up'}
+          {loading ? "Signing up..." : "Sign Up"}
         </Button>
       </form>
 
-  {message && <div className="mt-4 text-center text-uswift-accent">{message}</div>}
+      {message && (
+        <div className="mt-4 text-center text-uswift-accent">{message}</div>
+      )}
       <div className="mt-6 text-center">
-        <a href="/auth/signin" className="text-uswift-blue hover:underline">Already have an account?</a>
+        <a href="/auth/signin" className="text-uswift-blue hover:underline">
+          Already have an account?
+        </a>
       </div>
     </main>
   );

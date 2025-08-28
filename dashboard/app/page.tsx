@@ -1,8 +1,8 @@
-import LandingHero from "../components/LandingHero";
-import FeaturesSection from "../components/FeaturesSection";
-import HowItWorks from "../components/HowItWorks";
-import Testimonials from "../components/Testimonials";
-import CTAButton from "../components/ui/CTAButton";
+import LandingHero from "@/components/LandingHero";
+import FeaturesSection from "@/components/FeaturesSection";
+import HowItWorks from "@/components/HowItWorks";
+import Testimonials from "@/components/Testimonials";
+import CTAButton from "@/components/ui/CTAButton";
 // using a plain anchor tag instead of next/link to avoid missing module/type errors
 
 export default function HomePage() {

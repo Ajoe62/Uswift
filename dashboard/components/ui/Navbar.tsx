@@ -1,8 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useAuth } from "../../src/contexts/AuthContext";
-import CTAButton from "./CTAButton";
+import { useAuth } from "@/src/contexts/AuthContext";
+import CTAButton from "@/components/ui/CTAButton";
 
 export default function Navbar() {
   const [isLoaded, setIsLoaded] = useState(false);

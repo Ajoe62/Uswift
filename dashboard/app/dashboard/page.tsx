@@ -1,5 +1,5 @@
-import Image from 'next/image';
-import DashboardStats from '../../components/DashboardStats';
+import Image from "next/image";
+import DashboardStats from "@/components/DashboardStats";
 
 export default function DashboardHome() {
   return (
@@ -10,7 +10,9 @@ export default function DashboardHome() {
         </div>
         <div>
           <h1 className="text-3xl font-bold">Dashboard Overview</h1>
-          <p className="text-sm text-gray-600">Quick overview of your job search and stats</p>
+          <p className="text-sm text-gray-600">
+            Quick overview of your job search and stats
+          </p>
         </div>
       </header>
 

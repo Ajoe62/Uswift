@@ -1,7 +1,7 @@
 import "../styles/globals.css";
 import "../styles/uswift-accent-fallback.css";
-import Navbar from "../components/ui/Navbar";
-import { AuthProvider } from "../src/contexts/AuthContext";
+import Navbar from "@/components/ui/Navbar";
+import { AuthProvider } from "@/src/contexts/AuthContext";
 
 export default function RootLayout({
   children,

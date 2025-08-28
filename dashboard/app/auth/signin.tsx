@@ -2,10 +2,10 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { useAuth } from "../../src/contexts/AuthContext";
-import Button from "../../components/ui/Button";
-import CTAButton from "../../components/ui/CTAButton";
-import Input from "../../components/ui/Input";
+import { useAuth } from "@/src/contexts/AuthContext";
+import Button from "@/components/ui/Button";
+import CTAButton from "@/components/ui/CTAButton";
+import Input from "@/components/ui/Input";
 
 export default function SignInPage() {
   const [email, setEmail] = useState("");

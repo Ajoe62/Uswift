@@ -113,6 +113,24 @@ type RouteHandlerConfig<Route extends AppRouteHandlerRoutes = AppRouteHandlerRou
   handler satisfies AppPageConfig<"/pricing">
 }
 
+// Validate ..\..\app\api\dashboard\stats\route.ts
+{
+  const handler = {} as typeof import("..\\..\\app\\api\\dashboard\\stats\\route.js")
+  handler satisfies RouteHandlerConfig<"/api/dashboard/stats">
+}
+
+// Validate ..\..\app\api\jobs\[id]\route.ts
+{
+  const handler = {} as typeof import("..\\..\\app\\api\\jobs\\[id]\\route.js")
+  handler satisfies RouteHandlerConfig<"/api/jobs/[id]">
+}
+
+// Validate ..\..\app\api\jobs\route.ts
+{
+  const handler = {} as typeof import("..\\..\\app\\api\\jobs\\route.js")
+  handler satisfies RouteHandlerConfig<"/api/jobs">
+}
+
 // Validate ..\..\app\api\mistral\chat\route.ts
 {
   const handler = {} as typeof import("..\\..\\app\\api\\mistral\\chat\\route.js")
