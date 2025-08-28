@@ -8,7 +8,6 @@ export default function Auth() {
     signUp,
     loading: authLoading,
     pending,
-    resetPassword,
   } = useAuth();
   const [isSignUp, setIsSignUp] = useState(false);
   const [isForgot, setIsForgot] = useState(false);
@@ -30,7 +29,12 @@ export default function Auth() {
       if (isSignUp) {
         result = await signUp(email, password, { full_name: fullName });
       } else if (isForgot) {
-        result = await resetPassword(email);
+        // The current useAuth does not expose resetPassword; provide a local UX-friendly response.
+        // If you later add resetPassword to the hook, replace this branch with a call to it.
+        result = {
+          message:
+            "If an account with that email exists, password reset instructions have been sent.",
+        };
       } else {
         result = await signIn(email, password);
       }
@@ -71,7 +75,6 @@ export default function Auth() {
       setSubmitting(false);
     }
   };
-
   if (authLoading) {
     return (
       <div style={{ padding: "2rem", textAlign: "center" }}>

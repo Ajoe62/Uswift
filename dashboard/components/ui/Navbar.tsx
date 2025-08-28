@@ -1,14 +1,20 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useAuth } from "../../src/contexts/AuthContext";
 import CTAButton from "./CTAButton";
 
 export default function Navbar() {
   const [isLoaded, setIsLoaded] = useState(false);
+  const { user, signOut } = useAuth();
 
   useEffect(() => {
     setIsLoaded(true);
   }, []);
+
+  const handleSignOut = async () => {
+    await signOut();
+  };
 
   return (
     <nav className="w-full py-4 px-8 flex justify-between items-center bg-uswift-gradient text-white">
@@ -43,8 +49,23 @@ export default function Navbar() {
         <a href="/pricing" className="hover:text-uswift-accent">
           Pricing
         </a>
-        {/* CTAButton centralized for consistent CTA styling */}
-        <CTAButton href="/auth/signup">Get Started</CTAButton>
+
+        {/* Conditional rendering based on auth state */}
+        {user ? (
+          <div className="flex items-center gap-4">
+            <a href="/dashboard" className="hover:text-uswift-accent">
+              Dashboard
+            </a>
+            <button
+              onClick={handleSignOut}
+              className="text-white hover:text-uswift-accent"
+            >
+              Sign Out
+            </button>
+          </div>
+        ) : (
+          <CTAButton href="/auth/signup">Get Started</CTAButton>
+        )}
       </div>
     </nav>
   );

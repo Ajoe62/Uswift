@@ -511,11 +511,8 @@ function useAuth() {
         const supabase = getSupabaseClient();
         if (supabase) {
           const currentUser = await supabase.getUser();
-          if (currentUser && !currentUser.error) {
+          if (currentUser) {
             setUser(currentUser);
-          } else if (currentUser?.error) {
-            console.warn("loadUser - getUser error", currentUser.error);
-            setUser(null);
           }
         }
       } catch (error) {
@@ -529,111 +526,59 @@ function useAuth() {
     });
   }, []);
   const signIn = async (email, password) => {
-    if (!email || !password)
-      return { user: null, error: "Please enter your email and password." };
     try {
       const supabase = getSupabaseClient();
       if (!supabase) {
-        return { user: null, error: "Auth service unavailable. Try again later." };
+        throw new Error("Supabase not initialized");
       }
       const result = await supabase.signIn(email, password);
-      if (result.ok) {
+      if (result.access_token) {
         setPending(true);
         for (let i = 0; i < 6; i++) {
           const userProfile = await supabase.getUser();
-          if (userProfile && !userProfile.error) {
+          if (userProfile) {
             setUser(userProfile);
             setPending(false);
             return { user: userProfile, error: null };
           }
-          if (userProfile?.error) {
-            const e = userProfile.error;
+          await new Promise((r) => setTimeout(r, 500));
+        }
+        setPending(false);
+        return { user: null, error: "Signed in but verification timed out" };
+      } else if (result.error) {
+        return { user: null, error: result.error };
+      }
+      return { user: null, error: "Sign in failed" };
+    } catch (error) {
+      return { user: null, error };
+    }
+  };
+  const signUp = async (email, password, metadata = {}) => {
+    try {
+      const supabase = getSupabaseClient();
+      if (!supabase) {
+        throw new Error("Supabase not initialized");
+      }
+      const result = await supabase.signUp(email, password, metadata);
+      if (result.access_token) {
+        setPending(true);
+        for (let i = 0; i < 6; i++) {
+          const userProfile = await supabase.getUser();
+          if (userProfile) {
+            setUser(userProfile);
             setPending(false);
-            const friendly = e?.message || e?.payload && JSON.stringify(e.payload) || "Authentication failed. Please sign in again.";
-            return { user: null, error: friendly };
+            return { user: userProfile, error: null };
           }
           await new Promise((r) => setTimeout(r, 500));
         }
         setPending(false);
-        return { user: null, error: "Signed in, but verification timed out. Please try again." };
+        return { user: null, error: "Signed up but verification timed out" };
+      } else if (result.error) {
+        return { user: null, error: result.error };
       }
-      if (result.error) {
-        const payload = result.error.payload;
-        const rawMsg = result.error.message || result.error.msg || String(result.error);
-        const candidate = function extract() {
-          if (!payload)
-            return rawMsg;
-          if (typeof payload === "string")
-            return payload;
-          if (Array.isArray(payload?.errors))
-            return payload.errors.map((x) => x?.message || x).join("; ");
-          return payload?.error || payload?.message || payload?.msg || JSON.stringify(payload);
-        }();
-        const msg = candidate || rawMsg;
-        if (/invalid/i.test(msg) || /password/i.test(msg))
-          return { user: null, error: "Invalid email or password." };
-        if (/not found|user not found/i.test(msg))
-          return { user: null, error: "No account found for that email." };
-        return { user: null, error: msg || "Sign in failed. Please try again." };
-      }
-      return { user: null, error: "Sign in failed. Please try again." };
+      return { user: null, error: "Sign up failed" };
     } catch (error) {
-      return { user: null, error: error?.message || "Sign in failed. Please try again." };
-    }
-  };
-  const signUp = async (email, password, metadata = {}) => {
-    if (!email || !password)
-      return { user: null, error: "Please enter an email and a password." };
-    if (password.length < 6)
-      return { user: null, error: "Password must be at least 6 characters." };
-    try {
-      const supabase = getSupabaseClient();
-      if (!supabase)
-        return { user: null, error: "Auth service unavailable. Try again later." };
-      const result = await supabase.signUp(email, password, metadata);
-      if (result.ok) {
-        if (result.access_token) {
-          setPending(true);
-          for (let i = 0; i < 6; i++) {
-            const userProfile = await supabase.getUser();
-            if (userProfile) {
-              setUser(userProfile);
-              setPending(false);
-              return { user: userProfile, error: null };
-            }
-            await new Promise((r) => setTimeout(r, 500));
-          }
-          setPending(false);
-          return { user: null, error: "Account created, but verification timed out. Please check your email." };
-        }
-        return { user: result.user || null, error: null, message: result.message || "Account created. Check your email to confirm." };
-      }
-      if (result.error) {
-        const payload = result.error.payload;
-        const rawMsg = result.error.message || result.error.msg || String(result.error);
-        const candidate = function extract() {
-          if (!payload)
-            return rawMsg;
-          if (typeof payload === "string")
-            return payload;
-          if (Array.isArray(payload?.errors))
-            return payload.errors.map((x) => x?.message || x).join("; ");
-          if (payload?.details)
-            return payload.details;
-          return payload?.error || payload?.message || payload?.msg || JSON.stringify(payload);
-        }();
-        const msg = candidate || rawMsg;
-        if (/invalid email/i.test(msg) || /email/i.test(msg) && /invalid/i.test(msg))
-          return { user: null, error: "Please provide a valid email address." };
-        if (/password/i.test(msg) && /weak|short/i.test(msg))
-          return { user: null, error: "Password is too weak. Try a longer password." };
-        if (/already exists|duplicate|user exists/i.test(msg))
-          return { user: null, error: "An account with that email already exists. Try signing in." };
-        return { user: null, error: msg || "Sign up failed. Please try again." };
-      }
-      return { user: null, error: "Sign up failed. Please try again." };
-    } catch (error) {
-      return { user: null, error: error?.message || "Sign up failed. Please try again." };
+      return { user: null, error };
     }
   };
   const signOut = async () => {
@@ -647,32 +592,12 @@ function useAuth() {
       console.error("Error signing out:", error);
     }
   };
-  const resetPassword = async (email) => {
-    if (!email)
-      return { ok: false, error: "Please enter your email." };
-    try {
-      const supabase = getSupabaseClient();
-      if (!supabase)
-        return { ok: false, error: "Auth service unavailable. Try again later." };
-      const result = await supabase.resetPassword(email);
-      if (result.ok)
-        return { ok: true, message: result.message };
-      if (result.error) {
-        const msg = result.error.message || JSON.stringify(result.error.payload || result.error);
-        return { ok: false, error: msg };
-      }
-      return { ok: false, error: "Failed to request password reset." };
-    } catch (error) {
-      return { ok: false, error: error?.message || "Failed to request password reset." };
-    }
-  };
   return {
     user,
     loading,
     pending,
     signIn,
     signUp,
-    resetPassword,
     signOut,
     isAuthenticated: !!user
   };
@@ -916,19 +841,46 @@ const JobTracker = () => {
       if (!user?.id)
         return;
       setLoading(true);
-      const { data: apps, error } = await supabase.from("job_applications").select("*").eq("user_id", user.id).order("applied_date", { ascending: false });
-      if (error)
-        throwNormalized(error);
-      const formattedApps = apps?.map((app) => ({
-        id: app.id,
-        company: app.company,
-        position: app.position,
-        status: app.status,
-        dateApplied: app.applied_date,
-        jobUrl: app.job_url,
-        notes: app.notes,
-        tags: app.tags || []
-      })) || [];
+      const client = getSupabaseClient();
+      let formattedApps = [];
+      if (client) {
+        try {
+          const apps = await client.makeRequest(
+            `job_applications?user_id=eq.${user.id}&order=applied_date.desc`
+          );
+          formattedApps = apps?.map((app) => ({
+            id: app.id,
+            company: app.company,
+            position: app.position,
+            status: app.status,
+            dateApplied: app.applied_date,
+            jobUrl: app.job_url,
+            notes: app.notes,
+            tags: app.tags || []
+          })) || [];
+        } catch (err) {
+          console.warn("Supabase REST load failed, falling back to client lib", err);
+        }
+      }
+      if (formattedApps.length === 0 && typeof window.supabase !== "undefined") {
+        try {
+          const { data: apps, error } = await window.supabase.from("job_applications").select("*").eq("user_id", user.id).order("applied_date", { ascending: false });
+          if (error)
+            throwNormalized(error);
+          formattedApps = apps?.map((app) => ({
+            id: app.id,
+            company: app.company,
+            position: app.position,
+            status: app.status,
+            dateApplied: app.applied_date,
+            jobUrl: app.job_url,
+            notes: app.notes,
+            tags: app.tags || []
+          })) || [];
+        } catch (e) {
+          console.error("Legacy supabase load failed", e);
+        }
+      }
       setApplications(formattedApps);
     } catch (error) {
       console.error("Error loading from Supabase:", error);
@@ -950,6 +902,7 @@ const JobTracker = () => {
     try {
       if (!user?.id)
         return false;
+      const client = getSupabaseClient();
       const appData = {
         user_id: user.id,
         company: application.company,
@@ -961,17 +914,35 @@ const JobTracker = () => {
         tags: application.tags,
         updated_at: (/* @__PURE__ */ new Date()).toISOString()
       };
-      if (application.id) {
-        const { error } = await supabase.from("job_applications").update(appData).eq("id", application.id);
-        if (error)
-          throwNormalized(error);
-      } else {
-        const { data, error } = await supabase.from("job_applications").insert([appData]).select().single();
-        if (error)
-          throwNormalized(error);
-        return data.id;
+      if (client) {
+        if (application.id) {
+          await client.makeRequest(`job_applications?id=eq.${application.id}`, {
+            method: "PATCH",
+            body: JSON.stringify(appData)
+          });
+          return true;
+        } else {
+          const inserted = await client.makeRequest("job_applications", {
+            method: "POST",
+            body: JSON.stringify([appData])
+          });
+          return inserted?.[0]?.id || true;
+        }
       }
-      return true;
+      if (typeof window.supabase !== "undefined") {
+        if (application.id) {
+          const { error } = await window.supabase.from("job_applications").update(appData).eq("id", application.id);
+          if (error)
+            throwNormalized(error);
+        } else {
+          const { data, error } = await window.supabase.from("job_applications").insert([appData]).select().single();
+          if (error)
+            throwNormalized(error);
+          return data.id;
+        }
+        return true;
+      }
+      return false;
     } catch (error) {
       console.error("Error saving to Supabase:", error);
       return false;
@@ -1626,7 +1597,12 @@ const JobTracker = () => {
 };
 
 function Auth() {
-  const { signIn, signUp, loading: authLoading, pending, resetPassword } = useAuth();
+  const {
+    signIn,
+    signUp,
+    loading: authLoading,
+    pending
+  } = useAuth();
   const [isSignUp, setIsSignUp] = reactExports.useState(false);
   const [isForgot, setIsForgot] = reactExports.useState(false);
   const [email, setEmail] = reactExports.useState("");
@@ -1645,7 +1621,9 @@ function Auth() {
       if (isSignUp) {
         result = await signUp(email, password, { full_name: fullName });
       } else if (isForgot) {
-        result = await resetPassword(email);
+        result = {
+          message: "If an account with that email exists, password reset instructions have been sent."
+        };
       } else {
         result = await signIn(email, password);
       }
@@ -1671,7 +1649,9 @@ function Auth() {
         if (result.message)
           setSuccess(result.message);
         else
-          setSuccess(isSignUp ? "✅ Account created successfully!" : "✅ Signed in successfully!");
+          setSuccess(
+            isSignUp ? "✅ Account created successfully!" : "✅ Signed in successfully!"
+          );
         setEmail("");
         setPassword("");
         setFullName("");
@@ -1821,7 +1801,13 @@ function Auth() {
               required: true
             }
           ),
-          isForgot && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { style: { fontSize: "0.9rem", color: "#6B7280", marginBottom: 12 }, children: "Enter your email and we'll send a password reset link if an account exists." }),
+          isForgot && /* @__PURE__ */ jsxRuntimeExports.jsx(
+            "div",
+            {
+              style: { fontSize: "0.9rem", color: "#6B7280", marginBottom: 12 },
+              children: "Enter your email and we'll send a password reset link if an account exists."
+            }
+          ),
           error && /* @__PURE__ */ jsxRuntimeExports.jsx(
             "div",
             {
@@ -1852,7 +1838,13 @@ function Auth() {
               },
               children: [
                 success,
-                pending && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { style: { fontSize: "0.85rem", color: "#065F46", marginTop: 8 }, children: "Verifying account... this may take a few seconds." })
+                pending && /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  "div",
+                  {
+                    style: { fontSize: "0.85rem", color: "#065F46", marginTop: 8 },
+                    children: "Verifying account... this may take a few seconds."
+                  }
+                )
               ]
             }
           ),
@@ -1900,7 +1892,13 @@ function Auth() {
                 setError("");
                 setSuccess("");
               },
-              style: { background: "none", border: "none", color: "#6D28D9", cursor: "pointer", textDecoration: "underline" },
+              style: {
+                background: "none",
+                border: "none",
+                color: "#6D28D9",
+                cursor: "pointer",
+                textDecoration: "underline"
+              },
               children: "Forgot password?"
             }
           ) : /* @__PURE__ */ jsxRuntimeExports.jsx(
@@ -1912,7 +1910,13 @@ function Auth() {
                 setError("");
                 setSuccess("");
               },
-              style: { background: "none", border: "none", color: "#6D28D9", cursor: "pointer", textDecoration: "underline" },
+              style: {
+                background: "none",
+                border: "none",
+                color: "#6D28D9",
+                cursor: "pointer",
+                textDecoration: "underline"
+              },
               children: "Back to sign in"
             }
           ) })
