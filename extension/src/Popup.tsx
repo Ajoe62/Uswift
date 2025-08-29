@@ -5,6 +5,12 @@ import React, { useState, useEffect } from "react";
 import "./index.css";
 import ProfileVault from "./ProfileVault";
 import JobTracker from "./JobTracker";
+import ChatInterface from "./ChatInterface";
+import ResumeEnhancement from "./ResumeEnhancement";
+import CoverLetterGenerator from "./CoverLetterGenerator";
+import FileManager from "./FileManager";
+import JobAnalysis from "./JobAnalysis";
+import InterviewPrep from "./InterviewPrep";
 import { useAuth } from "./hooks/useAuth";
 import Auth from "./Auth";
 import { getSupabaseClient } from "./supabaseClient";
@@ -34,7 +40,17 @@ export default function Popup() {
       setForceRerender((prev) => prev + 1);
     }
   }, [isAuthenticated, user]);
-  const [page, setPage] = useState<"home" | "profile" | "tracker">("home");
+  const [page, setPage] = useState<
+    | "home"
+    | "profile"
+    | "tracker"
+    | "chat"
+    | "resume"
+    | "cover-letter"
+    | "files"
+    | "job-analysis"
+    | "interview-prep"
+  >("home");
   const [profile, setProfile] = useState({
     resume: "",
     coverLetter: "",
@@ -257,6 +273,204 @@ export default function Popup() {
     );
   }
 
+  if (page === "chat") {
+    return (
+      <div>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            margin: "1rem",
+          }}
+        >
+          <button className="uswift-btn" onClick={() => setPage("home")}>
+            ← Back
+          </button>
+          <button
+            onClick={signOut}
+            style={{
+              background: "#EDE9FE",
+              color: "#6D28D9",
+              border: "none",
+              borderRadius: 8,
+              padding: "8px 12px",
+              cursor: "pointer",
+            }}
+          >
+            Sign Out
+          </button>
+        </div>
+        <ChatInterface />
+      </div>
+    );
+  }
+
+  if (page === "resume") {
+    return (
+      <div>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            margin: "1rem",
+          }}
+        >
+          <button className="uswift-btn" onClick={() => setPage("home")}>
+            ← Back
+          </button>
+          <button
+            onClick={signOut}
+            style={{
+              background: "#EDE9FE",
+              color: "#6D28D9",
+              border: "none",
+              borderRadius: 8,
+              padding: "8px 12px",
+              cursor: "pointer",
+            }}
+          >
+            Sign Out
+          </button>
+        </div>
+        <ResumeEnhancement />
+      </div>
+    );
+  }
+
+  if (page === "cover-letter") {
+    return (
+      <div>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            margin: "1rem",
+          }}
+        >
+          <button className="uswift-btn" onClick={() => setPage("home")}>
+            ← Back
+          </button>
+          <button
+            onClick={signOut}
+            style={{
+              background: "#EDE9FE",
+              color: "#6D28D9",
+              border: "none",
+              borderRadius: 8,
+              padding: "8px 12px",
+              cursor: "pointer",
+            }}
+          >
+            Sign Out
+          </button>
+        </div>
+        <CoverLetterGenerator />
+      </div>
+    );
+  }
+
+  if (page === "files") {
+    return (
+      <div>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            margin: "1rem",
+          }}
+        >
+          <button className="uswift-btn" onClick={() => setPage("home")}>
+            ← Back
+          </button>
+          <button
+            onClick={signOut}
+            style={{
+              background: "#EDE9FE",
+              color: "#6D28D9",
+              border: "none",
+              borderRadius: 8,
+              padding: "8px 12px",
+              cursor: "pointer",
+            }}
+          >
+            Sign Out
+          </button>
+        </div>
+        <FileManager />
+      </div>
+    );
+  }
+
+  if (page === "job-analysis") {
+    return (
+      <div>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            margin: "1rem",
+          }}
+        >
+          <button className="uswift-btn" onClick={() => setPage("home")}>
+            ← Back
+          </button>
+          <button
+            onClick={signOut}
+            style={{
+              background: "#EDE9FE",
+              color: "#6D28D9",
+              border: "none",
+              borderRadius: 8,
+              padding: "8px 12px",
+              cursor: "pointer",
+            }}
+          >
+            Sign Out
+          </button>
+        </div>
+        <JobAnalysis />
+      </div>
+    );
+  }
+
+  if (page === "interview-prep") {
+    return (
+      <div>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            margin: "1rem",
+          }}
+        >
+          <button className="uswift-btn" onClick={() => setPage("home")}>
+            ← Back
+          </button>
+          <button
+            onClick={signOut}
+            style={{
+              background: "#EDE9FE",
+              color: "#6D28D9",
+              border: "none",
+              borderRadius: 8,
+              padding: "8px 12px",
+              cursor: "pointer",
+            }}
+          >
+            Sign Out
+          </button>
+        </div>
+        <InterviewPrep />
+      </div>
+    );
+  }
+
   return (
     <div
       style={{
@@ -386,7 +600,9 @@ export default function Popup() {
             )}
           </div>
         )}
-        <div style={{ display: "flex", gap: 8, marginTop: 8 }}>
+        <div
+          style={{ display: "flex", gap: 8, marginTop: 8, flexWrap: "wrap" }}
+        >
           <button
             className="uswift-btn"
             style={{ background: "#EDE9FE", color: "#6D28D9" }}
@@ -401,6 +617,101 @@ export default function Popup() {
           >
             Job Tracker
           </button>
+        </div>
+
+        {/* AI Features Section */}
+        <div style={{ marginTop: 20 }}>
+          <h3
+            style={{
+              fontSize: "1rem",
+              fontWeight: 600,
+              color: "#111827",
+              marginBottom: 12,
+              textAlign: "center",
+            }}
+          >
+            🤖 AI-Powered Tools
+          </h3>
+          <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+            <button
+              className="uswift-btn"
+              style={{
+                background: "#10B981",
+                color: "#FFFFFF",
+                flex: 1,
+                minWidth: 120,
+              }}
+              onClick={() => setPage("chat")}
+            >
+              💬 AI Assistant
+            </button>
+            <button
+              className="uswift-btn"
+              style={{
+                background: "#3B82F6",
+                color: "#FFFFFF",
+                flex: 1,
+                minWidth: 120,
+              }}
+              onClick={() => setPage("resume")}
+            >
+              📄 Resume AI
+            </button>
+            <button
+              className="uswift-btn"
+              style={{
+                background: "#8B5CF6",
+                color: "#FFFFFF",
+                flex: 1,
+                minWidth: 120,
+              }}
+              onClick={() => setPage("cover-letter")}
+            >
+              ✍️ Cover Letter
+            </button>
+          </div>
+
+          {/* Advanced AI Features */}
+          <div style={{ marginTop: 12 }}>
+            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+              <button
+                className="uswift-btn"
+                style={{
+                  background: "#F59E0B",
+                  color: "#FFFFFF",
+                  flex: 1,
+                  minWidth: 120,
+                }}
+                onClick={() => setPage("files")}
+              >
+                📁 File Manager
+              </button>
+              <button
+                className="uswift-btn"
+                style={{
+                  background: "#EC4899",
+                  color: "#FFFFFF",
+                  flex: 1,
+                  minWidth: 120,
+                }}
+                onClick={() => setPage("job-analysis")}
+              >
+                🔍 Job Analysis
+              </button>
+              <button
+                className="uswift-btn"
+                style={{
+                  background: "#14B8A6",
+                  color: "#FFFFFF",
+                  flex: 1,
+                  minWidth: 120,
+                }}
+                onClick={() => setPage("interview-prep")}
+              >
+                🎤 Interview Prep
+              </button>
+            </div>
+          </div>
         </div>
       </div>
 

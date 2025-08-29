@@ -1664,13 +1664,4379 @@ const JobTracker = () => {
   );
 };
 
+class MistralClient {
+  config;
+  constructor(config) {
+    this.config = config;
+  }
+  async makeRequest(endpoint, options) {
+    const url = `${this.config.baseUrl}${endpoint}`;
+    const response = await fetch(url, {
+      ...options,
+      headers: {
+        Authorization: `Bearer ${this.config.apiKey}`,
+        "Content-Type": "application/json",
+        ...options.headers
+      },
+      mode: "cors"
+    });
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({ error: "Network error" }));
+      throw new Error(
+        errorData.error?.message || `HTTP ${response.status}: ${response.statusText}`
+      );
+    }
+    return await response.json();
+  }
+  // Chat completion
+  async chat(request) {
+    const chatUrl = this.config.chatUrl || "/v1/chat/completions";
+    return await this.makeRequest(chatUrl, {
+      method: "POST",
+      body: JSON.stringify({
+        model: request.model || "mistral-tiny",
+        messages: request.messages,
+        max_tokens: request.max_tokens || 512,
+        temperature: request.temperature || 0.7,
+        stream: request.stream || false
+      })
+    });
+  }
+  // Simple chat with text prompt
+  async chatWithPrompt(prompt, options) {
+    const messages = [];
+    if (options?.systemMessage) {
+      messages.push({
+        role: "system",
+        content: options.systemMessage
+      });
+    }
+    messages.push({
+      role: "user",
+      content: prompt
+    });
+    const response = await this.chat({
+      messages,
+      model: options?.model,
+      max_tokens: options?.max_tokens,
+      temperature: options?.temperature
+    });
+    return response.choices[0]?.message?.content || "";
+  }
+  // Generate embeddings
+  async generateEmbeddings(request) {
+    const embeddingsUrl = this.config.embeddingsUrl || "/v1/embeddings";
+    return await this.makeRequest(embeddingsUrl, {
+      method: "POST",
+      body: JSON.stringify({
+        input: request.input,
+        model: request.model || "mistral-embed",
+        encoding_format: request.encoding_format || "float"
+      })
+    });
+  }
+  // Resume enhancement
+  async enhanceResume(resumeContent, jobDescription) {
+    const systemMessage = `You are an expert resume writer and career coach. Your task is to enhance and optimize resumes to make them more compelling for job applications. Focus on:
+
+1. Strong action verbs and quantifiable achievements
+2. Relevant keywords from the job description
+3. Clear, concise language
+4. Professional formatting suggestions
+5. Skills optimization
+6. Experience highlighting
+
+Provide specific suggestions for improvement and a rewritten version if appropriate.`;
+    let prompt = `Please enhance the following resume:
+
+${resumeContent}`;
+    if (jobDescription) {
+      prompt += `
+
+For the following job description:
+
+${jobDescription}`;
+    }
+    prompt += `
+
+Please provide:
+1. Key improvements needed
+2. Enhanced version of the resume
+3. Specific suggestions for tailoring to the job`;
+    return await this.chatWithPrompt(prompt, {
+      model: "mistral-small",
+      max_tokens: 2048,
+      temperature: 0.7,
+      systemMessage
+    });
+  }
+  // Cover letter generation
+  async generateCoverLetter(resumeContent, jobDescription, companyName) {
+    const systemMessage = `You are a professional cover letter writer. Create compelling, personalized cover letters that:
+
+1. Highlight relevant experience and skills
+2. Show enthusiasm for the role and company
+3. Connect the candidate's background to the job requirements
+4. Use professional, engaging language
+5. Keep it concise (250-400 words)
+6. Include a strong call-to-action
+
+Structure: Introduction, Body paragraphs highlighting key qualifications, Conclusion with enthusiasm.`;
+    const prompt = `Please write a personalized cover letter for this job application:
+
+**Resume Content:**
+${resumeContent}
+
+**Job Description:**
+${jobDescription}
+
+**Company Name:** ${companyName || "the company"}
+
+Please create a professional cover letter that effectively connects the candidate's experience with the job requirements.`;
+    return await this.chatWithPrompt(prompt, {
+      model: "mistral-small",
+      max_tokens: 1024,
+      temperature: 0.8,
+      systemMessage
+    });
+  }
+  // Job description analysis
+  async analyzeJobDescription(jobDescription) {
+    const systemMessage = `You are a career counselor and job market expert. Analyze job descriptions to extract:
+
+1. Key requirements and qualifications
+2. Important skills and technologies
+3. Company culture indicators
+4. Career level assessment
+5. Salary range insights
+6. Application tips
+
+Provide clear, actionable insights for job seekers.`;
+    const prompt = `Please analyze this job description and provide insights for job seekers:
+
+${jobDescription}
+
+Please structure your analysis with:
+- Key Requirements
+- Required Skills
+- Nice-to-Have Skills
+- Company Culture Insights
+- Application Strategy Tips`;
+    return await this.chatWithPrompt(prompt, {
+      model: "mistral-small",
+      max_tokens: 1024,
+      temperature: 0.6,
+      systemMessage
+    });
+  }
+  // Skills gap analysis
+  async analyzeSkillsGap(userSkills, jobRequirements) {
+    const systemMessage = `You are a career development expert. Help candidates identify skill gaps and create development plans.
+
+Focus on:
+1. Matching existing skills to requirements
+2. Identifying gaps and learning priorities
+3. Suggesting learning resources
+4. Timeline recommendations
+5. Alternative qualifications that could compensate`;
+    const prompt = `Compare the candidate's skills with job requirements and provide a skills gap analysis:
+
+**Candidate Skills:**
+${userSkills}
+
+**Job Requirements:**
+${jobRequirements}
+
+Please provide:
+1. Skills Match Assessment
+2. Key Gaps to Address
+3. Learning Recommendations
+4. Timeline Suggestions
+5. Alternative Approaches`;
+    return await this.chatWithPrompt(prompt, {
+      model: "mistral-small",
+      max_tokens: 1024,
+      temperature: 0.7,
+      systemMessage
+    });
+  }
+}
+const DEFAULT_CONFIG = {
+  apiKey: "your-mistral-api-key-here",
+  // Replace with actual key
+  baseUrl: "https://api.mistral.ai",
+  chatUrl: "/v1/chat/completions",
+  embeddingsUrl: "/v1/embeddings"
+};
+let mistralClient = null;
+function getMistralClient() {
+  if (!mistralClient) {
+    mistralClient = new MistralClient(DEFAULT_CONFIG);
+  }
+  return mistralClient;
+}
+
+const QUICK_PROMPTS = [
+  // Career Development
+  {
+    id: "career-advice",
+    label: "Career Advice",
+    prompt: "I need advice on advancing my career. Can you help me identify growth opportunities and create a development plan?",
+    category: "Career"
+  },
+  {
+    id: "interview-prep",
+    label: "Interview Prep",
+    prompt: "Help me prepare for a technical interview. What are common questions and how should I structure my answers?",
+    category: "Career"
+  },
+  {
+    id: "skill-development",
+    label: "Skill Development",
+    prompt: "What skills should I focus on to stay competitive in the tech industry? Please suggest a learning roadmap.",
+    category: "Career"
+  },
+  // Job Search
+  {
+    id: "job-search-strategy",
+    label: "Job Search Strategy",
+    prompt: "Create a comprehensive job search strategy for me. Include networking, application tips, and follow-up strategies.",
+    category: "Job Search"
+  },
+  {
+    id: "resume-review",
+    label: "Resume Review",
+    prompt: "I'd like you to review my resume and suggest improvements. What are the key elements I should focus on?",
+    category: "Job Search"
+  },
+  {
+    id: "salary-negotiation",
+    label: "Salary Negotiation",
+    prompt: "Help me prepare for salary negotiations. What factors should I consider and how should I approach the discussion?",
+    category: "Job Search"
+  },
+  // Professional Development
+  {
+    id: "leadership-skills",
+    label: "Leadership Skills",
+    prompt: "What are essential leadership skills for technical professionals? How can I develop them?",
+    category: "Professional"
+  },
+  {
+    id: "communication",
+    label: "Communication Skills",
+    prompt: "How can I improve my technical communication skills, both written and verbal?",
+    category: "Professional"
+  },
+  {
+    id: "work-life-balance",
+    label: "Work-Life Balance",
+    prompt: "How can I maintain a healthy work-life balance while pursuing career growth?",
+    category: "Professional"
+  }
+];
+function ChatInterface() {
+  const [messages, setMessages] = reactExports.useState([
+    {
+      id: "welcome",
+      role: "assistant",
+      content: "Hello! I'm your AI career assistant powered by Mistral AI. I can help you with:\n\n• Resume and cover letter optimization\n• Career advice and planning\n• Interview preparation\n• Job search strategies\n• Skill development guidance\n\nWhat would you like to work on today?",
+      timestamp: /* @__PURE__ */ new Date()
+    }
+  ]);
+  const [inputMessage, setInputMessage] = reactExports.useState("");
+  const [isLoading, setIsLoading] = reactExports.useState(false);
+  const [selectedCategory, setSelectedCategory] = reactExports.useState("All");
+  const messagesEndRef = reactExports.useRef(null);
+  const mistralClient = getMistralClient();
+  reactExports.useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
+  const categories = [
+    "All",
+    ...Array.from(new Set(QUICK_PROMPTS.map((p) => p.category)))
+  ];
+  const filteredPrompts = selectedCategory === "All" ? QUICK_PROMPTS : QUICK_PROMPTS.filter((p) => p.category === selectedCategory);
+  const sendMessage = async (content) => {
+    if (!content.trim() || isLoading)
+      return;
+    const userMessage = {
+      id: `user-${Date.now()}`,
+      role: "user",
+      content: content.trim(),
+      timestamp: /* @__PURE__ */ new Date()
+    };
+    const loadingMessage = {
+      id: `assistant-${Date.now()}`,
+      role: "assistant",
+      content: "",
+      timestamp: /* @__PURE__ */ new Date(),
+      isLoading: true
+    };
+    setMessages((prev) => [...prev, userMessage, loadingMessage]);
+    setInputMessage("");
+    setIsLoading(true);
+    try {
+      const response = await mistralClient.chatWithPrompt(content, {
+        model: "mistral-small",
+        max_tokens: 1024,
+        temperature: 0.7,
+        systemMessage: "You are a helpful career assistant and job search expert. Provide practical, actionable advice and be encouraging and professional."
+      });
+      setMessages(
+        (prev) => prev.map(
+          (msg) => msg.id === loadingMessage.id ? { ...msg, content: response, isLoading: false } : msg
+        )
+      );
+    } catch (error) {
+      console.error("Chat error:", error);
+      setMessages(
+        (prev) => prev.map(
+          (msg) => msg.id === loadingMessage.id ? {
+            ...msg,
+            content: "Sorry, I encountered an error while processing your request. Please try again.",
+            isLoading: false
+          } : msg
+        )
+      );
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  const handleQuickPrompt = (prompt) => {
+    sendMessage(prompt.prompt);
+  };
+  const clearChat = () => {
+    setMessages([
+      {
+        id: "welcome",
+        role: "assistant",
+        content: "Hello! I'm your AI career assistant powered by Mistral AI. I can help you with:\n\n• Resume and cover letter optimization\n• Career advice and planning\n• Interview preparation\n• Job search strategies\n• Skill development guidance\n\nWhat would you like to work on today?",
+        timestamp: /* @__PURE__ */ new Date()
+      }
+    ]);
+  };
+  const formatMessage = (content) => {
+    return content.split("\n").map((line, index) => /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { children: [
+      line,
+      index < content.split("\n").length - 1 && /* @__PURE__ */ jsxRuntimeExports.jsx("br", {})
+    ] }, index));
+  };
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs(
+    "div",
+    {
+      style: {
+        background: "#FFFFFF",
+        borderRadius: "1.5rem",
+        padding: "2rem",
+        minWidth: 350,
+        minHeight: 520,
+        display: "flex",
+        flexDirection: "column"
+      },
+      children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          "div",
+          {
+            className: "uswift-gradient",
+            style: {
+              height: 8,
+              borderRadius: 8,
+              marginBottom: 16
+            }
+          }
+        ),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(
+          "div",
+          {
+            style: {
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              marginBottom: 16
+            },
+            children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "h2",
+                {
+                  style: {
+                    fontSize: "1.4rem",
+                    fontWeight: 700,
+                    color: "#111827",
+                    margin: 0
+                  },
+                  children: "AI Assistant"
+                }
+              ),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "button",
+                {
+                  onClick: clearChat,
+                  style: {
+                    background: "#EDE9FE",
+                    color: "#6D28D9",
+                    border: "none",
+                    borderRadius: 8,
+                    padding: "6px 12px",
+                    cursor: "pointer",
+                    fontSize: "0.8rem"
+                  },
+                  children: "Clear Chat"
+                }
+              )
+            ]
+          }
+        ),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { marginBottom: 16 }, children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            "div",
+            {
+              style: {
+                display: "flex",
+                gap: 8,
+                marginBottom: 12,
+                flexWrap: "wrap"
+              },
+              children: categories.map((category) => /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "button",
+                {
+                  onClick: () => setSelectedCategory(category),
+                  style: {
+                    background: selectedCategory === category ? "#6D28D9" : "#F3F4F6",
+                    color: selectedCategory === category ? "#FFFFFF" : "#6B7280",
+                    border: "none",
+                    borderRadius: 6,
+                    padding: "4px 12px",
+                    cursor: "pointer",
+                    fontSize: "0.8rem",
+                    fontWeight: 500
+                  },
+                  children: category
+                },
+                category
+              ))
+            }
+          ),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            "div",
+            {
+              style: {
+                display: "flex",
+                gap: 8,
+                flexWrap: "wrap",
+                maxHeight: 120,
+                overflowY: "auto"
+              },
+              children: filteredPrompts.slice(0, 6).map((prompt) => /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "button",
+                {
+                  onClick: () => handleQuickPrompt(prompt),
+                  disabled: isLoading,
+                  style: {
+                    background: "#F8F9FA",
+                    border: "1px solid #E5E7EB",
+                    borderRadius: 8,
+                    padding: "8px 12px",
+                    cursor: isLoading ? "not-allowed" : "pointer",
+                    fontSize: "0.8rem",
+                    color: "#4B5563",
+                    opacity: isLoading ? 0.6 : 1,
+                    transition: "all 0.2s ease",
+                    flex: "1 1 auto",
+                    minWidth: 120,
+                    textAlign: "left",
+                    whiteSpace: "nowrap",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis"
+                  },
+                  onMouseEnter: (e) => {
+                    if (!isLoading) {
+                      e.currentTarget.style.background = "#EDE9FE";
+                      e.currentTarget.style.borderColor = "#6D28D9";
+                    }
+                  },
+                  onMouseLeave: (e) => {
+                    if (!isLoading) {
+                      e.currentTarget.style.background = "#F8F9FA";
+                      e.currentTarget.style.borderColor = "#E5E7EB";
+                    }
+                  },
+                  children: prompt.label
+                },
+                prompt.id
+              ))
+            }
+          )
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(
+          "div",
+          {
+            style: {
+              flex: 1,
+              overflowY: "auto",
+              marginBottom: 16,
+              maxHeight: 300
+            },
+            children: [
+              messages.map((message) => /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "div",
+                {
+                  style: {
+                    marginBottom: 16,
+                    display: "flex",
+                    flexDirection: message.role === "user" ? "row-reverse" : "row"
+                  },
+                  children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                    "div",
+                    {
+                      style: {
+                        maxWidth: "80%",
+                        padding: "12px 16px",
+                        borderRadius: 12,
+                        background: message.role === "user" ? "#6D28D9" : "#F3F4F6",
+                        color: message.role === "user" ? "#FFFFFF" : "#111827",
+                        fontSize: "0.9rem",
+                        lineHeight: 1.4,
+                        position: "relative"
+                      },
+                      children: [
+                        message.isLoading ? /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { display: "flex", alignItems: "center", gap: 8 }, children: [
+                          /* @__PURE__ */ jsxRuntimeExports.jsx(
+                            "div",
+                            {
+                              style: {
+                                width: 16,
+                                height: 16,
+                                border: "2px solid #6D28D9",
+                                borderTop: "2px solid transparent",
+                                borderRadius: "50%",
+                                animation: "spin 1s linear infinite"
+                              }
+                            }
+                          ),
+                          /* @__PURE__ */ jsxRuntimeExports.jsx("span", { style: { color: "#6B7280" }, children: "Thinking..." })
+                        ] }) : formatMessage(message.content),
+                        /* @__PURE__ */ jsxRuntimeExports.jsx(
+                          "div",
+                          {
+                            style: {
+                              fontSize: "0.7rem",
+                              opacity: 0.7,
+                              marginTop: 4,
+                              textAlign: message.role === "user" ? "right" : "left"
+                            },
+                            children: message.timestamp.toLocaleTimeString([], {
+                              hour: "2-digit",
+                              minute: "2-digit"
+                            })
+                          }
+                        )
+                      ]
+                    }
+                  )
+                },
+                message.id
+              )),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { ref: messagesEndRef })
+            ]
+          }
+        ),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { display: "flex", gap: 8 }, children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            "input",
+            {
+              type: "text",
+              value: inputMessage,
+              onChange: (e) => setInputMessage(e.target.value),
+              onKeyPress: (e) => {
+                if (e.key === "Enter" && !e.shiftKey) {
+                  e.preventDefault();
+                  sendMessage(inputMessage);
+                }
+              },
+              placeholder: "Ask me anything about your career...",
+              disabled: isLoading,
+              style: {
+                flex: 1,
+                padding: "12px 16px",
+                borderRadius: 8,
+                border: "1px solid #E5E7EB",
+                fontSize: "0.9rem",
+                outline: "none",
+                opacity: isLoading ? 0.6 : 1
+              }
+            }
+          ),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            "button",
+            {
+              onClick: () => sendMessage(inputMessage),
+              disabled: isLoading || !inputMessage.trim(),
+              className: "uswift-btn",
+              style: {
+                padding: "12px 16px",
+                opacity: isLoading || !inputMessage.trim() ? 0.6 : 1,
+                cursor: isLoading || !inputMessage.trim() ? "not-allowed" : "pointer",
+                minWidth: 60
+              },
+              children: isLoading ? "..." : "Send"
+            }
+          )
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          "div",
+          {
+            style: {
+              marginTop: 12,
+              textAlign: "center",
+              fontSize: "0.8rem",
+              color: "#6B7280"
+            },
+            children: "Powered by Mistral AI • Ask me about career advice, resume help, or interview tips!"
+          }
+        )
+      ]
+    }
+  );
+}
+
+function ResumeEnhancement() {
+  const [resumeContent, setResumeContent] = reactExports.useState("");
+  const [jobDescription, setJobDescription] = reactExports.useState("");
+  const [isLoading, setIsLoading] = reactExports.useState(false);
+  const [result, setResult] = reactExports.useState(null);
+  const [activeTab, setActiveTab] = reactExports.useState("input");
+  const [enhancementType, setEnhancementType] = reactExports.useState("general");
+  const mistralClient = getMistralClient();
+  const handleEnhance = async () => {
+    if (!resumeContent.trim()) {
+      alert("Please enter your resume content");
+      return;
+    }
+    setIsLoading(true);
+    try {
+      const response = await mistralClient.enhanceResume(
+        resumeContent,
+        enhancementType === "job-specific" ? jobDescription : void 0
+      );
+      const parsedResult = parseEnhancementResponse(response);
+      setResult(parsedResult);
+      setActiveTab("result");
+    } catch (error) {
+      console.error("Resume enhancement error:", error);
+      alert("Failed to enhance resume. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  const parseEnhancementResponse = (response) => {
+    const suggestions = extractSection(response, "Suggestions", "Enhanced Resume") || extractSection(response, "Key improvements", "Enhanced") || "General suggestions for resume improvement";
+    const enhancedResume = extractSection(response, "Enhanced Resume", "Score") || extractSection(response, "Enhanced version", "") || response;
+    const score = extractScore(response);
+    const improvements = extractImprovements(response);
+    return {
+      suggestions,
+      enhancedResume,
+      score,
+      improvements
+    };
+  };
+  const extractSection = (text, startMarker, endMarker) => {
+    const startIndex = text.indexOf(startMarker);
+    if (startIndex === -1)
+      return "";
+    const contentStart = startIndex + startMarker.length;
+    const endIndex = endMarker ? text.indexOf(endMarker, contentStart) : text.length;
+    return text.substring(contentStart, endIndex).trim();
+  };
+  const extractScore = (text) => {
+    const scoreMatch = text.match(/(\d+)\/100|score[:\s]+(\d+)|(\d+)%/i);
+    if (scoreMatch) {
+      const score = parseInt(scoreMatch[1] || scoreMatch[2] || scoreMatch[3]);
+      return Math.min(100, Math.max(0, score));
+    }
+    return 75;
+  };
+  const extractImprovements = (text) => {
+    const lines = text.split("\n");
+    const improvements = [];
+    for (const line of lines) {
+      const trimmed = line.trim();
+      if (trimmed.startsWith("•") || trimmed.startsWith("-") || trimmed.startsWith("*")) {
+        improvements.push(trimmed.substring(1).trim());
+      } else if (trimmed.match(/^\d+\./)) {
+        improvements.push(trimmed.replace(/^\d+\.\s*/, ""));
+      }
+    }
+    return improvements.slice(0, 5);
+  };
+  const getScoreColor = (score) => {
+    if (score >= 80)
+      return "#10B981";
+    if (score >= 60)
+      return "#F59E0B";
+    return "#EF4444";
+  };
+  const getScoreLabel = (score) => {
+    if (score >= 80)
+      return "Excellent";
+    if (score >= 60)
+      return "Good";
+    return "Needs Improvement";
+  };
+  const copyToClipboard = (text) => {
+    navigator.clipboard.writeText(text).then(() => {
+      alert("Copied to clipboard!");
+    }).catch(() => {
+      const textArea = document.createElement("textarea");
+      textArea.value = text;
+      document.body.appendChild(textArea);
+      textArea.select();
+      document.execCommand("copy");
+      document.body.removeChild(textArea);
+      alert("Copied to clipboard!");
+    });
+  };
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs(
+    "div",
+    {
+      style: {
+        background: "#FFFFFF",
+        borderRadius: "1.5rem",
+        padding: "2rem",
+        minWidth: 350,
+        minHeight: 520
+      },
+      children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          "div",
+          {
+            className: "uswift-gradient",
+            style: {
+              height: 8,
+              borderRadius: 8,
+              marginBottom: 16
+            }
+          }
+        ),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(
+          "div",
+          {
+            style: {
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              marginBottom: 16
+            },
+            children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "h2",
+                {
+                  style: {
+                    fontSize: "1.4rem",
+                    fontWeight: 700,
+                    color: "#111827",
+                    margin: 0
+                  },
+                  children: "Resume Enhancement"
+                }
+              ),
+              activeTab === "result" && /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "button",
+                {
+                  onClick: () => setActiveTab("input"),
+                  style: {
+                    background: "#EDE9FE",
+                    color: "#6D28D9",
+                    border: "none",
+                    borderRadius: 8,
+                    padding: "6px 12px",
+                    cursor: "pointer",
+                    fontSize: "0.8rem"
+                  },
+                  children: "← Back to Edit"
+                }
+              )
+            ]
+          }
+        ),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(
+          "div",
+          {
+            style: {
+              display: "flex",
+              marginBottom: 16,
+              borderBottom: "1px solid #E5E7EB"
+            },
+            children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "button",
+                {
+                  onClick: () => setActiveTab("input"),
+                  style: {
+                    background: "none",
+                    border: "none",
+                    padding: "12px 16px",
+                    cursor: "pointer",
+                    fontSize: "0.9rem",
+                    fontWeight: activeTab === "input" ? 600 : 400,
+                    color: activeTab === "input" ? "#6D28D9" : "#6B7280",
+                    borderBottom: activeTab === "input" ? "2px solid #6D28D9" : "none"
+                  },
+                  children: "Input"
+                }
+              ),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "button",
+                {
+                  onClick: () => setActiveTab("result"),
+                  disabled: !result,
+                  style: {
+                    background: "none",
+                    border: "none",
+                    padding: "12px 16px",
+                    cursor: result ? "pointer" : "not-allowed",
+                    fontSize: "0.9rem",
+                    fontWeight: activeTab === "result" ? 600 : 400,
+                    color: activeTab === "result" ? "#6D28D9" : "#6B7280",
+                    borderBottom: activeTab === "result" ? "2px solid #6D28D9" : "none",
+                    opacity: result ? 1 : 0.5
+                  },
+                  children: "Enhanced Resume"
+                }
+              )
+            ]
+          }
+        ),
+        activeTab === "input" && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { marginBottom: 16 }, children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "label",
+              {
+                style: {
+                  display: "block",
+                  fontSize: "0.9rem",
+                  fontWeight: 600,
+                  color: "#374151",
+                  marginBottom: 8
+                },
+                children: "Enhancement Type:"
+              }
+            ),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { display: "flex", gap: 8 }, children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "button",
+                {
+                  onClick: () => setEnhancementType("general"),
+                  style: {
+                    background: enhancementType === "general" ? "#6D28D9" : "#F3F4F6",
+                    color: enhancementType === "general" ? "#FFFFFF" : "#6B7280",
+                    border: "none",
+                    borderRadius: 6,
+                    padding: "8px 16px",
+                    cursor: "pointer",
+                    fontSize: "0.8rem",
+                    fontWeight: 500
+                  },
+                  children: "General Enhancement"
+                }
+              ),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "button",
+                {
+                  onClick: () => setEnhancementType("job-specific"),
+                  style: {
+                    background: enhancementType === "job-specific" ? "#6D28D9" : "#F3F4F6",
+                    color: enhancementType === "job-specific" ? "#FFFFFF" : "#6B7280",
+                    border: "none",
+                    borderRadius: 6,
+                    padding: "8px 16px",
+                    cursor: "pointer",
+                    fontSize: "0.8rem",
+                    fontWeight: 500
+                  },
+                  children: "Job-Specific Tailoring"
+                }
+              )
+            ] })
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "uswift-card", style: { marginBottom: 16 }, children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "label",
+              {
+                style: {
+                  fontWeight: 600,
+                  display: "block",
+                  marginBottom: 8,
+                  color: "#374151"
+                },
+                children: "Your Resume Content:"
+              }
+            ),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "textarea",
+              {
+                value: resumeContent,
+                onChange: (e) => setResumeContent(e.target.value),
+                placeholder: "Paste your current resume content here...",
+                rows: 8,
+                style: {
+                  width: "100%",
+                  padding: 12,
+                  borderRadius: 8,
+                  border: "1px solid #E5E7EB",
+                  fontSize: "0.9rem",
+                  resize: "vertical",
+                  fontFamily: "monospace"
+                }
+              }
+            )
+          ] }),
+          enhancementType === "job-specific" && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "uswift-card", style: { marginBottom: 16 }, children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "label",
+              {
+                style: {
+                  fontWeight: 600,
+                  display: "block",
+                  marginBottom: 8,
+                  color: "#374151"
+                },
+                children: "Job Description (Optional):"
+              }
+            ),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "textarea",
+              {
+                value: jobDescription,
+                onChange: (e) => setJobDescription(e.target.value),
+                placeholder: "Paste the job description to tailor your resume specifically for this role...",
+                rows: 6,
+                style: {
+                  width: "100%",
+                  padding: 12,
+                  borderRadius: 8,
+                  border: "1px solid #E5E7EB",
+                  fontSize: "0.9rem",
+                  resize: "vertical"
+                }
+              }
+            )
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            "button",
+            {
+              onClick: handleEnhance,
+              disabled: isLoading || !resumeContent.trim(),
+              className: "uswift-btn",
+              style: {
+                width: "100%",
+                opacity: isLoading || !resumeContent.trim() ? 0.6 : 1,
+                cursor: isLoading || !resumeContent.trim() ? "not-allowed" : "pointer"
+              },
+              children: isLoading ? /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                "div",
+                {
+                  style: {
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gap: 8
+                  },
+                  children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(
+                      "div",
+                      {
+                        style: {
+                          width: 16,
+                          height: 16,
+                          border: "2px solid #ffffff",
+                          borderTop: "2px solid transparent",
+                          borderRadius: "50%",
+                          animation: "spin 1s linear infinite"
+                        }
+                      }
+                    ),
+                    "Enhancing Resume..."
+                  ]
+                }
+              ) : "Enhance My Resume"
+            }
+          ),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(
+            "div",
+            {
+              style: {
+                marginTop: 16,
+                padding: 12,
+                background: "#F8F9FA",
+                borderRadius: 8,
+                fontSize: "0.8rem",
+                color: "#6B7280"
+              },
+              children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Tips:" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("ul", { style: { margin: "8px 0 0 16px", padding: 0 }, children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Include your full work history and key achievements" }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Use quantifiable metrics where possible" }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Keep it concise but comprehensive" }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "For job-specific enhancement, include relevant keywords from the job posting" })
+                ] })
+              ]
+            }
+          )
+        ] }),
+        activeTab === "result" && result && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(
+            "div",
+            {
+              style: {
+                display: "flex",
+                alignItems: "center",
+                gap: 16,
+                marginBottom: 20,
+                padding: 16,
+                background: "#F8F9FA",
+                borderRadius: 8
+              },
+              children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { textAlign: "center" }, children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                    "div",
+                    {
+                      style: {
+                        fontSize: "2rem",
+                        fontWeight: 700,
+                        color: getScoreColor(result.score),
+                        marginBottom: 4
+                      },
+                      children: [
+                        result.score,
+                        "/100"
+                      ]
+                    }
+                  ),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(
+                    "div",
+                    {
+                      style: {
+                        fontSize: "0.8rem",
+                        color: "#6B7280",
+                        fontWeight: 500
+                      },
+                      children: getScoreLabel(result.score)
+                    }
+                  )
+                ] }),
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { flex: 1 }, children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(
+                    "h3",
+                    {
+                      style: {
+                        margin: "0 0 8px 0",
+                        fontSize: "1rem",
+                        color: "#111827"
+                      },
+                      children: "Resume Quality Score"
+                    }
+                  ),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("p", { style: { margin: 0, fontSize: "0.8rem", color: "#6B7280" }, children: "Based on content relevance, formatting, and impact statements" })
+                ] })
+              ]
+            }
+          ),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "uswift-card", style: { marginBottom: 16 }, children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "h3",
+              {
+                style: {
+                  fontSize: "1.1rem",
+                  fontWeight: 600,
+                  color: "#111827",
+                  marginBottom: 12
+                },
+                children: "Key Suggestions"
+              }
+            ),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "div",
+              {
+                style: { fontSize: "0.9rem", lineHeight: 1.6, color: "#4B5563" },
+                children: result.suggestions
+              }
+            )
+          ] }),
+          result.improvements.length > 0 && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "uswift-card", style: { marginBottom: 16 }, children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "h3",
+              {
+                style: {
+                  fontSize: "1.1rem",
+                  fontWeight: 600,
+                  color: "#111827",
+                  marginBottom: 12
+                },
+                children: "Top Improvements Made"
+              }
+            ),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("ul", { style: { margin: 0, paddingLeft: 20 }, children: result.improvements.map((improvement, index) => /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "li",
+              {
+                style: {
+                  fontSize: "0.9rem",
+                  color: "#4B5563",
+                  marginBottom: 8
+                },
+                children: improvement
+              },
+              index
+            )) })
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "uswift-card", style: { marginBottom: 16 }, children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsxs(
+              "div",
+              {
+                style: {
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  marginBottom: 12
+                },
+                children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(
+                    "h3",
+                    {
+                      style: {
+                        fontSize: "1.1rem",
+                        fontWeight: 600,
+                        color: "#111827",
+                        margin: 0
+                      },
+                      children: "Enhanced Resume"
+                    }
+                  ),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(
+                    "button",
+                    {
+                      onClick: () => copyToClipboard(result.enhancedResume),
+                      style: {
+                        background: "#EDE9FE",
+                        color: "#6D28D9",
+                        border: "none",
+                        borderRadius: 6,
+                        padding: "6px 12px",
+                        cursor: "pointer",
+                        fontSize: "0.8rem"
+                      },
+                      children: "Copy"
+                    }
+                  )
+                ]
+              }
+            ),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "div",
+              {
+                style: {
+                  background: "#F8F9FA",
+                  padding: 16,
+                  borderRadius: 8,
+                  fontSize: "0.85rem",
+                  fontFamily: "monospace",
+                  whiteSpace: "pre-wrap",
+                  maxHeight: 300,
+                  overflowY: "auto",
+                  border: "1px solid #E5E7EB"
+                },
+                children: result.enhancedResume
+              }
+            )
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { display: "flex", gap: 8 }, children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "button",
+              {
+                onClick: () => copyToClipboard(result.enhancedResume),
+                className: "uswift-btn",
+                style: { flex: 1 },
+                children: "Copy Enhanced Resume"
+              }
+            ),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "button",
+              {
+                onClick: () => setActiveTab("input"),
+                style: {
+                  flex: 1,
+                  background: "#F3F4F6",
+                  color: "#6B7280",
+                  border: "1px solid #E5E7EB",
+                  borderRadius: 8,
+                  padding: "12px",
+                  cursor: "pointer"
+                },
+                children: "Make Another Edit"
+              }
+            )
+          ] })
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          "div",
+          {
+            style: {
+              marginTop: 16,
+              textAlign: "center",
+              fontSize: "0.8rem",
+              color: "#6B7280"
+            },
+            children: "Powered by Mistral AI • Get professional resume enhancement suggestions"
+          }
+        )
+      ]
+    }
+  );
+}
+
+function CoverLetterGenerator() {
+  const [resumeContent, setResumeContent] = reactExports.useState("");
+  const [jobDescription, setJobDescription] = reactExports.useState("");
+  const [companyName, setCompanyName] = reactExports.useState("");
+  const [jobTitle, setJobTitle] = reactExports.useState("");
+  const [tone, setTone] = reactExports.useState("professional");
+  const [isLoading, setIsLoading] = reactExports.useState(false);
+  const [result, setResult] = reactExports.useState(null);
+  const [activeTab, setActiveTab] = reactExports.useState("input");
+  const mistralClient = getMistralClient();
+  const toneOptions = [
+    {
+      value: "professional",
+      label: "Professional",
+      description: "Formal and polished tone"
+    },
+    {
+      value: "enthusiastic",
+      label: "Enthusiastic",
+      description: "Energetic and passionate"
+    },
+    {
+      value: "confident",
+      label: "Confident",
+      description: "Strong and self-assured"
+    }
+  ];
+  const handleGenerate = async () => {
+    if (!resumeContent.trim() || !jobDescription.trim()) {
+      alert("Please fill in both resume and job description");
+      return;
+    }
+    setIsLoading(true);
+    try {
+      const response = await mistralClient.generateCoverLetter(
+        resumeContent,
+        jobDescription,
+        companyName || void 0
+      );
+      const parsedResult = parseCoverLetterResponse(response, tone);
+      setResult(parsedResult);
+      setActiveTab("result");
+    } catch (error) {
+      console.error("Cover letter generation error:", error);
+      alert("Failed to generate cover letter. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  const parseCoverLetterResponse = (response, selectedTone) => {
+    const keyPoints = extractKeyPoints(response);
+    const wordCount = response.split(/\s+/).length;
+    return {
+      content: response,
+      keyPoints,
+      tone: selectedTone,
+      wordCount
+    };
+  };
+  const extractKeyPoints = (text) => {
+    const lines = text.split("\n");
+    const keyPoints = [];
+    for (const line of lines) {
+      const trimmed = line.trim();
+      if (trimmed.startsWith("•") || trimmed.startsWith("-") || trimmed.startsWith("*")) {
+        keyPoints.push(trimmed.substring(1).trim());
+      } else if (trimmed.match(/^\d+\./)) {
+        keyPoints.push(trimmed.replace(/^\d+\.\s*/, ""));
+      }
+    }
+    if (keyPoints.length === 0) {
+      const sentences = text.split(/[.!?]+/).filter((s) => s.trim().length > 20);
+      return sentences.slice(0, 5).map((s) => s.trim());
+    }
+    return keyPoints.slice(0, 6);
+  };
+  const copyToClipboard = (text) => {
+    navigator.clipboard.writeText(text).then(() => {
+      alert("Cover letter copied to clipboard!");
+    }).catch(() => {
+      const textArea = document.createElement("textarea");
+      textArea.value = text;
+      document.body.appendChild(textArea);
+      textArea.select();
+      document.execCommand("copy");
+      document.body.removeChild(textArea);
+      alert("Cover letter copied to clipboard!");
+    });
+  };
+  const downloadAsText = (content, filename) => {
+    const blob = new Blob([content], { type: "text/plain" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs(
+    "div",
+    {
+      style: {
+        background: "#FFFFFF",
+        borderRadius: "1.5rem",
+        padding: "2rem",
+        minWidth: 350,
+        minHeight: 520
+      },
+      children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          "div",
+          {
+            className: "uswift-gradient",
+            style: {
+              height: 8,
+              borderRadius: 8,
+              marginBottom: 16
+            }
+          }
+        ),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(
+          "div",
+          {
+            style: {
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              marginBottom: 16
+            },
+            children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "h2",
+                {
+                  style: {
+                    fontSize: "1.4rem",
+                    fontWeight: 700,
+                    color: "#111827",
+                    margin: 0
+                  },
+                  children: "Cover Letter Generator"
+                }
+              ),
+              activeTab === "result" && /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "button",
+                {
+                  onClick: () => setActiveTab("input"),
+                  style: {
+                    background: "#EDE9FE",
+                    color: "#6D28D9",
+                    border: "none",
+                    borderRadius: 8,
+                    padding: "6px 12px",
+                    cursor: "pointer",
+                    fontSize: "0.8rem"
+                  },
+                  children: "← Back to Edit"
+                }
+              )
+            ]
+          }
+        ),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(
+          "div",
+          {
+            style: {
+              display: "flex",
+              marginBottom: 16,
+              borderBottom: "1px solid #E5E7EB"
+            },
+            children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "button",
+                {
+                  onClick: () => setActiveTab("input"),
+                  style: {
+                    background: "none",
+                    border: "none",
+                    padding: "12px 16px",
+                    cursor: "pointer",
+                    fontSize: "0.9rem",
+                    fontWeight: activeTab === "input" ? 600 : 400,
+                    color: activeTab === "input" ? "#6D28D9" : "#6B7280",
+                    borderBottom: activeTab === "input" ? "2px solid #6D28D9" : "none"
+                  },
+                  children: "Input"
+                }
+              ),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "button",
+                {
+                  onClick: () => setActiveTab("result"),
+                  disabled: !result,
+                  style: {
+                    background: "none",
+                    border: "none",
+                    padding: "12px 16px",
+                    cursor: result ? "pointer" : "not-allowed",
+                    fontSize: "0.9rem",
+                    fontWeight: activeTab === "result" ? 600 : 400,
+                    color: activeTab === "result" ? "#6D28D9" : "#6B7280",
+                    borderBottom: activeTab === "result" ? "2px solid #6D28D9" : "none",
+                    opacity: result ? 1 : 0.5
+                  },
+                  children: "Generated Letter"
+                }
+              )
+            ]
+          }
+        ),
+        activeTab === "input" && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { display: "flex", gap: 12, marginBottom: 16 }, children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { flex: 1 }, children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "label",
+                {
+                  style: {
+                    display: "block",
+                    fontSize: "0.9rem",
+                    fontWeight: 600,
+                    color: "#374151",
+                    marginBottom: 4
+                  },
+                  children: "Job Title"
+                }
+              ),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "input",
+                {
+                  type: "text",
+                  value: jobTitle,
+                  onChange: (e) => setJobTitle(e.target.value),
+                  placeholder: "e.g., Senior Software Engineer",
+                  style: {
+                    width: "100%",
+                    padding: "8px 12px",
+                    borderRadius: 6,
+                    border: "1px solid #E5E7EB",
+                    fontSize: "0.9rem"
+                  }
+                }
+              )
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { flex: 1 }, children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "label",
+                {
+                  style: {
+                    display: "block",
+                    fontSize: "0.9rem",
+                    fontWeight: 600,
+                    color: "#374151",
+                    marginBottom: 4
+                  },
+                  children: "Company Name"
+                }
+              ),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "input",
+                {
+                  type: "text",
+                  value: companyName,
+                  onChange: (e) => setCompanyName(e.target.value),
+                  placeholder: "e.g., Google",
+                  style: {
+                    width: "100%",
+                    padding: "8px 12px",
+                    borderRadius: 6,
+                    border: "1px solid #E5E7EB",
+                    fontSize: "0.9rem"
+                  }
+                }
+              )
+            ] })
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { marginBottom: 16 }, children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "label",
+              {
+                style: {
+                  display: "block",
+                  fontSize: "0.9rem",
+                  fontWeight: 600,
+                  color: "#374151",
+                  marginBottom: 8
+                },
+                children: "Cover Letter Tone:"
+              }
+            ),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { style: { display: "flex", gap: 8, flexWrap: "wrap" }, children: toneOptions.map((option) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
+              "button",
+              {
+                onClick: () => setTone(option.value),
+                style: {
+                  background: tone === option.value ? "#6D28D9" : "#F3F4F6",
+                  color: tone === option.value ? "#FFFFFF" : "#6B7280",
+                  border: "none",
+                  borderRadius: 6,
+                  padding: "8px 16px",
+                  cursor: "pointer",
+                  fontSize: "0.8rem",
+                  fontWeight: 500,
+                  minWidth: 120,
+                  textAlign: "left"
+                },
+                title: option.description,
+                children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("div", { style: { fontWeight: 600 }, children: option.label }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("div", { style: { fontSize: "0.7rem", opacity: 0.8 }, children: option.description })
+                ]
+              },
+              option.value
+            )) })
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "uswift-card", style: { marginBottom: 16 }, children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "label",
+              {
+                style: {
+                  fontWeight: 600,
+                  display: "block",
+                  marginBottom: 8,
+                  color: "#374151"
+                },
+                children: "Your Resume Content:"
+              }
+            ),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "textarea",
+              {
+                value: resumeContent,
+                onChange: (e) => setResumeContent(e.target.value),
+                placeholder: "Paste your resume content here to help tailor the cover letter...",
+                rows: 6,
+                style: {
+                  width: "100%",
+                  padding: 12,
+                  borderRadius: 8,
+                  border: "1px solid #E5E7EB",
+                  fontSize: "0.9rem",
+                  resize: "vertical"
+                }
+              }
+            )
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "uswift-card", style: { marginBottom: 16 }, children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "label",
+              {
+                style: {
+                  fontWeight: 600,
+                  display: "block",
+                  marginBottom: 8,
+                  color: "#374151"
+                },
+                children: "Job Description:"
+              }
+            ),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "textarea",
+              {
+                value: jobDescription,
+                onChange: (e) => setJobDescription(e.target.value),
+                placeholder: "Paste the complete job description here...",
+                rows: 8,
+                style: {
+                  width: "100%",
+                  padding: 12,
+                  borderRadius: 8,
+                  border: "1px solid #E5E7EB",
+                  fontSize: "0.9rem",
+                  resize: "vertical"
+                }
+              }
+            )
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            "button",
+            {
+              onClick: handleGenerate,
+              disabled: isLoading || !resumeContent.trim() || !jobDescription.trim(),
+              className: "uswift-btn",
+              style: {
+                width: "100%",
+                opacity: isLoading || !resumeContent.trim() || !jobDescription.trim() ? 0.6 : 1,
+                cursor: isLoading || !resumeContent.trim() || !jobDescription.trim() ? "not-allowed" : "pointer"
+              },
+              children: isLoading ? /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                "div",
+                {
+                  style: {
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gap: 8
+                  },
+                  children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(
+                      "div",
+                      {
+                        style: {
+                          width: 16,
+                          height: 16,
+                          border: "2px solid #ffffff",
+                          borderTop: "2px solid transparent",
+                          borderRadius: "50%",
+                          animation: "spin 1s linear infinite"
+                        }
+                      }
+                    ),
+                    "Generating Cover Letter..."
+                  ]
+                }
+              ) : "Generate Cover Letter"
+            }
+          ),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(
+            "div",
+            {
+              style: {
+                marginTop: 16,
+                padding: 12,
+                background: "#F8F9FA",
+                borderRadius: 8,
+                fontSize: "0.8rem",
+                color: "#6B7280"
+              },
+              children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Tips for Better Results:" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("ul", { style: { margin: "8px 0 0 16px", padding: 0 }, children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Include specific achievements and metrics from your resume" }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Highlight relevant skills that match the job requirements" }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Keep the job description comprehensive for better tailoring" }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Choose a tone that matches the company culture" })
+                ] })
+              ]
+            }
+          )
+        ] }),
+        activeTab === "result" && result && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(
+            "div",
+            {
+              style: {
+                display: "flex",
+                gap: 16,
+                marginBottom: 20,
+                padding: 16,
+                background: "#F8F9FA",
+                borderRadius: 8
+              },
+              children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { textAlign: "center", flex: 1 }, children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(
+                    "div",
+                    {
+                      style: {
+                        fontSize: "1.5rem",
+                        fontWeight: 700,
+                        color: "#6D28D9",
+                        marginBottom: 4
+                      },
+                      children: result.wordCount
+                    }
+                  ),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(
+                    "div",
+                    {
+                      style: {
+                        fontSize: "0.8rem",
+                        color: "#6B7280",
+                        fontWeight: 500
+                      },
+                      children: "Words"
+                    }
+                  )
+                ] }),
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { textAlign: "center", flex: 1 }, children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(
+                    "div",
+                    {
+                      style: {
+                        fontSize: "1.2rem",
+                        fontWeight: 600,
+                        color: "#10B981",
+                        marginBottom: 4
+                      },
+                      children: result.tone
+                    }
+                  ),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(
+                    "div",
+                    {
+                      style: {
+                        fontSize: "0.8rem",
+                        color: "#6B7280",
+                        fontWeight: 500
+                      },
+                      children: "Tone"
+                    }
+                  )
+                ] })
+              ]
+            }
+          ),
+          result.keyPoints.length > 0 && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "uswift-card", style: { marginBottom: 16 }, children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "h3",
+              {
+                style: {
+                  fontSize: "1.1rem",
+                  fontWeight: 600,
+                  color: "#111827",
+                  marginBottom: 12
+                },
+                children: "Key Highlights"
+              }
+            ),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("ul", { style: { margin: 0, paddingLeft: 20 }, children: result.keyPoints.map((point, index) => /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "li",
+              {
+                style: {
+                  fontSize: "0.9rem",
+                  color: "#4B5563",
+                  marginBottom: 8
+                },
+                children: point
+              },
+              index
+            )) })
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "uswift-card", style: { marginBottom: 16 }, children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsxs(
+              "div",
+              {
+                style: {
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  marginBottom: 12
+                },
+                children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(
+                    "h3",
+                    {
+                      style: {
+                        fontSize: "1.1rem",
+                        fontWeight: 600,
+                        color: "#111827",
+                        margin: 0
+                      },
+                      children: "Your Cover Letter"
+                    }
+                  ),
+                  /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { display: "flex", gap: 8 }, children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(
+                      "button",
+                      {
+                        onClick: () => copyToClipboard(result.content),
+                        style: {
+                          background: "#EDE9FE",
+                          color: "#6D28D9",
+                          border: "none",
+                          borderRadius: 6,
+                          padding: "6px 12px",
+                          cursor: "pointer",
+                          fontSize: "0.8rem"
+                        },
+                        children: "Copy"
+                      }
+                    ),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(
+                      "button",
+                      {
+                        onClick: () => downloadAsText(result.content, "cover-letter.txt"),
+                        style: {
+                          background: "#EDE9FE",
+                          color: "#6D28D9",
+                          border: "none",
+                          borderRadius: 6,
+                          padding: "6px 12px",
+                          cursor: "pointer",
+                          fontSize: "0.8rem"
+                        },
+                        children: "Download"
+                      }
+                    )
+                  ] })
+                ]
+              }
+            ),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "div",
+              {
+                style: {
+                  background: "#F8F9FA",
+                  padding: 16,
+                  borderRadius: 8,
+                  fontSize: "0.9rem",
+                  lineHeight: 1.6,
+                  whiteSpace: "pre-wrap",
+                  maxHeight: 400,
+                  overflowY: "auto",
+                  border: "1px solid #E5E7EB"
+                },
+                children: result.content
+              }
+            )
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { display: "flex", gap: 8 }, children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "button",
+              {
+                onClick: () => copyToClipboard(result.content),
+                className: "uswift-btn",
+                style: { flex: 1 },
+                children: "Copy to Clipboard"
+              }
+            ),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "button",
+              {
+                onClick: () => setActiveTab("input"),
+                style: {
+                  flex: 1,
+                  background: "#F3F4F6",
+                  color: "#6B7280",
+                  border: "1px solid #E5E7EB",
+                  borderRadius: 8,
+                  padding: "12px",
+                  cursor: "pointer"
+                },
+                children: "Generate Another"
+              }
+            )
+          ] })
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          "div",
+          {
+            style: {
+              marginTop: 16,
+              textAlign: "center",
+              fontSize: "0.8rem",
+              color: "#6B7280"
+            },
+            children: "Powered by Mistral AI • Create professional cover letters tailored to each job"
+          }
+        )
+      ]
+    }
+  );
+}
+
+function FileManager() {
+  const [files, setFiles] = reactExports.useState([]);
+  const [isLoading, setIsLoading] = reactExports.useState(false);
+  const [selectedFile, setSelectedFile] = reactExports.useState(null);
+  const [analysis, setAnalysis] = reactExports.useState(null);
+  const [activeTab, setActiveTab] = reactExports.useState(
+    "upload"
+  );
+  const [fileType, setFileType] = reactExports.useState("resume");
+  const [dragActive, setDragActive] = reactExports.useState(false);
+  const mistralClient = getMistralClient();
+  reactExports.useEffect(() => {
+    loadFilesFromStorage();
+  }, []);
+  const loadFilesFromStorage = async () => {
+    try {
+      if (typeof chrome !== "undefined" && chrome.storage && chrome.storage.local) {
+        chrome.storage.local.get(["uploadedFiles"], (result) => {
+          if (result.uploadedFiles) {
+            const parsedFiles = result.uploadedFiles.map((file) => ({
+              ...file,
+              uploadedAt: new Date(file.uploadedAt)
+            }));
+            setFiles(parsedFiles);
+          }
+        });
+      }
+    } catch (error) {
+      console.error("Error loading files:", error);
+    }
+  };
+  const saveFilesToStorage = async (filesToSave) => {
+    try {
+      if (typeof chrome !== "undefined" && chrome.storage && chrome.storage.local) {
+        await chrome.storage.local.set({ uploadedFiles: filesToSave });
+      }
+    } catch (error) {
+      console.error("Error saving files:", error);
+    }
+  };
+  const handleFileUpload = async (file) => {
+    if (!file)
+      return;
+    setIsLoading(true);
+    try {
+      const content = await readFileContent(file);
+      const newFile = {
+        id: `file-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+        name: file.name,
+        type: fileType,
+        content,
+        size: file.size,
+        uploadedAt: /* @__PURE__ */ new Date()
+      };
+      const updatedFiles = [...files, newFile];
+      setFiles(updatedFiles);
+      await saveFilesToStorage(updatedFiles);
+      alert(`File "${file.name}" uploaded successfully!`);
+    } catch (error) {
+      console.error("Upload error:", error);
+      alert("Failed to upload file. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  const readFileContent = (file) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const content = e.target?.result;
+        resolve(content);
+      };
+      reader.onerror = () => reject(new Error("Failed to read file"));
+      reader.readAsText(file);
+    });
+  };
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    setDragActive(true);
+  };
+  const handleDragLeave = (e) => {
+    e.preventDefault();
+    setDragActive(false);
+  };
+  const handleDrop = async (e) => {
+    e.preventDefault();
+    setDragActive(false);
+    const droppedFiles = Array.from(e.dataTransfer.files);
+    if (droppedFiles.length > 0) {
+      await handleFileUpload(droppedFiles[0]);
+    }
+  };
+  const handleFileSelect = async (e) => {
+    const selectedFiles = e.target.files;
+    if (selectedFiles && selectedFiles.length > 0) {
+      await handleFileUpload(selectedFiles[0]);
+    }
+  };
+  const analyzeFile = async (file) => {
+    setIsLoading(true);
+    try {
+      let analysisPrompt = "";
+      switch (file.type) {
+        case "resume":
+          analysisPrompt = `Analyze this resume and provide:
+1. Overall quality score (0-100)
+2. Key strengths
+3. Areas for improvement
+4. Missing elements
+5. Keyword optimization suggestions
+6. Formatting recommendations
+
+Resume content:
+${file.content}`;
+          break;
+        case "cover_letter":
+          analysisPrompt = `Analyze this cover letter and provide:
+1. Overall quality score (0-100)
+2. Effectiveness assessment
+3. Tone and professionalism
+4. Content structure analysis
+5. Improvement suggestions
+6. Length appropriateness
+
+Cover letter content:
+${file.content}`;
+          break;
+        default:
+          analysisPrompt = `Analyze this document and provide:
+1. Overall quality score (0-100)
+2. Content assessment
+3. Clarity and professionalism
+4. Structure analysis
+5. Improvement suggestions
+
+Document content:
+${file.content}`;
+      }
+      const response = await mistralClient.chatWithPrompt(analysisPrompt, {
+        model: "mistral-small",
+        max_tokens: 1024,
+        temperature: 0.7
+      });
+      const parsedAnalysis = parseAnalysisResponse(response);
+      setAnalysis(parsedAnalysis);
+      setSelectedFile(file);
+      setActiveTab("analyze");
+    } catch (error) {
+      console.error("Analysis error:", error);
+      alert("Failed to analyze file. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  const parseAnalysisResponse = (response) => {
+    const scoreMatch = response.match(/(\d+)\/100|score[:\s]+(\d+)/i);
+    const score = scoreMatch ? parseInt(scoreMatch[1] || scoreMatch[2]) : 75;
+    const keywords = extractKeywords(response);
+    const suggestions = extractSuggestions(response);
+    return {
+      summary: response.split("\n").slice(0, 3).join("\n"),
+      keywords,
+      suggestions,
+      score
+    };
+  };
+  const extractKeywords = (text) => {
+    const keywordSection = text.match(
+      /keywords?:?\s*(.*?)(?:\n\n|\n\d+\.|\n[A-Z]|$)/is
+    );
+    if (keywordSection) {
+      return keywordSection[1].split(/[,\n•\-*]/).map((k) => k.trim()).filter((k) => k.length > 0).slice(0, 10);
+    }
+    return [];
+  };
+  const extractSuggestions = (text) => {
+    const suggestions = [];
+    const lines = text.split("\n");
+    for (const line of lines) {
+      const trimmed = line.trim();
+      if (trimmed.match(/^\d+\./) || trimmed.startsWith("•") || trimmed.startsWith("-")) {
+        if (trimmed.toLowerCase().includes("suggest") || trimmed.toLowerCase().includes("improve") || trimmed.toLowerCase().includes("recommend")) {
+          suggestions.push(trimmed.replace(/^[\d•\-*]\s*/, ""));
+        }
+      }
+    }
+    return suggestions.slice(0, 5);
+  };
+  const deleteFile = async (fileId) => {
+    if (!confirm("Are you sure you want to delete this file?"))
+      return;
+    const updatedFiles = files.filter((f) => f.id !== fileId);
+    setFiles(updatedFiles);
+    await saveFilesToStorage(updatedFiles);
+    if (selectedFile?.id === fileId) {
+      setSelectedFile(null);
+      setAnalysis(null);
+    }
+  };
+  const getFileTypeIcon = (type) => {
+    switch (type) {
+      case "resume":
+        return "📄";
+      case "cover_letter":
+        return "✉️";
+      case "portfolio":
+        return "💼";
+      case "certificate":
+        return "🏆";
+      default:
+        return "📎";
+    }
+  };
+  const formatFileSize = (bytes) => {
+    if (bytes === 0)
+      return "0 Bytes";
+    const k = 1024;
+    const sizes = ["Bytes", "KB", "MB", "GB"];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
+  };
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs(
+    "div",
+    {
+      style: {
+        background: "#FFFFFF",
+        borderRadius: "1.5rem",
+        padding: "2rem",
+        minWidth: 350,
+        minHeight: 520
+      },
+      children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          "div",
+          {
+            className: "uswift-gradient",
+            style: {
+              height: 8,
+              borderRadius: 8,
+              marginBottom: 16
+            }
+          }
+        ),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(
+          "div",
+          {
+            style: {
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              marginBottom: 16
+            },
+            children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "h2",
+                {
+                  style: {
+                    fontSize: "1.4rem",
+                    fontWeight: 700,
+                    color: "#111827",
+                    margin: 0
+                  },
+                  children: "File Manager"
+                }
+              ),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { style: { display: "flex", gap: 8 }, children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                "span",
+                {
+                  style: {
+                    color: "#6B7280",
+                    fontSize: "0.8rem",
+                    alignSelf: "center"
+                  },
+                  children: [
+                    files.length,
+                    " files"
+                  ]
+                }
+              ) })
+            ]
+          }
+        ),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(
+          "div",
+          {
+            style: {
+              display: "flex",
+              marginBottom: 16,
+              borderBottom: "1px solid #E5E7EB"
+            },
+            children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "button",
+                {
+                  onClick: () => setActiveTab("upload"),
+                  style: {
+                    background: "none",
+                    border: "none",
+                    padding: "12px 16px",
+                    cursor: "pointer",
+                    fontSize: "0.9rem",
+                    fontWeight: activeTab === "upload" ? 600 : 400,
+                    color: activeTab === "upload" ? "#6D28D9" : "#6B7280",
+                    borderBottom: activeTab === "upload" ? "2px solid #6D28D9" : "none"
+                  },
+                  children: "Upload"
+                }
+              ),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                "button",
+                {
+                  onClick: () => setActiveTab("manage"),
+                  style: {
+                    background: "none",
+                    border: "none",
+                    padding: "12px 16px",
+                    cursor: "pointer",
+                    fontSize: "0.9rem",
+                    fontWeight: activeTab === "manage" ? 600 : 400,
+                    color: activeTab === "manage" ? "#6D28D9" : "#6B7280",
+                    borderBottom: activeTab === "manage" ? "2px solid #6D28D9" : "none"
+                  },
+                  children: [
+                    "Manage (",
+                    files.length,
+                    ")"
+                  ]
+                }
+              ),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "button",
+                {
+                  onClick: () => setActiveTab("analyze"),
+                  disabled: !selectedFile,
+                  style: {
+                    background: "none",
+                    border: "none",
+                    padding: "12px 16px",
+                    cursor: selectedFile ? "pointer" : "not-allowed",
+                    fontSize: "0.9rem",
+                    fontWeight: activeTab === "analyze" ? 600 : 400,
+                    color: activeTab === "analyze" ? "#6D28D9" : "#6B7280",
+                    borderBottom: activeTab === "analyze" ? "2px solid #6D28D9" : "none",
+                    opacity: selectedFile ? 1 : 0.5
+                  },
+                  children: "Analyze"
+                }
+              )
+            ]
+          }
+        ),
+        activeTab === "upload" && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { marginBottom: 16 }, children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "label",
+              {
+                style: {
+                  display: "block",
+                  fontSize: "0.9rem",
+                  fontWeight: 600,
+                  color: "#374151",
+                  marginBottom: 8
+                },
+                children: "Document Type:"
+              }
+            ),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { style: { display: "flex", gap: 8, flexWrap: "wrap" }, children: [
+              { value: "resume", label: "Resume", icon: "📄" },
+              { value: "cover_letter", label: "Cover Letter", icon: "✉️" },
+              { value: "portfolio", label: "Portfolio", icon: "💼" },
+              { value: "certificate", label: "Certificate", icon: "🏆" },
+              { value: "other", label: "Other", icon: "📎" }
+            ].map((option) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
+              "button",
+              {
+                onClick: () => setFileType(option.value),
+                style: {
+                  background: fileType === option.value ? "#6D28D9" : "#F3F4F6",
+                  color: fileType === option.value ? "#FFFFFF" : "#6B7280",
+                  border: "none",
+                  borderRadius: 6,
+                  padding: "8px 16px",
+                  cursor: "pointer",
+                  fontSize: "0.8rem",
+                  fontWeight: 500,
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 4
+                },
+                children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: option.icon }),
+                  option.label
+                ]
+              },
+              option.value
+            )) })
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(
+            "div",
+            {
+              className: "uswift-card",
+              onDragOver: handleDragOver,
+              onDragLeave: handleDragLeave,
+              onDrop: handleDrop,
+              style: {
+                border: dragActive ? "2px dashed #6D28D9" : "2px dashed #E5E7EB",
+                background: dragActive ? "#F8F9FA" : "#FFFFFF",
+                cursor: "pointer",
+                transition: "all 0.2s ease",
+                textAlign: "center",
+                padding: "2rem",
+                marginBottom: 16
+              },
+              children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { marginBottom: 16 }, children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(
+                    "div",
+                    {
+                      style: {
+                        fontSize: "2rem",
+                        marginBottom: 8,
+                        color: dragActive ? "#6D28D9" : "#6B7280"
+                      },
+                      children: "📁"
+                    }
+                  ),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(
+                    "h3",
+                    {
+                      style: {
+                        fontSize: "1.1rem",
+                        fontWeight: 600,
+                        color: "#111827",
+                        marginBottom: 8
+                      },
+                      children: "Drop your file here"
+                    }
+                  ),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(
+                    "p",
+                    {
+                      style: {
+                        color: "#6B7280",
+                        fontSize: "0.9rem",
+                        marginBottom: 16
+                      },
+                      children: "or click to browse"
+                    }
+                  )
+                ] }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  "input",
+                  {
+                    type: "file",
+                    accept: ".txt,.pdf,.doc,.docx",
+                    onChange: handleFileSelect,
+                    style: { display: "none" },
+                    id: "file-input"
+                  }
+                ),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  "label",
+                  {
+                    htmlFor: "file-input",
+                    style: {
+                      background: "#6D28D9",
+                      color: "#FFFFFF",
+                      border: "none",
+                      borderRadius: 8,
+                      padding: "12px 24px",
+                      cursor: "pointer",
+                      fontSize: "0.9rem",
+                      fontWeight: 500
+                    },
+                    children: "Choose File"
+                  }
+                )
+              ]
+            }
+          ),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(
+            "div",
+            {
+              style: {
+                padding: 12,
+                background: "#F8F9FA",
+                borderRadius: 8,
+                fontSize: "0.8rem",
+                color: "#6B7280"
+              },
+              children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Supported formats:" }),
+                " .txt, .pdf, .doc, .docx",
+                /* @__PURE__ */ jsxRuntimeExports.jsx("br", {}),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Max file size:" }),
+                " 5MB",
+                /* @__PURE__ */ jsxRuntimeExports.jsx("br", {}),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Recommended:" }),
+                " Plain text files work best for AI analysis"
+              ]
+            }
+          )
+        ] }),
+        activeTab === "manage" && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { children: files.length === 0 ? /* @__PURE__ */ jsxRuntimeExports.jsxs(
+          "div",
+          {
+            style: {
+              textAlign: "center",
+              padding: "3rem",
+              color: "#6B7280"
+            },
+            children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { style: { fontSize: "3rem", marginBottom: 16 }, children: "📂" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { style: { fontSize: "1.1rem", marginBottom: 8 }, children: "No files uploaded yet" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("p", { style: { fontSize: "0.9rem" }, children: "Upload your first document to get started" })
+            ]
+          }
+        ) : /* @__PURE__ */ jsxRuntimeExports.jsx("div", { style: { maxHeight: 400, overflowY: "auto" }, children: files.map((file) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
+          "div",
+          {
+            className: "uswift-card",
+            style: {
+              marginBottom: 12,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between"
+            },
+            children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { style: { flex: 1 }, children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                "div",
+                {
+                  style: {
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 8,
+                    marginBottom: 4
+                  },
+                  children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("span", { style: { fontSize: "1.2rem" }, children: getFileTypeIcon(file.type) }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+                      /* @__PURE__ */ jsxRuntimeExports.jsx(
+                        "h4",
+                        {
+                          style: {
+                            fontSize: "0.9rem",
+                            fontWeight: 600,
+                            color: "#111827",
+                            margin: 0
+                          },
+                          children: file.name
+                        }
+                      ),
+                      /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                        "p",
+                        {
+                          style: {
+                            fontSize: "0.7rem",
+                            color: "#6B7280",
+                            margin: 0
+                          },
+                          children: [
+                            file.type.replace("_", " "),
+                            " •",
+                            " ",
+                            formatFileSize(file.size),
+                            " •",
+                            " ",
+                            file.uploadedAt.toLocaleDateString()
+                          ]
+                        }
+                      )
+                    ] })
+                  ]
+                }
+              ) }),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { display: "flex", gap: 4 }, children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  "button",
+                  {
+                    onClick: () => analyzeFile(file),
+                    disabled: isLoading,
+                    style: {
+                      background: "#10B981",
+                      color: "#FFFFFF",
+                      border: "none",
+                      borderRadius: 4,
+                      padding: "4px 8px",
+                      cursor: "pointer",
+                      fontSize: "0.7rem"
+                    },
+                    children: "Analyze"
+                  }
+                ),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  "button",
+                  {
+                    onClick: () => deleteFile(file.id),
+                    style: {
+                      background: "#EF4444",
+                      color: "#FFFFFF",
+                      border: "none",
+                      borderRadius: 4,
+                      padding: "4px 8px",
+                      cursor: "pointer",
+                      fontSize: "0.7rem"
+                    },
+                    children: "Delete"
+                  }
+                )
+              ] })
+            ]
+          },
+          file.id
+        )) }) }),
+        activeTab === "analyze" && selectedFile && analysis && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "uswift-card", style: { marginBottom: 16 }, children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsxs(
+              "div",
+              {
+                style: {
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 8,
+                  marginBottom: 12
+                },
+                children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("span", { style: { fontSize: "1.5rem" }, children: getFileTypeIcon(selectedFile.type) }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(
+                      "h3",
+                      {
+                        style: {
+                          fontSize: "1.1rem",
+                          fontWeight: 600,
+                          color: "#111827",
+                          margin: 0
+                        },
+                        children: selectedFile.name
+                      }
+                    ),
+                    /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                      "p",
+                      {
+                        style: {
+                          fontSize: "0.8rem",
+                          color: "#6B7280",
+                          margin: 0
+                        },
+                        children: [
+                          selectedFile.type.replace("_", " "),
+                          " •",
+                          " ",
+                          formatFileSize(selectedFile.size)
+                        ]
+                      }
+                    )
+                  ] })
+                ]
+              }
+            ),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "div",
+              {
+                style: {
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 12,
+                  padding: 12,
+                  background: "#F8F9FA",
+                  borderRadius: 8,
+                  marginBottom: 12
+                },
+                children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { textAlign: "center" }, children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                    "div",
+                    {
+                      style: {
+                        fontSize: "1.8rem",
+                        fontWeight: 700,
+                        color: analysis.score >= 80 ? "#10B981" : analysis.score >= 60 ? "#F59E0B" : "#EF4444",
+                        marginBottom: 4
+                      },
+                      children: [
+                        analysis.score,
+                        "/100"
+                      ]
+                    }
+                  ),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(
+                    "div",
+                    {
+                      style: {
+                        fontSize: "0.8rem",
+                        color: "#6B7280",
+                        fontWeight: 500
+                      },
+                      children: "Quality Score"
+                    }
+                  )
+                ] })
+              }
+            )
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "uswift-card", style: { marginBottom: 16 }, children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "h3",
+              {
+                style: {
+                  fontSize: "1.1rem",
+                  fontWeight: 600,
+                  color: "#111827",
+                  marginBottom: 12
+                },
+                children: "Analysis Summary"
+              }
+            ),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "p",
+              {
+                style: {
+                  fontSize: "0.9rem",
+                  lineHeight: 1.6,
+                  color: "#4B5563",
+                  margin: 0
+                },
+                children: analysis.summary
+              }
+            )
+          ] }),
+          analysis.keywords.length > 0 && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "uswift-card", style: { marginBottom: 16 }, children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "h3",
+              {
+                style: {
+                  fontSize: "1.1rem",
+                  fontWeight: 600,
+                  color: "#111827",
+                  marginBottom: 12
+                },
+                children: "Key Keywords"
+              }
+            ),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { style: { display: "flex", gap: 4, flexWrap: "wrap" }, children: analysis.keywords.map((keyword, index) => /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "span",
+              {
+                style: {
+                  background: "#EDE9FE",
+                  color: "#6D28D9",
+                  padding: "4px 8px",
+                  borderRadius: 4,
+                  fontSize: "0.8rem",
+                  fontWeight: 500
+                },
+                children: keyword
+              },
+              index
+            )) })
+          ] }),
+          analysis.suggestions.length > 0 && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "uswift-card", style: { marginBottom: 16 }, children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "h3",
+              {
+                style: {
+                  fontSize: "1.1rem",
+                  fontWeight: 600,
+                  color: "#111827",
+                  marginBottom: 12
+                },
+                children: "Improvement Suggestions"
+              }
+            ),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("ul", { style: { margin: 0, paddingLeft: 20 }, children: analysis.suggestions.map((suggestion, index) => /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "li",
+              {
+                style: {
+                  fontSize: "0.9rem",
+                  color: "#4B5563",
+                  marginBottom: 8
+                },
+                children: suggestion
+              },
+              index
+            )) })
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { display: "flex", gap: 8 }, children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "button",
+              {
+                onClick: () => setActiveTab("upload"),
+                className: "uswift-btn",
+                style: { flex: 1 },
+                children: "Upload Another File"
+              }
+            ),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "button",
+              {
+                onClick: () => setActiveTab("manage"),
+                style: {
+                  flex: 1,
+                  background: "#F3F4F6",
+                  color: "#6B7280",
+                  border: "1px solid #E5E7EB",
+                  borderRadius: 8,
+                  padding: "12px",
+                  cursor: "pointer"
+                },
+                children: "Back to Files"
+              }
+            )
+          ] })
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          "div",
+          {
+            style: {
+              marginTop: 16,
+              textAlign: "center",
+              fontSize: "0.8rem",
+              color: "#6B7280"
+            },
+            children: "Powered by Mistral AI • Secure file storage and AI-powered analysis"
+          }
+        )
+      ]
+    }
+  );
+}
+
+function JobAnalysis() {
+  const [jobDescription, setJobDescription] = reactExports.useState("");
+  const [userProfile, setUserProfile] = reactExports.useState("");
+  const [jobDetails, setJobDetails] = reactExports.useState({
+    title: "",
+    company: "",
+    location: "",
+    salary: "",
+    type: "full-time"
+  });
+  const [isLoading, setIsLoading] = reactExports.useState(false);
+  const [result, setResult] = reactExports.useState(null);
+  const [activeTab, setActiveTab] = reactExports.useState("input");
+  const mistralClient = getMistralClient();
+  const jobTypes = [
+    "full-time",
+    "part-time",
+    "contract",
+    "freelance",
+    "internship",
+    "remote"
+  ];
+  const handleAnalyze = async () => {
+    if (!jobDescription.trim()) {
+      alert("Please enter a job description");
+      return;
+    }
+    setIsLoading(true);
+    try {
+      const analysisPrompt = `Please analyze this job posting and provide a comprehensive assessment:
+
+**Job Details:**
+- Title: ${jobDetails.title || "Not specified"}
+- Company: ${jobDetails.company || "Not specified"}
+- Location: ${jobDetails.location || "Not specified"}
+- Salary: ${jobDetails.salary || "Not specified"}
+- Type: ${jobDetails.type}
+
+**Job Description:**
+${jobDescription}
+
+${userProfile ? `**User Profile/Skills:**
+${userProfile}
+
+` : ""}Please provide a detailed analysis including:
+
+1. **Overall Match Score (0-100)**: How well does this job match typical requirements
+2. **Key Requirements**: List the most important skills, experience, and qualifications
+3. **Missing Skills**: Skills that would be beneficial but aren't strictly required
+4. **Matching Skills**: Skills that align well with the job requirements
+5. **Recommendations**: Specific advice for applying to this role
+6. **Salary Insights**: Analysis of compensation expectations
+7. **Company Culture Indicators**: What the job posting reveals about company culture
+8. **Application Tips**: Specific strategies for success
+
+Format your response clearly with sections and bullet points.`;
+      const response = await mistralClient.chatWithPrompt(analysisPrompt, {
+        model: "mistral-small",
+        max_tokens: 1500,
+        temperature: 0.7
+      });
+      const parsedResult = parseAnalysisResponse(response);
+      setResult(parsedResult);
+      setActiveTab("analysis");
+    } catch (error) {
+      console.error("Job analysis error:", error);
+      alert("Failed to analyze job. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  const parseAnalysisResponse = (response) => {
+    const scoreMatch = response.match(/(\d+)\/100|score[:\s]+(\d+)|(\d+)%/i);
+    const overallMatch = scoreMatch ? parseInt(scoreMatch[1] || scoreMatch[2] || scoreMatch[3]) : 75;
+    return {
+      overallMatch,
+      keyRequirements: extractSectionItems(
+        response,
+        "Key Requirements",
+        "Missing Skills"
+      ),
+      missingSkills: extractSectionItems(
+        response,
+        "Missing Skills",
+        "Matching Skills"
+      ),
+      matchingSkills: extractSectionItems(
+        response,
+        "Matching Skills",
+        "Recommendations"
+      ),
+      recommendations: extractSectionItems(
+        response,
+        "Recommendations",
+        "Salary Insights"
+      ),
+      salaryInsights: extractSectionText(
+        response,
+        "Salary Insights",
+        "Company Culture"
+      ),
+      companyCulture: extractSectionText(
+        response,
+        "Company Culture",
+        "Application Tips"
+      ),
+      applicationTips: extractSectionItems(response, "Application Tips", "")
+    };
+  };
+  const extractSectionItems = (text, startMarker, endMarker) => {
+    const items = [];
+    const startIndex = text.indexOf(startMarker);
+    if (startIndex === -1)
+      return items;
+    const contentStart = startIndex + startMarker.length;
+    const endIndex = endMarker ? text.indexOf(endMarker, contentStart) : text.length;
+    const sectionContent = text.substring(contentStart, endIndex);
+    const lines = sectionContent.split("\n");
+    for (const line of lines) {
+      const trimmed = line.trim();
+      if (trimmed.startsWith("•") || trimmed.startsWith("-") || trimmed.startsWith("*") || trimmed.match(/^\d+\./)) {
+        items.push(trimmed.replace(/^[\d•\-*]\s*/, "").trim());
+      }
+    }
+    return items.slice(0, 8);
+  };
+  const extractSectionText = (text, startMarker, endMarker) => {
+    const startIndex = text.indexOf(startMarker);
+    if (startIndex === -1)
+      return "No specific insights available";
+    const contentStart = startIndex + startMarker.length;
+    const endIndex = endMarker ? text.indexOf(endMarker, contentStart) : text.length;
+    const sectionContent = text.substring(contentStart, endIndex).trim();
+    return sectionContent.split("\n").filter((line) => line.trim().length > 0).join(" ").trim();
+  };
+  const getMatchColor = (score) => {
+    if (score >= 80)
+      return "#10B981";
+    if (score >= 60)
+      return "#F59E0B";
+    return "#EF4444";
+  };
+  const getMatchLabel = (score) => {
+    if (score >= 80)
+      return "Excellent Match";
+    if (score >= 60)
+      return "Good Match";
+    return "Needs Improvement";
+  };
+  const copyToClipboard = (text) => {
+    navigator.clipboard.writeText(text).then(() => {
+      alert("Analysis copied to clipboard!");
+    }).catch(() => {
+      const textArea = document.createElement("textarea");
+      textArea.value = text;
+      document.body.appendChild(textArea);
+      textArea.select();
+      document.execCommand("copy");
+      document.body.removeChild(textArea);
+      alert("Analysis copied to clipboard!");
+    });
+  };
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs(
+    "div",
+    {
+      style: {
+        background: "#FFFFFF",
+        borderRadius: "1.5rem",
+        padding: "2rem",
+        minWidth: 350,
+        minHeight: 520
+      },
+      children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          "div",
+          {
+            className: "uswift-gradient",
+            style: {
+              height: 8,
+              borderRadius: 8,
+              marginBottom: 16
+            }
+          }
+        ),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(
+          "div",
+          {
+            style: {
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              marginBottom: 16
+            },
+            children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "h2",
+                {
+                  style: {
+                    fontSize: "1.4rem",
+                    fontWeight: 700,
+                    color: "#111827",
+                    margin: 0
+                  },
+                  children: "Job Analysis"
+                }
+              ),
+              activeTab === "analysis" && /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "button",
+                {
+                  onClick: () => setActiveTab("input"),
+                  style: {
+                    background: "#EDE9FE",
+                    color: "#6D28D9",
+                    border: "none",
+                    borderRadius: 8,
+                    padding: "6px 12px",
+                    cursor: "pointer",
+                    fontSize: "0.8rem"
+                  },
+                  children: "← Back to Input"
+                }
+              )
+            ]
+          }
+        ),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(
+          "div",
+          {
+            style: {
+              display: "flex",
+              marginBottom: 16,
+              borderBottom: "1px solid #E5E7EB"
+            },
+            children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "button",
+                {
+                  onClick: () => setActiveTab("input"),
+                  style: {
+                    background: "none",
+                    border: "none",
+                    padding: "12px 16px",
+                    cursor: "pointer",
+                    fontSize: "0.9rem",
+                    fontWeight: activeTab === "input" ? 600 : 400,
+                    color: activeTab === "input" ? "#6D28D9" : "#6B7280",
+                    borderBottom: activeTab === "input" ? "2px solid #6D28D9" : "none"
+                  },
+                  children: "Input"
+                }
+              ),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "button",
+                {
+                  onClick: () => setActiveTab("analysis"),
+                  disabled: !result,
+                  style: {
+                    background: "none",
+                    border: "none",
+                    padding: "12px 16px",
+                    cursor: result ? "pointer" : "not-allowed",
+                    fontSize: "0.9rem",
+                    fontWeight: activeTab === "analysis" ? 600 : 400,
+                    color: activeTab === "analysis" ? "#6D28D9" : "#6B7280",
+                    borderBottom: activeTab === "analysis" ? "2px solid #6D28D9" : "none",
+                    opacity: result ? 1 : 0.5
+                  },
+                  children: "Analysis"
+                }
+              )
+            ]
+          }
+        ),
+        activeTab === "input" && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "uswift-card", style: { marginBottom: 16 }, children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "h3",
+              {
+                style: {
+                  fontSize: "1.1rem",
+                  fontWeight: 600,
+                  color: "#111827",
+                  marginBottom: 12
+                },
+                children: "Job Details"
+              }
+            ),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { display: "flex", gap: 12, marginBottom: 12 }, children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { flex: 1 }, children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  "label",
+                  {
+                    style: {
+                      display: "block",
+                      fontSize: "0.9rem",
+                      fontWeight: 600,
+                      color: "#374151",
+                      marginBottom: 4
+                    },
+                    children: "Job Title"
+                  }
+                ),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  "input",
+                  {
+                    type: "text",
+                    value: jobDetails.title,
+                    onChange: (e) => setJobDetails({ ...jobDetails, title: e.target.value }),
+                    placeholder: "e.g., Senior Software Engineer",
+                    style: {
+                      width: "100%",
+                      padding: "8px 12px",
+                      borderRadius: 6,
+                      border: "1px solid #E5E7EB",
+                      fontSize: "0.9rem"
+                    }
+                  }
+                )
+              ] }),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { flex: 1 }, children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  "label",
+                  {
+                    style: {
+                      display: "block",
+                      fontSize: "0.9rem",
+                      fontWeight: 600,
+                      color: "#374151",
+                      marginBottom: 4
+                    },
+                    children: "Company"
+                  }
+                ),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  "input",
+                  {
+                    type: "text",
+                    value: jobDetails.company,
+                    onChange: (e) => setJobDetails({ ...jobDetails, company: e.target.value }),
+                    placeholder: "e.g., Google",
+                    style: {
+                      width: "100%",
+                      padding: "8px 12px",
+                      borderRadius: 6,
+                      border: "1px solid #E5E7EB",
+                      fontSize: "0.9rem"
+                    }
+                  }
+                )
+              ] })
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { display: "flex", gap: 12, marginBottom: 12 }, children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { flex: 1 }, children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  "label",
+                  {
+                    style: {
+                      display: "block",
+                      fontSize: "0.9rem",
+                      fontWeight: 600,
+                      color: "#374151",
+                      marginBottom: 4
+                    },
+                    children: "Location"
+                  }
+                ),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  "input",
+                  {
+                    type: "text",
+                    value: jobDetails.location,
+                    onChange: (e) => setJobDetails({ ...jobDetails, location: e.target.value }),
+                    placeholder: "e.g., San Francisco, CA",
+                    style: {
+                      width: "100%",
+                      padding: "8px 12px",
+                      borderRadius: 6,
+                      border: "1px solid #E5E7EB",
+                      fontSize: "0.9rem"
+                    }
+                  }
+                )
+              ] }),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { flex: 1 }, children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  "label",
+                  {
+                    style: {
+                      display: "block",
+                      fontSize: "0.9rem",
+                      fontWeight: 600,
+                      color: "#374151",
+                      marginBottom: 4
+                    },
+                    children: "Job Type"
+                  }
+                ),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  "select",
+                  {
+                    value: jobDetails.type,
+                    onChange: (e) => setJobDetails({ ...jobDetails, type: e.target.value }),
+                    style: {
+                      width: "100%",
+                      padding: "8px 12px",
+                      borderRadius: 6,
+                      border: "1px solid #E5E7EB",
+                      fontSize: "0.9rem",
+                      background: "#FFFFFF"
+                    },
+                    children: jobTypes.map((type) => /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: type, children: type.charAt(0).toUpperCase() + type.slice(1) }, type))
+                  }
+                )
+              ] })
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { marginBottom: 12 }, children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "label",
+                {
+                  style: {
+                    display: "block",
+                    fontSize: "0.9rem",
+                    fontWeight: 600,
+                    color: "#374151",
+                    marginBottom: 4
+                  },
+                  children: "Salary Range (Optional)"
+                }
+              ),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "input",
+                {
+                  type: "text",
+                  value: jobDetails.salary,
+                  onChange: (e) => setJobDetails({ ...jobDetails, salary: e.target.value }),
+                  placeholder: "e.g., $120K - $150K",
+                  style: {
+                    width: "100%",
+                    padding: "8px 12px",
+                    borderRadius: 6,
+                    border: "1px solid #E5E7EB",
+                    fontSize: "0.9rem"
+                  }
+                }
+              )
+            ] })
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "uswift-card", style: { marginBottom: 16 }, children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "label",
+              {
+                style: {
+                  fontWeight: 600,
+                  display: "block",
+                  marginBottom: 8,
+                  color: "#374151"
+                },
+                children: "Job Description:"
+              }
+            ),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "textarea",
+              {
+                value: jobDescription,
+                onChange: (e) => setJobDescription(e.target.value),
+                placeholder: "Paste the complete job description here...",
+                rows: 8,
+                style: {
+                  width: "100%",
+                  padding: 12,
+                  borderRadius: 8,
+                  border: "1px solid #E5E7EB",
+                  fontSize: "0.9rem",
+                  resize: "vertical"
+                }
+              }
+            )
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "uswift-card", style: { marginBottom: 16 }, children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "label",
+              {
+                style: {
+                  fontWeight: 600,
+                  display: "block",
+                  marginBottom: 8,
+                  color: "#374151"
+                },
+                children: "Your Profile/Skills (Optional):"
+              }
+            ),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "textarea",
+              {
+                value: userProfile,
+                onChange: (e) => setUserProfile(e.target.value),
+                placeholder: "Describe your skills, experience, and qualifications to get personalized analysis...",
+                rows: 4,
+                style: {
+                  width: "100%",
+                  padding: 12,
+                  borderRadius: 8,
+                  border: "1px solid #E5E7EB",
+                  fontSize: "0.9rem",
+                  resize: "vertical"
+                }
+              }
+            )
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            "button",
+            {
+              onClick: handleAnalyze,
+              disabled: isLoading || !jobDescription.trim(),
+              className: "uswift-btn",
+              style: {
+                width: "100%",
+                opacity: isLoading || !jobDescription.trim() ? 0.6 : 1,
+                cursor: isLoading || !jobDescription.trim() ? "not-allowed" : "pointer"
+              },
+              children: isLoading ? /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                "div",
+                {
+                  style: {
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gap: 8
+                  },
+                  children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(
+                      "div",
+                      {
+                        style: {
+                          width: 16,
+                          height: 16,
+                          border: "2px solid #ffffff",
+                          borderTop: "2px solid transparent",
+                          borderRadius: "50%",
+                          animation: "spin 1s linear infinite"
+                        }
+                      }
+                    ),
+                    "Analyzing Job..."
+                  ]
+                }
+              ) : "Analyze Job"
+            }
+          ),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(
+            "div",
+            {
+              style: {
+                marginTop: 16,
+                padding: 12,
+                background: "#F8F9FA",
+                borderRadius: 8,
+                fontSize: "0.8rem",
+                color: "#6B7280"
+              },
+              children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Pro Tips:" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("ul", { style: { margin: "8px 0 0 16px", padding: 0 }, children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Include your skills section for personalized matching analysis" }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "The more detailed the job description, the better the analysis" }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Look for key requirements, responsibilities, and qualifications" }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Consider both technical skills and soft skills mentioned" })
+                ] })
+              ]
+            }
+          )
+        ] }),
+        activeTab === "analysis" && result && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(
+            "div",
+            {
+              style: {
+                display: "flex",
+                alignItems: "center",
+                gap: 16,
+                marginBottom: 20,
+                padding: 20,
+                background: "#F8F9FA",
+                borderRadius: 8
+              },
+              children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { textAlign: "center" }, children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                    "div",
+                    {
+                      style: {
+                        fontSize: "2.5rem",
+                        fontWeight: 700,
+                        color: getMatchColor(result.overallMatch),
+                        marginBottom: 8
+                      },
+                      children: [
+                        result.overallMatch,
+                        "/100"
+                      ]
+                    }
+                  ),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(
+                    "div",
+                    {
+                      style: {
+                        fontSize: "1rem",
+                        color: "#6B7280",
+                        fontWeight: 600
+                      },
+                      children: getMatchLabel(result.overallMatch)
+                    }
+                  )
+                ] }),
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { flex: 1 }, children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(
+                    "h3",
+                    {
+                      style: {
+                        margin: "0 0 8px 0",
+                        fontSize: "1.2rem",
+                        color: "#111827"
+                      },
+                      children: "Job Match Analysis"
+                    }
+                  ),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("p", { style: { margin: 0, fontSize: "0.9rem", color: "#6B7280" }, children: "Based on requirements analysis and market standards" })
+                ] })
+              ]
+            }
+          ),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "uswift-card", style: { marginBottom: 16 }, children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "h3",
+              {
+                style: {
+                  fontSize: "1.1rem",
+                  fontWeight: 600,
+                  color: "#111827",
+                  marginBottom: 12
+                },
+                children: "Key Requirements"
+              }
+            ),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { style: { display: "flex", gap: 4, flexWrap: "wrap" }, children: result.keyRequirements.map((req, index) => /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "span",
+              {
+                style: {
+                  background: "#DBEAFE",
+                  color: "#1E40AF",
+                  padding: "6px 12px",
+                  borderRadius: 6,
+                  fontSize: "0.8rem",
+                  fontWeight: 500,
+                  display: "inline-block",
+                  marginBottom: 4
+                },
+                children: req
+              },
+              index
+            )) })
+          ] }),
+          result.matchingSkills.length > 0 && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "uswift-card", style: { marginBottom: 16 }, children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "h3",
+              {
+                style: {
+                  fontSize: "1.1rem",
+                  fontWeight: 600,
+                  color: "#111827",
+                  marginBottom: 12
+                },
+                children: "Matching Skills"
+              }
+            ),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { style: { display: "flex", gap: 4, flexWrap: "wrap" }, children: result.matchingSkills.map((skill, index) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
+              "span",
+              {
+                style: {
+                  background: "#D1FAE5",
+                  color: "#065F46",
+                  padding: "4px 8px",
+                  borderRadius: 4,
+                  fontSize: "0.8rem",
+                  fontWeight: 500
+                },
+                children: [
+                  "✓ ",
+                  skill
+                ]
+              },
+              index
+            )) })
+          ] }),
+          result.missingSkills.length > 0 && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "uswift-card", style: { marginBottom: 16 }, children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "h3",
+              {
+                style: {
+                  fontSize: "1.1rem",
+                  fontWeight: 600,
+                  color: "#111827",
+                  marginBottom: 12
+                },
+                children: "Beneficial Skills (Not Required)"
+              }
+            ),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { style: { display: "flex", gap: 4, flexWrap: "wrap" }, children: result.missingSkills.map((skill, index) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
+              "span",
+              {
+                style: {
+                  background: "#FEF3C7",
+                  color: "#92400E",
+                  padding: "4px 8px",
+                  borderRadius: 4,
+                  fontSize: "0.8rem",
+                  fontWeight: 500
+                },
+                children: [
+                  "+ ",
+                  skill
+                ]
+              },
+              index
+            )) })
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "uswift-card", style: { marginBottom: 16 }, children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "h3",
+              {
+                style: {
+                  fontSize: "1.1rem",
+                  fontWeight: 600,
+                  color: "#111827",
+                  marginBottom: 12
+                },
+                children: "💰 Salary Insights"
+              }
+            ),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "p",
+              {
+                style: {
+                  fontSize: "0.9rem",
+                  lineHeight: 1.6,
+                  color: "#4B5563",
+                  margin: 0
+                },
+                children: result.salaryInsights
+              }
+            )
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "uswift-card", style: { marginBottom: 16 }, children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "h3",
+              {
+                style: {
+                  fontSize: "1.1rem",
+                  fontWeight: 600,
+                  color: "#111827",
+                  marginBottom: 12
+                },
+                children: "🏢 Company Culture Indicators"
+              }
+            ),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "p",
+              {
+                style: {
+                  fontSize: "0.9rem",
+                  lineHeight: 1.6,
+                  color: "#4B5563",
+                  margin: 0
+                },
+                children: result.companyCulture
+              }
+            )
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "uswift-card", style: { marginBottom: 16 }, children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "h3",
+              {
+                style: {
+                  fontSize: "1.1rem",
+                  fontWeight: 600,
+                  color: "#111827",
+                  marginBottom: 12
+                },
+                children: "🎯 Application Tips"
+              }
+            ),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("ul", { style: { margin: 0, paddingLeft: 20 }, children: result.applicationTips.map((tip, index) => /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "li",
+              {
+                style: {
+                  fontSize: "0.9rem",
+                  color: "#4B5563",
+                  marginBottom: 8
+                },
+                children: tip
+              },
+              index
+            )) })
+          ] }),
+          result.recommendations.length > 0 && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "uswift-card", style: { marginBottom: 16 }, children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "h3",
+              {
+                style: {
+                  fontSize: "1.1rem",
+                  fontWeight: 600,
+                  color: "#111827",
+                  marginBottom: 12
+                },
+                children: "💡 Recommendations"
+              }
+            ),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("ul", { style: { margin: 0, paddingLeft: 20 }, children: result.recommendations.map((rec, index) => /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "li",
+              {
+                style: {
+                  fontSize: "0.9rem",
+                  color: "#4B5563",
+                  marginBottom: 8
+                },
+                children: rec
+              },
+              index
+            )) })
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { display: "flex", gap: 8 }, children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "button",
+              {
+                onClick: () => copyToClipboard(`
+Job Analysis Report
+==================
+
+Overall Match: ${result.overallMatch}/100
+
+Key Requirements:
+${result.keyRequirements.map((req) => `• ${req}`).join("\n")}
+
+${result.matchingSkills.length > 0 ? `Matching Skills:
+${result.matchingSkills.map((skill) => `✓ ${skill}`).join("\n")}
+
+` : ""}${result.missingSkills.length > 0 ? `Beneficial Skills:
+${result.missingSkills.map((skill) => `+ ${skill}`).join("\n")}
+
+` : ""}Salary Insights:
+${result.salaryInsights}
+
+Company Culture:
+${result.companyCulture}
+
+Application Tips:
+${result.applicationTips.map((tip) => `• ${tip}`).join("\n")}
+
+Recommendations:
+${result.recommendations.map((rec) => `• ${rec}`).join("\n")}
+              `),
+                className: "uswift-btn",
+                style: { flex: 1 },
+                children: "Copy Full Report"
+              }
+            ),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "button",
+              {
+                onClick: () => setActiveTab("input"),
+                style: {
+                  flex: 1,
+                  background: "#F3F4F6",
+                  color: "#6B7280",
+                  border: "1px solid #E5E7EB",
+                  borderRadius: 8,
+                  padding: "12px",
+                  cursor: "pointer"
+                },
+                children: "Analyze Another Job"
+              }
+            )
+          ] })
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          "div",
+          {
+            style: {
+              marginTop: 16,
+              textAlign: "center",
+              fontSize: "0.8rem",
+              color: "#6B7280"
+            },
+            children: "Powered by Mistral AI • Smart job analysis and career insights"
+          }
+        )
+      ]
+    }
+  );
+}
+
+function InterviewPrep() {
+  const [jobDescription, setJobDescription] = reactExports.useState("");
+  const [experienceLevel, setExperienceLevel] = reactExports.useState("mid");
+  const [focusAreas, setFocusAreas] = reactExports.useState([]);
+  const [isLoading, setIsLoading] = reactExports.useState(false);
+  const [result, setResult] = reactExports.useState(null);
+  const [activeTab, setActiveTab] = reactExports.useState(
+    "input"
+  );
+  const mistralClient = getMistralClient();
+  const experienceLevels = [
+    {
+      value: "entry",
+      label: "Entry Level (0-2 years)",
+      description: "Junior developer, intern"
+    },
+    {
+      value: "mid",
+      label: "Mid Level (2-5 years)",
+      description: "Regular developer, team lead"
+    },
+    {
+      value: "senior",
+      label: "Senior Level (5-10 years)",
+      description: "Senior developer, architect"
+    },
+    {
+      value: "executive",
+      label: "Executive Level (10+ years)",
+      description: "Engineering manager, CTO"
+    }
+  ];
+  const commonFocusAreas = [
+    "Technical Skills",
+    "Behavioral Questions",
+    "System Design",
+    "Leadership Experience",
+    "Problem Solving",
+    "Communication Skills",
+    "Company Culture",
+    "Career Goals"
+  ];
+  const handleGenerate = async () => {
+    if (!jobDescription.trim()) {
+      alert("Please enter a job description");
+      return;
+    }
+    setIsLoading(true);
+    try {
+      const preparationPrompt = `Create a comprehensive interview preparation guide for this position:
+
+**Job Description:**
+${jobDescription}
+
+**Experience Level:** ${experienceLevel}
+**Focus Areas:** ${focusAreas.length > 0 ? focusAreas.join(", ") : "General preparation"}
+
+Please provide:
+
+1. **15-20 Interview Questions** organized by category (Technical, Behavioral, Situational)
+   - Include question difficulty (Easy/Medium/Hard)
+   - Provide suggested answers for each
+   - Highlight key points to emphasize
+
+2. **Overall Preparation Tips** (8-10 key tips)
+
+3. **Company-Specific Advice** based on the job description
+
+4. **7-Day Preparation Plan** with daily goals
+
+Format the response clearly with proper sections and structure.`;
+      const response = await mistralClient.chatWithPrompt(preparationPrompt, {
+        model: "mistral-small",
+        max_tokens: 2e3,
+        temperature: 0.7
+      });
+      const parsedResult = parseInterviewPrepResponse(response);
+      setResult(parsedResult);
+      setActiveTab("questions");
+    } catch (error) {
+      console.error("Interview prep error:", error);
+      alert("Failed to generate interview preparation. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  const parseInterviewPrepResponse = (response) => {
+    const questions = extractQuestions(response);
+    const overallTips = extractTips(response);
+    const companySpecificAdvice = extractCompanyAdvice(response);
+    const preparationPlan = extractPreparationPlan(response);
+    return {
+      questions,
+      overallTips,
+      companySpecificAdvice,
+      preparationPlan
+    };
+  };
+  const extractQuestions = (text) => {
+    const questions = [];
+    const lines = text.split("\n");
+    let currentCategory = "";
+    let currentDifficulty = "medium";
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i].trim();
+      if (line.toLowerCase().includes("technical") && line.includes("Question")) {
+        currentCategory = "Technical";
+      } else if (line.toLowerCase().includes("behavioral") && line.includes("Question")) {
+        currentCategory = "Behavioral";
+      } else if (line.toLowerCase().includes("situational") && line.includes("Question")) {
+        currentCategory = "Situational";
+      }
+      if (line.toLowerCase().includes("easy"))
+        currentDifficulty = "easy";
+      else if (line.toLowerCase().includes("hard"))
+        currentDifficulty = "hard";
+      else if (line.toLowerCase().includes("medium"))
+        currentDifficulty = "medium";
+      if (line.match(/^\d+\./) || line.startsWith("•") || line.startsWith("-")) {
+        const questionMatch = line.match(/^[\d•\-]+\s*(.+?)(?:\(|$)/);
+        if (questionMatch && questionMatch[1].length > 10) {
+          const question = questionMatch[1].trim();
+          let answer = "";
+          let keyPoints = [];
+          let j = i + 1;
+          while (j < lines.length && j < i + 10) {
+            const nextLine = lines[j].trim();
+            if (nextLine && !nextLine.match(/^\d+\./) && !nextLine.startsWith("•") && !nextLine.includes("Question")) {
+              if (nextLine.includes("Answer:") || nextLine.includes("Response:")) {
+                answer = nextLine.replace(/^(Answer|Response):\s*/i, "");
+              } else if (nextLine.startsWith("-") || nextLine.startsWith("•")) {
+                keyPoints.push(nextLine.substring(1).trim());
+              } else if (answer) {
+                answer += " " + nextLine;
+              }
+            } else if (nextLine.match(/^\d+\./) || nextLine.startsWith("•")) {
+              break;
+            }
+            j++;
+          }
+          questions.push({
+            id: `q-${questions.length + 1}`,
+            question,
+            category: currentCategory,
+            difficulty: currentDifficulty,
+            suggestedAnswer: answer || "Practice providing a structured answer that demonstrates your experience and problem-solving approach.",
+            keyPoints
+          });
+        }
+      }
+    }
+    return questions.slice(0, 15);
+  };
+  const extractTips = (text) => {
+    const tips = [];
+    const tipSection = text.match(
+      /(?:tips|advice|recommendations):?\s*(.*?)(?:\n\n|\n[A-Z]|$)/is
+    );
+    if (tipSection) {
+      const tipLines = tipSection[1].split("\n");
+      for (const line of tipLines) {
+        const trimmed = line.trim();
+        if (trimmed.startsWith("•") || trimmed.startsWith("-") || trimmed.match(/^\d+\./)) {
+          tips.push(trimmed.replace(/^[\d•\-]\s*/, "").trim());
+        }
+      }
+    }
+    return tips.slice(0, 10);
+  };
+  const extractCompanyAdvice = (text) => {
+    const adviceSection = text.match(
+      /(?:company|organization)(?:\s|-)(?:specific|advice|tips):?\s*(.*?)(?:\n\n|\n[A-Z]|$)/is
+    );
+    return adviceSection ? adviceSection[1].trim() : "Research the company culture, values, and recent news. Prepare questions about their challenges and goals.";
+  };
+  const extractPreparationPlan = (text) => {
+    const planSection = text.match(
+      /(?:plan|schedule|timeline):?\s*(.*?)(?:\n\n|\n[A-Z]|$)/is
+    );
+    if (planSection) {
+      const planLines = planSection[1].split("\n");
+      const plan = [];
+      for (const line of planLines) {
+        const trimmed = line.trim();
+        if (trimmed.startsWith("•") || trimmed.startsWith("-") || trimmed.match(/^\d+\./) || trimmed.match(/Day \d+:/)) {
+          plan.push(trimmed.replace(/^[\d•\-]\s*/, "").trim());
+        }
+      }
+      return plan.slice(0, 7);
+    }
+    return [
+      "Day 1: Research company and review job description",
+      "Day 2: Practice technical questions and coding problems",
+      "Day 3: Prepare behavioral questions and stories",
+      "Day 4: Mock interviews with friends or mentors",
+      "Day 5: Review resume and prepare questions for interviewer",
+      "Day 6: Rest and mental preparation",
+      "Day 7: Final review and confidence building"
+    ];
+  };
+  const toggleFocusArea = (area) => {
+    setFocusAreas(
+      (prev) => prev.includes(area) ? prev.filter((a) => a !== area) : [...prev, area]
+    );
+  };
+  const getDifficultyColor = (difficulty) => {
+    switch (difficulty) {
+      case "easy":
+        return "#10B981";
+      case "medium":
+        return "#F59E0B";
+      case "hard":
+        return "#EF4444";
+      default:
+        return "#6B7280";
+    }
+  };
+  const getDifficultyLabel = (difficulty) => {
+    return difficulty.charAt(0).toUpperCase() + difficulty.slice(1);
+  };
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs(
+    "div",
+    {
+      style: {
+        background: "#FFFFFF",
+        borderRadius: "1.5rem",
+        padding: "2rem",
+        minWidth: 350,
+        minHeight: 520
+      },
+      children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          "div",
+          {
+            className: "uswift-gradient",
+            style: {
+              height: 8,
+              borderRadius: 8,
+              marginBottom: 16
+            }
+          }
+        ),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(
+          "div",
+          {
+            style: {
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              marginBottom: 16
+            },
+            children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "h2",
+                {
+                  style: {
+                    fontSize: "1.4rem",
+                    fontWeight: 700,
+                    color: "#111827",
+                    margin: 0
+                  },
+                  children: "Interview Preparation"
+                }
+              ),
+              activeTab !== "input" && /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "button",
+                {
+                  onClick: () => setActiveTab("input"),
+                  style: {
+                    background: "#EDE9FE",
+                    color: "#6D28D9",
+                    border: "none",
+                    borderRadius: 8,
+                    padding: "6px 12px",
+                    cursor: "pointer",
+                    fontSize: "0.8rem"
+                  },
+                  children: "← Back to Input"
+                }
+              )
+            ]
+          }
+        ),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(
+          "div",
+          {
+            style: {
+              display: "flex",
+              marginBottom: 16,
+              borderBottom: "1px solid #E5E7EB"
+            },
+            children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "button",
+                {
+                  onClick: () => setActiveTab("input"),
+                  style: {
+                    background: "none",
+                    border: "none",
+                    padding: "12px 16px",
+                    cursor: "pointer",
+                    fontSize: "0.9rem",
+                    fontWeight: activeTab === "input" ? 600 : 400,
+                    color: activeTab === "input" ? "#6D28D9" : "#6B7280",
+                    borderBottom: activeTab === "input" ? "2px solid #6D28D9" : "none"
+                  },
+                  children: "Input"
+                }
+              ),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "button",
+                {
+                  onClick: () => setActiveTab("questions"),
+                  disabled: !result,
+                  style: {
+                    background: "none",
+                    border: "none",
+                    padding: "12px 16px",
+                    cursor: result ? "pointer" : "not-allowed",
+                    fontSize: "0.9rem",
+                    fontWeight: activeTab === "questions" ? 600 : 400,
+                    color: activeTab === "questions" ? "#6D28D9" : "#6B7280",
+                    borderBottom: activeTab === "questions" ? "2px solid #6D28D9" : "none",
+                    opacity: result ? 1 : 0.5
+                  },
+                  children: "Questions"
+                }
+              ),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "button",
+                {
+                  onClick: () => setActiveTab("tips"),
+                  disabled: !result,
+                  style: {
+                    background: "none",
+                    border: "none",
+                    padding: "12px 16px",
+                    cursor: result ? "pointer" : "not-allowed",
+                    fontSize: "0.9rem",
+                    fontWeight: activeTab === "tips" ? 600 : 400,
+                    color: activeTab === "tips" ? "#6D28D9" : "#6B7280",
+                    borderBottom: activeTab === "tips" ? "2px solid #6D28D9" : "none",
+                    opacity: result ? 1 : 0.5
+                  },
+                  children: "Tips & Plan"
+                }
+              )
+            ]
+          }
+        ),
+        activeTab === "input" && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "uswift-card", style: { marginBottom: 16 }, children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "label",
+              {
+                style: {
+                  fontWeight: 600,
+                  display: "block",
+                  marginBottom: 8,
+                  color: "#374151"
+                },
+                children: "Job Description:"
+              }
+            ),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "textarea",
+              {
+                value: jobDescription,
+                onChange: (e) => setJobDescription(e.target.value),
+                placeholder: "Paste the job description to generate relevant interview questions...",
+                rows: 6,
+                style: {
+                  width: "100%",
+                  padding: 12,
+                  borderRadius: 8,
+                  border: "1px solid #E5E7EB",
+                  fontSize: "0.9rem",
+                  resize: "vertical"
+                }
+              }
+            )
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "uswift-card", style: { marginBottom: 16 }, children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "label",
+              {
+                style: {
+                  fontWeight: 600,
+                  display: "block",
+                  marginBottom: 8,
+                  color: "#374151"
+                },
+                children: "Your Experience Level:"
+              }
+            ),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { style: { display: "flex", gap: 8, flexWrap: "wrap" }, children: experienceLevels.map((level) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
+              "button",
+              {
+                onClick: () => setExperienceLevel(level.value),
+                style: {
+                  background: experienceLevel === level.value ? "#6D28D9" : "#F3F4F6",
+                  color: experienceLevel === level.value ? "#FFFFFF" : "#6B7280",
+                  border: "none",
+                  borderRadius: 6,
+                  padding: "8px 16px",
+                  cursor: "pointer",
+                  fontSize: "0.8rem",
+                  fontWeight: 500,
+                  minWidth: 120,
+                  textAlign: "left"
+                },
+                title: level.description,
+                children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("div", { style: { fontWeight: 600 }, children: level.label }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("div", { style: { fontSize: "0.7rem", opacity: 0.8 }, children: level.description })
+                ]
+              },
+              level.value
+            )) })
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "uswift-card", style: { marginBottom: 16 }, children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "label",
+              {
+                style: {
+                  fontWeight: 600,
+                  display: "block",
+                  marginBottom: 8,
+                  color: "#374151"
+                },
+                children: "Focus Areas (Optional):"
+              }
+            ),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { style: { display: "flex", gap: 4, flexWrap: "wrap" }, children: commonFocusAreas.map((area) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
+              "button",
+              {
+                onClick: () => toggleFocusArea(area),
+                style: {
+                  background: focusAreas.includes(area) ? "#6D28D9" : "#F3F4F6",
+                  color: focusAreas.includes(area) ? "#FFFFFF" : "#6B7280",
+                  border: "none",
+                  borderRadius: 6,
+                  padding: "6px 12px",
+                  cursor: "pointer",
+                  fontSize: "0.8rem",
+                  fontWeight: 500
+                },
+                children: [
+                  focusAreas.includes(area) ? "✓" : "+",
+                  " ",
+                  area
+                ]
+              },
+              area
+            )) })
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            "button",
+            {
+              onClick: handleGenerate,
+              disabled: isLoading || !jobDescription.trim(),
+              className: "uswift-btn",
+              style: {
+                width: "100%",
+                opacity: isLoading || !jobDescription.trim() ? 0.6 : 1,
+                cursor: isLoading || !jobDescription.trim() ? "not-allowed" : "pointer"
+              },
+              children: isLoading ? /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                "div",
+                {
+                  style: {
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gap: 8
+                  },
+                  children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(
+                      "div",
+                      {
+                        style: {
+                          width: 16,
+                          height: 16,
+                          border: "2px solid #ffffff",
+                          borderTop: "2px solid transparent",
+                          borderRadius: "50%",
+                          animation: "spin 1s linear infinite"
+                        }
+                      }
+                    ),
+                    "Generating Interview Prep..."
+                  ]
+                }
+              ) : "Generate Interview Preparation"
+            }
+          ),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(
+            "div",
+            {
+              style: {
+                marginTop: 16,
+                padding: 12,
+                background: "#F8F9FA",
+                borderRadius: 8,
+                fontSize: "0.8rem",
+                color: "#6B7280"
+              },
+              children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Interview Preparation Tips:" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("ul", { style: { margin: "8px 0 0 16px", padding: 0 }, children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Use the STAR method (Situation, Task, Action, Result) for behavioral questions" }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Practice coding problems on platforms like LeetCode" }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Research the company and prepare thoughtful questions" }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Review your resume and be ready to discuss any experience" })
+                ] })
+              ]
+            }
+          )
+        ] }),
+        activeTab === "questions" && result && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { style: { maxHeight: 400, overflowY: "auto" }, children: result.questions.map((question) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
+          "div",
+          {
+            className: "uswift-card",
+            style: { marginBottom: 12 },
+            children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                "div",
+                {
+                  style: {
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "flex-start",
+                    marginBottom: 8
+                  },
+                  children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(
+                      "h4",
+                      {
+                        style: {
+                          fontSize: "0.9rem",
+                          fontWeight: 600,
+                          color: "#111827",
+                          margin: 0,
+                          flex: 1,
+                          marginRight: 12
+                        },
+                        children: question.question
+                      }
+                    ),
+                    /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                      "div",
+                      {
+                        style: { display: "flex", gap: 4, alignItems: "center" },
+                        children: [
+                          /* @__PURE__ */ jsxRuntimeExports.jsx(
+                            "span",
+                            {
+                              style: {
+                                background: "#EDE9FE",
+                                color: "#6D28D9",
+                                padding: "2px 6px",
+                                borderRadius: 4,
+                                fontSize: "0.7rem",
+                                fontWeight: 500
+                              },
+                              children: question.category
+                            }
+                          ),
+                          /* @__PURE__ */ jsxRuntimeExports.jsx(
+                            "span",
+                            {
+                              style: {
+                                background: getDifficultyColor(question.difficulty),
+                                color: "#FFFFFF",
+                                padding: "2px 6px",
+                                borderRadius: 4,
+                                fontSize: "0.7rem",
+                                fontWeight: 500
+                              },
+                              children: getDifficultyLabel(question.difficulty)
+                            }
+                          )
+                        ]
+                      }
+                    )
+                  ]
+                }
+              ),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                "div",
+                {
+                  style: {
+                    fontSize: "0.85rem",
+                    color: "#4B5563",
+                    lineHeight: 1.5,
+                    marginBottom: 8
+                  },
+                  children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Suggested Answer:" }),
+                    " ",
+                    question.suggestedAnswer
+                  ]
+                }
+              ),
+              question.keyPoints.length > 0 && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { style: { fontSize: "0.8rem", color: "#374151" }, children: "Key Points:" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("ul", { style: { margin: "4px 0 0 16px", padding: 0 }, children: question.keyPoints.map((point, index) => /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  "li",
+                  {
+                    style: {
+                      fontSize: "0.8rem",
+                      color: "#6B7280",
+                      marginBottom: 4
+                    },
+                    children: point
+                  },
+                  index
+                )) })
+              ] })
+            ]
+          },
+          question.id
+        )) }) }),
+        activeTab === "tips" && result && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "uswift-card", style: { marginBottom: 16 }, children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "h3",
+              {
+                style: {
+                  fontSize: "1.1rem",
+                  fontWeight: 600,
+                  color: "#111827",
+                  marginBottom: 12
+                },
+                children: "💡 Overall Preparation Tips"
+              }
+            ),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("ul", { style: { margin: 0, paddingLeft: 20 }, children: result.overallTips.map((tip, index) => /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "li",
+              {
+                style: {
+                  fontSize: "0.9rem",
+                  color: "#4B5563",
+                  marginBottom: 8
+                },
+                children: tip
+              },
+              index
+            )) })
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "uswift-card", style: { marginBottom: 16 }, children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "h3",
+              {
+                style: {
+                  fontSize: "1.1rem",
+                  fontWeight: 600,
+                  color: "#111827",
+                  marginBottom: 12
+                },
+                children: "🏢 Company-Specific Advice"
+              }
+            ),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "p",
+              {
+                style: {
+                  fontSize: "0.9rem",
+                  lineHeight: 1.6,
+                  color: "#4B5563",
+                  margin: 0
+                },
+                children: result.companySpecificAdvice
+              }
+            )
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "uswift-card", style: { marginBottom: 16 }, children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "h3",
+              {
+                style: {
+                  fontSize: "1.1rem",
+                  fontWeight: 600,
+                  color: "#111827",
+                  marginBottom: 12
+                },
+                children: "📅 7-Day Preparation Plan"
+              }
+            ),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { style: { display: "flex", flexDirection: "column", gap: 8 }, children: result.preparationPlan.map((day, index) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
+              "div",
+              {
+                style: {
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 8,
+                  padding: 8,
+                  background: "#F8F9FA",
+                  borderRadius: 6
+                },
+                children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(
+                    "span",
+                    {
+                      style: {
+                        background: "#6D28D9",
+                        color: "#FFFFFF",
+                        width: 24,
+                        height: 24,
+                        borderRadius: "50%",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        fontSize: "0.8rem",
+                        fontWeight: 600
+                      },
+                      children: index + 1
+                    }
+                  ),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(
+                    "span",
+                    {
+                      style: {
+                        fontSize: "0.9rem",
+                        color: "#4B5563",
+                        flex: 1
+                      },
+                      children: day
+                    }
+                  )
+                ]
+              },
+              index
+            )) })
+          ] })
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          "div",
+          {
+            style: {
+              marginTop: 16,
+              textAlign: "center",
+              fontSize: "0.8rem",
+              color: "#6B7280"
+            },
+            children: "Powered by Mistral AI • Comprehensive interview preparation and practice questions"
+          }
+        )
+      ]
+    }
+  );
+}
+
 function Auth({ onAuthSuccess }) {
-  const {
-    signIn,
-    signUp,
-    loading: authLoading,
-    pending
-  } = useAuth();
+  const { signIn, signUp, loading: authLoading, pending } = useAuth();
   const [isSignUp, setIsSignUp] = reactExports.useState(false);
   const [isForgot, setIsForgot] = reactExports.useState(false);
   const [email, setEmail] = reactExports.useState("");
@@ -2116,14 +6482,25 @@ function Popup() {
           { type: "AUTO_APPLY", profile },
           (response) => {
             if (!response) {
-              setAutoStatus({ status: "error", message: "No response from page (content script missing or blocked)." });
+              setAutoStatus({
+                status: "error",
+                message: "No response from page (content script missing or blocked)."
+              });
               return;
             }
             setLastAutoDetails(response.details || null);
             if (response?.status === "success") {
-              setAutoStatus({ status: "success", message: `Applied on ${response.jobBoard || "site"}`, details: response.details });
+              setAutoStatus({
+                status: "success",
+                message: `Applied on ${response.jobBoard || "site"}`,
+                details: response.details
+              });
             } else {
-              setAutoStatus({ status: "error", message: response?.message || "Auto-apply failed", details: response.details });
+              setAutoStatus({
+                status: "error",
+                message: response?.message || "Auto-apply failed",
+                details: response.details
+              });
             }
           }
         );
@@ -2133,36 +6510,52 @@ function Popup() {
     });
   };
   if (!isAuthenticated && !loading) {
-    return /* @__PURE__ */ jsxRuntimeExports.jsx(Auth, { onAuthSuccess: async () => {
-      setPage("home");
-      await refreshAuth();
-      setForceRerender((prev) => prev + 1);
-      setTimeout(async () => {
-        await refreshAuth();
-        setForceRerender((prev) => prev + 1);
-      }, 500);
-    } });
+    return /* @__PURE__ */ jsxRuntimeExports.jsx(
+      Auth,
+      {
+        onAuthSuccess: async () => {
+          setPage("home");
+          await refreshAuth();
+          setForceRerender((prev) => prev + 1);
+          setTimeout(async () => {
+            await refreshAuth();
+            setForceRerender((prev) => prev + 1);
+          }, 500);
+        }
+      }
+    );
   }
   if (loading) {
-    return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { style: {
-      padding: "2rem",
-      textAlign: "center",
-      minHeight: 400,
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center"
-    }, children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { style: {
-        width: 40,
-        height: 40,
-        border: "4px solid #e5e7eb",
-        borderTop: "4px solid #6d28d9",
-        borderRadius: "50%",
-        animation: "spin 1s linear infinite",
-        margin: "0 auto 16px"
-      } }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx("p", { style: { color: "#6b7280", margin: 0 }, children: "Loading..." })
-    ] }) });
+    return /* @__PURE__ */ jsxRuntimeExports.jsx(
+      "div",
+      {
+        style: {
+          padding: "2rem",
+          textAlign: "center",
+          minHeight: 400,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center"
+        },
+        children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            "div",
+            {
+              style: {
+                width: 40,
+                height: 40,
+                border: "4px solid #e5e7eb",
+                borderTop: "4px solid #6d28d9",
+                borderRadius: "50%",
+                animation: "spin 1s linear infinite",
+                margin: "0 auto 16px"
+              }
+            }
+          ),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { style: { color: "#6b7280", margin: 0 }, children: "Loading..." })
+        ] })
+      }
+    );
   }
   if (page === "profile") {
     return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
@@ -2230,6 +6623,210 @@ function Popup() {
         }
       ),
       /* @__PURE__ */ jsxRuntimeExports.jsx(JobTracker, {})
+    ] });
+  }
+  if (page === "chat") {
+    return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsxs(
+        "div",
+        {
+          style: {
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            margin: "1rem"
+          },
+          children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("button", { className: "uswift-btn", onClick: () => setPage("home"), children: "← Back" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "button",
+              {
+                onClick: signOut,
+                style: {
+                  background: "#EDE9FE",
+                  color: "#6D28D9",
+                  border: "none",
+                  borderRadius: 8,
+                  padding: "8px 12px",
+                  cursor: "pointer"
+                },
+                children: "Sign Out"
+              }
+            )
+          ]
+        }
+      ),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(ChatInterface, {})
+    ] });
+  }
+  if (page === "resume") {
+    return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsxs(
+        "div",
+        {
+          style: {
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            margin: "1rem"
+          },
+          children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("button", { className: "uswift-btn", onClick: () => setPage("home"), children: "← Back" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "button",
+              {
+                onClick: signOut,
+                style: {
+                  background: "#EDE9FE",
+                  color: "#6D28D9",
+                  border: "none",
+                  borderRadius: 8,
+                  padding: "8px 12px",
+                  cursor: "pointer"
+                },
+                children: "Sign Out"
+              }
+            )
+          ]
+        }
+      ),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(ResumeEnhancement, {})
+    ] });
+  }
+  if (page === "cover-letter") {
+    return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsxs(
+        "div",
+        {
+          style: {
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            margin: "1rem"
+          },
+          children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("button", { className: "uswift-btn", onClick: () => setPage("home"), children: "← Back" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "button",
+              {
+                onClick: signOut,
+                style: {
+                  background: "#EDE9FE",
+                  color: "#6D28D9",
+                  border: "none",
+                  borderRadius: 8,
+                  padding: "8px 12px",
+                  cursor: "pointer"
+                },
+                children: "Sign Out"
+              }
+            )
+          ]
+        }
+      ),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(CoverLetterGenerator, {})
+    ] });
+  }
+  if (page === "files") {
+    return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsxs(
+        "div",
+        {
+          style: {
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            margin: "1rem"
+          },
+          children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("button", { className: "uswift-btn", onClick: () => setPage("home"), children: "← Back" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "button",
+              {
+                onClick: signOut,
+                style: {
+                  background: "#EDE9FE",
+                  color: "#6D28D9",
+                  border: "none",
+                  borderRadius: 8,
+                  padding: "8px 12px",
+                  cursor: "pointer"
+                },
+                children: "Sign Out"
+              }
+            )
+          ]
+        }
+      ),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(FileManager, {})
+    ] });
+  }
+  if (page === "job-analysis") {
+    return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsxs(
+        "div",
+        {
+          style: {
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            margin: "1rem"
+          },
+          children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("button", { className: "uswift-btn", onClick: () => setPage("home"), children: "← Back" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "button",
+              {
+                onClick: signOut,
+                style: {
+                  background: "#EDE9FE",
+                  color: "#6D28D9",
+                  border: "none",
+                  borderRadius: 8,
+                  padding: "8px 12px",
+                  cursor: "pointer"
+                },
+                children: "Sign Out"
+              }
+            )
+          ]
+        }
+      ),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(JobAnalysis, {})
+    ] });
+  }
+  if (page === "interview-prep") {
+    return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsxs(
+        "div",
+        {
+          style: {
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            margin: "1rem"
+          },
+          children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("button", { className: "uswift-btn", onClick: () => setPage("home"), children: "← Back" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "button",
+              {
+                onClick: signOut,
+                style: {
+                  background: "#EDE9FE",
+                  color: "#6D28D9",
+                  border: "none",
+                  borderRadius: 8,
+                  padding: "8px 12px",
+                  cursor: "pointer"
+                },
+                children: "Sign Out"
+              }
+            )
+          ]
+        }
+      ),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(InterviewPrep, {})
     ] });
   }
   return /* @__PURE__ */ jsxRuntimeExports.jsxs(
@@ -2340,29 +6937,161 @@ function Popup() {
             autoStatus.status === "success" && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { style: { color: "#10B981" }, children: autoStatus.message }),
             autoStatus.status === "error" && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
               /* @__PURE__ */ jsxRuntimeExports.jsx("div", { style: { color: "#DC2626" }, children: autoStatus.message }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx("button", { className: "uswift-btn", style: { marginTop: 8 }, onClick: handleAutoApply, children: "Retry" }),
-              lastAutoDetails && /* @__PURE__ */ jsxRuntimeExports.jsx("pre", { style: { textAlign: "left", maxHeight: 120, overflow: "auto", fontSize: 11, background: "#F3F4F6", padding: 8, borderRadius: 6, marginTop: 8 }, children: JSON.stringify(lastAutoDetails, null, 2) })
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "button",
+                {
+                  className: "uswift-btn",
+                  style: { marginTop: 8 },
+                  onClick: handleAutoApply,
+                  children: "Retry"
+                }
+              ),
+              lastAutoDetails && /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "pre",
+                {
+                  style: {
+                    textAlign: "left",
+                    maxHeight: 120,
+                    overflow: "auto",
+                    fontSize: 11,
+                    background: "#F3F4F6",
+                    padding: 8,
+                    borderRadius: 6,
+                    marginTop: 8
+                  },
+                  children: JSON.stringify(lastAutoDetails, null, 2)
+                }
+              )
             ] })
           ] }),
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { display: "flex", gap: 8, marginTop: 8 }, children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(
+            "div",
+            {
+              style: { display: "flex", gap: 8, marginTop: 8, flexWrap: "wrap" },
+              children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  "button",
+                  {
+                    className: "uswift-btn",
+                    style: { background: "#EDE9FE", color: "#6D28D9" },
+                    onClick: () => setPage("profile"),
+                    children: "Profile Vault"
+                  }
+                ),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  "button",
+                  {
+                    className: "uswift-btn",
+                    style: { background: "#EDE9FE", color: "#6D28D9" },
+                    onClick: () => setPage("tracker"),
+                    children: "Job Tracker"
+                  }
+                )
+              ]
+            }
+          ),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { marginTop: 20 }, children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx(
-              "button",
+              "h3",
               {
-                className: "uswift-btn",
-                style: { background: "#EDE9FE", color: "#6D28D9" },
-                onClick: () => setPage("profile"),
-                children: "Profile Vault"
+                style: {
+                  fontSize: "1rem",
+                  fontWeight: 600,
+                  color: "#111827",
+                  marginBottom: 12,
+                  textAlign: "center"
+                },
+                children: "🤖 AI-Powered Tools"
               }
             ),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(
-              "button",
-              {
-                className: "uswift-btn",
-                style: { background: "#EDE9FE", color: "#6D28D9" },
-                onClick: () => setPage("tracker"),
-                children: "Job Tracker"
-              }
-            )
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { display: "flex", gap: 8, flexWrap: "wrap" }, children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "button",
+                {
+                  className: "uswift-btn",
+                  style: {
+                    background: "#10B981",
+                    color: "#FFFFFF",
+                    flex: 1,
+                    minWidth: 120
+                  },
+                  onClick: () => setPage("chat"),
+                  children: "💬 AI Assistant"
+                }
+              ),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "button",
+                {
+                  className: "uswift-btn",
+                  style: {
+                    background: "#3B82F6",
+                    color: "#FFFFFF",
+                    flex: 1,
+                    minWidth: 120
+                  },
+                  onClick: () => setPage("resume"),
+                  children: "📄 Resume AI"
+                }
+              ),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "button",
+                {
+                  className: "uswift-btn",
+                  style: {
+                    background: "#8B5CF6",
+                    color: "#FFFFFF",
+                    flex: 1,
+                    minWidth: 120
+                  },
+                  onClick: () => setPage("cover-letter"),
+                  children: "✍️ Cover Letter"
+                }
+              )
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { style: { marginTop: 12 }, children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { display: "flex", gap: 8, flexWrap: "wrap" }, children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "button",
+                {
+                  className: "uswift-btn",
+                  style: {
+                    background: "#F59E0B",
+                    color: "#FFFFFF",
+                    flex: 1,
+                    minWidth: 120
+                  },
+                  onClick: () => setPage("files"),
+                  children: "📁 File Manager"
+                }
+              ),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "button",
+                {
+                  className: "uswift-btn",
+                  style: {
+                    background: "#EC4899",
+                    color: "#FFFFFF",
+                    flex: 1,
+                    minWidth: 120
+                  },
+                  onClick: () => setPage("job-analysis"),
+                  children: "🔍 Job Analysis"
+                }
+              ),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "button",
+                {
+                  className: "uswift-btn",
+                  style: {
+                    background: "#14B8A6",
+                    color: "#FFFFFF",
+                    flex: 1,
+                    minWidth: 120
+                  },
+                  onClick: () => setPage("interview-prep"),
+                  children: "🎤 Interview Prep"
+                }
+              )
+            ] }) })
           ] })
         ] }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs(
