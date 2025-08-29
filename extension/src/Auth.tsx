@@ -2,13 +2,12 @@ import React, { useState } from "react";
 import { useAuth } from "./hooks/useAuth";
 import "./index.css";
 
-export default function Auth() {
-  const {
-    signIn,
-    signUp,
-    loading: authLoading,
-    pending,
-  } = useAuth();
+interface AuthProps {
+  onAuthSuccess?: () => void;
+}
+
+export default function Auth({ onAuthSuccess }: AuthProps) {
+  const { signIn, signUp, loading: authLoading, pending } = useAuth();
   const [isSignUp, setIsSignUp] = useState(false);
   const [isForgot, setIsForgot] = useState(false);
   const [email, setEmail] = useState("");
@@ -66,6 +65,14 @@ export default function Auth() {
         setEmail("");
         setPassword("");
         setFullName("");
+
+        // Call the success callback after a brief delay to show the success message
+        // and ensure authentication state is fully updated
+        setTimeout(() => {
+          if (onAuthSuccess) {
+            onAuthSuccess();
+          }
+        }, 2000);
       } else {
         setError("An unexpected error occurred. Please try again.");
       }
@@ -243,6 +250,13 @@ export default function Auth() {
                 style={{ fontSize: "0.85rem", color: "#065F46", marginTop: 8 }}
               >
                 Verifying account... this may take a few seconds.
+              </div>
+            )}
+            {!pending && success.includes("successfully") && (
+              <div
+                style={{ fontSize: "0.85rem", color: "#065F46", marginTop: 8 }}
+              >
+                Redirecting to dashboard...
               </div>
             )}
           </div>

@@ -22,7 +22,7 @@ export function useAuth() {
 
   useEffect(() => {
     // Load existing session
-  const loadUser = async () => {
+    const loadUser = async () => {
       try {
         // Get supabase client using our singleton
         const supabase = getSupabaseClient();
@@ -62,6 +62,8 @@ export function useAuth() {
           if (userProfile) {
             setUser(userProfile);
             setPending(false);
+            // Force a session save to ensure persistence
+            (await supabase.saveSession) && supabase.saveSession(result);
             return { user: userProfile, error: null };
           }
           await new Promise((r) => setTimeout(r, 500));
@@ -119,13 +121,35 @@ export function useAuth() {
     }
   };
 
+  const refreshAuth = async () => {
+    try {
+      const supabase = getSupabaseClient();
+      if (supabase) {
+        const currentUser = await supabase.getUser();
+        if (currentUser) {
+          setUser(currentUser);
+          return true;
+        } else {
+          setUser(null);
+          return false;
+        }
+      }
+    } catch (error) {
+      console.error("Error refreshing auth:", error);
+      setUser(null);
+      return false;
+    }
+    return false;
+  };
+
   return {
     user,
     loading,
-  pending,
+    pending,
     signIn,
     signUp,
     signOut,
+    refreshAuth,
     isAuthenticated: !!user,
   };
 }

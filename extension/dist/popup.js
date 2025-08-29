@@ -539,6 +539,7 @@ function useAuth() {
           if (userProfile) {
             setUser(userProfile);
             setPending(false);
+            await supabase.saveSession && supabase.saveSession(result);
             return { user: userProfile, error: null };
           }
           await new Promise((r) => setTimeout(r, 500));
@@ -592,6 +593,26 @@ function useAuth() {
       console.error("Error signing out:", error);
     }
   };
+  const refreshAuth = async () => {
+    try {
+      const supabase = getSupabaseClient();
+      if (supabase) {
+        const currentUser = await supabase.getUser();
+        if (currentUser) {
+          setUser(currentUser);
+          return true;
+        } else {
+          setUser(null);
+          return false;
+        }
+      }
+    } catch (error) {
+      console.error("Error refreshing auth:", error);
+      setUser(null);
+      return false;
+    }
+    return false;
+  };
   return {
     user,
     loading,
@@ -599,6 +620,7 @@ function useAuth() {
     signIn,
     signUp,
     signOut,
+    refreshAuth,
     isAuthenticated: !!user
   };
 }
@@ -630,7 +652,9 @@ function ProfileVault() {
       if (error)
         throwNormalized(error);
       const resumeDoc = resumes?.find((r) => r.type === "resume");
-      const coverLetterDoc = resumes?.find((r) => r.type === "cover_letter");
+      const coverLetterDoc = resumes?.find(
+        (r) => r.type === "cover_letter"
+      );
       if (resumeDoc)
         setResume(resumeDoc.content || "");
       if (coverLetterDoc)
@@ -648,14 +672,17 @@ function ProfileVault() {
   };
   const loadFromChromeStorage = () => {
     if (typeof chrome !== "undefined" && chrome.storage && chrome.storage.sync) {
-      chrome.storage.sync.get(["resume", "coverLetter", "qaProfile"], (result) => {
-        if (result.resume)
-          setResume(result.resume);
-        if (result.coverLetter)
-          setCoverLetter(result.coverLetter);
-        if (result.qaProfile)
-          setQaProfile(result.qaProfile);
-      });
+      chrome.storage.sync.get(
+        ["resume", "coverLetter", "qaProfile"],
+        (result) => {
+          if (result.resume)
+            setResume(result.resume);
+          if (result.coverLetter)
+            setCoverLetter(result.coverLetter);
+          if (result.qaProfile)
+            setQaProfile(result.qaProfile);
+        }
+      );
     }
   };
   const saveProfile = async () => {
@@ -671,39 +698,48 @@ function ProfileVault() {
         return;
       setLoading(true);
       if (resume.trim()) {
-        const { error: resumeError } = await supabase.from("resumes").upsert({
-          user_id: user.id,
-          type: "resume",
-          title: "Default Resume",
-          content: resume,
-          updated_at: (/* @__PURE__ */ new Date()).toISOString()
-        }, {
-          onConflict: "user_id,type"
-        });
+        const { error: resumeError } = await supabase.from("resumes").upsert(
+          {
+            user_id: user.id,
+            type: "resume",
+            title: "Default Resume",
+            content: resume,
+            updated_at: (/* @__PURE__ */ new Date()).toISOString()
+          },
+          {
+            onConflict: "user_id,type"
+          }
+        );
         if (resumeError)
           throwNormalized(resumeError);
       }
       if (coverLetter.trim()) {
-        const { error: coverError } = await supabase.from("resumes").upsert({
-          user_id: user.id,
-          type: "cover_letter",
-          title: "Default Cover Letter",
-          content: coverLetter,
-          updated_at: (/* @__PURE__ */ new Date()).toISOString()
-        }, {
-          onConflict: "user_id,type"
-        });
+        const { error: coverError } = await supabase.from("resumes").upsert(
+          {
+            user_id: user.id,
+            type: "cover_letter",
+            title: "Default Cover Letter",
+            content: coverLetter,
+            updated_at: (/* @__PURE__ */ new Date()).toISOString()
+          },
+          {
+            onConflict: "user_id,type"
+          }
+        );
         if (coverError)
           throwNormalized(coverError);
       }
       if (qaProfile.trim()) {
-        const { error: qaError } = await supabase.from("user_preferences").upsert({
-          user_id: user.id,
-          qa_profile: qaProfile,
-          updated_at: (/* @__PURE__ */ new Date()).toISOString()
-        }, {
-          onConflict: "user_id"
-        });
+        const { error: qaError } = await supabase.from("user_preferences").upsert(
+          {
+            user_id: user.id,
+            qa_profile: qaProfile,
+            updated_at: (/* @__PURE__ */ new Date()).toISOString()
+          },
+          {
+            onConflict: "user_id"
+          }
+        );
         if (qaError)
           throwNormalized(qaError);
       }
@@ -725,86 +761,115 @@ function ProfileVault() {
       alert("Storage is not available.");
     }
   };
-  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { background: "#FFFFFF", borderRadius: "1.5rem", padding: "2rem" }, children: [
-    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "uswift-gradient", style: { height: 8, borderRadius: 8, marginBottom: 24 } }),
-    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }, children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx("h2", { style: { fontSize: "1.4rem", fontWeight: 700, color: "#111827" }, children: "Profile Vault" }),
-      isAuthenticated && /* @__PURE__ */ jsxRuntimeExports.jsx("span", { style: { color: "#10B981", fontSize: "0.8rem", fontWeight: 600 }, children: "☁️ Cloud Sync" })
-    ] }),
-    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "uswift-card", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx("label", { style: { fontWeight: 600, display: "block", marginBottom: 8 }, children: "Resume" }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx(
-        "textarea",
-        {
-          value: resume,
-          onChange: (e) => setResume(e.target.value),
-          rows: 4,
-          style: {
-            width: "100%",
-            marginBottom: 12,
-            borderRadius: 8,
-            border: "1px solid #E5E7EB",
-            padding: 8,
-            resize: "vertical"
-          },
-          placeholder: "Paste your resume content here...",
-          disabled: loading
-        }
-      )
-    ] }),
-    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "uswift-card", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx("label", { style: { fontWeight: 600, display: "block", marginBottom: 8 }, children: "Cover Letter" }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx(
-        "textarea",
-        {
-          value: coverLetter,
-          onChange: (e) => setCoverLetter(e.target.value),
-          rows: 4,
-          style: {
-            width: "100%",
-            marginBottom: 12,
-            borderRadius: 8,
-            border: "1px solid #E5E7EB",
-            padding: 8,
-            resize: "vertical"
-          },
-          placeholder: "Paste your cover letter template here...",
-          disabled: loading
-        }
-      )
-    ] }),
-    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "uswift-card", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx("label", { style: { fontWeight: 600, display: "block", marginBottom: 8 }, children: "Q&A Profile" }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx(
-        "textarea",
-        {
-          value: qaProfile,
-          onChange: (e) => setQaProfile(e.target.value),
-          rows: 4,
-          style: {
-            width: "100%",
-            marginBottom: 12,
-            borderRadius: 8,
-            border: "1px solid #E5E7EB",
-            padding: 8,
-            resize: "vertical"
-          },
-          placeholder: "Common interview Q&A, skills, experience highlights...",
-          disabled: loading
-        }
-      )
-    ] }),
-    /* @__PURE__ */ jsxRuntimeExports.jsx(
-      "button",
-      {
-        className: "uswift-btn",
-        style: { marginTop: 16, opacity: loading ? 0.6 : 1 },
-        onClick: saveProfile,
-        disabled: loading,
-        children: loading ? "Saving..." : isAuthenticated ? "Save to Cloud" : "Save Locally"
-      }
-    )
-  ] });
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs(
+    "div",
+    {
+      style: { background: "#FFFFFF", borderRadius: "1.5rem", padding: "2rem" },
+      children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          "div",
+          {
+            className: "uswift-gradient",
+            style: { height: 8, borderRadius: 8, marginBottom: 24 }
+          }
+        ),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(
+          "div",
+          {
+            style: {
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              marginBottom: 16
+            },
+            children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("h2", { style: { fontSize: "1.4rem", fontWeight: 700, color: "#111827" }, children: "Profile Vault" }),
+              isAuthenticated && /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "span",
+                {
+                  style: { color: "#10B981", fontSize: "0.8rem", fontWeight: 600 },
+                  children: "☁️ Cloud Sync"
+                }
+              )
+            ]
+          }
+        ),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "uswift-card", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("label", { style: { fontWeight: 600, display: "block", marginBottom: 8 }, children: "Resume" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            "textarea",
+            {
+              value: resume,
+              onChange: (e) => setResume(e.target.value),
+              rows: 4,
+              style: {
+                width: "100%",
+                marginBottom: 12,
+                borderRadius: 8,
+                border: "1px solid #E5E7EB",
+                padding: 8,
+                resize: "vertical"
+              },
+              placeholder: "Paste your resume content here...",
+              disabled: loading
+            }
+          )
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "uswift-card", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("label", { style: { fontWeight: 600, display: "block", marginBottom: 8 }, children: "Cover Letter" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            "textarea",
+            {
+              value: coverLetter,
+              onChange: (e) => setCoverLetter(e.target.value),
+              rows: 4,
+              style: {
+                width: "100%",
+                marginBottom: 12,
+                borderRadius: 8,
+                border: "1px solid #E5E7EB",
+                padding: 8,
+                resize: "vertical"
+              },
+              placeholder: "Paste your cover letter template here...",
+              disabled: loading
+            }
+          )
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "uswift-card", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("label", { style: { fontWeight: 600, display: "block", marginBottom: 8 }, children: "Q&A Profile" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            "textarea",
+            {
+              value: qaProfile,
+              onChange: (e) => setQaProfile(e.target.value),
+              rows: 4,
+              style: {
+                width: "100%",
+                marginBottom: 12,
+                borderRadius: 8,
+                border: "1px solid #E5E7EB",
+                padding: 8,
+                resize: "vertical"
+              },
+              placeholder: "Common interview Q&A, skills, experience highlights...",
+              disabled: loading
+            }
+          )
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          "button",
+          {
+            className: "uswift-btn",
+            style: { marginTop: 16, opacity: loading ? 0.6 : 1 },
+            onClick: saveProfile,
+            disabled: loading,
+            children: loading ? "Saving..." : isAuthenticated ? "Save to Cloud" : "Save Locally"
+          }
+        )
+      ]
+    }
+  );
 }
 
 const JobTracker = () => {
@@ -846,33 +911,36 @@ const JobTracker = () => {
       if (client) {
         try {
           const apps = await client.makeRequest(
-            `job_applications?user_id=eq.${user.id}&order=applied_date.desc`
+            `applications?user_id=eq.${user.id}&order=applied_at.desc`
           );
           formattedApps = apps?.map((app) => ({
             id: app.id,
             company: app.company,
-            position: app.position,
+            position: app.job_title,
             status: app.status,
-            dateApplied: app.applied_date,
+            dateApplied: app.applied_at,
             jobUrl: app.job_url,
             notes: app.notes,
             tags: app.tags || []
           })) || [];
         } catch (err) {
-          console.warn("Supabase REST load failed, falling back to client lib", err);
+          console.warn(
+            "Supabase REST load failed, falling back to client lib",
+            err
+          );
         }
       }
       if (formattedApps.length === 0 && typeof window.supabase !== "undefined") {
         try {
-          const { data: apps, error } = await window.supabase.from("job_applications").select("*").eq("user_id", user.id).order("applied_date", { ascending: false });
+          const { data: apps, error } = await window.supabase.from("applications").select("*").eq("user_id", user.id).order("applied_at", { ascending: false });
           if (error)
             throwNormalized(error);
           formattedApps = apps?.map((app) => ({
             id: app.id,
             company: app.company,
-            position: app.position,
+            position: app.job_title,
             status: app.status,
-            dateApplied: app.applied_date,
+            dateApplied: app.applied_at,
             jobUrl: app.job_url,
             notes: app.notes,
             tags: app.tags || []
@@ -906,9 +974,9 @@ const JobTracker = () => {
       const appData = {
         user_id: user.id,
         company: application.company,
-        position: application.position,
+        job_title: application.position,
         status: application.status,
-        applied_date: application.dateApplied,
+        applied_at: application.dateApplied,
         job_url: application.jobUrl,
         notes: application.notes,
         tags: application.tags,
@@ -916,13 +984,13 @@ const JobTracker = () => {
       };
       if (client) {
         if (application.id) {
-          await client.makeRequest(`job_applications?id=eq.${application.id}`, {
+          await client.makeRequest(`applications?id=eq.${application.id}`, {
             method: "PATCH",
             body: JSON.stringify(appData)
           });
           return true;
         } else {
-          const inserted = await client.makeRequest("job_applications", {
+          const inserted = await client.makeRequest("applications", {
             method: "POST",
             body: JSON.stringify([appData])
           });
@@ -931,11 +999,11 @@ const JobTracker = () => {
       }
       if (typeof window.supabase !== "undefined") {
         if (application.id) {
-          const { error } = await window.supabase.from("job_applications").update(appData).eq("id", application.id);
+          const { error } = await window.supabase.from("applications").update(appData).eq("id", application.id);
           if (error)
             throwNormalized(error);
         } else {
-          const { data, error } = await window.supabase.from("job_applications").insert([appData]).select().single();
+          const { data, error } = await window.supabase.from("applications").insert([appData]).select().single();
           if (error)
             throwNormalized(error);
           return data.id;
@@ -1006,7 +1074,7 @@ const JobTracker = () => {
       return;
     if (isAuthenticated && user) {
       try {
-        const { error } = await supabase.from("job_applications").delete().eq("id", id);
+        const { error } = await supabase.from("applications").delete().eq("id", id);
         if (error)
           throwNormalized(error);
       } catch (error) {
@@ -1596,7 +1664,7 @@ const JobTracker = () => {
   );
 };
 
-function Auth() {
+function Auth({ onAuthSuccess }) {
   const {
     signIn,
     signUp,
@@ -1655,6 +1723,11 @@ function Auth() {
         setEmail("");
         setPassword("");
         setFullName("");
+        setTimeout(() => {
+          if (onAuthSuccess) {
+            onAuthSuccess();
+          }
+        }, 2e3);
       } else {
         setError("An unexpected error occurred. Please try again.");
       }
@@ -1844,6 +1917,13 @@ function Auth() {
                     style: { fontSize: "0.85rem", color: "#065F46", marginTop: 8 },
                     children: "Verifying account... this may take a few seconds."
                   }
+                ),
+                !pending && success.includes("successfully") && /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  "div",
+                  {
+                    style: { fontSize: "0.85rem", color: "#065F46", marginTop: 8 },
+                    children: "Redirecting to dashboard..."
+                  }
                 )
               ]
             }
@@ -1957,7 +2037,8 @@ function Auth() {
 }
 
 function Popup() {
-  const { user, signOut, isAuthenticated } = useAuth();
+  const { user, signOut, isAuthenticated, loading, refreshAuth } = useAuth();
+  const [forceRerender, setForceRerender] = reactExports.useState(0);
   reactExports.useEffect(() => {
     try {
       if (isAuthenticated)
@@ -1973,6 +2054,11 @@ function Popup() {
       }
     };
   }, [isAuthenticated]);
+  reactExports.useEffect(() => {
+    if (isAuthenticated && user) {
+      setForceRerender((prev) => prev + 1);
+    }
+  }, [isAuthenticated, user]);
   const [page, setPage] = reactExports.useState("home");
   const [profile, setProfile] = reactExports.useState({
     resume: "",
@@ -2046,8 +2132,37 @@ function Popup() {
       }
     });
   };
-  if (!isAuthenticated) {
-    return /* @__PURE__ */ jsxRuntimeExports.jsx(Auth, {});
+  if (!isAuthenticated && !loading) {
+    return /* @__PURE__ */ jsxRuntimeExports.jsx(Auth, { onAuthSuccess: async () => {
+      setPage("home");
+      await refreshAuth();
+      setForceRerender((prev) => prev + 1);
+      setTimeout(async () => {
+        await refreshAuth();
+        setForceRerender((prev) => prev + 1);
+      }, 500);
+    } });
+  }
+  if (loading) {
+    return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { style: {
+      padding: "2rem",
+      textAlign: "center",
+      minHeight: 400,
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center"
+    }, children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { style: {
+        width: 40,
+        height: 40,
+        border: "4px solid #e5e7eb",
+        borderTop: "4px solid #6d28d9",
+        borderRadius: "50%",
+        animation: "spin 1s linear infinite",
+        margin: "0 auto 16px"
+      } }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("p", { style: { color: "#6b7280", margin: 0 }, children: "Loading..." })
+    ] }) });
   }
   if (page === "profile") {
     return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [

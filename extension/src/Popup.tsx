@@ -10,20 +10,30 @@ import Auth from "./Auth";
 import { getSupabaseClient } from "./supabaseClient";
 
 export default function Popup() {
-  const { user, signOut, isAuthenticated } = useAuth();
-  
+  const { user, signOut, isAuthenticated, loading, refreshAuth } = useAuth();
+  const [forceRerender, setForceRerender] = useState(0);
+
   // Toggle a body class so CSS can change colors for authenticated state
   useEffect(() => {
     try {
-      if (isAuthenticated) document.body.classList.add('is-auth');
-      else document.body.classList.remove('is-auth');
+      if (isAuthenticated) document.body.classList.add("is-auth");
+      else document.body.classList.remove("is-auth");
     } catch (e) {
       // ignore in non-browser environments
     }
     return () => {
-      try { document.body.classList.remove('is-auth'); } catch (e) {}
+      try {
+        document.body.classList.remove("is-auth");
+      } catch (e) {}
     };
   }, [isAuthenticated]);
+
+  // Force re-render when authentication state changes
+  useEffect(() => {
+    if (isAuthenticated && user) {
+      setForceRerender((prev) => prev + 1);
+    }
+  }, [isAuthenticated, user]);
   const [page, setPage] = useState<"home" | "profile" | "tracker">("home");
   const [profile, setProfile] = useState({
     resume: "",
@@ -81,11 +91,15 @@ export default function Popup() {
   };
 
   // Handler for auto-apply (sends profile data to content script)
-  const [autoStatus, setAutoStatus] = useState<null | { status: string; message?: string; details?: any }>(null);
+  const [autoStatus, setAutoStatus] = useState<null | {
+    status: string;
+    message?: string;
+    details?: any;
+  }>(null);
   const [lastAutoDetails, setLastAutoDetails] = useState<any>(null);
 
   const handleAutoApply = () => {
-    setAutoStatus({ status: 'pending' });
+    setAutoStatus({ status: "pending" });
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs: any) => {
       if (tabs[0]?.id) {
         chrome.tabs.sendMessage(
@@ -93,26 +107,88 @@ export default function Popup() {
           { type: "AUTO_APPLY", profile },
           (response: any) => {
             if (!response) {
-              setAutoStatus({ status: 'error', message: 'No response from page (content script missing or blocked).' });
+              setAutoStatus({
+                status: "error",
+                message:
+                  "No response from page (content script missing or blocked).",
+              });
               return;
             }
             setLastAutoDetails(response.details || null);
             if (response?.status === "success") {
-              setAutoStatus({ status: 'success', message: `Applied on ${response.jobBoard || 'site'}` , details: response.details});
+              setAutoStatus({
+                status: "success",
+                message: `Applied on ${response.jobBoard || "site"}`,
+                details: response.details,
+              });
             } else {
-              setAutoStatus({ status: 'error', message: response?.message || 'Auto-apply failed', details: response.details });
+              setAutoStatus({
+                status: "error",
+                message: response?.message || "Auto-apply failed",
+                details: response.details,
+              });
             }
           }
         );
       } else {
-        setAutoStatus({ status: 'error', message: 'No active tab found.' });
+        setAutoStatus({ status: "error", message: "No active tab found." });
       }
     });
   };
 
   // If not authenticated, show auth form
-  if (!isAuthenticated) {
-    return <Auth />;
+  if (!isAuthenticated && !loading) {
+    return (
+      <Auth
+        onAuthSuccess={async () => {
+          // Force a re-render and ensure we're on the home page
+          setPage("home");
+
+          // Refresh authentication state to ensure it's properly updated
+          await refreshAuth();
+
+          // Force re-render
+          setForceRerender((prev) => prev + 1);
+
+          // Additional check after a small delay to ensure state is consistent
+          setTimeout(async () => {
+            await refreshAuth();
+            setForceRerender((prev) => prev + 1);
+          }, 500);
+        }}
+      />
+    );
+  }
+
+  // Show loading state while authentication is being determined
+  if (loading) {
+    return (
+      <div
+        style={{
+          padding: "2rem",
+          textAlign: "center",
+          minHeight: 400,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <div>
+          <div
+            style={{
+              width: 40,
+              height: 40,
+              border: "4px solid #e5e7eb",
+              borderTop: "4px solid #6d28d9",
+              borderRadius: "50%",
+              animation: "spin 1s linear infinite",
+              margin: "0 auto 16px",
+            }}
+          />
+          <p style={{ color: "#6b7280", margin: 0 }}>Loading...</p>
+        </div>
+      </div>
+    );
   }
 
   if (page === "profile") {
@@ -273,15 +349,38 @@ export default function Popup() {
           Auto-Apply to Job
         </button>
         {autoStatus && (
-          <div style={{ marginTop: 12, textAlign: 'center' }}>
-            {autoStatus.status === 'pending' && <div style={{ color: '#6B7280' }}>Applying…</div>}
-            {autoStatus.status === 'success' && <div style={{ color: '#10B981' }}>{autoStatus.message}</div>}
-            {autoStatus.status === 'error' && (
+          <div style={{ marginTop: 12, textAlign: "center" }}>
+            {autoStatus.status === "pending" && (
+              <div style={{ color: "#6B7280" }}>Applying…</div>
+            )}
+            {autoStatus.status === "success" && (
+              <div style={{ color: "#10B981" }}>{autoStatus.message}</div>
+            )}
+            {autoStatus.status === "error" && (
               <div>
-                <div style={{ color: '#DC2626' }}>{autoStatus.message}</div>
-                <button className="uswift-btn" style={{ marginTop: 8 }} onClick={handleAutoApply}>Retry</button>
+                <div style={{ color: "#DC2626" }}>{autoStatus.message}</div>
+                <button
+                  className="uswift-btn"
+                  style={{ marginTop: 8 }}
+                  onClick={handleAutoApply}
+                >
+                  Retry
+                </button>
                 {lastAutoDetails && (
-                  <pre style={{ textAlign: 'left', maxHeight: 120, overflow: 'auto', fontSize: 11, background: '#F3F4F6', padding: 8, borderRadius: 6, marginTop: 8 }}>{JSON.stringify(lastAutoDetails, null, 2)}</pre>
+                  <pre
+                    style={{
+                      textAlign: "left",
+                      maxHeight: 120,
+                      overflow: "auto",
+                      fontSize: 11,
+                      background: "#F3F4F6",
+                      padding: 8,
+                      borderRadius: 6,
+                      marginTop: 8,
+                    }}
+                  >
+                    {JSON.stringify(lastAutoDetails, null, 2)}
+                  </pre>
                 )}
               </div>
             )}

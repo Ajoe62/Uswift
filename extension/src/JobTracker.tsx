@@ -60,40 +60,46 @@ const JobTracker: React.FC = () => {
       if (client) {
         try {
           const apps = await client.makeRequest(
-            `job_applications?user_id=eq.${user.id}&order=applied_date.desc`
+            `applications?user_id=eq.${user.id}&order=applied_at.desc`
           );
           formattedApps =
             apps?.map((app: any) => ({
               id: app.id,
               company: app.company,
-              position: app.position,
+              position: app.job_title,
               status: app.status,
-              dateApplied: app.applied_date,
+              dateApplied: app.applied_at,
               jobUrl: app.job_url,
               notes: app.notes,
               tags: app.tags || [],
             })) || [];
         } catch (err) {
-          console.warn("Supabase REST load failed, falling back to client lib", err);
+          console.warn(
+            "Supabase REST load failed, falling back to client lib",
+            err
+          );
         }
       }
 
       // Fallback to legacy global `supabase` client if available
-      if (formattedApps.length === 0 && typeof (window as any).supabase !== "undefined") {
+      if (
+        formattedApps.length === 0 &&
+        typeof (window as any).supabase !== "undefined"
+      ) {
         try {
           const { data: apps, error } = await (window as any).supabase
-            .from("job_applications")
+            .from("applications")
             .select("*")
             .eq("user_id", user.id)
-            .order("applied_date", { ascending: false });
+            .order("applied_at", { ascending: false });
           if (error) throwNormalized(error);
           formattedApps =
             apps?.map((app: any) => ({
               id: app.id,
               company: app.company,
-              position: app.position,
+              position: app.job_title,
               status: app.status,
-              dateApplied: app.applied_date,
+              dateApplied: app.applied_at,
               jobUrl: app.job_url,
               notes: app.notes,
               tags: app.tags || [],
@@ -132,9 +138,9 @@ const JobTracker: React.FC = () => {
       const appData = {
         user_id: user.id,
         company: application.company,
-        position: application.position,
+        job_title: application.position,
         status: application.status,
-        applied_date: application.dateApplied,
+        applied_at: application.dateApplied,
         job_url: application.jobUrl,
         notes: application.notes,
         tags: application.tags,
@@ -143,13 +149,13 @@ const JobTracker: React.FC = () => {
 
       if (client) {
         if (application.id) {
-          await client.makeRequest(`job_applications?id=eq.${application.id}`, {
+          await client.makeRequest(`applications?id=eq.${application.id}`, {
             method: "PATCH",
             body: JSON.stringify(appData),
           });
           return true;
         } else {
-          const inserted = await client.makeRequest("job_applications", {
+          const inserted = await client.makeRequest("applications", {
             method: "POST",
             body: JSON.stringify([appData]),
           });
@@ -161,13 +167,13 @@ const JobTracker: React.FC = () => {
       if (typeof (window as any).supabase !== "undefined") {
         if (application.id) {
           const { error } = await (window as any).supabase
-            .from("job_applications")
+            .from("applications")
             .update(appData)
             .eq("id", application.id);
           if (error) throwNormalized(error);
         } else {
           const { data, error } = await (window as any).supabase
-            .from("job_applications")
+            .from("applications")
             .insert([appData])
             .select()
             .single();
@@ -248,7 +254,7 @@ const JobTracker: React.FC = () => {
     if (isAuthenticated && user) {
       try {
         const { error } = await supabase
-          .from("job_applications")
+          .from("applications")
           .delete()
           .eq("id", id);
         if (error) throwNormalized(error);

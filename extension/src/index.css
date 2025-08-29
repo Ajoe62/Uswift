@@ -26,7 +26,7 @@ body {
 }
 
 .uswift-card {
-  background: linear-gradient(90deg, #1cb5e0 0%, #000851 100%);
+  background: #ffffff;
   border: 1px solid #e5e7eb;
   border-radius: 1rem;
   padding: 1.5rem;
@@ -36,13 +36,14 @@ body {
 }
 
 .uswift-badge {
-  background: linear-gradient(90deg, #1cb5e0 0%, #000851 100%);
+  background: #f3f4f6;
   color: #6d28d9;
   border-radius: 0.5rem;
   padding: 0.25rem 0.75rem;
   font-size: 0.875rem;
   font-weight: 600;
   margin-right: 0.5rem;
+  border: 1px solid #e5e7eb;
 }
 
 .uswift-trust {
@@ -112,8 +113,7 @@ input:focus {
 }
 
 /* When the extension is opened and the user is authenticated, ensure
-   body text inside cards and key sections is white to match the
-   darker gradient background used in the popup. We use !important to
+   body text inside cards and key sections is readable. We use !important to
    override inline color styles applied in the JSX. */
 .is-auth .uswift-card,
 .is-auth .uswift-card p,
@@ -121,15 +121,26 @@ input:focus {
 .is-auth h2,
 .is-auth p,
 .is-auth label,
-.is-auth .uswift-card label,
-.is-auth textarea,
-.is-auth input {
-  color: #ffffff !important;
+.is-auth .uswift-card label {
+  color: #1f2937 !important;
 }
 
-/* Small adjustments so inputs and textareas remain readable */
+/* Ensure cards maintain white background in authenticated state */
+.is-auth .uswift-card {
+  background: #ffffff !important;
+}
+
+/* Improve input styling for authenticated state */
 .is-auth textarea,
 .is-auth input {
-  background: rgba(255,255,255,0.06) !important;
-  border-color: rgba(255,255,255,0.12) !important;
+  background: #ffffff !important;
+  border-color: #e5e7eb !important;
+  color: #1f2937 !important;
+}
+
+/* Improve input focus states for authenticated users */
+.is-auth input:focus,
+.is-auth textarea:focus {
+  border-color: #6d28d9 !important;
+  box-shadow: 0 0 0 3px rgba(109, 40, 217, 0.1) !important;
 }
