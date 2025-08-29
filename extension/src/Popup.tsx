@@ -111,6 +111,14 @@ export default function Popup() {
     status: string;
     message?: string;
     details?: any;
+    jobBoard?: string;
+    session?: {
+      jobBoard: string;
+      startTime: number;
+      steps: string[];
+      errors: string[];
+      success: boolean;
+    };
   }>(null);
   const [lastAutoDetails, setLastAutoDetails] = useState<any>(null);
 
@@ -474,341 +482,883 @@ export default function Popup() {
   return (
     <div
       style={{
-        minWidth: 350,
-        minHeight: 520,
-        background: "#FFFFFF",
-        borderRadius: "1.5rem",
-        boxShadow: "0 4px 24px rgba(0,0,0,0.07)",
-        padding: "2rem",
+        minWidth: 380,
+        maxWidth: 420,
+        background: "linear-gradient(145deg, #ffffff 0%, #f8fafc 100%)",
+        borderRadius: "20px",
+        boxShadow:
+          "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
+        fontFamily:
+          "-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Inter', sans-serif",
+        color: "#1f2937",
+        border: "1px solid rgba(255, 255, 255, 0.8)",
+        position: "relative",
+        overflow: "hidden",
       }}
     >
-      {/* Header with user info and sign out */}
+      {/* Background Pattern */}
       <div
         style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          marginBottom: 16,
+          position: "absolute",
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundImage: `
+            radial-gradient(circle at 25% 25%, rgba(99, 102, 241, 0.05) 0%, transparent 50%),
+            radial-gradient(circle at 75% 75%, rgba(168, 85, 247, 0.05) 0%, transparent 50%)
+          `,
+          pointerEvents: "none",
         }}
-      >
-        <span style={{ color: "#4B5563", fontSize: "0.9rem" }}>
-          Welcome, {user?.email || "User"}
-        </span>
-        <button
-          onClick={signOut}
-          style={{
-            background: "#EDE9FE",
-            color: "#6D28D9",
-            border: "none",
-            borderRadius: 8,
-            padding: "6px 10px",
-            cursor: "pointer",
-            fontSize: "0.8rem",
-          }}
-        >
-          Sign Out
-        </button>
-      </div>
-
-      {/* Gradient Accent Bar */}
-      <div
-        className="uswift-gradient"
-        style={{ height: 8, borderRadius: 8, marginBottom: 24 }}
       />
 
-      {/* Headline & Illustration */}
-      <div style={{ textAlign: "center", marginBottom: 24 }}>
-        <h1
-          style={{
-            fontSize: "1.7rem",
-            fontWeight: 700,
-            color: "#111827",
-            marginBottom: 8,
-          }}
-        >
-          Uswift Chrome Extension
-        </h1>
-        <p style={{ color: "#4B5563", fontSize: "1rem", marginBottom: 16 }}>
-          Auto-apply to jobs on top boards. Save time, get more interviews.
-        </p>
-        {/* Animated Illustration Placeholder */}
+      {/* Header */}
+      <div
+        style={{
+          background:
+            "linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%)",
+          borderRadius: "20px 20px 0 0",
+          padding: "2rem 2rem 1.5rem",
+          textAlign: "center",
+          color: "#FFFFFF",
+          position: "relative",
+          zIndex: 1,
+        }}
+      >
         <div
           style={{
-            width: 80,
-            height: 80,
-            margin: "0 auto 16px",
-            borderRadius: "50%",
-            background: "linear-gradient(135deg, #EDE9FE 0%, #6D28D9 100%)",
+            width: "60px",
+            height: "60px",
+            background: "rgba(255, 255, 255, 0.2)",
+            borderRadius: "16px",
+            margin: "0 auto 1rem",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            animation: "pulse 2s infinite",
+            backdropFilter: "blur(10px)",
+            border: "2px solid rgba(255, 255, 255, 0.3)",
           }}
         >
-          <svg className="uswift-icon" fill="none" viewBox="0 0 32 32">
-            <circle cx="16" cy="16" r="14" stroke="#6D28D9" strokeWidth="2" />
-            <path
-              d="M10 16h12M16 10v12"
-              stroke="#6D28D9"
-              strokeWidth="2"
-              strokeLinecap="round"
-            />
-          </svg>
+          <span style={{ fontSize: "1.8rem" }}>🚀</span>
         </div>
-        <button
-          className="uswift-btn"
-          style={{ marginTop: 8 }}
-          onClick={handleAutoApply}
+        <h1
+          style={{
+            fontSize: "1.8rem",
+            fontWeight: 800,
+            margin: "0 0 0.5rem 0",
+            background: "linear-gradient(45deg, #ffffff, #f0f9ff)",
+            WebkitBackgroundClip: "text",
+            WebkitTextFillColor: "transparent",
+            backgroundClip: "text",
+            textShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
+          }}
         >
-          Auto-Apply to Job
-        </button>
-        {autoStatus && (
-          <div style={{ marginTop: 12, textAlign: "center" }}>
-            {autoStatus.status === "pending" && (
-              <div style={{ color: "#6B7280" }}>Applying…</div>
-            )}
-            {autoStatus.status === "success" && (
-              <div style={{ color: "#10B981" }}>{autoStatus.message}</div>
-            )}
-            {autoStatus.status === "error" && (
+          USwift
+        </h1>
+        <p
+          style={{
+            fontSize: "0.9rem",
+            margin: 0,
+            opacity: 0.95,
+            fontWeight: 500,
+          }}
+        >
+          AI-Powered Career Excellence
+        </p>
+
+        {/* User Welcome */}
+        <div
+          style={{
+            marginTop: "1rem",
+            padding: "0.5rem 1rem",
+            background: "rgba(255, 255, 255, 0.15)",
+            borderRadius: "12px",
+            backdropFilter: "blur(10px)",
+            border: "1px solid rgba(255, 255, 255, 0.2)",
+          }}
+        >
+          <div
+            style={{
+              fontSize: "0.8rem",
+              opacity: 0.9,
+              fontWeight: 600,
+            }}
+          >
+            Welcome back, {user?.email?.split("@")[0] || "Professional"}
+          </div>
+        </div>
+      </div>
+
+      {/* Main Content */}
+      <div style={{ padding: "1.5rem 2rem", position: "relative", zIndex: 1 }}>
+        {/* Quick Actions */}
+        <div style={{ marginBottom: "2rem" }}>
+          <h2
+            style={{
+              fontSize: "1.2rem",
+              fontWeight: 700,
+              color: "#1f2937",
+              marginBottom: "1rem",
+              textAlign: "center",
+            }}
+          >
+            Quick Actions
+          </h2>
+
+          {/* Auto-Apply Section */}
+          <div
+            style={{
+              background: "linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%)",
+              borderRadius: "16px",
+              padding: "1.5rem",
+              marginBottom: "1.5rem",
+              border: "1px solid rgba(59, 130, 246, 0.1)",
+              position: "relative",
+              overflow: "hidden",
+            }}
+          >
+            <div
+              style={{
+                position: "absolute",
+                top: "-20px",
+                right: "-20px",
+                width: "60px",
+                height: "60px",
+                background:
+                  "radial-gradient(circle, rgba(59, 130, 246, 0.1) 0%, transparent 70%)",
+                borderRadius: "50%",
+              }}
+            />
+
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "0.75rem",
+                marginBottom: "1rem",
+              }}
+            >
+              <div
+                style={{
+                  width: "40px",
+                  height: "40px",
+                  background:
+                    "linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)",
+                  borderRadius: "12px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  boxShadow: "0 4px 12px rgba(59, 130, 246, 0.3)",
+                }}
+              >
+                <span style={{ fontSize: "1.2rem", color: "white" }}>⚡</span>
+              </div>
               <div>
-                <div style={{ color: "#DC2626" }}>{autoStatus.message}</div>
-                <button
-                  className="uswift-btn"
-                  style={{ marginTop: 8 }}
-                  onClick={handleAutoApply}
+                <h3
+                  style={{
+                    fontSize: "1.1rem",
+                    fontWeight: 700,
+                    color: "#1e40af",
+                    margin: 0,
+                  }}
                 >
-                  Retry
-                </button>
-                {lastAutoDetails && (
-                  <pre
+                  Smart Auto-Apply
+                </h3>
+                <p
+                  style={{
+                    fontSize: "0.85rem",
+                    color: "#64748b",
+                    margin: "0.25rem 0 0 0",
+                  }}
+                >
+                  Apply to jobs instantly with AI-optimized profiles
+                </p>
+              </div>
+            </div>
+
+            <button
+              onClick={handleAutoApply}
+              style={{
+                width: "100%",
+                background: "linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)",
+                color: "#ffffff",
+                border: "none",
+                borderRadius: "12px",
+                padding: "12px 20px",
+                fontSize: "0.95rem",
+                fontWeight: 600,
+                cursor: "pointer",
+                transition: "all 0.2s ease",
+                boxShadow: "0 4px 12px rgba(59, 130, 246, 0.3)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: "8px",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = "translateY(-2px)";
+                e.currentTarget.style.boxShadow =
+                  "0 8px 20px rgba(59, 130, 246, 0.4)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = "translateY(0)";
+                e.currentTarget.style.boxShadow =
+                  "0 4px 12px rgba(59, 130, 246, 0.3)";
+              }}
+            >
+              <span>🚀</span>
+              Auto-Apply to Job
+            </button>
+
+            {autoStatus && (
+              <div
+                style={{
+                  marginTop: "1rem",
+                  padding: "1rem",
+                  borderRadius: "12px",
+                  fontSize: "0.9rem",
+                  background:
+                    autoStatus.status === "success"
+                      ? "linear-gradient(135deg, rgba(34, 197, 94, 0.1) 0%, rgba(34, 197, 94, 0.05) 100%)"
+                      : autoStatus.status === "error"
+                      ? "linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(239, 68, 68, 0.05) 100%)"
+                      : "linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(59, 130, 246, 0.05) 100%)",
+                  color:
+                    autoStatus.status === "success"
+                      ? "#16a34a"
+                      : autoStatus.status === "error"
+                      ? "#dc2626"
+                      : "#1e40af",
+                  border: `1px solid ${
+                    autoStatus.status === "success"
+                      ? "rgba(34, 197, 94, 0.3)"
+                      : autoStatus.status === "error"
+                      ? "rgba(239, 68, 68, 0.3)"
+                      : "rgba(59, 130, 246, 0.3)"
+                  }`,
+                }}
+              >
+                {autoStatus.status === "pending" && (
+                  <div
                     style={{
-                      textAlign: "left",
-                      maxHeight: 120,
-                      overflow: "auto",
-                      fontSize: 11,
-                      background: "#F3F4F6",
-                      padding: 8,
-                      borderRadius: 6,
-                      marginTop: 8,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      gap: "12px",
                     }}
                   >
-                    {JSON.stringify(lastAutoDetails, null, 2)}
-                  </pre>
+                    <div
+                      style={{
+                        width: "20px",
+                        height: "20px",
+                        border: "3px solid rgba(59, 130, 246, 0.3)",
+                        borderTop: "3px solid #3b82f6",
+                        borderRadius: "50%",
+                        animation: "spin 1s linear infinite",
+                      }}
+                    />
+                    <div>
+                      <div style={{ fontWeight: 600, marginBottom: "4px" }}>
+                        🚀 Advanced Auto-Apply in Progress
+                      </div>
+                      <div style={{ fontSize: "0.8rem", opacity: 0.8 }}>
+                        Detecting job board, filling forms, uploading files...
+                      </div>
+                    </div>
+                  </div>
+                )}
+                {autoStatus.status === "success" && (
+                  <div>
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "8px",
+                        marginBottom: "8px",
+                        fontWeight: 600,
+                      }}
+                    >
+                      <span>✅</span>
+                      <span>Application Submitted Successfully!</span>
+                    </div>
+                    <div
+                      style={{
+                        fontSize: "0.85rem",
+                        opacity: 0.9,
+                        marginBottom: "8px",
+                      }}
+                    >
+                      {autoStatus.message}
+                    </div>
+                    {autoStatus.jobBoard && (
+                      <div
+                        style={{
+                          fontSize: "0.75rem",
+                          opacity: 0.7,
+                          padding: "6px 12px",
+                          background: "rgba(255, 255, 255, 0.5)",
+                          borderRadius: "6px",
+                          display: "inline-block",
+                        }}
+                      >
+                        Platform: {autoStatus.jobBoard}
+                      </div>
+                    )}
+                  </div>
+                )}
+                {autoStatus.status === "error" && (
+                  <div>
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "8px",
+                        marginBottom: "8px",
+                        fontWeight: 600,
+                      }}
+                    >
+                      <span>❌</span>
+                      <span>Auto-Apply Failed</span>
+                    </div>
+                    <div
+                      style={{
+                        fontSize: "0.85rem",
+                        opacity: 0.9,
+                        marginBottom: "12px",
+                      }}
+                    >
+                      {autoStatus.message}
+                    </div>
+                    {autoStatus.session &&
+                      autoStatus.session.errors &&
+                      autoStatus.session.errors.length > 0 && (
+                        <div
+                          style={{
+                            fontSize: "0.75rem",
+                            opacity: 0.8,
+                            marginBottom: "12px",
+                            padding: "8px",
+                            background: "rgba(255, 255, 255, 0.3)",
+                            borderRadius: "6px",
+                          }}
+                        >
+                          <div style={{ fontWeight: 600, marginBottom: "4px" }}>
+                            Issues detected:
+                          </div>
+                          {autoStatus.session.errors
+                            .slice(0, 3)
+                            .map((error, index) => (
+                              <div key={index} style={{ marginBottom: "2px" }}>
+                                • {error}
+                              </div>
+                            ))}
+                          {autoStatus.session.errors.length > 3 && (
+                            <div>
+                              ... and {autoStatus.session.errors.length - 3}{" "}
+                              more
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    <button
+                      onClick={handleAutoApply}
+                      style={{
+                        background:
+                          "linear-gradient(135deg, #dc2626 0%, #b91c1c 100%)",
+                        color: "#ffffff",
+                        border: "none",
+                        borderRadius: "8px",
+                        padding: "8px 16px",
+                        fontSize: "0.85rem",
+                        fontWeight: 600,
+                        cursor: "pointer",
+                        boxShadow: "0 2px 8px rgba(220, 38, 38, 0.3)",
+                        transition: "all 0.2s ease",
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.transform = "translateY(-1px)";
+                        e.currentTarget.style.boxShadow =
+                          "0 4px 12px rgba(220, 38, 38, 0.4)";
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.transform = "translateY(0)";
+                        e.currentTarget.style.boxShadow =
+                          "0 2px 8px rgba(220, 38, 38, 0.3)";
+                      }}
+                    >
+                      🔄 Retry Auto-Apply
+                    </button>
+                  </div>
                 )}
               </div>
             )}
           </div>
-        )}
-        <div
-          style={{ display: "flex", gap: 8, marginTop: 8, flexWrap: "wrap" }}
-        >
-          <button
-            className="uswift-btn"
-            style={{ background: "#EDE9FE", color: "#6D28D9" }}
-            onClick={() => setPage("profile")}
-          >
-            Profile Vault
-          </button>
-          <button
-            className="uswift-btn"
-            style={{ background: "#EDE9FE", color: "#6D28D9" }}
-            onClick={() => setPage("tracker")}
-          >
-            Job Tracker
-          </button>
-        </div>
 
-        {/* AI Features Section */}
-        <div style={{ marginTop: 20 }}>
-          <h3
-            style={{
-              fontSize: "1rem",
-              fontWeight: 600,
-              color: "#111827",
-              marginBottom: 12,
-              textAlign: "center",
-            }}
-          >
-            🤖 AI-Powered Tools
-          </h3>
-          <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-            <button
-              className="uswift-btn"
+          {/* Core Features */}
+          <div style={{ marginBottom: "2rem" }}>
+            <h3
               style={{
-                background: "#10B981",
-                color: "#FFFFFF",
-                flex: 1,
-                minWidth: 120,
+                fontSize: "1rem",
+                fontWeight: 600,
+                color: "#374151",
+                marginBottom: "1rem",
+                textAlign: "center",
               }}
-              onClick={() => setPage("chat")}
             >
-              💬 AI Assistant
-            </button>
-            <button
-              className="uswift-btn"
+              Core Features
+            </h3>
+            <div
               style={{
-                background: "#3B82F6",
-                color: "#FFFFFF",
-                flex: 1,
-                minWidth: 120,
+                display: "grid",
+                gridTemplateColumns: "1fr 1fr",
+                gap: "0.75rem",
               }}
-              onClick={() => setPage("resume")}
             >
-              📄 Resume AI
-            </button>
-            <button
-              className="uswift-btn"
-              style={{
-                background: "#8B5CF6",
-                color: "#FFFFFF",
-                flex: 1,
-                minWidth: 120,
-              }}
-              onClick={() => setPage("cover-letter")}
-            >
-              ✍️ Cover Letter
-            </button>
-          </div>
+              <button
+                onClick={() => setPage("profile")}
+                style={{
+                  background: "#ffffff",
+                  border: "2px solid #e5e7eb",
+                  borderRadius: "12px",
+                  padding: "1rem",
+                  cursor: "pointer",
+                  transition: "all 0.2s ease",
+                  textAlign: "center",
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  gap: "0.5rem",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.borderColor = "#6366f1";
+                  e.currentTarget.style.transform = "translateY(-2px)";
+                  e.currentTarget.style.boxShadow =
+                    "0 8px 16px rgba(99, 102, 241, 0.15)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.borderColor = "#e5e7eb";
+                  e.currentTarget.style.transform = "translateY(0)";
+                  e.currentTarget.style.boxShadow = "none";
+                }}
+              >
+                <div
+                  style={{
+                    width: "32px",
+                    height: "32px",
+                    background:
+                      "linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)",
+                    borderRadius: "8px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  <span style={{ fontSize: "1rem", color: "white" }}>📋</span>
+                </div>
+                <div>
+                  <div
+                    style={{
+                      fontSize: "0.9rem",
+                      fontWeight: 600,
+                      color: "#1f2937",
+                    }}
+                  >
+                    Profile Vault
+                  </div>
+                  <div style={{ fontSize: "0.75rem", color: "#6b7280" }}>
+                    Manage profiles
+                  </div>
+                </div>
+              </button>
 
-          {/* Advanced AI Features */}
-          <div style={{ marginTop: 12 }}>
-            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
               <button
-                className="uswift-btn"
+                onClick={() => setPage("tracker")}
                 style={{
-                  background: "#F59E0B",
-                  color: "#FFFFFF",
-                  flex: 1,
-                  minWidth: 120,
+                  background: "#ffffff",
+                  border: "2px solid #e5e7eb",
+                  borderRadius: "12px",
+                  padding: "1rem",
+                  cursor: "pointer",
+                  transition: "all 0.2s ease",
+                  textAlign: "center",
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  gap: "0.5rem",
                 }}
-                onClick={() => setPage("files")}
-              >
-                📁 File Manager
-              </button>
-              <button
-                className="uswift-btn"
-                style={{
-                  background: "#EC4899",
-                  color: "#FFFFFF",
-                  flex: 1,
-                  minWidth: 120,
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.borderColor = "#f59e0b";
+                  e.currentTarget.style.transform = "translateY(-2px)";
+                  e.currentTarget.style.boxShadow =
+                    "0 8px 16px rgba(245, 158, 11, 0.15)";
                 }}
-                onClick={() => setPage("job-analysis")}
-              >
-                🔍 Job Analysis
-              </button>
-              <button
-                className="uswift-btn"
-                style={{
-                  background: "#14B8A6",
-                  color: "#FFFFFF",
-                  flex: 1,
-                  minWidth: 120,
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.borderColor = "#e5e7eb";
+                  e.currentTarget.style.transform = "translateY(0)";
+                  e.currentTarget.style.boxShadow = "none";
                 }}
-                onClick={() => setPage("interview-prep")}
               >
-                🎤 Interview Prep
+                <div
+                  style={{
+                    width: "32px",
+                    height: "32px",
+                    background:
+                      "linear-gradient(135deg, #f59e0b 0%, #d97706 100%)",
+                    borderRadius: "8px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  <span style={{ fontSize: "1rem", color: "white" }}>📊</span>
+                </div>
+                <div>
+                  <div
+                    style={{
+                      fontSize: "0.9rem",
+                      fontWeight: 600,
+                      color: "#1f2937",
+                    }}
+                  >
+                    Job Tracker
+                  </div>
+                  <div style={{ fontSize: "0.75rem", color: "#6b7280" }}>
+                    Track applications
+                  </div>
+                </div>
               </button>
             </div>
           </div>
-        </div>
-      </div>
 
-      {/* Trust Badges */}
-      <div
-        className="uswift-trust"
-        style={{ justifyContent: "center", marginBottom: 24 }}
-      >
-        <span className="uswift-badge">Secure</span>
-        <span className="uswift-badge">Fast</span>
-        <span className="uswift-badge">Private</span>
-      </div>
+          {/* AI Tools Section */}
+          <div>
+            <h3
+              style={{
+                fontSize: "1rem",
+                fontWeight: 600,
+                color: "#374151",
+                marginBottom: "1rem",
+                textAlign: "center",
+              }}
+            >
+              🤖 AI-Powered Tools
+            </h3>
 
-      {/* Feature Cards */}
-      <div>
-        <div className="uswift-card">
-          <svg className="uswift-icon" fill="none" viewBox="0 0 32 32">
-            <rect
-              x="6"
-              y="10"
-              width="20"
-              height="12"
-              rx="3"
-              stroke="#6D28D9"
-              strokeWidth="2"
-            />
-            <path
-              d="M16 14v4"
-              stroke="#6D28D9"
-              strokeWidth="2"
-              strokeLinecap="round"
-            />
-          </svg>
-          <h3 style={{ fontWeight: 700, fontSize: "1.1rem", marginBottom: 4 }}>
-            Profile Vault
-          </h3>
-          <p style={{ color: "#4B5563", fontSize: "0.95rem" }}>
-            Store resumes, cover letters, and Q&A profiles securely.
-          </p>
+            {/* Primary AI Tools */}
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "1fr 1fr",
+                gap: "0.75rem",
+                marginBottom: "1rem",
+              }}
+            >
+              <button
+                onClick={() => setPage("chat")}
+                style={{
+                  background:
+                    "linear-gradient(135deg, #10b981 0%, #059669 100%)",
+                  border: "none",
+                  borderRadius: "12px",
+                  padding: "1rem",
+                  cursor: "pointer",
+                  transition: "all 0.2s ease",
+                  color: "white",
+                  textAlign: "center",
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  gap: "0.5rem",
+                  boxShadow: "0 4px 12px rgba(16, 185, 129, 0.3)",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = "translateY(-2px)";
+                  e.currentTarget.style.boxShadow =
+                    "0 8px 20px rgba(16, 185, 129, 0.4)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = "translateY(0)";
+                  e.currentTarget.style.boxShadow =
+                    "0 4px 12px rgba(16, 185, 129, 0.3)";
+                }}
+              >
+                <div
+                  style={{
+                    width: "32px",
+                    height: "32px",
+                    background: "rgba(255, 255, 255, 0.2)",
+                    borderRadius: "8px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    backdropFilter: "blur(10px)",
+                  }}
+                >
+                  <span style={{ fontSize: "1rem" }}>💬</span>
+                </div>
+                <div>
+                  <div style={{ fontSize: "0.85rem", fontWeight: 600 }}>
+                    AI Assistant
+                  </div>
+                  <div style={{ fontSize: "0.7rem", opacity: 0.9 }}>
+                    Career guidance
+                  </div>
+                </div>
+              </button>
+
+              <button
+                onClick={() => setPage("resume")}
+                style={{
+                  background:
+                    "linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)",
+                  border: "none",
+                  borderRadius: "12px",
+                  padding: "1rem",
+                  cursor: "pointer",
+                  transition: "all 0.2s ease",
+                  color: "white",
+                  textAlign: "center",
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  gap: "0.5rem",
+                  boxShadow: "0 4px 12px rgba(59, 130, 246, 0.3)",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = "translateY(-2px)";
+                  e.currentTarget.style.boxShadow =
+                    "0 8px 20px rgba(59, 130, 246, 0.4)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = "translateY(0)";
+                  e.currentTarget.style.boxShadow =
+                    "0 4px 12px rgba(59, 130, 246, 0.3)";
+                }}
+              >
+                <div
+                  style={{
+                    width: "32px",
+                    height: "32px",
+                    background: "rgba(255, 255, 255, 0.2)",
+                    borderRadius: "8px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    backdropFilter: "blur(10px)",
+                  }}
+                >
+                  <span style={{ fontSize: "1rem" }}>📄</span>
+                </div>
+                <div>
+                  <div style={{ fontSize: "0.85rem", fontWeight: 600 }}>
+                    Resume AI
+                  </div>
+                  <div style={{ fontSize: "0.7rem", opacity: 0.9 }}>
+                    Enhance & optimize
+                  </div>
+                </div>
+              </button>
+            </div>
+
+            {/* Secondary AI Tools */}
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "1fr 1fr 1fr",
+                gap: "0.5rem",
+              }}
+            >
+              <button
+                onClick={() => setPage("cover-letter")}
+                style={{
+                  background: "#ffffff",
+                  border: "2px solid #e5e7eb",
+                  borderRadius: "8px",
+                  padding: "0.75rem",
+                  cursor: "pointer",
+                  transition: "all 0.2s ease",
+                  textAlign: "center",
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  gap: "0.25rem",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.borderColor = "#8b5cf6";
+                  e.currentTarget.style.background = "#faf5ff";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.borderColor = "#e5e7eb";
+                  e.currentTarget.style.background = "#ffffff";
+                }}
+              >
+                <span style={{ fontSize: "1rem" }}>✍️</span>
+                <span
+                  style={{
+                    fontSize: "0.7rem",
+                    fontWeight: 600,
+                    color: "#1f2937",
+                  }}
+                >
+                  Cover Letter
+                </span>
+              </button>
+
+              <button
+                onClick={() => setPage("files")}
+                style={{
+                  background: "#ffffff",
+                  border: "2px solid #e5e7eb",
+                  borderRadius: "8px",
+                  padding: "0.75rem",
+                  cursor: "pointer",
+                  transition: "all 0.2s ease",
+                  textAlign: "center",
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  gap: "0.25rem",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.borderColor = "#f59e0b";
+                  e.currentTarget.style.background = "#fffbeb";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.borderColor = "#e5e7eb";
+                  e.currentTarget.style.background = "#ffffff";
+                }}
+              >
+                <span style={{ fontSize: "1rem" }}>📁</span>
+                <span
+                  style={{
+                    fontSize: "0.7rem",
+                    fontWeight: 600,
+                    color: "#1f2937",
+                  }}
+                >
+                  File Manager
+                </span>
+              </button>
+
+              <button
+                onClick={() => setPage("job-analysis")}
+                style={{
+                  background: "#ffffff",
+                  border: "2px solid #e5e7eb",
+                  borderRadius: "8px",
+                  padding: "0.75rem",
+                  cursor: "pointer",
+                  transition: "all 0.2s ease",
+                  textAlign: "center",
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  gap: "0.25rem",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.borderColor = "#ec4899";
+                  e.currentTarget.style.background = "#fdf2f8";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.borderColor = "#e5e7eb";
+                  e.currentTarget.style.background = "#ffffff";
+                }}
+              >
+                <span style={{ fontSize: "1rem" }}>🔍</span>
+                <span
+                  style={{
+                    fontSize: "0.7rem",
+                    fontWeight: 600,
+                    color: "#1f2937",
+                  }}
+                >
+                  Job Analysis
+                </span>
+              </button>
+            </div>
+
+            {/* Interview Prep - Full Width */}
+            <button
+              onClick={() => setPage("interview-prep")}
+              style={{
+                marginTop: "0.75rem",
+                width: "100%",
+                background: "linear-gradient(135deg, #14b8a6 0%, #0d9488 100%)",
+                border: "none",
+                borderRadius: "12px",
+                padding: "1rem",
+                cursor: "pointer",
+                transition: "all 0.2s ease",
+                color: "white",
+                display: "flex",
+                alignItems: "center",
+                gap: "0.75rem",
+                boxShadow: "0 4px 12px rgba(20, 184, 166, 0.3)",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = "translateY(-2px)";
+                e.currentTarget.style.boxShadow =
+                  "0 8px 20px rgba(20, 184, 166, 0.4)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = "translateY(0)";
+                e.currentTarget.style.boxShadow =
+                  "0 4px 12px rgba(20, 184, 166, 0.3)";
+              }}
+            >
+              <div
+                style={{
+                  width: "40px",
+                  height: "40px",
+                  background: "rgba(255, 255, 255, 0.2)",
+                  borderRadius: "8px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  backdropFilter: "blur(10px)",
+                }}
+              >
+                <span style={{ fontSize: "1.2rem" }}>🎤</span>
+              </div>
+              <div style={{ textAlign: "left", flex: 1 }}>
+                <div style={{ fontSize: "0.95rem", fontWeight: 600 }}>
+                  Interview Preparation
+                </div>
+                <div style={{ fontSize: "0.8rem", opacity: 0.9 }}>
+                  AI-powered practice questions & tips
+                </div>
+              </div>
+              <span style={{ fontSize: "1rem", opacity: 0.8 }}>→</span>
+            </button>
+          </div>
         </div>
-        <div className="uswift-card">
-          <svg className="uswift-icon" fill="none" viewBox="0 0 32 32">
-            <path
-              d="M8 16h16M16 8v16"
-              stroke="#6D28D9"
-              strokeWidth="2"
-              strokeLinecap="round"
-            />
-          </svg>
-          <h3 style={{ fontWeight: 700, fontSize: "1.1rem", marginBottom: 4 }}>
-            Auto-Apply
-          </h3>
-          <p style={{ color: "#4B5563", fontSize: "0.95rem" }}>
-            Automatically apply to jobs on Greenhouse, Lever, and more.
-          </p>
-        </div>
-        <div className="uswift-card">
-          <svg className="uswift-icon" fill="none" viewBox="0 0 32 32">
-            <circle cx="16" cy="16" r="10" stroke="#6D28D9" strokeWidth="2" />
-            <path
-              d="M16 12v4l2 2"
-              stroke="#6D28D9"
-              strokeWidth="2"
-              strokeLinecap="round"
-            />
-          </svg>
-          <h3 style={{ fontWeight: 700, fontSize: "1.1rem", marginBottom: 4 }}>
-            Job Tracker
-          </h3>
-          <p style={{ color: "#4B5563", fontSize: "0.95rem" }}>
-            Track your applications and interview progress in one place.
-          </p>
-        </div>
-        <div className="uswift-card">
-          <svg className="uswift-icon" fill="none" viewBox="0 0 32 32">
-            <rect
-              x="8"
-              y="8"
-              width="16"
-              height="16"
-              rx="4"
-              stroke="#6D28D9"
-              strokeWidth="2"
-            />
-            <path
-              d="M12 16h8"
-              stroke="#6D28D9"
-              strokeWidth="2"
-              strokeLinecap="round"
-            />
-          </svg>
-          <h3 style={{ fontWeight: 700, fontSize: "1.1rem", marginBottom: 4 }}>
-            Privacy First
-          </h3>
-          <p style={{ color: "#4B5563", fontSize: "0.95rem" }}>
-            Your data is encrypted and never shared without consent.
-          </p>
+
+        {/* Sign Out */}
+        <div style={{ textAlign: "center", marginTop: "1.5rem" }}>
+          <button
+            onClick={signOut}
+            style={{
+              background: "transparent",
+              color: "#6b7280",
+              border: "1px solid #d1d5db",
+              borderRadius: "8px",
+              padding: "8px 16px",
+              cursor: "pointer",
+              fontSize: "0.85rem",
+              fontWeight: 500,
+              transition: "all 0.2s ease",
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.borderColor = "#9ca3af";
+              e.currentTarget.style.color = "#4b5563";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.borderColor = "#d1d5db";
+              e.currentTarget.style.color = "#6b7280";
+            }}
+          >
+            Sign Out
+          </button>
         </div>
       </div>
     </div>

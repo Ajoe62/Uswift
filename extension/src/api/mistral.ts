@@ -303,19 +303,65 @@ Please provide:
   }
 }
 
-// Configuration - in production, these should come from environment variables
-const DEFAULT_CONFIG: MistralConfig = {
-  apiKey: "your-mistral-api-key-here", // Replace with actual key
-  baseUrl: "https://api.mistral.ai",
-  chatUrl: "/v1/chat/completions",
-  embeddingsUrl: "/v1/embeddings",
+// Configuration - uses centralized config system
+const getMistralConfig = (): MistralConfig => {
+  // Try to get from global config first (Chrome extension environment)
+  const globalConfig = (globalThis as any).EXTENSION_CONFIG;
+
+  if (globalConfig?.mistral) {
+    return {
+      apiKey: globalConfig.mistral.apiKey,
+      baseUrl: globalConfig.mistral.baseUrl,
+      chatUrl: "/v1/chat/completions",
+      embeddingsUrl: "/v1/embeddings",
+    };
+  }
+
+  // Fallback to global variables (for Chrome extension environment)
+  const apiKey =
+    (globalThis as any).VITE_MISTRAL_API_KEY ||
+    (globalThis as any).process?.env?.VITE_MISTRAL_API_KEY ||
+    "your-mistral-api-key-here"; // Fallback for development
+
+  const baseUrl =
+    (globalThis as any).VITE_MISTRAL_BASE_URL ||
+    (globalThis as any).process?.env?.VITE_MISTRAL_BASE_URL ||
+    "https://api.mistral.ai";
+
+  return {
+    apiKey,
+    baseUrl,
+    chatUrl: "/v1/chat/completions",
+    embeddingsUrl: "/v1/embeddings",
+  };
 };
+
+const DEFAULT_CONFIG: MistralConfig = getMistralConfig();
 
 // Create and export singleton instance
 let mistralClient: MistralClient | null = null;
 
 export function getMistralClient(): MistralClient {
   if (!mistralClient) {
+    // Validate configuration before creating client
+    if (
+      !DEFAULT_CONFIG.apiKey ||
+      DEFAULT_CONFIG.apiKey === "your-mistral-api-key-here"
+    ) {
+      console.error(
+        "🚨 Mistral API Key not configured! Please set VITE_MISTRAL_API_KEY environment variable."
+      );
+      throw new Error(
+        "Mistral API key not configured. Please check your environment variables."
+      );
+    }
+
+    console.log("✅ Initializing Mistral client with config:", {
+      baseUrl: DEFAULT_CONFIG.baseUrl,
+      hasApiKey: !!DEFAULT_CONFIG.apiKey,
+      apiKeyLength: DEFAULT_CONFIG.apiKey.length,
+    });
+
     mistralClient = new MistralClient(DEFAULT_CONFIG);
   }
   return mistralClient;

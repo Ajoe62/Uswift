@@ -1861,16 +1861,42 @@ Please provide:
     });
   }
 }
-const DEFAULT_CONFIG = {
-  apiKey: "your-mistral-api-key-here",
-  // Replace with actual key
-  baseUrl: "https://api.mistral.ai",
-  chatUrl: "/v1/chat/completions",
-  embeddingsUrl: "/v1/embeddings"
+const getMistralConfig = () => {
+  const globalConfig = globalThis.EXTENSION_CONFIG;
+  if (globalConfig?.mistral) {
+    return {
+      apiKey: globalConfig.mistral.apiKey,
+      baseUrl: globalConfig.mistral.baseUrl,
+      chatUrl: "/v1/chat/completions",
+      embeddingsUrl: "/v1/embeddings"
+    };
+  }
+  const apiKey = globalThis.VITE_MISTRAL_API_KEY || globalThis.process?.env?.VITE_MISTRAL_API_KEY || "your-mistral-api-key-here";
+  const baseUrl = globalThis.VITE_MISTRAL_BASE_URL || globalThis.process?.env?.VITE_MISTRAL_BASE_URL || "https://api.mistral.ai";
+  return {
+    apiKey,
+    baseUrl,
+    chatUrl: "/v1/chat/completions",
+    embeddingsUrl: "/v1/embeddings"
+  };
 };
+const DEFAULT_CONFIG = getMistralConfig();
 let mistralClient = null;
 function getMistralClient() {
   if (!mistralClient) {
+    if (!DEFAULT_CONFIG.apiKey || DEFAULT_CONFIG.apiKey === "your-mistral-api-key-here") {
+      console.error(
+        "🚨 Mistral API Key not configured! Please set VITE_MISTRAL_API_KEY environment variable."
+      );
+      throw new Error(
+        "Mistral API key not configured. Please check your environment variables."
+      );
+    }
+    console.log("✅ Initializing Mistral client with config:", {
+      baseUrl: DEFAULT_CONFIG.baseUrl,
+      hasApiKey: !!DEFAULT_CONFIG.apiKey,
+      apiKeyLength: DEFAULT_CONFIG.apiKey.length
+    });
     mistralClient = new MistralClient(DEFAULT_CONFIG);
   }
   return mistralClient;
@@ -6833,363 +6859,923 @@ function Popup() {
     "div",
     {
       style: {
-        minWidth: 350,
-        minHeight: 520,
-        background: "#FFFFFF",
-        borderRadius: "1.5rem",
-        boxShadow: "0 4px 24px rgba(0,0,0,0.07)",
-        padding: "2rem"
+        minWidth: 380,
+        maxWidth: 420,
+        background: "linear-gradient(145deg, #ffffff 0%, #f8fafc 100%)",
+        borderRadius: "20px",
+        boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
+        fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Inter', sans-serif",
+        color: "#1f2937",
+        border: "1px solid rgba(255, 255, 255, 0.8)",
+        position: "relative",
+        overflow: "hidden"
       },
       children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          "div",
+          {
+            style: {
+              position: "absolute",
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              backgroundImage: `
+            radial-gradient(circle at 25% 25%, rgba(99, 102, 241, 0.05) 0%, transparent 50%),
+            radial-gradient(circle at 75% 75%, rgba(168, 85, 247, 0.05) 0%, transparent 50%)
+          `,
+              pointerEvents: "none"
+            }
+          }
+        ),
         /* @__PURE__ */ jsxRuntimeExports.jsxs(
           "div",
           {
             style: {
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              marginBottom: 16
+              background: "linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%)",
+              borderRadius: "20px 20px 0 0",
+              padding: "2rem 2rem 1.5rem",
+              textAlign: "center",
+              color: "#FFFFFF",
+              position: "relative",
+              zIndex: 1
             },
             children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { style: { color: "#4B5563", fontSize: "0.9rem" }, children: [
-                "Welcome, ",
-                user?.email || "User"
-              ] }),
               /* @__PURE__ */ jsxRuntimeExports.jsx(
-                "button",
+                "div",
                 {
-                  onClick: signOut,
                   style: {
-                    background: "#EDE9FE",
-                    color: "#6D28D9",
-                    border: "none",
-                    borderRadius: 8,
-                    padding: "6px 10px",
-                    cursor: "pointer",
-                    fontSize: "0.8rem"
+                    width: "60px",
+                    height: "60px",
+                    background: "rgba(255, 255, 255, 0.2)",
+                    borderRadius: "16px",
+                    margin: "0 auto 1rem",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    backdropFilter: "blur(10px)",
+                    border: "2px solid rgba(255, 255, 255, 0.3)"
                   },
-                  children: "Sign Out"
+                  children: /* @__PURE__ */ jsxRuntimeExports.jsx("span", { style: { fontSize: "1.8rem" }, children: "🚀" })
+                }
+              ),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "h1",
+                {
+                  style: {
+                    fontSize: "1.8rem",
+                    fontWeight: 800,
+                    margin: "0 0 0.5rem 0",
+                    background: "linear-gradient(45deg, #ffffff, #f0f9ff)",
+                    WebkitBackgroundClip: "text",
+                    WebkitTextFillColor: "transparent",
+                    backgroundClip: "text",
+                    textShadow: "0 2px 4px rgba(0, 0, 0, 0.1)"
+                  },
+                  children: "USwift"
+                }
+              ),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "p",
+                {
+                  style: {
+                    fontSize: "0.9rem",
+                    margin: 0,
+                    opacity: 0.95,
+                    fontWeight: 500
+                  },
+                  children: "AI-Powered Career Excellence"
+                }
+              ),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "div",
+                {
+                  style: {
+                    marginTop: "1rem",
+                    padding: "0.5rem 1rem",
+                    background: "rgba(255, 255, 255, 0.15)",
+                    borderRadius: "12px",
+                    backdropFilter: "blur(10px)",
+                    border: "1px solid rgba(255, 255, 255, 0.2)"
+                  },
+                  children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                    "div",
+                    {
+                      style: {
+                        fontSize: "0.8rem",
+                        opacity: 0.9,
+                        fontWeight: 600
+                      },
+                      children: [
+                        "Welcome back, ",
+                        user?.email?.split("@")[0] || "Professional"
+                      ]
+                    }
+                  )
                 }
               )
             ]
           }
         ),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(
-          "div",
-          {
-            className: "uswift-gradient",
-            style: { height: 8, borderRadius: 8, marginBottom: 24 }
-          }
-        ),
-        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { textAlign: "center", marginBottom: 24 }, children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx(
-            "h1",
-            {
-              style: {
-                fontSize: "1.7rem",
-                fontWeight: 700,
-                color: "#111827",
-                marginBottom: 8
-              },
-              children: "Uswift Chrome Extension"
-            }
-          ),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { style: { color: "#4B5563", fontSize: "1rem", marginBottom: 16 }, children: "Auto-apply to jobs on top boards. Save time, get more interviews." }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(
-            "div",
-            {
-              style: {
-                width: 80,
-                height: 80,
-                margin: "0 auto 16px",
-                borderRadius: "50%",
-                background: "linear-gradient(135deg, #EDE9FE 0%, #6D28D9 100%)",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                animation: "pulse 2s infinite"
-              },
-              children: /* @__PURE__ */ jsxRuntimeExports.jsxs("svg", { className: "uswift-icon", fill: "none", viewBox: "0 0 32 32", children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx("circle", { cx: "16", cy: "16", r: "14", stroke: "#6D28D9", strokeWidth: "2" }),
-                /* @__PURE__ */ jsxRuntimeExports.jsx(
-                  "path",
-                  {
-                    d: "M10 16h12M16 10v12",
-                    stroke: "#6D28D9",
-                    strokeWidth: "2",
-                    strokeLinecap: "round"
-                  }
-                )
-              ] })
-            }
-          ),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(
-            "button",
-            {
-              className: "uswift-btn",
-              style: { marginTop: 8 },
-              onClick: handleAutoApply,
-              children: "Auto-Apply to Job"
-            }
-          ),
-          autoStatus && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { marginTop: 12, textAlign: "center" }, children: [
-            autoStatus.status === "pending" && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { style: { color: "#6B7280" }, children: "Applying…" }),
-            autoStatus.status === "success" && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { style: { color: "#10B981" }, children: autoStatus.message }),
-            autoStatus.status === "error" && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { style: { color: "#DC2626" }, children: autoStatus.message }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { padding: "1.5rem 2rem", position: "relative", zIndex: 1 }, children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { marginBottom: "2rem" }, children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "h2",
+              {
+                style: {
+                  fontSize: "1.2rem",
+                  fontWeight: 700,
+                  color: "#1f2937",
+                  marginBottom: "1rem",
+                  textAlign: "center"
+                },
+                children: "Quick Actions"
+              }
+            ),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs(
+              "div",
+              {
+                style: {
+                  background: "linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%)",
+                  borderRadius: "16px",
+                  padding: "1.5rem",
+                  marginBottom: "1.5rem",
+                  border: "1px solid rgba(59, 130, 246, 0.1)",
+                  position: "relative",
+                  overflow: "hidden"
+                },
+                children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(
+                    "div",
+                    {
+                      style: {
+                        position: "absolute",
+                        top: "-20px",
+                        right: "-20px",
+                        width: "60px",
+                        height: "60px",
+                        background: "radial-gradient(circle, rgba(59, 130, 246, 0.1) 0%, transparent 70%)",
+                        borderRadius: "50%"
+                      }
+                    }
+                  ),
+                  /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                    "div",
+                    {
+                      style: {
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "0.75rem",
+                        marginBottom: "1rem"
+                      },
+                      children: [
+                        /* @__PURE__ */ jsxRuntimeExports.jsx(
+                          "div",
+                          {
+                            style: {
+                              width: "40px",
+                              height: "40px",
+                              background: "linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)",
+                              borderRadius: "12px",
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              boxShadow: "0 4px 12px rgba(59, 130, 246, 0.3)"
+                            },
+                            children: /* @__PURE__ */ jsxRuntimeExports.jsx("span", { style: { fontSize: "1.2rem", color: "white" }, children: "⚡" })
+                          }
+                        ),
+                        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+                          /* @__PURE__ */ jsxRuntimeExports.jsx(
+                            "h3",
+                            {
+                              style: {
+                                fontSize: "1.1rem",
+                                fontWeight: 700,
+                                color: "#1e40af",
+                                margin: 0
+                              },
+                              children: "Smart Auto-Apply"
+                            }
+                          ),
+                          /* @__PURE__ */ jsxRuntimeExports.jsx(
+                            "p",
+                            {
+                              style: {
+                                fontSize: "0.85rem",
+                                color: "#64748b",
+                                margin: "0.25rem 0 0 0"
+                              },
+                              children: "Apply to jobs instantly with AI-optimized profiles"
+                            }
+                          )
+                        ] })
+                      ]
+                    }
+                  ),
+                  /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                    "button",
+                    {
+                      onClick: handleAutoApply,
+                      style: {
+                        width: "100%",
+                        background: "linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)",
+                        color: "#ffffff",
+                        border: "none",
+                        borderRadius: "12px",
+                        padding: "12px 20px",
+                        fontSize: "0.95rem",
+                        fontWeight: 600,
+                        cursor: "pointer",
+                        transition: "all 0.2s ease",
+                        boxShadow: "0 4px 12px rgba(59, 130, 246, 0.3)",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        gap: "8px"
+                      },
+                      onMouseEnter: (e) => {
+                        e.currentTarget.style.transform = "translateY(-2px)";
+                        e.currentTarget.style.boxShadow = "0 8px 20px rgba(59, 130, 246, 0.4)";
+                      },
+                      onMouseLeave: (e) => {
+                        e.currentTarget.style.transform = "translateY(0)";
+                        e.currentTarget.style.boxShadow = "0 4px 12px rgba(59, 130, 246, 0.3)";
+                      },
+                      children: [
+                        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: "🚀" }),
+                        "Auto-Apply to Job"
+                      ]
+                    }
+                  ),
+                  autoStatus && /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                    "div",
+                    {
+                      style: {
+                        marginTop: "1rem",
+                        padding: "1rem",
+                        borderRadius: "12px",
+                        fontSize: "0.9rem",
+                        background: autoStatus.status === "success" ? "linear-gradient(135deg, rgba(34, 197, 94, 0.1) 0%, rgba(34, 197, 94, 0.05) 100%)" : autoStatus.status === "error" ? "linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(239, 68, 68, 0.05) 100%)" : "linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(59, 130, 246, 0.05) 100%)",
+                        color: autoStatus.status === "success" ? "#16a34a" : autoStatus.status === "error" ? "#dc2626" : "#1e40af",
+                        border: `1px solid ${autoStatus.status === "success" ? "rgba(34, 197, 94, 0.3)" : autoStatus.status === "error" ? "rgba(239, 68, 68, 0.3)" : "rgba(59, 130, 246, 0.3)"}`
+                      },
+                      children: [
+                        autoStatus.status === "pending" && /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                          "div",
+                          {
+                            style: {
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              gap: "12px"
+                            },
+                            children: [
+                              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                                "div",
+                                {
+                                  style: {
+                                    width: "20px",
+                                    height: "20px",
+                                    border: "3px solid rgba(59, 130, 246, 0.3)",
+                                    borderTop: "3px solid #3b82f6",
+                                    borderRadius: "50%",
+                                    animation: "spin 1s linear infinite"
+                                  }
+                                }
+                              ),
+                              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+                                /* @__PURE__ */ jsxRuntimeExports.jsx("div", { style: { fontWeight: 600, marginBottom: "4px" }, children: "🚀 Advanced Auto-Apply in Progress" }),
+                                /* @__PURE__ */ jsxRuntimeExports.jsx("div", { style: { fontSize: "0.8rem", opacity: 0.8 }, children: "Detecting job board, filling forms, uploading files..." })
+                              ] })
+                            ]
+                          }
+                        ),
+                        autoStatus.status === "success" && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+                          /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                            "div",
+                            {
+                              style: {
+                                display: "flex",
+                                alignItems: "center",
+                                gap: "8px",
+                                marginBottom: "8px",
+                                fontWeight: 600
+                              },
+                              children: [
+                                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: "✅" }),
+                                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: "Application Submitted Successfully!" })
+                              ]
+                            }
+                          ),
+                          /* @__PURE__ */ jsxRuntimeExports.jsx(
+                            "div",
+                            {
+                              style: {
+                                fontSize: "0.85rem",
+                                opacity: 0.9,
+                                marginBottom: "8px"
+                              },
+                              children: autoStatus.message
+                            }
+                          ),
+                          autoStatus.jobBoard && /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                            "div",
+                            {
+                              style: {
+                                fontSize: "0.75rem",
+                                opacity: 0.7,
+                                padding: "6px 12px",
+                                background: "rgba(255, 255, 255, 0.5)",
+                                borderRadius: "6px",
+                                display: "inline-block"
+                              },
+                              children: [
+                                "Platform: ",
+                                autoStatus.jobBoard
+                              ]
+                            }
+                          )
+                        ] }),
+                        autoStatus.status === "error" && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+                          /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                            "div",
+                            {
+                              style: {
+                                display: "flex",
+                                alignItems: "center",
+                                gap: "8px",
+                                marginBottom: "8px",
+                                fontWeight: 600
+                              },
+                              children: [
+                                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: "❌" }),
+                                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: "Auto-Apply Failed" })
+                              ]
+                            }
+                          ),
+                          /* @__PURE__ */ jsxRuntimeExports.jsx(
+                            "div",
+                            {
+                              style: {
+                                fontSize: "0.85rem",
+                                opacity: 0.9,
+                                marginBottom: "12px"
+                              },
+                              children: autoStatus.message
+                            }
+                          ),
+                          autoStatus.session && autoStatus.session.errors && autoStatus.session.errors.length > 0 && /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                            "div",
+                            {
+                              style: {
+                                fontSize: "0.75rem",
+                                opacity: 0.8,
+                                marginBottom: "12px",
+                                padding: "8px",
+                                background: "rgba(255, 255, 255, 0.3)",
+                                borderRadius: "6px"
+                              },
+                              children: [
+                                /* @__PURE__ */ jsxRuntimeExports.jsx("div", { style: { fontWeight: 600, marginBottom: "4px" }, children: "Issues detected:" }),
+                                autoStatus.session.errors.slice(0, 3).map((error, index) => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { marginBottom: "2px" }, children: [
+                                  "• ",
+                                  error
+                                ] }, index)),
+                                autoStatus.session.errors.length > 3 && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+                                  "... and ",
+                                  autoStatus.session.errors.length - 3,
+                                  " ",
+                                  "more"
+                                ] })
+                              ]
+                            }
+                          ),
+                          /* @__PURE__ */ jsxRuntimeExports.jsx(
+                            "button",
+                            {
+                              onClick: handleAutoApply,
+                              style: {
+                                background: "linear-gradient(135deg, #dc2626 0%, #b91c1c 100%)",
+                                color: "#ffffff",
+                                border: "none",
+                                borderRadius: "8px",
+                                padding: "8px 16px",
+                                fontSize: "0.85rem",
+                                fontWeight: 600,
+                                cursor: "pointer",
+                                boxShadow: "0 2px 8px rgba(220, 38, 38, 0.3)",
+                                transition: "all 0.2s ease"
+                              },
+                              onMouseEnter: (e) => {
+                                e.currentTarget.style.transform = "translateY(-1px)";
+                                e.currentTarget.style.boxShadow = "0 4px 12px rgba(220, 38, 38, 0.4)";
+                              },
+                              onMouseLeave: (e) => {
+                                e.currentTarget.style.transform = "translateY(0)";
+                                e.currentTarget.style.boxShadow = "0 2px 8px rgba(220, 38, 38, 0.3)";
+                              },
+                              children: "🔄 Retry Auto-Apply"
+                            }
+                          )
+                        ] })
+                      ]
+                    }
+                  )
+                ]
+              }
+            ),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { marginBottom: "2rem" }, children: [
               /* @__PURE__ */ jsxRuntimeExports.jsx(
-                "button",
-                {
-                  className: "uswift-btn",
-                  style: { marginTop: 8 },
-                  onClick: handleAutoApply,
-                  children: "Retry"
-                }
-              ),
-              lastAutoDetails && /* @__PURE__ */ jsxRuntimeExports.jsx(
-                "pre",
+                "h3",
                 {
                   style: {
-                    textAlign: "left",
-                    maxHeight: 120,
-                    overflow: "auto",
-                    fontSize: 11,
-                    background: "#F3F4F6",
-                    padding: 8,
-                    borderRadius: 6,
-                    marginTop: 8
+                    fontSize: "1rem",
+                    fontWeight: 600,
+                    color: "#374151",
+                    marginBottom: "1rem",
+                    textAlign: "center"
                   },
-                  children: JSON.stringify(lastAutoDetails, null, 2)
+                  children: "Core Features"
+                }
+              ),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                "div",
+                {
+                  style: {
+                    display: "grid",
+                    gridTemplateColumns: "1fr 1fr",
+                    gap: "0.75rem"
+                  },
+                  children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                      "button",
+                      {
+                        onClick: () => setPage("profile"),
+                        style: {
+                          background: "#ffffff",
+                          border: "2px solid #e5e7eb",
+                          borderRadius: "12px",
+                          padding: "1rem",
+                          cursor: "pointer",
+                          transition: "all 0.2s ease",
+                          textAlign: "center",
+                          display: "flex",
+                          flexDirection: "column",
+                          alignItems: "center",
+                          gap: "0.5rem"
+                        },
+                        onMouseEnter: (e) => {
+                          e.currentTarget.style.borderColor = "#6366f1";
+                          e.currentTarget.style.transform = "translateY(-2px)";
+                          e.currentTarget.style.boxShadow = "0 8px 16px rgba(99, 102, 241, 0.15)";
+                        },
+                        onMouseLeave: (e) => {
+                          e.currentTarget.style.borderColor = "#e5e7eb";
+                          e.currentTarget.style.transform = "translateY(0)";
+                          e.currentTarget.style.boxShadow = "none";
+                        },
+                        children: [
+                          /* @__PURE__ */ jsxRuntimeExports.jsx(
+                            "div",
+                            {
+                              style: {
+                                width: "32px",
+                                height: "32px",
+                                background: "linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)",
+                                borderRadius: "8px",
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center"
+                              },
+                              children: /* @__PURE__ */ jsxRuntimeExports.jsx("span", { style: { fontSize: "1rem", color: "white" }, children: "📋" })
+                            }
+                          ),
+                          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+                            /* @__PURE__ */ jsxRuntimeExports.jsx(
+                              "div",
+                              {
+                                style: {
+                                  fontSize: "0.9rem",
+                                  fontWeight: 600,
+                                  color: "#1f2937"
+                                },
+                                children: "Profile Vault"
+                              }
+                            ),
+                            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { style: { fontSize: "0.75rem", color: "#6b7280" }, children: "Manage profiles" })
+                          ] })
+                        ]
+                      }
+                    ),
+                    /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                      "button",
+                      {
+                        onClick: () => setPage("tracker"),
+                        style: {
+                          background: "#ffffff",
+                          border: "2px solid #e5e7eb",
+                          borderRadius: "12px",
+                          padding: "1rem",
+                          cursor: "pointer",
+                          transition: "all 0.2s ease",
+                          textAlign: "center",
+                          display: "flex",
+                          flexDirection: "column",
+                          alignItems: "center",
+                          gap: "0.5rem"
+                        },
+                        onMouseEnter: (e) => {
+                          e.currentTarget.style.borderColor = "#f59e0b";
+                          e.currentTarget.style.transform = "translateY(-2px)";
+                          e.currentTarget.style.boxShadow = "0 8px 16px rgba(245, 158, 11, 0.15)";
+                        },
+                        onMouseLeave: (e) => {
+                          e.currentTarget.style.borderColor = "#e5e7eb";
+                          e.currentTarget.style.transform = "translateY(0)";
+                          e.currentTarget.style.boxShadow = "none";
+                        },
+                        children: [
+                          /* @__PURE__ */ jsxRuntimeExports.jsx(
+                            "div",
+                            {
+                              style: {
+                                width: "32px",
+                                height: "32px",
+                                background: "linear-gradient(135deg, #f59e0b 0%, #d97706 100%)",
+                                borderRadius: "8px",
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center"
+                              },
+                              children: /* @__PURE__ */ jsxRuntimeExports.jsx("span", { style: { fontSize: "1rem", color: "white" }, children: "📊" })
+                            }
+                          ),
+                          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+                            /* @__PURE__ */ jsxRuntimeExports.jsx(
+                              "div",
+                              {
+                                style: {
+                                  fontSize: "0.9rem",
+                                  fontWeight: 600,
+                                  color: "#1f2937"
+                                },
+                                children: "Job Tracker"
+                              }
+                            ),
+                            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { style: { fontSize: "0.75rem", color: "#6b7280" }, children: "Track applications" })
+                          ] })
+                        ]
+                      }
+                    )
+                  ]
+                }
+              )
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "h3",
+                {
+                  style: {
+                    fontSize: "1rem",
+                    fontWeight: 600,
+                    color: "#374151",
+                    marginBottom: "1rem",
+                    textAlign: "center"
+                  },
+                  children: "🤖 AI-Powered Tools"
+                }
+              ),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                "div",
+                {
+                  style: {
+                    display: "grid",
+                    gridTemplateColumns: "1fr 1fr",
+                    gap: "0.75rem",
+                    marginBottom: "1rem"
+                  },
+                  children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                      "button",
+                      {
+                        onClick: () => setPage("chat"),
+                        style: {
+                          background: "linear-gradient(135deg, #10b981 0%, #059669 100%)",
+                          border: "none",
+                          borderRadius: "12px",
+                          padding: "1rem",
+                          cursor: "pointer",
+                          transition: "all 0.2s ease",
+                          color: "white",
+                          textAlign: "center",
+                          display: "flex",
+                          flexDirection: "column",
+                          alignItems: "center",
+                          gap: "0.5rem",
+                          boxShadow: "0 4px 12px rgba(16, 185, 129, 0.3)"
+                        },
+                        onMouseEnter: (e) => {
+                          e.currentTarget.style.transform = "translateY(-2px)";
+                          e.currentTarget.style.boxShadow = "0 8px 20px rgba(16, 185, 129, 0.4)";
+                        },
+                        onMouseLeave: (e) => {
+                          e.currentTarget.style.transform = "translateY(0)";
+                          e.currentTarget.style.boxShadow = "0 4px 12px rgba(16, 185, 129, 0.3)";
+                        },
+                        children: [
+                          /* @__PURE__ */ jsxRuntimeExports.jsx(
+                            "div",
+                            {
+                              style: {
+                                width: "32px",
+                                height: "32px",
+                                background: "rgba(255, 255, 255, 0.2)",
+                                borderRadius: "8px",
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                backdropFilter: "blur(10px)"
+                              },
+                              children: /* @__PURE__ */ jsxRuntimeExports.jsx("span", { style: { fontSize: "1rem" }, children: "💬" })
+                            }
+                          ),
+                          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+                            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { style: { fontSize: "0.85rem", fontWeight: 600 }, children: "AI Assistant" }),
+                            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { style: { fontSize: "0.7rem", opacity: 0.9 }, children: "Career guidance" })
+                          ] })
+                        ]
+                      }
+                    ),
+                    /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                      "button",
+                      {
+                        onClick: () => setPage("resume"),
+                        style: {
+                          background: "linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)",
+                          border: "none",
+                          borderRadius: "12px",
+                          padding: "1rem",
+                          cursor: "pointer",
+                          transition: "all 0.2s ease",
+                          color: "white",
+                          textAlign: "center",
+                          display: "flex",
+                          flexDirection: "column",
+                          alignItems: "center",
+                          gap: "0.5rem",
+                          boxShadow: "0 4px 12px rgba(59, 130, 246, 0.3)"
+                        },
+                        onMouseEnter: (e) => {
+                          e.currentTarget.style.transform = "translateY(-2px)";
+                          e.currentTarget.style.boxShadow = "0 8px 20px rgba(59, 130, 246, 0.4)";
+                        },
+                        onMouseLeave: (e) => {
+                          e.currentTarget.style.transform = "translateY(0)";
+                          e.currentTarget.style.boxShadow = "0 4px 12px rgba(59, 130, 246, 0.3)";
+                        },
+                        children: [
+                          /* @__PURE__ */ jsxRuntimeExports.jsx(
+                            "div",
+                            {
+                              style: {
+                                width: "32px",
+                                height: "32px",
+                                background: "rgba(255, 255, 255, 0.2)",
+                                borderRadius: "8px",
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                backdropFilter: "blur(10px)"
+                              },
+                              children: /* @__PURE__ */ jsxRuntimeExports.jsx("span", { style: { fontSize: "1rem" }, children: "📄" })
+                            }
+                          ),
+                          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+                            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { style: { fontSize: "0.85rem", fontWeight: 600 }, children: "Resume AI" }),
+                            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { style: { fontSize: "0.7rem", opacity: 0.9 }, children: "Enhance & optimize" })
+                          ] })
+                        ]
+                      }
+                    )
+                  ]
+                }
+              ),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                "div",
+                {
+                  style: {
+                    display: "grid",
+                    gridTemplateColumns: "1fr 1fr 1fr",
+                    gap: "0.5rem"
+                  },
+                  children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                      "button",
+                      {
+                        onClick: () => setPage("cover-letter"),
+                        style: {
+                          background: "#ffffff",
+                          border: "2px solid #e5e7eb",
+                          borderRadius: "8px",
+                          padding: "0.75rem",
+                          cursor: "pointer",
+                          transition: "all 0.2s ease",
+                          textAlign: "center",
+                          display: "flex",
+                          flexDirection: "column",
+                          alignItems: "center",
+                          gap: "0.25rem"
+                        },
+                        onMouseEnter: (e) => {
+                          e.currentTarget.style.borderColor = "#8b5cf6";
+                          e.currentTarget.style.background = "#faf5ff";
+                        },
+                        onMouseLeave: (e) => {
+                          e.currentTarget.style.borderColor = "#e5e7eb";
+                          e.currentTarget.style.background = "#ffffff";
+                        },
+                        children: [
+                          /* @__PURE__ */ jsxRuntimeExports.jsx("span", { style: { fontSize: "1rem" }, children: "✍️" }),
+                          /* @__PURE__ */ jsxRuntimeExports.jsx(
+                            "span",
+                            {
+                              style: {
+                                fontSize: "0.7rem",
+                                fontWeight: 600,
+                                color: "#1f2937"
+                              },
+                              children: "Cover Letter"
+                            }
+                          )
+                        ]
+                      }
+                    ),
+                    /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                      "button",
+                      {
+                        onClick: () => setPage("files"),
+                        style: {
+                          background: "#ffffff",
+                          border: "2px solid #e5e7eb",
+                          borderRadius: "8px",
+                          padding: "0.75rem",
+                          cursor: "pointer",
+                          transition: "all 0.2s ease",
+                          textAlign: "center",
+                          display: "flex",
+                          flexDirection: "column",
+                          alignItems: "center",
+                          gap: "0.25rem"
+                        },
+                        onMouseEnter: (e) => {
+                          e.currentTarget.style.borderColor = "#f59e0b";
+                          e.currentTarget.style.background = "#fffbeb";
+                        },
+                        onMouseLeave: (e) => {
+                          e.currentTarget.style.borderColor = "#e5e7eb";
+                          e.currentTarget.style.background = "#ffffff";
+                        },
+                        children: [
+                          /* @__PURE__ */ jsxRuntimeExports.jsx("span", { style: { fontSize: "1rem" }, children: "📁" }),
+                          /* @__PURE__ */ jsxRuntimeExports.jsx(
+                            "span",
+                            {
+                              style: {
+                                fontSize: "0.7rem",
+                                fontWeight: 600,
+                                color: "#1f2937"
+                              },
+                              children: "File Manager"
+                            }
+                          )
+                        ]
+                      }
+                    ),
+                    /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                      "button",
+                      {
+                        onClick: () => setPage("job-analysis"),
+                        style: {
+                          background: "#ffffff",
+                          border: "2px solid #e5e7eb",
+                          borderRadius: "8px",
+                          padding: "0.75rem",
+                          cursor: "pointer",
+                          transition: "all 0.2s ease",
+                          textAlign: "center",
+                          display: "flex",
+                          flexDirection: "column",
+                          alignItems: "center",
+                          gap: "0.25rem"
+                        },
+                        onMouseEnter: (e) => {
+                          e.currentTarget.style.borderColor = "#ec4899";
+                          e.currentTarget.style.background = "#fdf2f8";
+                        },
+                        onMouseLeave: (e) => {
+                          e.currentTarget.style.borderColor = "#e5e7eb";
+                          e.currentTarget.style.background = "#ffffff";
+                        },
+                        children: [
+                          /* @__PURE__ */ jsxRuntimeExports.jsx("span", { style: { fontSize: "1rem" }, children: "🔍" }),
+                          /* @__PURE__ */ jsxRuntimeExports.jsx(
+                            "span",
+                            {
+                              style: {
+                                fontSize: "0.7rem",
+                                fontWeight: 600,
+                                color: "#1f2937"
+                              },
+                              children: "Job Analysis"
+                            }
+                          )
+                        ]
+                      }
+                    )
+                  ]
+                }
+              ),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                "button",
+                {
+                  onClick: () => setPage("interview-prep"),
+                  style: {
+                    marginTop: "0.75rem",
+                    width: "100%",
+                    background: "linear-gradient(135deg, #14b8a6 0%, #0d9488 100%)",
+                    border: "none",
+                    borderRadius: "12px",
+                    padding: "1rem",
+                    cursor: "pointer",
+                    transition: "all 0.2s ease",
+                    color: "white",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "0.75rem",
+                    boxShadow: "0 4px 12px rgba(20, 184, 166, 0.3)"
+                  },
+                  onMouseEnter: (e) => {
+                    e.currentTarget.style.transform = "translateY(-2px)";
+                    e.currentTarget.style.boxShadow = "0 8px 20px rgba(20, 184, 166, 0.4)";
+                  },
+                  onMouseLeave: (e) => {
+                    e.currentTarget.style.transform = "translateY(0)";
+                    e.currentTarget.style.boxShadow = "0 4px 12px rgba(20, 184, 166, 0.3)";
+                  },
+                  children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(
+                      "div",
+                      {
+                        style: {
+                          width: "40px",
+                          height: "40px",
+                          background: "rgba(255, 255, 255, 0.2)",
+                          borderRadius: "8px",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          backdropFilter: "blur(10px)"
+                        },
+                        children: /* @__PURE__ */ jsxRuntimeExports.jsx("span", { style: { fontSize: "1.2rem" }, children: "🎤" })
+                      }
+                    ),
+                    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { textAlign: "left", flex: 1 }, children: [
+                      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { style: { fontSize: "0.95rem", fontWeight: 600 }, children: "Interview Preparation" }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { style: { fontSize: "0.8rem", opacity: 0.9 }, children: "AI-powered practice questions & tips" })
+                    ] }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("span", { style: { fontSize: "1rem", opacity: 0.8 }, children: "→" })
+                  ]
                 }
               )
             ] })
           ] }),
-          /* @__PURE__ */ jsxRuntimeExports.jsxs(
-            "div",
+          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { style: { textAlign: "center", marginTop: "1.5rem" }, children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+            "button",
             {
-              style: { display: "flex", gap: 8, marginTop: 8, flexWrap: "wrap" },
-              children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx(
-                  "button",
-                  {
-                    className: "uswift-btn",
-                    style: { background: "#EDE9FE", color: "#6D28D9" },
-                    onClick: () => setPage("profile"),
-                    children: "Profile Vault"
-                  }
-                ),
-                /* @__PURE__ */ jsxRuntimeExports.jsx(
-                  "button",
-                  {
-                    className: "uswift-btn",
-                    style: { background: "#EDE9FE", color: "#6D28D9" },
-                    onClick: () => setPage("tracker"),
-                    children: "Job Tracker"
-                  }
-                )
-              ]
+              onClick: signOut,
+              style: {
+                background: "transparent",
+                color: "#6b7280",
+                border: "1px solid #d1d5db",
+                borderRadius: "8px",
+                padding: "8px 16px",
+                cursor: "pointer",
+                fontSize: "0.85rem",
+                fontWeight: 500,
+                transition: "all 0.2s ease"
+              },
+              onMouseEnter: (e) => {
+                e.currentTarget.style.borderColor = "#9ca3af";
+                e.currentTarget.style.color = "#4b5563";
+              },
+              onMouseLeave: (e) => {
+                e.currentTarget.style.borderColor = "#d1d5db";
+                e.currentTarget.style.color = "#6b7280";
+              },
+              children: "Sign Out"
             }
-          ),
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { marginTop: 20 }, children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(
-              "h3",
-              {
-                style: {
-                  fontSize: "1rem",
-                  fontWeight: 600,
-                  color: "#111827",
-                  marginBottom: 12,
-                  textAlign: "center"
-                },
-                children: "🤖 AI-Powered Tools"
-              }
-            ),
-            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { display: "flex", gap: 8, flexWrap: "wrap" }, children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx(
-                "button",
-                {
-                  className: "uswift-btn",
-                  style: {
-                    background: "#10B981",
-                    color: "#FFFFFF",
-                    flex: 1,
-                    minWidth: 120
-                  },
-                  onClick: () => setPage("chat"),
-                  children: "💬 AI Assistant"
-                }
-              ),
-              /* @__PURE__ */ jsxRuntimeExports.jsx(
-                "button",
-                {
-                  className: "uswift-btn",
-                  style: {
-                    background: "#3B82F6",
-                    color: "#FFFFFF",
-                    flex: 1,
-                    minWidth: 120
-                  },
-                  onClick: () => setPage("resume"),
-                  children: "📄 Resume AI"
-                }
-              ),
-              /* @__PURE__ */ jsxRuntimeExports.jsx(
-                "button",
-                {
-                  className: "uswift-btn",
-                  style: {
-                    background: "#8B5CF6",
-                    color: "#FFFFFF",
-                    flex: 1,
-                    minWidth: 120
-                  },
-                  onClick: () => setPage("cover-letter"),
-                  children: "✍️ Cover Letter"
-                }
-              )
-            ] }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { style: { marginTop: 12 }, children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { display: "flex", gap: 8, flexWrap: "wrap" }, children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx(
-                "button",
-                {
-                  className: "uswift-btn",
-                  style: {
-                    background: "#F59E0B",
-                    color: "#FFFFFF",
-                    flex: 1,
-                    minWidth: 120
-                  },
-                  onClick: () => setPage("files"),
-                  children: "📁 File Manager"
-                }
-              ),
-              /* @__PURE__ */ jsxRuntimeExports.jsx(
-                "button",
-                {
-                  className: "uswift-btn",
-                  style: {
-                    background: "#EC4899",
-                    color: "#FFFFFF",
-                    flex: 1,
-                    minWidth: 120
-                  },
-                  onClick: () => setPage("job-analysis"),
-                  children: "🔍 Job Analysis"
-                }
-              ),
-              /* @__PURE__ */ jsxRuntimeExports.jsx(
-                "button",
-                {
-                  className: "uswift-btn",
-                  style: {
-                    background: "#14B8A6",
-                    color: "#FFFFFF",
-                    flex: 1,
-                    minWidth: 120
-                  },
-                  onClick: () => setPage("interview-prep"),
-                  children: "🎤 Interview Prep"
-                }
-              )
-            ] }) })
-          ] })
-        ] }),
-        /* @__PURE__ */ jsxRuntimeExports.jsxs(
-          "div",
-          {
-            className: "uswift-trust",
-            style: { justifyContent: "center", marginBottom: 24 },
-            children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "uswift-badge", children: "Secure" }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "uswift-badge", children: "Fast" }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "uswift-badge", children: "Private" })
-            ]
-          }
-        ),
-        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "uswift-card", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsxs("svg", { className: "uswift-icon", fill: "none", viewBox: "0 0 32 32", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx(
-                "rect",
-                {
-                  x: "6",
-                  y: "10",
-                  width: "20",
-                  height: "12",
-                  rx: "3",
-                  stroke: "#6D28D9",
-                  strokeWidth: "2"
-                }
-              ),
-              /* @__PURE__ */ jsxRuntimeExports.jsx(
-                "path",
-                {
-                  d: "M16 14v4",
-                  stroke: "#6D28D9",
-                  strokeWidth: "2",
-                  strokeLinecap: "round"
-                }
-              )
-            ] }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { style: { fontWeight: 700, fontSize: "1.1rem", marginBottom: 4 }, children: "Profile Vault" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { style: { color: "#4B5563", fontSize: "0.95rem" }, children: "Store resumes, cover letters, and Q&A profiles securely." })
-          ] }),
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "uswift-card", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("svg", { className: "uswift-icon", fill: "none", viewBox: "0 0 32 32", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
-              "path",
-              {
-                d: "M8 16h16M16 8v16",
-                stroke: "#6D28D9",
-                strokeWidth: "2",
-                strokeLinecap: "round"
-              }
-            ) }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { style: { fontWeight: 700, fontSize: "1.1rem", marginBottom: 4 }, children: "Auto-Apply" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { style: { color: "#4B5563", fontSize: "0.95rem" }, children: "Automatically apply to jobs on Greenhouse, Lever, and more." })
-          ] }),
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "uswift-card", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsxs("svg", { className: "uswift-icon", fill: "none", viewBox: "0 0 32 32", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx("circle", { cx: "16", cy: "16", r: "10", stroke: "#6D28D9", strokeWidth: "2" }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx(
-                "path",
-                {
-                  d: "M16 12v4l2 2",
-                  stroke: "#6D28D9",
-                  strokeWidth: "2",
-                  strokeLinecap: "round"
-                }
-              )
-            ] }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { style: { fontWeight: 700, fontSize: "1.1rem", marginBottom: 4 }, children: "Job Tracker" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { style: { color: "#4B5563", fontSize: "0.95rem" }, children: "Track your applications and interview progress in one place." })
-          ] }),
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "uswift-card", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsxs("svg", { className: "uswift-icon", fill: "none", viewBox: "0 0 32 32", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx(
-                "rect",
-                {
-                  x: "8",
-                  y: "8",
-                  width: "16",
-                  height: "16",
-                  rx: "4",
-                  stroke: "#6D28D9",
-                  strokeWidth: "2"
-                }
-              ),
-              /* @__PURE__ */ jsxRuntimeExports.jsx(
-                "path",
-                {
-                  d: "M12 16h8",
-                  stroke: "#6D28D9",
-                  strokeWidth: "2",
-                  strokeLinecap: "round"
-                }
-              )
-            ] }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { style: { fontWeight: 700, fontSize: "1.1rem", marginBottom: 4 }, children: "Privacy First" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { style: { color: "#4B5563", fontSize: "0.95rem" }, children: "Your data is encrypted and never shared without consent." })
-          ] })
+          ) })
         ] })
       ]
     }

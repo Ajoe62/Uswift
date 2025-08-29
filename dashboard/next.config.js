@@ -11,14 +11,6 @@ const nextConfig = {
   // typedRoutes is now stable, no longer experimental
   typedRoutes: false,
 
-  // Fix Turbopack configuration - remove webpack loaders
-  turbopack: {
-    // Remove CSS loader rules - let Turbopack handle CSS natively
-    // rules: {
-    //   "*.css": ["css-loader"] // ❌ REMOVED - causing conflicts
-    // }
-  },
-
   // Webpack config - only runs when webpack is used (not Turbopack)
   webpack: (config, { dev, isServer, webpack }) => {
     // Webpack-specific optimizations
@@ -37,11 +29,12 @@ const nextConfig = {
     return config;
   },
 
-  // Turbopack configuration
+  // Single Turbopack configuration - FIXED: removed duplicate
   turbopack: {
-    rules: [
+    rules: {
       // Add any Turbopack-specific rules here if needed
-    ],
+      // Using object format instead of array
+    },
   },
 
   // Compiler options (these work with both Webpack and Turbopack)

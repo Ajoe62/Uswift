@@ -21,24 +21,6 @@ type AppPageConfig<Route extends AppRoutes = AppRoutes> = {
   viewport?: any
 }
 
-type PagesPageConfig = {
-  default: React.ComponentType<any> | ((props: any) => React.ReactNode | Promise<React.ReactNode> | never | void)
-  getStaticProps?: (context: any) => Promise<any> | any
-  getStaticPaths?: (context: any) => Promise<any> | any
-  getServerSideProps?: (context: any) => Promise<any> | any
-  getInitialProps?: (context: any) => Promise<any> | any
-  /**
-   * Segment configuration for legacy Pages Router pages.
-   * Validated at build-time by parsePagesSegmentConfig.
-   */
-  config?: {
-    amp?: boolean | 'hybrid' | string // necessary for JS
-    maxDuration?: number
-    runtime?: 'edge' | 'experimental-edge' | 'nodejs' | string // necessary unless config is exported as const
-    regions?: string[]
-  }
-}
-
 type LayoutConfig<Route extends LayoutRoutes = LayoutRoutes> = {
   default: React.ComponentType<LayoutProps<Route>> | ((props: LayoutProps<Route>) => React.ReactNode | Promise<React.ReactNode> | never | void | Promise<void>)
   generateStaticParams?: (props: { params: ParamMap[Route] }) => Promise<any[]> | any[]
@@ -55,158 +37,112 @@ type LayoutConfig<Route extends LayoutRoutes = LayoutRoutes> = {
 }
 
 type RouteHandlerConfig<Route extends AppRouteHandlerRoutes = AppRouteHandlerRoutes> = {
-  GET?: (request: NextRequest, context: { params: Promise<ParamMap[Route]> }) => Promise<Response> | Response | Promise<void> | void
-  POST?: (request: NextRequest, context: { params: Promise<ParamMap[Route]> }) => Promise<Response> | Response | Promise<void> | void
-  PUT?: (request: NextRequest, context: { params: Promise<ParamMap[Route]> }) => Promise<Response> | Response | Promise<void> | void
-  PATCH?: (request: NextRequest, context: { params: Promise<ParamMap[Route]> }) => Promise<Response> | Response | Promise<void> | void
-  DELETE?: (request: NextRequest, context: { params: Promise<ParamMap[Route]> }) => Promise<Response> | Response | Promise<void> | void
-  HEAD?: (request: NextRequest, context: { params: Promise<ParamMap[Route]> }) => Promise<Response> | Response | Promise<void> | void
-  OPTIONS?: (request: NextRequest, context: { params: Promise<ParamMap[Route]> }) => Promise<Response> | Response | Promise<void> | void
+  GET?: (request: NextRequest, context: { params: Promise<ParamMap[Route]> }) => Promise<Response | void> | Response | void
+  POST?: (request: NextRequest, context: { params: Promise<ParamMap[Route]> }) => Promise<Response | void> | Response | void
+  PUT?: (request: NextRequest, context: { params: Promise<ParamMap[Route]> }) => Promise<Response | void> | Response | void
+  PATCH?: (request: NextRequest, context: { params: Promise<ParamMap[Route]> }) => Promise<Response | void> | Response | void
+  DELETE?: (request: NextRequest, context: { params: Promise<ParamMap[Route]> }) => Promise<Response | void> | Response | void
+  HEAD?: (request: NextRequest, context: { params: Promise<ParamMap[Route]> }) => Promise<Response | void> | Response | void
+  OPTIONS?: (request: NextRequest, context: { params: Promise<ParamMap[Route]> }) => Promise<Response | void> | Response | void
 }
 
 
-// Validate ..\..\app\auth\reset-password\page.tsx
+// Validate ../../app/auth/reset-password/page.tsx
 {
-  const handler = {} as typeof import("..\\..\\app\\auth\\reset-password\\page.js")
+  const handler = {} as typeof import("../../app/auth/reset-password/page.js")
   handler satisfies AppPageConfig<"/auth/reset-password">
 }
 
-// Validate ..\..\app\dashboard\jobs\page.tsx
+// Validate ../../app/dashboard/jobs/page.tsx
 {
-  const handler = {} as typeof import("..\\..\\app\\dashboard\\jobs\\page.js")
+  const handler = {} as typeof import("../../app/dashboard/jobs/page.js")
   handler satisfies AppPageConfig<"/dashboard/jobs">
 }
 
-// Validate ..\..\app\dashboard\page.tsx
+// Validate ../../app/dashboard/page.tsx
 {
-  const handler = {} as typeof import("..\\..\\app\\dashboard\\page.js")
+  const handler = {} as typeof import("../../app/dashboard/page.js")
   handler satisfies AppPageConfig<"/dashboard">
 }
 
-// Validate ..\..\app\dashboard\profile\page.tsx
+// Validate ../../app/dashboard/profile/page.tsx
 {
-  const handler = {} as typeof import("..\\..\\app\\dashboard\\profile\\page.js")
+  const handler = {} as typeof import("../../app/dashboard/profile/page.js")
   handler satisfies AppPageConfig<"/dashboard/profile">
 }
 
-// Validate ..\..\app\dashboard\settings\page.tsx
+// Validate ../../app/dashboard/settings/page.tsx
 {
-  const handler = {} as typeof import("..\\..\\app\\dashboard\\settings\\page.js")
+  const handler = {} as typeof import("../../app/dashboard/settings/page.js")
   handler satisfies AppPageConfig<"/dashboard/settings">
 }
 
-// Validate ..\..\app\features\page.tsx
+// Validate ../../app/features/page.tsx
 {
-  const handler = {} as typeof import("..\\..\\app\\features\\page.js")
+  const handler = {} as typeof import("../../app/features/page.js")
   handler satisfies AppPageConfig<"/features">
 }
 
-// Validate ..\..\app\page.tsx
+// Validate ../../app/page.tsx
 {
-  const handler = {} as typeof import("..\\..\\app\\page.js")
+  const handler = {} as typeof import("../../app/page.js")
   handler satisfies AppPageConfig<"/">
 }
 
-// Validate ..\..\app\pricing\page.tsx
+// Validate ../../app/pricing/page.tsx
 {
-  const handler = {} as typeof import("..\\..\\app\\pricing\\page.js")
+  const handler = {} as typeof import("../../app/pricing/page.js")
   handler satisfies AppPageConfig<"/pricing">
 }
 
-// Validate ..\..\app\api\dashboard\stats\route.ts
+// Validate ../../app/api/dashboard/stats/route.ts
 {
-  const handler = {} as typeof import("..\\..\\app\\api\\dashboard\\stats\\route.js")
+  const handler = {} as typeof import("../../app/api/dashboard/stats/route.js")
   handler satisfies RouteHandlerConfig<"/api/dashboard/stats">
 }
 
-// Validate ..\..\app\api\jobs\[id]\route.ts
+// Validate ../../app/api/jobs/[id]/route.ts
 {
-  const handler = {} as typeof import("..\\..\\app\\api\\jobs\\[id]\\route.js")
+  const handler = {} as typeof import("../../app/api/jobs/[id]/route.js")
   handler satisfies RouteHandlerConfig<"/api/jobs/[id]">
 }
 
-// Validate ..\..\app\api\jobs\route.ts
+// Validate ../../app/api/jobs/route.ts
 {
-  const handler = {} as typeof import("..\\..\\app\\api\\jobs\\route.js")
+  const handler = {} as typeof import("../../app/api/jobs/route.js")
   handler satisfies RouteHandlerConfig<"/api/jobs">
 }
 
-// Validate ..\..\app\api\mistral\chat\route.ts
+// Validate ../../app/api/mistral/chat/route.ts
 {
-  const handler = {} as typeof import("..\\..\\app\\api\\mistral\\chat\\route.js")
+  const handler = {} as typeof import("../../app/api/mistral/chat/route.js")
   handler satisfies RouteHandlerConfig<"/api/mistral/chat">
 }
 
-// Validate ..\..\app\api\mistral\embeddings\route.ts
+// Validate ../../app/api/mistral/embeddings/route.ts
 {
-  const handler = {} as typeof import("..\\..\\app\\api\\mistral\\embeddings\\route.js")
+  const handler = {} as typeof import("../../app/api/mistral/embeddings/route.js")
   handler satisfies RouteHandlerConfig<"/api/mistral/embeddings">
 }
 
-// Validate ..\..\app\api\mistral\files\route.ts
+// Validate ../../app/api/mistral/files/route.ts
 {
-  const handler = {} as typeof import("..\\..\\app\\api\\mistral\\files\\route.js")
+  const handler = {} as typeof import("../../app/api/mistral/files/route.js")
   handler satisfies RouteHandlerConfig<"/api/mistral/files">
 }
 
-// Validate ..\..\src\pages\Analytics.tsx
+
+
+
+
+// Validate ../../app/dashboard/layout.tsx
 {
-  const handler = {} as typeof import("..\\..\\src\\pages\\Analytics.js")
-  handler satisfies PagesPageConfig
-}
-
-// Validate ..\..\src\pages\Dashboard.tsx
-{
-  const handler = {} as typeof import("..\\..\\src\\pages\\Dashboard.js")
-  handler satisfies PagesPageConfig
-}
-
-// Validate ..\..\src\pages\Dashboard_New.tsx
-{
-  const handler = {} as typeof import("..\\..\\src\\pages\\Dashboard_New.js")
-  handler satisfies PagesPageConfig
-}
-
-// Validate ..\..\src\pages\JobTracker.tsx
-{
-  const handler = {} as typeof import("..\\..\\src\\pages\\JobTracker.js")
-  handler satisfies PagesPageConfig
-}
-
-// Validate ..\..\src\pages\LandingPage.tsx
-{
-  const handler = {} as typeof import("..\\..\\src\\pages\\LandingPage.js")
-  handler satisfies PagesPageConfig
-}
-
-// Validate ..\..\src\pages\Pricing.tsx
-{
-  const handler = {} as typeof import("..\\..\\src\\pages\\Pricing.js")
-  handler satisfies PagesPageConfig
-}
-
-// Validate ..\..\src\pages\Profile.tsx
-{
-  const handler = {} as typeof import("..\\..\\src\\pages\\Profile.js")
-  handler satisfies PagesPageConfig
-}
-
-// Validate ..\..\src\pages\Support.tsx
-{
-  const handler = {} as typeof import("..\\..\\src\\pages\\Support.js")
-  handler satisfies PagesPageConfig
-}
-
-
-
-// Validate ..\..\app\dashboard\layout.tsx
-{
-  const handler = {} as typeof import("..\\..\\app\\dashboard\\layout.js")
+  const handler = {} as typeof import("../../app/dashboard/layout.js")
   handler satisfies LayoutConfig<"/dashboard">
 }
 
-// Validate ..\..\app\layout.tsx
+// Validate ../../app/layout.tsx
 {
-  const handler = {} as typeof import("..\\..\\app\\layout.js")
+  const handler = {} as typeof import("../../app/layout.js")
   handler satisfies LayoutConfig<"/">
 }

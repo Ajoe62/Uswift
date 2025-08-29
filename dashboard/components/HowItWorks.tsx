@@ -1,6 +1,6 @@
 export default function HowItWorks() {
   // Replace this with your real YouTube video id (e.g. 'dQw4w9WgXcQ')
-  const YOUTUBE_ID = '44a4a6EOIiE&t';
+  const YOUTUBE_ID = '44a4a6EOIiE';
 
   return (
     <section className="py-16 px-4 bg-white text-black">
