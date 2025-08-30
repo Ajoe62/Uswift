@@ -18,7 +18,7 @@ import { getSupabaseClient } from "./supabaseClient";
 export default function Popup() {
   const { user, signOut, isAuthenticated, loading, refreshAuth } = useAuth();
   const [forceRerender, setForceRerender] = useState(0);
-
+  
   // Toggle a body class so CSS can change colors for authenticated state
   useEffect(() => {
     try {
@@ -52,8 +52,14 @@ export default function Popup() {
     | "interview-prep"
   >("home");
   const [profile, setProfile] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    phone: "",
     resume: "",
     coverLetter: "",
+    linkedin: "",
+    portfolio: "",
     qaProfile: "",
   });
 
@@ -65,11 +71,27 @@ export default function Popup() {
     } else {
       // Fallback to Chrome storage for unauthenticated users
       chrome.storage.sync.get(
-        ["resume", "coverLetter", "qaProfile"],
+        [
+          "resume",
+          "coverLetter",
+          "qaProfile",
+          "firstName",
+          "lastName",
+          "email",
+          "phone",
+          "linkedin",
+          "portfolio",
+        ],
         (result: any) => {
           setProfile({
+            firstName: result.firstName || "",
+            lastName: result.lastName || "",
+            email: result.email || "",
+            phone: result.phone || "",
             resume: result.resume || "",
             coverLetter: result.coverLetter || "",
+            linkedin: result.linkedin || "",
+            portfolio: result.portfolio || "",
             qaProfile: result.qaProfile || "",
           });
         }
@@ -92,14 +114,28 @@ export default function Popup() {
         "resumes?user_id=eq." + user.id
       );
 
-      // For now, just use the first resume and cover letter
+      // Load user preferences for basic info and Q&A profile
+      const preferences = await supabase.makeRequest(
+        "user_preferences?user_id=eq." + user.id
+      );
+
+      // Get the first resume and cover letter
       const resume = resumes?.find((r: any) => r.type === "resume");
       const coverLetter = resumes?.find((r: any) => r.type === "cover_letter");
 
+      // Get user preferences (should be single record)
+      const userPrefs = preferences?.[0] || {};
+
       setProfile({
-        resume: resume?.file_url || "",
-        coverLetter: coverLetter?.file_url || "",
-        qaProfile: "", // TODO: Load from preferences
+        firstName: userPrefs.first_name || "",
+        lastName: userPrefs.last_name || "",
+        email: userPrefs.email || "",
+        phone: userPrefs.phone || "",
+        resume: resume?.content || resume?.file_url || "",
+        coverLetter: coverLetter?.content || coverLetter?.file_url || "",
+        linkedin: userPrefs.linkedin || "",
+        portfolio: userPrefs.portfolio || "",
+        qaProfile: userPrefs.qa_profile || "",
       });
     } catch (error) {
       console.error("Error loading profile from Supabase:", error);
@@ -122,42 +158,146 @@ export default function Popup() {
   }>(null);
   const [lastAutoDetails, setLastAutoDetails] = useState<any>(null);
 
-  const handleAutoApply = () => {
-    setAutoStatus({ status: "pending" });
-    chrome.tabs.query({ active: true, currentWindow: true }, (tabs: any) => {
-      if (tabs[0]?.id) {
+  const handleAutoApply = async () => {
+    setAutoStatus({ status: "pending", message: "Starting auto-apply..." });
+
+    try {
+      // Get current tab
+      const tabs = await chrome.tabs.query({
+        active: true,
+        currentWindow: true,
+      });
+      const tab = tabs[0];
+
+      if (!tab?.id) {
+        throw new Error("No active tab found");
+      }
+
+      // First, check if content script is responding with a ping
+      try {
+        console.log("🔍 Checking if content script is responding...");
+        await new Promise((resolve, reject) => {
         chrome.tabs.sendMessage(
-          tabs[0].id,
-          { type: "AUTO_APPLY", profile },
+            tab.id!,
+            { action: "ping" },
           (response: any) => {
-            if (!response) {
-              setAutoStatus({
-                status: "error",
-                message:
-                  "No response from page (content script missing or blocked).",
-              });
-              return;
+              if (chrome.runtime.lastError) {
+                reject(new Error(chrome.runtime.lastError.message));
+              } else if (response?.status === "pong") {
+                console.log("✅ Content script is responding");
+                resolve(response);
+              } else {
+                reject(new Error("Content script not responding"));
+              }
             }
-            setLastAutoDetails(response.details || null);
-            if (response?.status === "success") {
-              setAutoStatus({
-                status: "success",
-                message: `Applied on ${response.jobBoard || "site"}`,
-                details: response.details,
-              });
+          );
+        });
+      } catch (pingError) {
+        console.warn("⚠️ Content script ping failed:", pingError);
+        throw new Error("CONTENT_SCRIPT_NOT_RESPONDING");
+      }
+
+      // Send auto-apply message to content script
+      const response = await new Promise<any>((resolve, reject) => {
+        chrome.tabs.sendMessage(
+          tab.id!,
+          { action: "autoApply", profile },
+          (response: any) => {
+            if (chrome.runtime.lastError) {
+              reject(new Error(chrome.runtime.lastError.message));
             } else {
-              setAutoStatus({
-                status: "error",
-                message: response?.message || "Auto-apply failed",
-                details: response.details,
-              });
+              resolve(response);
             }
           }
         );
-      } else {
-        setAutoStatus({ status: "error", message: "No active tab found." });
+      });
+
+      if (!response) {
+        throw new Error("No response from content script");
       }
-    });
+
+      setLastAutoDetails(response.details || null);
+
+      if (response.status === "success") {
+        setAutoStatus({
+          status: "success",
+          message:
+            response.message ||
+            `Successfully applied on ${response.jobBoard || "site"}`,
+          jobBoard: response.jobBoard,
+          session: response.session,
+        });
+      } else {
+        setAutoStatus({
+          status: "error",
+          message: response.message || "Auto-apply failed",
+          session: response.session,
+        });
+      }
+    } catch (error: any) {
+      console.error("Auto-apply error:", error);
+
+      // Enhanced error handling for different scenarios
+      if (
+        error.message === "CONTENT_SCRIPT_NOT_RESPONDING" ||
+        error.message?.includes("Receiving end does not exist") ||
+        error.message?.includes("Could not establish connection") ||
+        error.message?.includes("content script")
+      ) {
+        setAutoStatus({
+          status: "error",
+          message:
+            "No response from page (content script missing or blocked). Follow these steps:",
+          details: {
+            troubleshooting: [
+              "1. 🔄 Refresh the current page (Ctrl+F5) and wait for full load",
+              "2. 🔍 Open browser console (F12) → Run: checkUSwiftHealth()",
+              "3. 🎯 Run: testJobBoard() to check platform detection",
+              "4. ⚙️ Check extension permissions in chrome://extensions/",
+              "5. 🚫 Try incognito mode (may have different permissions)",
+              "6. 🔌 Disable other extensions temporarily",
+              "7. 🛡️ Check if site uses anti-bot protection",
+              "8. 📄 Ensure you're on actual application page (not job listing)"
+            ],
+            quickTests: [
+              "checkUSwiftHealth() - Check if extension is loaded",
+              "testJobBoard() - Test platform detection",
+              "console.log(window.location.href) - Verify current URL"
+            ],
+            currentUrl: window.location?.href || "Unknown",
+          },
+        });
+      } else if (
+        error.message?.includes("Cannot read property") ||
+        error.message?.includes("undefined") ||
+        error.message?.includes("null")
+      ) {
+        setAutoStatus({
+          status: "error",
+          message:
+            "Page not fully loaded. Please wait for the page to load completely and try again.",
+        });
+      } else if (error.message?.includes("Extension context invalidated")) {
+        setAutoStatus({
+          status: "error",
+          message:
+            "Extension was reloaded. Please refresh the page and try again.",
+        });
+      } else if (error.message?.includes("Cannot access")) {
+        setAutoStatus({
+          status: "error",
+          message:
+            "Cannot access this page. The site may block extensions or have strict security policies.",
+        });
+      } else {
+        setAutoStatus({
+          status: "error",
+          message:
+            error.message ||
+            "Auto-apply failed. Please check the console for details.",
+        });
+      }
+    }
   };
 
   // If not authenticated, show auth form
@@ -282,10 +422,10 @@ export default function Popup() {
   }
 
   if (page === "chat") {
-    return (
+  return (
       <div>
-        <div
-          style={{
+    <div
+      style={{
             display: "flex",
             justifyContent: "space-between",
             alignItems: "center",
@@ -317,31 +457,31 @@ export default function Popup() {
   if (page === "resume") {
     return (
       <div>
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
             margin: "1rem",
           }}
         >
           <button className="uswift-btn" onClick={() => setPage("home")}>
             ← Back
           </button>
-          <button
-            onClick={signOut}
-            style={{
-              background: "#EDE9FE",
-              color: "#6D28D9",
-              border: "none",
-              borderRadius: 8,
+        <button
+          onClick={signOut}
+          style={{
+            background: "#EDE9FE",
+            color: "#6D28D9",
+            border: "none",
+            borderRadius: 8,
               padding: "8px 12px",
-              cursor: "pointer",
-            }}
-          >
-            Sign Out
-          </button>
-        </div>
+            cursor: "pointer",
+          }}
+        >
+          Sign Out
+        </button>
+      </div>
         <ResumeEnhancement />
       </div>
     );
@@ -626,7 +766,7 @@ export default function Popup() {
                 height: "60px",
                 background:
                   "radial-gradient(circle, rgba(59, 130, 246, 0.1) 0%, transparent 70%)",
-                borderRadius: "50%",
+            borderRadius: "50%",
               }}
             />
 
@@ -645,14 +785,14 @@ export default function Popup() {
                   background:
                     "linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)",
                   borderRadius: "12px",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
                   boxShadow: "0 4px 12px rgba(59, 130, 246, 0.3)",
                 }}
               >
                 <span style={{ fontSize: "1.2rem", color: "white" }}>⚡</span>
-              </div>
+        </div>
               <div>
                 <h3
                   style={{
@@ -676,8 +816,8 @@ export default function Popup() {
               </div>
             </div>
 
-            <button
-              onClick={handleAutoApply}
+        <button
+          onClick={handleAutoApply}
               style={{
                 width: "100%",
                 background: "linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)",
@@ -707,10 +847,10 @@ export default function Popup() {
               }}
             >
               <span>🚀</span>
-              Auto-Apply to Job
-            </button>
+          Auto-Apply to Job
+        </button>
 
-            {autoStatus && (
+        {autoStatus && (
               <div
                 style={{
                   marginTop: "1rem",
@@ -757,7 +897,7 @@ export default function Popup() {
                         animation: "spin 1s linear infinite",
                       }}
                     />
-                    <div>
+              <div>
                       <div style={{ fontWeight: 600, marginBottom: "4px" }}>
                         🚀 Advanced Auto-Apply in Progress
                       </div>
@@ -802,10 +942,10 @@ export default function Popup() {
                         }}
                       >
                         Platform: {autoStatus.jobBoard}
-                      </div>
-                    )}
-                  </div>
-                )}
+              </div>
+            )}
+          </div>
+        )}
                 {autoStatus.status === "error" && (
                   <div>
                     <div
@@ -860,7 +1000,7 @@ export default function Popup() {
                           )}
                         </div>
                       )}
-                    <button
+          <button
                       onClick={handleAutoApply}
                       style={{
                         background:
@@ -915,7 +1055,7 @@ export default function Popup() {
               }}
             >
               <button
-                onClick={() => setPage("profile")}
+            onClick={() => setPage("profile")}
                 style={{
                   background: "#ffffff",
                   border: "2px solid #e5e7eb",
@@ -962,17 +1102,17 @@ export default function Popup() {
                       fontWeight: 600,
                       color: "#1f2937",
                     }}
-                  >
-                    Profile Vault
+          >
+            Profile Vault
                   </div>
                   <div style={{ fontSize: "0.75rem", color: "#6b7280" }}>
                     Manage profiles
                   </div>
                 </div>
-              </button>
+          </button>
 
-              <button
-                onClick={() => setPage("tracker")}
+          <button
+            onClick={() => setPage("tracker")}
                 style={{
                   background: "#ffffff",
                   border: "2px solid #e5e7eb",
@@ -1019,16 +1159,16 @@ export default function Popup() {
                       fontWeight: 600,
                       color: "#1f2937",
                     }}
-                  >
-                    Job Tracker
+          >
+            Job Tracker
                   </div>
                   <div style={{ fontSize: "0.75rem", color: "#6b7280" }}>
                     Track applications
                   </div>
                 </div>
-              </button>
-            </div>
-          </div>
+          </button>
+        </div>
+      </div>
 
           {/* AI Tools Section */}
           <div>
@@ -1095,7 +1235,7 @@ export default function Popup() {
                   }}
                 >
                   <span style={{ fontSize: "1rem" }}>💬</span>
-                </div>
+      </div>
                 <div>
                   <div style={{ fontSize: "0.85rem", fontWeight: 600 }}>
                     AI Assistant
@@ -1149,16 +1289,16 @@ export default function Popup() {
                 >
                   <span style={{ fontSize: "1rem" }}>📄</span>
                 </div>
-                <div>
+      <div>
                   <div style={{ fontSize: "0.85rem", fontWeight: 600 }}>
                     Resume AI
-                  </div>
+        </div>
                   <div style={{ fontSize: "0.7rem", opacity: 0.9 }}>
                     Enhance & optimize
-                  </div>
-                </div>
+        </div>
+        </div>
               </button>
-            </div>
+        </div>
 
             {/* Secondary AI Tools */}
             <div

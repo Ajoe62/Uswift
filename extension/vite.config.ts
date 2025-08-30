@@ -1,9 +1,20 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import { resolve } from "path";
+import { copyFileSync } from "fs";
 
 export default defineConfig({
-  plugins: [react()],
+  plugins: [
+    react(),
+    {
+      name: "copy-manifest",
+      generateBundle() {
+        // Copy manifest.json to dist after build
+        copyFileSync("manifest.json", "dist/manifest.json");
+        console.log("✅ manifest.json copied to dist/");
+      },
+    },
+  ],
   // Use Vite's public directory so files in `extension/public` are copied to `dist`
   publicDir: "public",
   build: {

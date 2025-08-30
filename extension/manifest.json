@@ -3,16 +3,37 @@
   "name": "Uswift",
   "version": "1.0",
   "description": "Auto-apply to job boards using saved profiles.",
-  "action": { "default_popup": "index.html" },
-  "permissions": ["storage", "activeTab", "scripting", "identity"],
+  "action": { "default_popup": "popup.html" },
+  "permissions": ["storage", "activeTab", "scripting", "identity", "tabs"],
   "host_permissions": [
-    "https://*.supabase.co/*"
+    "https://*/*",
+    "http://*/*",
+    "https://*.supabase.co/*",
+    "https://*.greenhouse.io/*",
+    "https://*.lever.co/*",
+    "https://*.workday.com/*",
+    "https://*.myworkday.com/*",
+    "https://*.linkedin.com/*",
+    "https://*.indeed.com/*",
+    "https://*.glassdoor.com/*",
+    "https://*.ziprecruiter.com/*",
+    "https://*.smartrecruiters.com/*",
+    "https://*.icims.com/*",
+    "https://*.bamboohr.com/*",
+    "https://*.jobvite.com/*",
+    "https://*.taleo.net/*",
+    "https://*.ultipro.com/*",
+    "https://*.successfactors.com/*",
+    "https://*.sapsf.com/*",
+    "https://*.oracle.com/*"
   ],
   "background": { "service_worker": "background.js" },
   "content_scripts": [
     {
-      "matches": ["https://*/*"],
-      "js": ["content.js"]
+      "matches": ["https://*/*", "http://*/*"],
+      "js": ["content.js"],
+      "run_at": "document_idle",
+      "all_frames": false
     }
   ],
   "web_accessible_resources": [

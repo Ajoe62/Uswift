@@ -6499,41 +6499,109 @@ function Popup() {
   };
   const [autoStatus, setAutoStatus] = reactExports.useState(null);
   const [lastAutoDetails, setLastAutoDetails] = reactExports.useState(null);
-  const handleAutoApply = () => {
-    setAutoStatus({ status: "pending" });
-    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-      if (tabs[0]?.id) {
-        chrome.tabs.sendMessage(
-          tabs[0].id,
-          { type: "AUTO_APPLY", profile },
-          (response) => {
-            if (!response) {
-              setAutoStatus({
-                status: "error",
-                message: "No response from page (content script missing or blocked)."
-              });
-              return;
+  const handleAutoApply = async () => {
+    setAutoStatus({ status: "pending", message: "Starting auto-apply..." });
+    try {
+      const tabs = await chrome.tabs.query({
+        active: true,
+        currentWindow: true
+      });
+      const tab = tabs[0];
+      if (!tab?.id) {
+        throw new Error("No active tab found");
+      }
+      try {
+        console.log("🔍 Checking if content script is responding...");
+        await new Promise((resolve, reject) => {
+          chrome.tabs.sendMessage(
+            tab.id,
+            { action: "ping" },
+            (response2) => {
+              if (chrome.runtime.lastError) {
+                reject(new Error(chrome.runtime.lastError.message));
+              } else if (response2?.status === "pong") {
+                console.log("✅ Content script is responding");
+                resolve(response2);
+              } else {
+                reject(new Error("Content script not responding"));
+              }
             }
-            setLastAutoDetails(response.details || null);
-            if (response?.status === "success") {
-              setAutoStatus({
-                status: "success",
-                message: `Applied on ${response.jobBoard || "site"}`,
-                details: response.details
-              });
+          );
+        });
+      } catch (pingError) {
+        console.warn("⚠️ Content script ping failed:", pingError);
+        throw new Error("CONTENT_SCRIPT_NOT_RESPONDING");
+      }
+      const response = await new Promise((resolve, reject) => {
+        chrome.tabs.sendMessage(
+          tab.id,
+          { action: "autoApply", profile },
+          (response2) => {
+            if (chrome.runtime.lastError) {
+              reject(new Error(chrome.runtime.lastError.message));
             } else {
-              setAutoStatus({
-                status: "error",
-                message: response?.message || "Auto-apply failed",
-                details: response.details
-              });
+              resolve(response2);
             }
           }
         );
-      } else {
-        setAutoStatus({ status: "error", message: "No active tab found." });
+      });
+      if (!response) {
+        throw new Error("No response from content script");
       }
-    });
+      setLastAutoDetails(response.details || null);
+      if (response.status === "success") {
+        setAutoStatus({
+          status: "success",
+          message: response.message || `Successfully applied on ${response.jobBoard || "site"}`,
+          jobBoard: response.jobBoard,
+          session: response.session
+        });
+      } else {
+        setAutoStatus({
+          status: "error",
+          message: response.message || "Auto-apply failed",
+          session: response.session
+        });
+      }
+    } catch (error) {
+      console.error("Auto-apply error:", error);
+      if (error.message === "CONTENT_SCRIPT_NOT_RESPONDING" || error.message?.includes("Receiving end does not exist") || error.message?.includes("Could not establish connection") || error.message?.includes("content script")) {
+        setAutoStatus({
+          status: "error",
+          message: "No response from page (content script missing or blocked). Follow these steps:",
+          details: {
+            troubleshooting: [
+              "1. Refresh the current page (Ctrl+F5)",
+              "2. Open browser console (F12) and run: checkUSwiftHealth()",
+              "3. Check if extension has permission for this site",
+              "4. Try disabling and re-enabling the extension",
+              "5. Check if the site has strict security policies (CSP)"
+            ],
+            currentUrl: window.location?.href || "Unknown"
+          }
+        });
+      } else if (error.message?.includes("Cannot read property") || error.message?.includes("undefined") || error.message?.includes("null")) {
+        setAutoStatus({
+          status: "error",
+          message: "Page not fully loaded. Please wait for the page to load completely and try again."
+        });
+      } else if (error.message?.includes("Extension context invalidated")) {
+        setAutoStatus({
+          status: "error",
+          message: "Extension was reloaded. Please refresh the page and try again."
+        });
+      } else if (error.message?.includes("Cannot access")) {
+        setAutoStatus({
+          status: "error",
+          message: "Cannot access this page. The site may block extensions or have strict security policies."
+        });
+      } else {
+        setAutoStatus({
+          status: "error",
+          message: error.message || "Auto-apply failed. Please check the console for details."
+        });
+      }
+    }
   };
   if (!isAuthenticated && !loading) {
     return /* @__PURE__ */ jsxRuntimeExports.jsx(

@@ -586,29 +586,134 @@ function detectJobBoard() {
   const pathname = window.location.pathname.toLowerCase();
   const url = window.location.href.toLowerCase();
   if (hostname.includes("greenhouse.io") || hostname.includes("boards.greenhouse.io")) {
-    return { name: "greenhouse", confidence: 0.95 };
+    return {
+      name: "greenhouse",
+      confidence: 0.98,
+      url: window.location.hostname
+    };
   }
   if (hostname.includes("lever.co")) {
-    return { name: "lever", confidence: 0.95 };
+    return { name: "lever", confidence: 0.98, url: window.location.hostname };
   }
   if (hostname.includes("myworkday.com") || hostname.includes("workday.com")) {
-    return { name: "workday", confidence: 0.95 };
+    return { name: "workday", confidence: 0.98, url: window.location.hostname };
   }
   if (hostname.includes("smartrecruiters.com")) {
-    return { name: "smartrecruiters", confidence: 0.9 };
+    return {
+      name: "smartrecruiters",
+      confidence: 0.95,
+      url: window.location.hostname
+    };
   }
-  if (hostname.includes("icims.com"))
-    return { name: "icims", confidence: 0.8 };
-  if (hostname.includes("bamboohr.com"))
-    return { name: "bamboohr", confidence: 0.8 };
-  if (hostname.includes("jobvite.com"))
-    return { name: "jobvite", confidence: 0.8 };
-  if (hostname.includes("taleo.net"))
-    return { name: "taleo", confidence: 0.8 };
-  if (pathname.includes("/jobs/") || pathname.includes("/careers/") || url.includes("apply")) {
-    return { name: "generic", confidence: 0.6 };
+  if (hostname.includes("linkedin.com")) {
+    return {
+      name: "linkedin",
+      confidence: 0.95,
+      url: window.location.hostname,
+      notes: "LinkedIn Easy Apply"
+    };
   }
-  return { name: "unknown", confidence: 0 };
+  if (hostname.includes("indeed.com")) {
+    return { name: "indeed", confidence: 0.95, url: window.location.hostname };
+  }
+  if (hostname.includes("glassdoor.com")) {
+    return {
+      name: "glassdoor",
+      confidence: 0.95,
+      url: window.location.hostname
+    };
+  }
+  if (hostname.includes("ziprecruiter.com")) {
+    return {
+      name: "ziprecruiter",
+      confidence: 0.95,
+      url: window.location.hostname
+    };
+  }
+  if (hostname.includes("icims.com")) {
+    return { name: "icims", confidence: 0.85, url: window.location.hostname };
+  }
+  if (hostname.includes("bamboohr.com")) {
+    return {
+      name: "bamboohr",
+      confidence: 0.85,
+      url: window.location.hostname
+    };
+  }
+  if (hostname.includes("jobvite.com")) {
+    return { name: "jobvite", confidence: 0.85, url: window.location.hostname };
+  }
+  if (hostname.includes("taleo.net")) {
+    return { name: "taleo", confidence: 0.85, url: window.location.hostname };
+  }
+  if (hostname.includes("ultipro.com")) {
+    return { name: "ultipro", confidence: 0.85, url: window.location.hostname };
+  }
+  if (hostname.includes("successfactors.com") || hostname.includes("sapsf.com")) {
+    return {
+      name: "successfactors",
+      confidence: 0.85,
+      url: window.location.hostname
+    };
+  }
+  if (hostname.includes("oracle.com") && pathname.includes("/recruitment")) {
+    return {
+      name: "oracle-hcm",
+      confidence: 0.85,
+      url: window.location.hostname
+    };
+  }
+  const jobApplicationPatterns = [
+    /\/job/i,
+    /\/jobs/i,
+    /\/career/i,
+    /\/careers/i,
+    /\/position/i,
+    /\/positions/i,
+    /\/opening/i,
+    /\/openings/i,
+    /\/apply/i,
+    /\/application/i,
+    /\/recruit/i,
+    /\/hiring/i
+  ];
+  const hasJobPattern = jobApplicationPatterns.some(
+    (pattern) => pattern.test(pathname) || pattern.test(url)
+  );
+  const hasApplyKeyword = /\b(apply|application|submit|join|now)\b/i.test(url) || /\b(apply|application|submit)\b/i.test(document.title);
+  const hasApplicationForm = document.querySelectorAll(
+    'form input[type="email"], form input[placeholder*="email" i], .application-form, .job-application'
+  ).length > 0;
+  if (hasJobPattern && (hasApplyKeyword || hasApplicationForm)) {
+    return {
+      name: "generic",
+      confidence: 0.75,
+      url: window.location.hostname,
+      notes: "Generic job application form detected"
+    };
+  }
+  if (hasJobPattern) {
+    return {
+      name: "generic",
+      confidence: 0.65,
+      url: window.location.hostname,
+      notes: "Job page detected"
+    };
+  }
+  if (hasApplicationForm) {
+    return {
+      name: "generic",
+      confidence: 0.55,
+      url: window.location.hostname,
+      notes: "Potential application form detected"
+    };
+  }
+  return {
+    name: "unknown",
+    confidence: 0,
+    url: window.location.hostname,
+    notes: "No job application patterns detected"
+  };
 }
 async function waitForFormReady(jobBoard, timeout = 1e4) {
   const startTime = Date.now();
@@ -913,11 +1018,32 @@ async function performAdvancedAutoApply(profile) {
     console.log(
       `🎯 Detected job board: ${detection.name} (${(detection.confidence * 100).toFixed(1)}% confidence)`
     );
-    if (detection.name === "unknown" || detection.confidence < 0.5) {
+    if (detection.name === "unknown" || detection.confidence < 0.4) {
       session.errors.push("Job board detection failed or confidence too low");
+      let guidanceMessage = "This job board is not fully supported yet.";
+      if (detection.confidence >= 0.4) {
+        guidanceMessage = "This appears to be a job application page, but the system needs more information to proceed safely.";
+      }
+      const detailedMessage = detection.confidence > 0 ? `${guidanceMessage}
+
+Detected: ${detection.url}
+Confidence: ${(detection.confidence * 100).toFixed(1)}%
+${detection.notes || ""}
+
+Try using manual application or contact support for this platform.` : `Unable to detect job application form on this page.
+
+Please ensure you're on a job application page with a visible application form.
+
+Current URL: ${detection.url}`;
       return {
         status: "error",
-        message: `Unsupported or unrecognized job board (${detection.name})`,
+        message: detailedMessage,
+        details: {
+          detectedBoard: detection.name,
+          confidence: detection.confidence,
+          url: detection.url,
+          notes: detection.notes
+        },
         session
       };
     }
@@ -1067,27 +1193,37 @@ async function performAdvancedAutoApply(profile) {
 }
 chrome.runtime.onMessage.addListener(
   async (message, sender, sendResponse) => {
-    if (message.type === "AUTO_APPLY") {
-      console.log("🚀 Advanced Auto-Apply triggered");
-      console.log("📋 Profile data:", message.profile);
-      try {
-        const result = await performAdvancedAutoApply(message.profile);
-        sendResponse(result);
-      } catch (e) {
-        console.error("💥 Auto-apply failed with exception:", e);
-        sendResponse({
-          status: "error",
-          message: `Exception during auto-apply: ${e}`,
-          session: {
-            jobBoard: "unknown",
-            startTime: Date.now(),
-            steps: ["Exception occurred"],
-            errors: [`Exception: ${e}`],
-            success: false
-          }
-        });
-      }
+    switch (message.action || message.type) {
+      case "autoApply":
+      case "AUTO_APPLY":
+        console.log("🚀 Advanced Auto-Apply triggered");
+        console.log("📋 Profile data:", message.profile);
+        try {
+          const result = await performAdvancedAutoApply(message.profile);
+          sendResponse(result);
+        } catch (e) {
+          console.error("💥 Auto-apply failed with exception:", e);
+          sendResponse({
+            status: "error",
+            message: `Exception during auto-apply: ${e}`,
+            session: {
+              jobBoard: "unknown",
+              startTime: Date.now(),
+              steps: ["Exception occurred"],
+              errors: [`Exception: ${e}`],
+              success: false
+            }
+          });
+        }
+        break;
+      case "ping":
+        sendResponse({ status: "pong", timestamp: Date.now() });
+        break;
+      default:
+        sendResponse({ status: "error", message: "Unknown action" });
+        break;
     }
+    return true;
   }
 );
 function injectIndicator() {
@@ -1112,15 +1248,103 @@ function injectIndicator() {
     indicator.remove();
   }, 3e3);
 }
+function testCurrentPage() {
+  const detection = detectJobBoard();
+  console.log("🔍 USwift Job Board Detection Test");
+  console.log("=====================================");
+  console.log(`📍 Current URL: ${detection.url}`);
+  console.log(`🎯 Detected Platform: ${detection.name}`);
+  console.log(`📊 Confidence: ${(detection.confidence * 100).toFixed(1)}%`);
+  console.log(`📝 Notes: ${detection.notes || "None"}`);
+  if (detection.name === "unknown") {
+    console.log("❌ This page is not recognized as a job application page.");
+    console.log(
+      "💡 Make sure you're on a job application page with a visible form."
+    );
+  } else if (detection.confidence >= 0.8) {
+    console.log("✅ This platform is well supported!");
+    console.log("🚀 Auto-apply should work reliably here.");
+  } else if (detection.confidence >= 0.5) {
+    console.log("⚠️ This platform has basic support.");
+    console.log("🔄 Auto-apply may work but could need improvements.");
+  } else {
+    console.log(
+      "❓ This page might be a job application but needs verification."
+    );
+    console.log("🧪 Test auto-apply to see if it works.");
+  }
+  console.log("=====================================");
+  console.log(
+    "💡 Tip: Run this function on different job pages to see support levels."
+  );
+}
+window.testJobBoard = testCurrentPage;
 function init() {
-  const jobBoard = detectJobBoard();
-  if (jobBoard.name !== "unknown") {
-    console.log(`Uswift loaded on ${jobBoard}`);
+  const detection = detectJobBoard();
+  if (detection.name !== "unknown") {
+    console.log(
+      `Uswift loaded on ${detection.name} (${detection.url}) - ${(detection.confidence * 100).toFixed(1)}% confidence`
+    );
     injectIndicator();
   }
 }
-if (document.readyState === "loading") {
-  document.addEventListener("DOMContentLoaded", init);
-} else {
-  init();
+function healthCheck() {
+  console.log("🔍 USwift Content Script Health Check");
+  console.log("=====================================");
+  console.log(`📍 Current URL: ${window.location.href}`);
+  console.log(`🏷️  Hostname: ${window.location.hostname}`);
+  console.log(`📄 Page Title: ${document.title}`);
+  console.log(`🔧 Content Script Status: ✅ LOADED`);
+  const emailInputs = document.querySelectorAll('input[type="email"]');
+  const fileInputs = document.querySelectorAll('input[type="file"]');
+  const applyButtons = document.querySelectorAll(
+    'button, input[type="submit"]'
+  );
+  console.log(`📧 Email inputs found: ${emailInputs.length}`);
+  console.log(`📎 File inputs found: ${fileInputs.length}`);
+  console.log(`🔘 Submit buttons found: ${applyButtons.length}`);
+  const hasJobKeywords = /\b(job|career|apply|application|hiring|recruit)\b/i.test(document.title) || /\b(job|career|apply|application|hiring|recruit)\b/i.test(
+    document.body?.textContent || ""
+  );
+  console.log(
+    `🎯 Job-related content detected: ${hasJobKeywords ? "✅ YES" : "❌ NO"}`
+  );
+  console.log("=====================================");
+  console.log("💡 If you see this message, the content script is working!");
+  console.log(
+    "🚀 Try auto-apply now or run testJobBoard() for platform detection."
+  );
 }
+window.checkUSwiftHealth = healthCheck;
+function initWithRetry() {
+  try {
+    console.log("🚀 USwift Content Script initializing...");
+    init();
+    console.log("✅ USwift Content Script initialized successfully");
+  } catch (error) {
+    console.error("❌ USwift Content Script initialization failed:", error);
+    setTimeout(() => {
+      try {
+        console.log("🔄 Retrying USwift Content Script initialization...");
+        init();
+        console.log("✅ USwift Content Script initialized on retry");
+      } catch (retryError) {
+        console.error("❌ USwift Content Script retry failed:", retryError);
+      }
+    }, 1e3);
+  }
+}
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", initWithRetry);
+} else if (document.readyState === "interactive") {
+  setTimeout(initWithRetry, 100);
+} else {
+  initWithRetry();
+}
+setTimeout(() => {
+  if (!window.uswiftInitialized) {
+    console.log("🔄 Late initialization attempt for USwift Content Script");
+    initWithRetry();
+  }
+}, 3e3);
+window.uswiftInitialized = true;
