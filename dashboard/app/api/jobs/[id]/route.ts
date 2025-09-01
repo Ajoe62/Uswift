@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabaseClient";
+import { supabase } from "@/lib/supabaseClient";
 import { NextRequest, NextResponse } from "next/server";
 
 // PUT /api/jobs/[id] - Update a job application
@@ -7,7 +7,6 @@ export async function PUT(
   { params }: { params: { id: string } }
 ) {
   try {
-    const supabase = createClient();
 
     const {
       data: { user },
@@ -59,7 +58,6 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   try {
-    const supabase = createClient();
 
     const {
       data: { user },

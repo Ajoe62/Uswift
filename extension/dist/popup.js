@@ -626,250 +626,534 @@ function useAuth() {
 }
 
 function ProfileVault() {
-  const throwNormalized = (err) => {
-    if (err instanceof Error)
-      throw err;
-    throw new Error(String(err));
-  };
   const { user, isAuthenticated } = useAuth();
   const [resume, setResume] = reactExports.useState("");
   const [coverLetter, setCoverLetter] = reactExports.useState("");
   const [qaProfile, setQaProfile] = reactExports.useState("");
+  const [firstName, setFirstName] = reactExports.useState("");
+  const [lastName, setLastName] = reactExports.useState("");
+  const [email, setEmail] = reactExports.useState("");
+  const [phone, setPhone] = reactExports.useState("");
+  const [linkedin, setLinkedin] = reactExports.useState("");
+  const [portfolio, setPortfolio] = reactExports.useState("");
+  const [resumeFile, setResumeFile] = reactExports.useState(null);
   const [loading, setLoading] = reactExports.useState(false);
-  reactExports.useEffect(() => {
-    if (isAuthenticated && user) {
-      loadFromSupabase();
-    } else {
-      loadFromChromeStorage();
+  const [lastSaved, setLastSaved] = reactExports.useState(null);
+  const [showTour, setShowTour] = reactExports.useState(false);
+  const isProfileCompleteForAutoApply = () => {
+    return firstName.trim() && lastName.trim() && email.trim() && phone.trim() && resume.trim();
+  };
+  const createProfileForAutoApply = () => {
+    return {
+      firstName: firstName.trim(),
+      lastName: lastName.trim(),
+      email: email.trim(),
+      phone: phone.trim(),
+      resume: resume.trim(),
+      linkedin: linkedin.trim(),
+      portfolio: portfolio.trim()
+    };
+  };
+  const handleResumeFileUpload = (e) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 10 * 1024 * 1024) {
+        alert("File size must be less than 10MB");
+        return;
+      }
+      const allowedTypes = ["application/pdf", "application/msword", "application/vnd.openxmlformats-officedocument.wordprocessingml.document"];
+      if (!allowedTypes.includes(file.type)) {
+        alert("Only PDF, DOC, and DOCX files are allowed");
+        return;
+      }
+      setResumeFile(file);
+      const reader = new FileReader();
+      reader.onload = (e2) => {
+        if (e2.target?.result) {
+          setResume(e2.target.result);
+        }
+      };
+      reader.readAsDataURL(file);
     }
-  }, [isAuthenticated, user]);
+  };
   const loadFromSupabase = async () => {
     try {
       if (!user?.id)
         return;
-      setLoading(true);
-      const { data: resumes, error } = await supabase.from("resumes").select("*").eq("user_id", user.id);
-      if (error)
-        throwNormalized(error);
-      const resumeDoc = resumes?.find((r) => r.type === "resume");
-      const coverLetterDoc = resumes?.find(
-        (r) => r.type === "cover_letter"
-      );
-      if (resumeDoc)
-        setResume(resumeDoc.content || "");
-      if (coverLetterDoc)
-        setCoverLetter(coverLetterDoc.content || "");
-      const { data: preferences, error: prefError } = await supabase.from("user_preferences").select("qa_profile").eq("user_id", user.id).single();
-      if (!prefError && preferences) {
-        setQaProfile(preferences.qa_profile || "");
+      const { data: profileData } = await supabase.from("user_preferences").select("*").eq("user_id", user.id).single();
+      if (profileData) {
+        setFirstName(profileData.first_name || "");
+        setLastName(profileData.last_name || "");
+        setEmail(profileData.email || "");
+        setPhone(profileData.phone || "");
+        setLinkedin(profileData.linkedin || "");
+        setPortfolio(profileData.portfolio || "");
+      }
+      const { data: resumeData } = await supabase.from("resumes").select("content").eq("user_id", user.id).single();
+      if (resumeData) {
+        setResume(resumeData.content || "");
       }
     } catch (error) {
       console.error("Error loading from Supabase:", error);
-      loadFromChromeStorage();
-    } finally {
-      setLoading(false);
-    }
-  };
-  const loadFromChromeStorage = () => {
-    if (typeof chrome !== "undefined" && chrome.storage && chrome.storage.sync) {
-      chrome.storage.sync.get(
-        ["resume", "coverLetter", "qaProfile"],
-        (result) => {
-          if (result.resume)
-            setResume(result.resume);
-          if (result.coverLetter)
-            setCoverLetter(result.coverLetter);
-          if (result.qaProfile)
-            setQaProfile(result.qaProfile);
-        }
-      );
-    }
-  };
-  const saveProfile = async () => {
-    if (isAuthenticated && user) {
-      await saveToSupabase();
-    } else {
-      saveToChrome();
     }
   };
   const saveToSupabase = async () => {
     try {
       if (!user?.id)
         return;
-      setLoading(true);
-      if (resume.trim()) {
-        const { error: resumeError } = await supabase.from("resumes").upsert(
-          {
-            user_id: user.id,
-            type: "resume",
-            title: "Default Resume",
-            content: resume,
-            updated_at: (/* @__PURE__ */ new Date()).toISOString()
-          },
-          {
-            onConflict: "user_id,type"
-          }
-        );
-        if (resumeError)
-          throwNormalized(resumeError);
+      await supabase.from("user_preferences").upsert({
+        user_id: user.id,
+        first_name: firstName,
+        last_name: lastName,
+        email,
+        phone,
+        linkedin,
+        portfolio
+      }, { onConflict: "user_id" });
+      if (resume) {
+        await supabase.from("resumes").upsert({
+          user_id: user.id,
+          content: resume
+        }, { onConflict: "user_id" });
       }
-      if (coverLetter.trim()) {
-        const { error: coverError } = await supabase.from("resumes").upsert(
-          {
-            user_id: user.id,
-            type: "cover_letter",
-            title: "Default Cover Letter",
-            content: coverLetter,
-            updated_at: (/* @__PURE__ */ new Date()).toISOString()
-          },
-          {
-            onConflict: "user_id,type"
-          }
-        );
-        if (coverError)
-          throwNormalized(coverError);
-      }
-      if (qaProfile.trim()) {
-        const { error: qaError } = await supabase.from("user_preferences").upsert(
-          {
-            user_id: user.id,
-            qa_profile: qaProfile,
-            updated_at: (/* @__PURE__ */ new Date()).toISOString()
-          },
-          {
-            onConflict: "user_id"
-          }
-        );
-        if (qaError)
-          throwNormalized(qaError);
-      }
-      alert("Profile saved to cloud!");
     } catch (error) {
       console.error("Error saving to Supabase:", error);
-      alert("Failed to save to cloud. Saving locally...");
-      saveToChrome();
+      throw error;
+    }
+  };
+  const loadFromChromeStorage = async () => {
+    try {
+      const result = await chrome.storage.sync.get([
+        "firstName",
+        "lastName",
+        "email",
+        "phone",
+        "linkedin",
+        "portfolio",
+        "resume"
+      ]);
+      setFirstName(result.firstName || "");
+      setLastName(result.lastName || "");
+      setEmail(result.email || "");
+      setPhone(result.phone || "");
+      setLinkedin(result.linkedin || "");
+      setPortfolio(result.portfolio || "");
+      setResume(result.resume || "");
+    } catch (error) {
+      console.error("Error loading from Chrome storage:", error);
+    }
+  };
+  const saveToChrome = async () => {
+    try {
+      await chrome.storage.sync.set({
+        firstName,
+        lastName,
+        email,
+        phone,
+        linkedin,
+        portfolio,
+        resume
+      });
+    } catch (error) {
+      console.error("Error saving to Chrome storage:", error);
+      throw error;
+    }
+  };
+  const saveProfile = async () => {
+    setLoading(true);
+    try {
+      if (isAuthenticated) {
+        await saveToSupabase();
+      } else {
+        await saveToChrome();
+      }
+      setLastSaved((/* @__PURE__ */ new Date()).toLocaleTimeString());
+    } catch (error) {
+      console.error("Error saving profile:", error);
+      alert("Failed to save profile. Please try again.");
     } finally {
       setLoading(false);
     }
   };
-  const saveToChrome = () => {
-    if (typeof chrome !== "undefined" && chrome.storage && chrome.storage.sync) {
-      chrome.storage.sync.set({ resume, coverLetter, qaProfile }, () => {
-        alert("Profile saved locally!");
-      });
+  reactExports.useEffect(() => {
+    if (isAuthenticated) {
+      loadFromSupabase();
     } else {
-      alert("Storage is not available.");
+      loadFromChromeStorage();
     }
+  }, [isAuthenticated, user]);
+  const TourGuide = () => {
+    return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: {
+      background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+      color: "white",
+      padding: "1.5rem",
+      borderRadius: "1rem",
+      marginBottom: "1.5rem",
+      position: "relative"
+    }, children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { style: {
+        position: "absolute",
+        top: "10px",
+        right: "10px",
+        cursor: "pointer",
+        fontSize: "1.2rem"
+      }, onClick: () => setShowTour(false), children: "✕" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { style: { margin: "0 0 1rem 0", fontSize: "1.2rem" }, children: "🚀 Auto-Apply Setup Guide" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { fontSize: "0.9rem", lineHeight: "1.5" }, children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { marginBottom: "1rem" }, children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "📋 Required Information:" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("ul", { style: { margin: "0.5rem 0", paddingLeft: "1.2rem" }, children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Basic Info:" }),
+              " First Name, Last Name, Email, Phone"
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Resume:" }),
+              " Upload your resume file (PDF/DOC)"
+            ] })
+          ] })
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { marginBottom: "1rem" }, children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "📝 Optional but Recommended:" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("ul", { style: { margin: "0.5rem 0", paddingLeft: "1.2rem" }, children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Cover Letter:" }),
+              " Template or custom content"
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "LinkedIn:" }),
+              " Your LinkedIn profile URL"
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Portfolio:" }),
+              " Website or portfolio link"
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Q&A Profile:" }),
+              " Interview answers and skills"
+            ] })
+          ] })
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { marginBottom: "1rem" }, children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "🎯 How Auto-Apply Works:" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("ol", { style: { margin: "0.5rem 0", paddingLeft: "1.2rem" }, children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Opens job application page" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Detects form fields automatically" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Fills your information" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Uploads your resume" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Submits the application" })
+          ] })
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { marginTop: "1rem", padding: "0.8rem", background: "rgba(255,255,255,0.1)", borderRadius: "8px" }, children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "💡 Pro Tip:" }),
+          " Complete all required fields to ensure successful auto-application on all major job boards!"
+        ] })
+      ] })
+    ] });
   };
-  return /* @__PURE__ */ jsxRuntimeExports.jsxs(
-    "div",
-    {
-      style: { background: "#FFFFFF", borderRadius: "1.5rem", padding: "2rem" },
-      children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(
-          "div",
-          {
-            className: "uswift-gradient",
-            style: { height: 8, borderRadius: 8, marginBottom: 24 }
-          }
-        ),
-        /* @__PURE__ */ jsxRuntimeExports.jsxs(
-          "div",
-          {
-            style: {
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              marginBottom: 16
-            },
-            children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx("h2", { style: { fontSize: "1.4rem", fontWeight: 700, color: "#111827" }, children: "Profile Vault" }),
-              isAuthenticated && /* @__PURE__ */ jsxRuntimeExports.jsx(
-                "span",
-                {
-                  style: { color: "#10B981", fontSize: "0.8rem", fontWeight: 600 },
-                  children: "☁️ Cloud Sync"
-                }
-              )
-            ]
-          }
-        ),
-        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "uswift-card", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx("label", { style: { fontWeight: 600, display: "block", marginBottom: 8 }, children: "Resume" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(
-            "textarea",
-            {
-              value: resume,
-              onChange: (e) => setResume(e.target.value),
-              rows: 4,
-              style: {
-                width: "100%",
-                marginBottom: 12,
-                borderRadius: 8,
-                border: "1px solid #E5E7EB",
-                padding: 8,
-                resize: "vertical"
-              },
-              placeholder: "Paste your resume content here...",
-              disabled: loading
-            }
-          )
-        ] }),
-        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "uswift-card", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx("label", { style: { fontWeight: 600, display: "block", marginBottom: 8 }, children: "Cover Letter" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(
-            "textarea",
-            {
-              value: coverLetter,
-              onChange: (e) => setCoverLetter(e.target.value),
-              rows: 4,
-              style: {
-                width: "100%",
-                marginBottom: 12,
-                borderRadius: 8,
-                border: "1px solid #E5E7EB",
-                padding: 8,
-                resize: "vertical"
-              },
-              placeholder: "Paste your cover letter template here...",
-              disabled: loading
-            }
-          )
-        ] }),
-        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "uswift-card", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx("label", { style: { fontWeight: 600, display: "block", marginBottom: 8 }, children: "Q&A Profile" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(
-            "textarea",
-            {
-              value: qaProfile,
-              onChange: (e) => setQaProfile(e.target.value),
-              rows: 4,
-              style: {
-                width: "100%",
-                marginBottom: 12,
-                borderRadius: 8,
-                border: "1px solid #E5E7EB",
-                padding: 8,
-                resize: "vertical"
-              },
-              placeholder: "Common interview Q&A, skills, experience highlights...",
-              disabled: loading
-            }
-          )
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { background: "#FFFFFF", borderRadius: "1.5rem", padding: "2rem" }, children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "uswift-gradient", style: { height: 8, borderRadius: 8, marginBottom: 24 } }),
+    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: {
+      display: "flex",
+      justifyContent: "space-between",
+      alignItems: "center",
+      marginBottom: 16
+    }, children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("h2", { className: "uswift-text-gradient", style: { fontSize: "1.5rem", margin: 0 }, children: "Profile Vault" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { style: { color: "#6B7280", fontSize: "0.9rem", margin: "4px 0 0 0" }, children: "Manage your career documents and auto-apply settings" })
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { display: "flex", alignItems: "center", gap: "12px" }, children: [
+        lastSaved && /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { style: { fontSize: "0.8rem", color: "#10B981" }, children: [
+          "✓ Saved ",
+          lastSaved
         ] }),
         /* @__PURE__ */ jsxRuntimeExports.jsx(
           "button",
           {
-            className: "uswift-btn",
-            style: { marginTop: 16, opacity: loading ? 0.6 : 1 },
-            onClick: saveProfile,
-            disabled: loading,
-            children: loading ? "Saving..." : isAuthenticated ? "Save to Cloud" : "Save Locally"
+            onClick: () => setShowTour(!showTour),
+            style: {
+              background: "#F3F4F6",
+              border: "1px solid #E5E7EB",
+              borderRadius: "8px",
+              padding: "8px 12px",
+              fontSize: "0.8rem",
+              cursor: "pointer",
+              color: "#374151"
+            },
+            children: "❓ Guide"
           }
         )
-      ]
-    }
-  );
+      ] })
+    ] }),
+    showTour && /* @__PURE__ */ jsxRuntimeExports.jsx(TourGuide, {}),
+    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { marginBottom: "1.5rem" }, children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("h3", { style: { fontSize: "1.1rem", fontWeight: 600, color: "#111827", marginBottom: "1rem", display: "flex", alignItems: "center", gap: "8px" }, children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { style: { color: "#EF4444" }, children: "●" }),
+        "Required for Auto-Apply"
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem", marginBottom: "1rem" }, children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "uswift-card", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("label", { style: { fontWeight: 600, display: "block", marginBottom: 8 }, children: "First Name *" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            "input",
+            {
+              type: "text",
+              value: firstName,
+              onChange: (e) => setFirstName(e.target.value),
+              style: {
+                width: "100%",
+                padding: "8px 12px",
+                borderRadius: 8,
+                border: "1px solid #E5E7EB",
+                fontSize: "0.9rem"
+              },
+              placeholder: "Your first name",
+              disabled: loading
+            }
+          )
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "uswift-card", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("label", { style: { fontWeight: 600, display: "block", marginBottom: 8 }, children: "Last Name *" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            "input",
+            {
+              type: "text",
+              value: lastName,
+              onChange: (e) => setLastName(e.target.value),
+              style: {
+                width: "100%",
+                padding: "8px 12px",
+                borderRadius: 8,
+                border: "1px solid #E5E7EB",
+                fontSize: "0.9rem"
+              },
+              placeholder: "Your last name",
+              disabled: loading
+            }
+          )
+        ] })
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { display: "grid", gridTemplateColumns: "2fr 1fr", gap: "1rem", marginBottom: "1rem" }, children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "uswift-card", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("label", { style: { fontWeight: 600, display: "block", marginBottom: 8 }, children: "Email Address *" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            "input",
+            {
+              type: "email",
+              value: email,
+              onChange: (e) => setEmail(e.target.value),
+              style: {
+                width: "100%",
+                padding: "8px 12px",
+                borderRadius: 8,
+                border: "1px solid #E5E7EB",
+                fontSize: "0.9rem"
+              },
+              placeholder: "your.email@example.com",
+              disabled: loading
+            }
+          )
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "uswift-card", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("label", { style: { fontWeight: 600, display: "block", marginBottom: 8 }, children: "Phone Number *" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            "input",
+            {
+              type: "tel",
+              value: phone,
+              onChange: (e) => setPhone(e.target.value),
+              style: {
+                width: "100%",
+                padding: "8px 12px",
+                borderRadius: 8,
+                border: "1px solid #E5E7EB",
+                fontSize: "0.9rem"
+              },
+              placeholder: "+1 (555) 123-4567",
+              disabled: loading
+            }
+          )
+        ] })
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "uswift-card", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("label", { style: { fontWeight: 600, display: "block", marginBottom: 8 }, children: "Resume File *" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { display: "flex", alignItems: "center", gap: "12px" }, children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            "input",
+            {
+              type: "file",
+              accept: ".pdf,.doc,.docx",
+              onChange: handleResumeFileUpload,
+              style: {
+                flex: 1,
+                padding: "8px",
+                borderRadius: 8,
+                border: "1px solid #E5E7EB",
+                fontSize: "0.9rem"
+              },
+              disabled: loading
+            }
+          ),
+          resumeFile && /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { style: { color: "#10B981", fontSize: "0.8rem", fontWeight: 500 }, children: [
+            "✓ ",
+            resumeFile.name
+          ] })
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("small", { style: { color: "#6B7280", fontSize: "0.8rem", marginTop: "4px", display: "block" }, children: "Supported formats: PDF, DOC, DOCX (Max 10MB)" })
+      ] })
+    ] }),
+    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { marginBottom: "1.5rem" }, children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("h3", { style: { fontSize: "1.1rem", fontWeight: 600, color: "#111827", marginBottom: "1rem", display: "flex", alignItems: "center", gap: "8px" }, children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { style: { color: "#F59E0B" }, children: "●" }),
+        "Optional (Recommended)"
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem", marginBottom: "1rem" }, children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "uswift-card", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("label", { style: { fontWeight: 600, display: "block", marginBottom: 8 }, children: "LinkedIn Profile" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            "input",
+            {
+              type: "url",
+              value: linkedin,
+              onChange: (e) => setLinkedin(e.target.value),
+              style: {
+                width: "100%",
+                padding: "8px 12px",
+                borderRadius: 8,
+                border: "1px solid #E5E7EB",
+                fontSize: "0.9rem"
+              },
+              placeholder: "https://linkedin.com/in/yourprofile",
+              disabled: loading
+            }
+          )
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "uswift-card", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("label", { style: { fontWeight: 600, display: "block", marginBottom: 8 }, children: "Portfolio/Website" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            "input",
+            {
+              type: "url",
+              value: portfolio,
+              onChange: (e) => setPortfolio(e.target.value),
+              style: {
+                width: "100%",
+                padding: "8px 12px",
+                borderRadius: 8,
+                border: "1px solid #E5E7EB",
+                fontSize: "0.9rem"
+              },
+              placeholder: "https://yourportfolio.com",
+              disabled: loading
+            }
+          )
+        ] })
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "uswift-card", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("label", { style: { fontWeight: 600, display: "block", marginBottom: 8 }, children: "Cover Letter Template" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          "textarea",
+          {
+            value: coverLetter,
+            onChange: (e) => setCoverLetter(e.target.value),
+            rows: 4,
+            style: {
+              width: "100%",
+              padding: "8px 12px",
+              borderRadius: 8,
+              border: "1px solid #E5E7EB",
+              fontSize: "0.9rem",
+              resize: "vertical"
+            },
+            placeholder: "Write your cover letter template here. Use [COMPANY] and [POSITION] as placeholders...",
+            disabled: loading
+          }
+        ),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("small", { style: { color: "#6B7280", fontSize: "0.8rem", marginTop: "4px", display: "block" }, children: "Tip: Use placeholders like [COMPANY] and [POSITION] for auto-customization" })
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "uswift-card", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("label", { style: { fontWeight: 600, display: "block", marginBottom: 8 }, children: "Interview Q&A Profile" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          "textarea",
+          {
+            value: qaProfile,
+            onChange: (e) => setQaProfile(e.target.value),
+            rows: 4,
+            style: {
+              width: "100%",
+              padding: "8px 12px",
+              borderRadius: 8,
+              border: "1px solid #E5E7EB",
+              fontSize: "0.9rem",
+              resize: "vertical"
+            },
+            placeholder: "List your key skills, experience highlights, and common interview answers...",
+            disabled: loading
+          }
+        ),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("small", { style: { color: "#6B7280", fontSize: "0.8rem", marginTop: "4px", display: "block" }, children: "Used by AI interview preparation features" })
+      ] })
+    ] }),
+    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: {
+      marginTop: "1.5rem",
+      padding: "1rem",
+      borderRadius: "8px",
+      background: isProfileCompleteForAutoApply() ? "linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(16, 185, 129, 0.05) 100%)" : "linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(245, 158, 11, 0.05) 100%)",
+      border: `1px solid ${isProfileCompleteForAutoApply() ? "#10B981" : "#F59E0B"}`
+    }, children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { display: "flex", alignItems: "center", gap: "8px", marginBottom: "0.5rem" }, children: [
+        isProfileCompleteForAutoApply() ? /* @__PURE__ */ jsxRuntimeExports.jsx("span", { style: { color: "#10B981", fontSize: "1.2rem" }, children: "✅" }) : /* @__PURE__ */ jsxRuntimeExports.jsx("span", { style: { color: "#F59E0B", fontSize: "1.2rem" }, children: "⚠️" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { style: { fontWeight: 600, color: "#111827" }, children: [
+          "Auto-Apply Status: ",
+          isProfileCompleteForAutoApply() ? "Ready" : "Incomplete"
+        ] })
+      ] }),
+      isProfileCompleteForAutoApply() ? /* @__PURE__ */ jsxRuntimeExports.jsx("p", { style: { color: "#10B981", fontSize: "0.9rem", margin: 0 }, children: "🎉 Your profile is complete! You can now use auto-apply on supported job boards." }) : /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { fontSize: "0.9rem", color: "#92400E" }, children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { style: { margin: "0 0 0.5rem 0", fontWeight: 500 }, children: "Complete these fields to enable auto-apply:" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("ul", { style: { margin: 0, paddingLeft: "1.2rem" }, children: [
+          !firstName.trim() && /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "First Name" }),
+          !lastName.trim() && /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Last Name" }),
+          !email.trim() && /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Email Address" }),
+          !phone.trim() && /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Phone Number" }),
+          !resume.trim() && /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Resume File" })
+        ] })
+      ] })
+    ] }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(
+      "button",
+      {
+        className: "uswift-btn",
+        style: { marginTop: 16, opacity: loading ? 0.6 : 1 },
+        onClick: saveProfile,
+        disabled: loading,
+        children: loading ? "Saving..." : isAuthenticated ? "Save to Cloud" : "Save Locally"
+      }
+    ),
+    isProfileCompleteForAutoApply() && /* @__PURE__ */ jsxRuntimeExports.jsx(
+      "button",
+      {
+        onClick: () => {
+          const profile = createProfileForAutoApply();
+          console.log("📋 Profile for Auto-Apply:", profile);
+          navigator.clipboard.writeText(JSON.stringify(profile, null, 2));
+          alert("Profile copied to clipboard for debugging!");
+        },
+        style: {
+          marginTop: "8px",
+          marginLeft: "8px",
+          padding: "8px 16px",
+          background: "#F3F4F6",
+          color: "#6B7280",
+          border: "none",
+          borderRadius: "6px",
+          fontSize: "0.8rem",
+          cursor: "pointer"
+        },
+        children: "📋 Export Profile"
+      }
+    )
+  ] });
 }
 
 const JobTracker = () => {
@@ -6453,8 +6737,14 @@ function Popup() {
   }, [isAuthenticated, user]);
   const [page, setPage] = reactExports.useState("home");
   const [profile, setProfile] = reactExports.useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    phone: "",
     resume: "",
     coverLetter: "",
+    linkedin: "",
+    portfolio: "",
     qaProfile: ""
   });
   reactExports.useEffect(() => {
@@ -6462,11 +6752,27 @@ function Popup() {
       loadProfileFromSupabase();
     } else {
       chrome.storage.sync.get(
-        ["resume", "coverLetter", "qaProfile"],
+        [
+          "resume",
+          "coverLetter",
+          "qaProfile",
+          "firstName",
+          "lastName",
+          "email",
+          "phone",
+          "linkedin",
+          "portfolio"
+        ],
         (result) => {
           setProfile({
+            firstName: result.firstName || "",
+            lastName: result.lastName || "",
+            email: result.email || "",
+            phone: result.phone || "",
             resume: result.resume || "",
             coverLetter: result.coverLetter || "",
+            linkedin: result.linkedin || "",
+            portfolio: result.portfolio || "",
             qaProfile: result.qaProfile || ""
           });
         }
@@ -6485,13 +6791,22 @@ function Popup() {
       const resumes = await supabase.makeRequest(
         "resumes?user_id=eq." + user.id
       );
+      const preferences = await supabase.makeRequest(
+        "user_preferences?user_id=eq." + user.id
+      );
       const resume = resumes?.find((r) => r.type === "resume");
       const coverLetter = resumes?.find((r) => r.type === "cover_letter");
+      const userPrefs = preferences?.[0] || {};
       setProfile({
-        resume: resume?.file_url || "",
-        coverLetter: coverLetter?.file_url || "",
-        qaProfile: ""
-        // TODO: Load from preferences
+        firstName: userPrefs.first_name || "",
+        lastName: userPrefs.last_name || "",
+        email: userPrefs.email || "",
+        phone: userPrefs.phone || "",
+        resume: resume?.content || resume?.file_url || "",
+        coverLetter: coverLetter?.content || coverLetter?.file_url || "",
+        linkedin: userPrefs.linkedin || "",
+        portfolio: userPrefs.portfolio || "",
+        qaProfile: userPrefs.qa_profile || ""
       });
     } catch (error) {
       console.error("Error loading profile from Supabase:", error);
@@ -6571,11 +6886,19 @@ function Popup() {
           message: "No response from page (content script missing or blocked). Follow these steps:",
           details: {
             troubleshooting: [
-              "1. Refresh the current page (Ctrl+F5)",
-              "2. Open browser console (F12) and run: checkUSwiftHealth()",
-              "3. Check if extension has permission for this site",
-              "4. Try disabling and re-enabling the extension",
-              "5. Check if the site has strict security policies (CSP)"
+              "1. 🔄 Refresh the current page (Ctrl+F5) and wait for full load",
+              "2. 🔍 Open browser console (F12) → Run: checkUSwiftHealth()",
+              "3. 🎯 Run: testJobBoard() to check platform detection",
+              "4. ⚙️ Check extension permissions in chrome://extensions/",
+              "5. 🚫 Try incognito mode (may have different permissions)",
+              "6. 🔌 Disable other extensions temporarily",
+              "7. 🛡️ Check if site uses anti-bot protection",
+              "8. 📄 Ensure you're on actual application page (not job listing)"
+            ],
+            quickTests: [
+              "checkUSwiftHealth() - Check if extension is loaded",
+              "testJobBoard() - Test platform detection",
+              "console.log(window.location.href) - Verify current URL"
             ],
             currentUrl: window.location?.href || "Unknown"
           }

@@ -1,9 +1,8 @@
-import { createClient } from "@/lib/supabaseClient";
+import { supabase } from "@/lib/supabaseClient";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(req: NextRequest) {
   try {
-    const supabase = createClient();
 
     // Get the current user
     const {
@@ -32,8 +31,8 @@ export async function GET(req: NextRequest) {
     // Calculate statistics
     const totalApplications = stats?.length || 0;
     const interviews =
-      stats?.filter((app) => app.status === "interview").length || 0;
-    const offers = stats?.filter((app) => app.status === "offer").length || 0;
+      stats?.filter((app: any) => app.status === "interview").length || 0;
+    const offers = stats?.filter((app: any) => app.status === "offer").length || 0;
 
     // Calculate applications this month
     const currentDate = new Date();
@@ -41,7 +40,7 @@ export async function GET(req: NextRequest) {
     const currentYear = currentDate.getFullYear();
 
     const thisMonthApplications =
-      stats?.filter((app) => {
+      stats?.filter((app: any) => {
         const appDate = new Date(app.created_at);
         return (
           appDate.getMonth() === currentMonth &&

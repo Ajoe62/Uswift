@@ -55,7 +55,7 @@ export default function JobApplicationForm({
             <Input
               type="text"
               value={formData.company_name}
-              onChange={(e) => handleChange("company_name", e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChange("company_name", e.target.value)}
               placeholder="e.g. Google, Microsoft, Amazon"
               required
             />
@@ -68,7 +68,7 @@ export default function JobApplicationForm({
             <Input
               type="text"
               value={formData.job_title}
-              onChange={(e) => handleChange("job_title", e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChange("job_title", e.target.value)}
               placeholder="e.g. Software Engineer, Product Manager"
               required
             />
@@ -82,7 +82,7 @@ export default function JobApplicationForm({
             </label>
             <select
               value={formData.status}
-              onChange={(e) => handleChange("status", e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLSelectElement>) => handleChange("status", e.target.value)}
               className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             >
               <option value="applied">Applied</option>
@@ -100,7 +100,7 @@ export default function JobApplicationForm({
             <Input
               type="date"
               value={formData.applied_date}
-              onChange={(e) => handleChange("applied_date", e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChange("applied_date", e.target.value)}
             />
           </div>
         </div>
@@ -112,7 +112,7 @@ export default function JobApplicationForm({
           <Input
             type="url"
             value={formData.application_url}
-            onChange={(e) => handleChange("application_url", e.target.value)}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChange("application_url", e.target.value)}
             placeholder="https://company.com/careers/job/123"
           />
         </div>
@@ -123,7 +123,7 @@ export default function JobApplicationForm({
           </label>
           <textarea
             value={formData.notes}
-            onChange={(e) => handleChange("notes", e.target.value)}
+            onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => handleChange("notes", e.target.value)}
             placeholder="Add any additional notes about this application..."
             className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-vertical"
             rows={3}

@@ -23,94 +23,86 @@ export default function ProfileVault() {
   const [portfolio, setPortfolio] = useState("");
   const [resumeFile, setResumeFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
+  const [lastSaved, setLastSaved] = useState<string | null>(null);
   const [showTour, setShowTour] = useState(false);
 
-  // Load saved profiles from Supabase or Chrome storage
-  useEffect(() => {
-    if (isAuthenticated && user) {
-      loadFromSupabase();
-    } else {
-      loadFromChromeStorage();
+  const isProfileCompleteForAutoApply = () => {
+    return firstName.trim() && lastName.trim() && email.trim() && phone.trim() && resume.trim();
+  };
+
+  const createProfileForAutoApply = () => {
+    return {
+      firstName: firstName.trim(),
+      lastName: lastName.trim(),
+      email: email.trim(),
+      phone: phone.trim(),
+      resume: resume.trim(),
+      linkedin: linkedin.trim(),
+      portfolio: portfolio.trim()
+    };
+  };
+
+  const handleResumeFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      // Validate file size (max 10MB)
+      if (file.size > 10 * 1024 * 1024) {
+        alert("File size must be less than 10MB");
+        return;
+      }
+      
+      // Validate file type
+      const allowedTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+      if (!allowedTypes.includes(file.type)) {
+        alert("Only PDF, DOC, and DOCX files are allowed");
+        return;
+      }
+      
+      setResumeFile(file);
+      
+      // Convert to base64 for storage
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        if (e.target?.result) {
+          setResume(e.target.result as string);
+        }
+      };
+      reader.readAsDataURL(file);
     }
-  }, [isAuthenticated, user]);
+  };
 
   const loadFromSupabase = async () => {
     try {
       if (!user?.id) return;
       
-      setLoading(true);
-      
-      // Load resumes from Supabase
-      const { data: resumes, error } = await supabase
-        .from("resumes")
-        .select("*")
-        .eq("user_id", user.id);
-      
-  if (error) throwNormalized(error);
-      
-      // Find different types of documents
-      const resumeDoc = resumes?.find((r: any) => r.type === "resume");
-      const coverLetterDoc = resumes?.find(
-        (r: any) => r.type === "cover_letter"
-      );
-
-      if (resumeDoc) setResume(resumeDoc.content || "");
-      if (coverLetterDoc) setCoverLetter(coverLetterDoc.content || "");
-
-      // Load user preferences (including Q&A profile and basic info)
-      const { data: preferences, error: prefError } = await supabase
-        .from("user_preferences")
-        .select("qa_profile, first_name, last_name, email, phone, linkedin, portfolio")
-        .eq("user_id", user.id)
+      // Load basic profile
+      const { data: profileData } = await supabase
+        .from('user_preferences')
+        .select('*')
+        .eq('user_id', user.id)
         .single();
       
-      if (!prefError && preferences) {
-        setQaProfile(preferences.qa_profile || "");
-        setFirstName(preferences.first_name || "");
-        setLastName(preferences.last_name || "");
-        setEmail(preferences.email || "");
-        setPhone(preferences.phone || "");
-        setLinkedin(preferences.linkedin || "");
-        setPortfolio(preferences.portfolio || "");
+      if (profileData) {
+        setFirstName(profileData.first_name || '');
+        setLastName(profileData.last_name || '');
+        setEmail(profileData.email || '');
+        setPhone(profileData.phone || '');
+        setLinkedin(profileData.linkedin || '');
+        setPortfolio(profileData.portfolio || '');
+      }
+      
+      // Load resume
+      const { data: resumeData } = await supabase
+        .from('resumes')
+        .select('content')
+        .eq('user_id', user.id)
+        .single();
+      
+      if (resumeData) {
+        setResume(resumeData.content || '');
       }
     } catch (error) {
-      console.error("Error loading from Supabase:", error);
-      // Fallback to Chrome storage
-      loadFromChromeStorage();
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const loadFromChromeStorage = () => {
-    if (
-      typeof chrome !== "undefined" &&
-      chrome.storage &&
-      chrome.storage.sync
-    ) {
-      chrome.storage.sync.get(
-        ["resume", "coverLetter", "qaProfile", "firstName", "lastName", "email", "phone", "linkedin", "portfolio"],
-        (result: any) => {
-        if (result.resume) setResume(result.resume);
-        if (result.coverLetter) setCoverLetter(result.coverLetter);
-        if (result.qaProfile) setQaProfile(result.qaProfile);
-          if (result.firstName) setFirstName(result.firstName);
-          if (result.lastName) setLastName(result.lastName);
-          if (result.email) setEmail(result.email);
-          if (result.phone) setPhone(result.phone);
-          if (result.linkedin) setLinkedin(result.linkedin);
-          if (result.portfolio) setPortfolio(result.portfolio);
-        }
-      );
-    }
-  };
-
-  // Save profile data to Supabase or Chrome storage
-  const saveProfile = async () => {
-    if (isAuthenticated && user) {
-      await saveToSupabase();
-    } else {
-      saveToChrome();
+      console.error('Error loading from Supabase:', error);
     }
   };
 
@@ -118,189 +110,111 @@ export default function ProfileVault() {
     try {
       if (!user?.id) return;
       
-      setLoading(true);
-
-      // Save basic profile information
-      if (firstName || lastName || email || phone) {
-        const { error: profileError } = await supabase
-          .from("user_preferences")
-          .upsert(
-            {
-              user_id: user.id,
-              first_name: firstName,
-              last_name: lastName,
-              email: email,
-              phone: phone,
-              linkedin: linkedin,
-              portfolio: portfolio,
-              updated_at: new Date().toISOString(),
-            },
-            {
-              onConflict: "user_id",
-            }
-          );
-
-        if (profileError) throwNormalized(profileError);
-      }
+      // Save basic profile
+      await supabase
+        .from('user_preferences')
+        .upsert({
+          user_id: user.id,
+          first_name: firstName,
+          last_name: lastName,
+          email: email,
+          phone: phone,
+          linkedin: linkedin,
+          portfolio: portfolio
+        }, { onConflict: 'user_id' });
       
       // Save resume
-      if (resume.trim()) {
-        const { error: resumeError } = await supabase.from("resumes").upsert(
-          {
+      if (resume) {
+        await supabase
+          .from('resumes')
+          .upsert({
             user_id: user.id,
-            type: "resume",
-            title: resumeFile?.name || "Default Resume",
-            content: resume,
-            updated_at: new Date().toISOString(),
-          },
-          {
-            onConflict: "user_id,type",
-          }
-        );
-        
-    if (resumeError) throwNormalized(resumeError);
+            content: resume
+          }, { onConflict: 'user_id' });
       }
-      
-      // Save cover letter
-      if (coverLetter.trim()) {
-        const { error: coverError } = await supabase.from("resumes").upsert(
-          {
-            user_id: user.id,
-            type: "cover_letter",
-            title: "Default Cover Letter",
-            content: coverLetter,
-            updated_at: new Date().toISOString(),
-          },
-          {
-            onConflict: "user_id,type",
-          }
-        );
-        
-  if (coverError) throwNormalized(coverError);
-      }
-      
-      // Save Q&A profile in user preferences
-      if (qaProfile.trim()) {
-        const { error: qaError } = await supabase
-          .from("user_preferences")
-          .upsert(
-            {
-            user_id: user.id,
-            qa_profile: qaProfile,
-              updated_at: new Date().toISOString(),
-            },
-            {
-              onConflict: "user_id",
-            }
-          );
-        
-  if (qaError) throwNormalized(qaError);
-      }
-      
-      alert("Profile saved to cloud!");
     } catch (error) {
-      console.error("Error saving to Supabase:", error);
-      alert("Failed to save to cloud. Saving locally...");
-      saveToChrome();
-    } finally {
-      setLoading(false);
+      console.error('Error saving to Supabase:', error);
+      throw error;
     }
   };
 
-  const saveToChrome = () => {
-    if (
-      typeof chrome !== "undefined" &&
-      chrome.storage &&
-      chrome.storage.sync
-    ) {
-      chrome.storage.sync.set({
-        resume,
-        coverLetter,
-        qaProfile,
+  const loadFromChromeStorage = async () => {
+    try {
+      const result = await chrome.storage.sync.get([
+        'firstName', 'lastName', 'email', 'phone', 'linkedin', 'portfolio', 'resume'
+      ]);
+      
+      setFirstName(result.firstName || '');
+      setLastName(result.lastName || '');
+      setEmail(result.email || '');
+      setPhone(result.phone || '');
+      setLinkedin(result.linkedin || '');
+      setPortfolio(result.portfolio || '');
+      setResume(result.resume || '');
+    } catch (error) {
+      console.error('Error loading from Chrome storage:', error);
+    }
+  };
+
+  const saveToChrome = async () => {
+    try {
+      await chrome.storage.sync.set({
         firstName,
         lastName,
         email,
         phone,
         linkedin,
-        portfolio
-      }, () => {
-        alert("Profile saved locally!");
+        portfolio,
+        resume
       });
+    } catch (error) {
+      console.error('Error saving to Chrome storage:', error);
+      throw error;
+    }
+  };
+
+  const saveProfile = async () => {
+    setLoading(true);
+    try {
+      if (isAuthenticated) {
+        await saveToSupabase();
+      } else {
+        await saveToChrome();
+      }
+      setLastSaved(new Date().toLocaleTimeString());
+    } catch (error) {
+      console.error('Error saving profile:', error);
+      alert('Failed to save profile. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      loadFromSupabase();
     } else {
-      alert("Storage is not available.");
+      loadFromChromeStorage();
     }
-  };
+  }, [isAuthenticated, user]);
 
-  const handleResumeFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      // Validate file size (10MB limit)
-      if (file.size > 10 * 1024 * 1024) {
-        alert("File size must be less than 10MB");
-        return;
-      }
-
-      // Validate file type
-      const allowedTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
-      if (!allowedTypes.includes(file.type)) {
-        alert("Please upload a PDF, DOC, or DOCX file");
-        return;
-      }
-
-      setResumeFile(file);
-      // Convert file to base64 for storage
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const base64 = e.target?.result as string;
-        setResume(base64); // Store as base64 string
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
-  // Validation function for auto-apply readiness
-  const isProfileCompleteForAutoApply = () => {
-    const requiredFields = [firstName, lastName, email, phone, resume];
-    return requiredFields.every(field => field.trim() !== "");
-  };
-
-  // Create profile object for auto-apply
-  const createProfileForAutoApply = () => {
-    return {
-      firstName: firstName.trim(),
-      lastName: lastName.trim(),
-      email: email.trim(),
-      phone: phone.trim(),
-      resume: resume, // This is the base64 encoded file
-      coverLetter: coverLetter.trim() || undefined,
-      linkedin: linkedin.trim() || undefined,
-      portfolio: portfolio.trim() || undefined,
-    };
-  };
-
-  // Tour Guide Component
   const TourGuide = () => {
     return (
-      <div
-        style={{
-          background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-          color: "white",
-          padding: "1.5rem",
-          borderRadius: "1rem",
-          marginBottom: "1.5rem",
-          position: "relative",
-        }}
-      >
-        <div
-          style={{
-            position: "absolute",
-            top: "10px",
-            right: "10px",
-            cursor: "pointer",
-            fontSize: "1.2rem",
-          }}
-          onClick={() => setShowTour(false)}
-        >
+      <div style={{
+        background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+        color: "white",
+        padding: "1.5rem",
+        borderRadius: "1rem",
+        marginBottom: "1.5rem",
+        position: "relative",
+      }}>
+        <div style={{
+          position: "absolute",
+          top: "10px",
+          right: "10px",
+          cursor: "pointer",
+          fontSize: "1.2rem",
+        }} onClick={() => setShowTour(false)}>
           ✕
         </div>
 
@@ -347,51 +261,46 @@ export default function ProfileVault() {
   };
 
   return (
-    <div
-      style={{ background: "#FFFFFF", borderRadius: "1.5rem", padding: "2rem" }}
-    >
-      <div
-        className="uswift-gradient"
-        style={{ height: 8, borderRadius: 8, marginBottom: 24 }}
-      />
+    <div style={{ background: "#FFFFFF", borderRadius: "1.5rem", padding: "2rem" }}>
+      <div className="uswift-gradient" style={{ height: 8, borderRadius: 8, marginBottom: 24 }} />
 
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          marginBottom: 16,
-        }}
-      >
-        <h2 style={{ fontSize: "1.4rem", fontWeight: 700, color: "#111827" }}>
-          Profile Vault
-        </h2>
-        <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+      <div style={{
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+        marginBottom: 16,
+      }}>
+        <div>
+          <h2 className="uswift-text-gradient" style={{ fontSize: "1.5rem", margin: 0 }}>
+            Profile Vault
+          </h2>
+          <p style={{ color: "#6B7280", fontSize: "0.9rem", margin: "4px 0 0 0" }}>
+            Manage your career documents and auto-apply settings
+          </p>
+        </div>
+        <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+          {lastSaved && (
+            <span style={{ fontSize: "0.8rem", color: "#10B981" }}>
+              ✓ Saved {lastSaved}
+            </span>
+          )}
           <button
             onClick={() => setShowTour(!showTour)}
             style={{
               background: "#F3F4F6",
-              color: "#6B7280",
-              border: "none",
-              borderRadius: "6px",
-              padding: "4px 8px",
+              border: "1px solid #E5E7EB",
+              borderRadius: "8px",
+              padding: "8px 12px",
               fontSize: "0.8rem",
               cursor: "pointer",
+              color: "#374151",
             }}
           >
             ❓ Guide
           </button>
-        {isAuthenticated && (
-            <span
-              style={{ color: "#10B981", fontSize: "0.8rem", fontWeight: 600 }}
-            >
-              ☁️ Cloud Sync
-            </span>
-          )}
         </div>
       </div>
-      
-      {/* Tour Guide */}
+
       {showTour && <TourGuide />}
 
       {/* Required Information Section */}
@@ -403,7 +312,7 @@ export default function ProfileVault() {
 
         {/* Basic Information */}
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem", marginBottom: "1rem" }}>
-      <div className="uswift-card">
+          <div className="uswift-card">
             <label style={{ fontWeight: 600, display: "block", marginBottom: 8 }}>
               First Name *
             </label>
@@ -411,19 +320,19 @@ export default function ProfileVault() {
               type="text"
               value={firstName}
               onChange={(e) => setFirstName(e.target.value)}
-          style={{ 
+              style={{
                 width: "100%",
                 padding: "8px 12px",
-            borderRadius: 8, 
+                borderRadius: 8,
                 border: "1px solid #E5E7EB",
                 fontSize: "0.9rem",
-          }} 
+              }}
               placeholder="Your first name"
-          disabled={loading}
-        />
-      </div>
-      
-      <div className="uswift-card">
+              disabled={loading}
+            />
+          </div>
+
+          <div className="uswift-card">
             <label style={{ fontWeight: 600, display: "block", marginBottom: 8 }}>
               Last Name *
             </label>
@@ -453,19 +362,19 @@ export default function ProfileVault() {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-          style={{ 
+              style={{
                 width: "100%",
                 padding: "8px 12px",
-            borderRadius: 8, 
+                borderRadius: 8,
                 border: "1px solid #E5E7EB",
                 fontSize: "0.9rem",
-          }} 
+              }}
               placeholder="your.email@example.com"
-          disabled={loading}
-        />
-      </div>
-      
-      <div className="uswift-card">
+              disabled={loading}
+            />
+          </div>
+
+          <div className="uswift-card">
             <label style={{ fontWeight: 600, display: "block", marginBottom: 8 }}>
               Phone Number *
             </label>
@@ -533,19 +442,19 @@ export default function ProfileVault() {
               type="url"
               value={linkedin}
               onChange={(e) => setLinkedin(e.target.value)}
-          style={{ 
+              style={{
                 width: "100%",
                 padding: "8px 12px",
-            borderRadius: 8, 
+                borderRadius: 8,
                 border: "1px solid #E5E7EB",
                 fontSize: "0.9rem",
-          }} 
+              }}
               placeholder="https://linkedin.com/in/yourprofile"
-          disabled={loading}
-        />
-      </div>
-      
-      <div className="uswift-card">
+              disabled={loading}
+            />
+          </div>
+
+          <div className="uswift-card">
             <label style={{ fontWeight: 600, display: "block", marginBottom: 8 }}>
               Portfolio/Website
             </label>
@@ -565,7 +474,6 @@ export default function ProfileVault() {
             />
           </div>
         </div>
-      </div>
 
         <div className="uswift-card">
           <label style={{ fontWeight: 600, display: "block", marginBottom: 8 }}>
@@ -595,39 +503,37 @@ export default function ProfileVault() {
           <label style={{ fontWeight: 600, display: "block", marginBottom: 8 }}>
             Interview Q&A Profile
           </label>
-        <textarea 
-          value={qaProfile} 
+          <textarea
+            value={qaProfile}
             onChange={(e) => setQaProfile(e.target.value)}
-          rows={4} 
-          style={{ 
+            rows={4}
+            style={{
               width: "100%",
               padding: "8px 12px",
-            borderRadius: 8, 
+              borderRadius: 8,
               border: "1px solid #E5E7EB",
               fontSize: "0.9rem",
               resize: "vertical",
             }}
             placeholder="List your key skills, experience highlights, and common interview answers..."
-          disabled={loading}
-        />
-        <small style={{ color: "#6B7280", fontSize: "0.8rem", marginTop: "4px", display: "block" }}>
-          Used by AI interview preparation features
-        </small>
+            disabled={loading}
+          />
+          <small style={{ color: "#6B7280", fontSize: "0.8rem", marginTop: "4px", display: "block" }}>
+            Used by AI interview preparation features
+          </small>
+        </div>
       </div>
-    </div> {/* End Optional Information Section */}
 
       {/* Auto-Apply Readiness Status */}
-      <div
-        style={{
-          marginTop: "1.5rem",
-          padding: "1rem",
-          borderRadius: "8px",
-          background: isProfileCompleteForAutoApply()
-            ? "linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(16, 185, 129, 0.05) 100%)"
-            : "linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(245, 158, 11, 0.05) 100%)",
-          border: `1px solid ${isProfileCompleteForAutoApply() ? "#10B981" : "#F59E0B"}`
-        }}
-      >
+      <div style={{
+        marginTop: "1.5rem",
+        padding: "1rem",
+        borderRadius: "8px",
+        background: isProfileCompleteForAutoApply()
+          ? "linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(16, 185, 129, 0.05) 100%)"
+          : "linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(245, 158, 11, 0.05) 100%)",
+        border: `1px solid ${isProfileCompleteForAutoApply() ? "#10B981" : "#F59E0B"}`
+      }}>
         <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "0.5rem" }}>
           {isProfileCompleteForAutoApply() ? (
             <span style={{ color: "#10B981", fontSize: "1.2rem" }}>✅</span>
@@ -658,10 +564,10 @@ export default function ProfileVault() {
           </div>
         )}
       </div>
-      
-      <button 
-        className="uswift-btn" 
-        style={{ marginTop: 16, opacity: loading ? 0.6 : 1 }} 
+
+      <button
+        className="uswift-btn"
+        style={{ marginTop: 16, opacity: loading ? 0.6 : 1 }}
         onClick={saveProfile}
         disabled={loading}
       >
@@ -672,7 +578,6 @@ export default function ProfileVault() {
           : "Save Locally"}
       </button>
 
-      {/* Export profile for debugging */}
       {isProfileCompleteForAutoApply() && (
         <button
           onClick={() => {
@@ -694,7 +599,7 @@ export default function ProfileVault() {
           }}
         >
           📋 Export Profile
-      </button>
+        </button>
       )}
     </div>
   );

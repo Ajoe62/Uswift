@@ -78,513 +78,100 @@ async function attachFileToInput(input, fileUrl) {
     };
   }
 }
-function findFormFields() {
-  const fields = {};
-  const fieldSelectors = {
-    firstName: [
-      'input[name="firstName"]',
-      'input[name="first_name"]',
-      'input[id="first_name"]',
-      'input[placeholder*="first name" i]',
-      'input[placeholder*="given name" i]',
-      'input[data-automation-id*="firstName"]',
-      'input[aria-label*="first name" i]'
-    ],
-    lastName: [
-      'input[name="lastName"]',
-      'input[name="last_name"]',
-      'input[id="last_name"]',
-      'input[placeholder*="last name" i]',
-      'input[placeholder*="family name" i]',
-      'input[data-automation-id*="lastName"]',
-      'input[aria-label*="last name" i]'
-    ],
-    email: [
-      'input[type="email"]',
-      'input[name="email"]',
-      'input[id="email"]',
-      'input[placeholder*="email" i]',
-      'input[data-automation-id*="email"]',
-      'input[aria-label*="email" i]'
-    ],
-    phone: [
-      'input[type="tel"]',
-      'input[name="phone"]',
-      'input[id="phone"]',
-      'input[placeholder*="phone" i]',
-      'input[data-automation-id*="phone"]',
-      'input[aria-label*="phone" i]'
-    ],
-    linkedin: [
-      'input[name*="linkedin" i]',
-      'input[placeholder*="linkedin" i]',
-      'input[aria-label*="linkedin" i]'
-    ],
-    portfolio: [
-      'input[name*="portfolio" i]',
-      'input[placeholder*="portfolio" i]',
-      'input[aria-label*="portfolio" i]'
-    ]
-  };
-  Object.entries(fieldSelectors).forEach(([fieldName, selectors]) => {
-    for (const selector of selectors) {
-      const element = document.querySelector(selector);
-      if (element && element.type !== "hidden" && element.offsetParent !== null) {
-        fields[fieldName] = element;
-        break;
-      }
-    }
-  });
-  const fileInputs = document.querySelectorAll(
-    'input[type="file"]'
-  );
-  fileInputs.forEach((input) => {
-    if (input.offsetParent === null)
-      return;
-    const label = input.labels?.[0]?.textContent?.toLowerCase() || "";
-    const name = input.name?.toLowerCase() || "";
-    const id = input.id?.toLowerCase() || "";
-    const ariaLabel = input.getAttribute("aria-label")?.toLowerCase() || "";
-    if (name.includes("resume") || label.includes("resume") || id.includes("resume") || ariaLabel.includes("resume")) {
-      fields.resumeInput = input;
-    } else if (name.includes("cover") || label.includes("cover") || id.includes("cover") || ariaLabel.includes("cover")) {
-      fields.coverLetterInput = input;
-    } else if (!fields.resumeInput) {
-      fields.resumeInput = input;
-    }
-  });
-  return fields;
-}
-const greenhouseAdapter = {
-  async detectFormReady() {
-    const formSelectors = [
-      ".application-form",
-      '[data-test="application-form"]',
-      ".job-application-form"
-    ];
-    for (const selector of formSelectors) {
-      const form = document.querySelector(selector);
-      if (form && form.offsetParent !== null) {
-        return true;
-      }
-    }
-    return false;
-  },
-  async fillForm(profile) {
-    const errors = [];
-    const warnings = [];
-    try {
-      const fields = findFormFields();
-      const textFields = [
-        {
-          field: fields.firstName,
-          value: profile.firstName,
-          name: "firstName"
-        },
-        { field: fields.lastName, value: profile.lastName, name: "lastName" },
-        { field: fields.email, value: profile.email, name: "email" },
-        { field: fields.phone, value: profile.phone, name: "phone" },
-        { field: fields.linkedin, value: profile.linkedin, name: "linkedin" },
-        {
-          field: fields.portfolio,
-          value: profile.portfolio,
-          name: "portfolio"
-        }
-      ];
-      for (const { field, value, name } of textFields) {
-        if (field && value) {
-          try {
-            field.value = value;
-            field.dispatchEvent(new Event("input", { bubbles: true }));
-            field.dispatchEvent(new Event("change", { bubbles: true }));
-            await new Promise((resolve) => setTimeout(resolve, 100));
-            if (field.validationMessage) {
-              warnings.push(`${name}: ${field.validationMessage}`);
-            }
-          } catch (e) {
-            errors.push(`Failed to fill ${name}: ${e}`);
-          }
-        } else if (!field && value) {
-          warnings.push(`${name} field not found`);
-        }
-      }
-      return {
-        success: errors.length === 0,
-        errors,
-        warnings,
-        details: { fieldsFound: Object.keys(fields).length }
-      };
-    } catch (e) {
-      return {
-        success: false,
-        errors: [`Form filling failed: ${e}`]
-      };
-    }
-  },
-  async handleFileUpload(profile) {
-    const errors = [];
-    const warnings = [];
-    try {
-      const fields = findFormFields();
-      if (profile.resume && fields.resumeInput) {
-        const resumeResult = await attachFileToInput(
-          fields.resumeInput,
-          profile.resume
-        );
-        if (!resumeResult.success) {
-          errors.push(
-            `Resume upload failed: ${resumeResult.errors?.join(", ")}`
-          );
-        } else {
-          warnings.push(...resumeResult.warnings || []);
-        }
-      } else if (profile.resume && !fields.resumeInput) {
-        errors.push("Resume input field not found");
-      }
-      if (profile.coverLetter && fields.coverLetterInput) {
-        const coverResult = await attachFileToInput(
-          fields.coverLetterInput,
-          profile.coverLetter
-        );
-        if (!coverResult.success) {
-          errors.push(
-            `Cover letter upload failed: ${coverResult.errors?.join(", ")}`
-          );
-        } else {
-          warnings.push(...coverResult.warnings || []);
-        }
-      }
-      return {
-        success: errors.length === 0,
-        errors,
-        warnings,
-        details: {
-          resumeUploaded: !!(profile.resume && fields.resumeInput),
-          coverLetterUploaded: !!(profile.coverLetter && fields.coverLetterInput)
-        }
-      };
-    } catch (e) {
-      return {
-        success: false,
-        errors: [`File upload failed: ${e}`]
-      };
-    }
-  },
-  async clickApply() {
-    try {
-      const applySelectors = [
-        '[data-source="apply_button"]',
-        ".application-header .btn-primary",
-        'button[type="submit"]',
-        ".apply-button",
-        '[data-test="submit-application"]'
-      ];
-      for (const selector of applySelectors) {
-        const button = document.querySelector(selector);
-        if (button && button.offsetParent !== null) {
-          if (button.hasAttribute("disabled") || button.getAttribute("aria-disabled") === "true") {
-            return {
-              success: false,
-              errors: [
-                "Apply button is disabled - form may have validation errors"
-              ]
-            };
-          }
-          try {
-            button.click();
-            return { success: true, details: { selector, method: "click" } };
-          } catch (e) {
-            button.dispatchEvent(new MouseEvent("click", { bubbles: true }));
-            return {
-              success: true,
-              details: { selector, method: "dispatchEvent" }
-            };
-          }
-        }
-      }
-      return {
-        success: false,
-        errors: ["Apply button not found"]
-      };
-    } catch (e) {
-      return {
-        success: false,
-        errors: [`Click apply failed: ${e}`]
-      };
-    }
-  },
-  async validateForm() {
-    const errors = [];
-    const warnings = [];
-    try {
-      const fields = findFormFields();
-      const requiredFields = ["firstName", "lastName", "email"];
-      for (const fieldName of requiredFields) {
-        const field = fields[fieldName];
-        if (!field) {
-          errors.push(`${fieldName} field is missing`);
-        } else if (!field.value.trim()) {
-          errors.push(`${fieldName} field is empty`);
-        } else if (field.validationMessage) {
-          errors.push(`${fieldName}: ${field.validationMessage}`);
-        }
-      }
-      if (fields.resumeInput) {
-        const resumeLabel = fields.resumeInput.labels?.[0]?.textContent || "";
-        if (resumeLabel.toLowerCase().includes("required") && fields.resumeInput.files?.length === 0) {
-          errors.push("Resume is required but not uploaded");
-        }
-      }
-      return {
-        success: errors.length === 0,
-        errors,
-        warnings,
-        details: {
-          requiredFieldsChecked: requiredFields.length,
-          fileFieldsChecked: !!(fields.resumeInput || fields.coverLetterInput)
-        }
-      };
-    } catch (e) {
-      return {
-        success: false,
-        errors: [`Form validation failed: ${e}`]
-      };
-    }
-  }
-};
-const leverAdapter = {
-  async detectFormReady() {
-    const formSelectors = [
-      ".application-form",
-      ".posting-apply-form",
-      '[data-qa="application-form"]'
-    ];
-    for (const selector of formSelectors) {
-      const form = document.querySelector(selector);
-      if (form && form.offsetParent !== null) {
-        return true;
-      }
-    }
-    return false;
-  },
-  async fillForm(profile) {
-    const errors = [];
-    const warnings = [];
-    try {
-      const fields = findFormFields();
-      const textFields = [
-        {
-          field: fields.firstName,
-          value: profile.firstName,
-          name: "firstName"
-        },
-        { field: fields.lastName, value: profile.lastName, name: "lastName" },
-        { field: fields.email, value: profile.email, name: "email" },
-        { field: fields.phone, value: profile.phone, name: "phone" }
-      ];
-      for (const { field, value, name } of textFields) {
-        if (field && value) {
-          try {
-            field.value = value;
-            field.dispatchEvent(new Event("input", { bubbles: true }));
-            field.dispatchEvent(new Event("blur", { bubbles: true }));
-            await new Promise((resolve) => setTimeout(resolve, 200));
-            if (field.validationMessage) {
-              warnings.push(`${name}: ${field.validationMessage}`);
-            }
-          } catch (e) {
-            errors.push(`Failed to fill ${name}: ${e}`);
-          }
-        }
-      }
-      return {
-        success: errors.length === 0,
-        errors,
-        warnings
-      };
-    } catch (e) {
-      return {
-        success: false,
-        errors: [`Form filling failed: ${e}`]
-      };
-    }
-  },
-  async handleFileUpload(profile) {
-    const errors = [];
-    try {
-      const fields = findFormFields();
-      if (profile.resume && fields.resumeInput) {
-        const result = await attachFileToInput(
-          fields.resumeInput,
-          profile.resume
-        );
-        if (!result.success) {
-          errors.push(`Resume upload failed: ${result.errors?.join(", ")}`);
-        }
-      }
-      if (profile.coverLetter && fields.coverLetterInput) {
-        const result = await attachFileToInput(
-          fields.coverLetterInput,
-          profile.coverLetter
-        );
-        if (!result.success) {
-          errors.push(
-            `Cover letter upload failed: ${result.errors?.join(", ")}`
-          );
-        }
-      }
-      return {
-        success: errors.length === 0,
-        errors
-      };
-    } catch (e) {
-      return {
-        success: false,
-        errors: [`File upload failed: ${e}`]
-      };
-    }
-  },
-  async clickApply() {
-    try {
-      const applySelectors = [
-        ".apply-button",
-        ".postings-btn",
-        'button[type="submit"]',
-        '[data-qa="apply-button"]'
-      ];
-      for (const selector of applySelectors) {
-        const button = document.querySelector(selector);
-        if (button && button.offsetParent !== null) {
-          button.click();
-          return { success: true, details: { selector } };
-        }
-      }
-      return {
-        success: false,
-        errors: ["Apply button not found"]
-      };
-    } catch (e) {
-      return {
-        success: false,
-        errors: [`Click apply failed: ${e}`]
-      };
-    }
-  }
-};
-const workdayAdapter = {
-  async detectFormReady() {
-    const formSelectors = [
-      '[data-automation-id="applicationForm"]',
-      ".css-1psuvku",
-      ".application-form"
-    ];
-    for (const selector of formSelectors) {
-      const form = document.querySelector(selector);
-      if (form && form.offsetParent !== null) {
-        return true;
-      }
-    }
-    return false;
-  },
-  async fillForm(profile) {
-    const errors = [];
-    const warnings = [];
-    try {
-      const selectors = {
-        firstName: 'input[data-automation-id*="firstName"]',
-        lastName: 'input[data-automation-id*="lastName"]',
-        email: 'input[data-automation-id*="email"]',
-        phone: 'input[data-automation-id*="phone"]'
-      };
-      const textFields = [
-        {
-          selector: selectors.firstName,
-          value: profile.firstName,
-          name: "firstName"
-        },
-        {
-          selector: selectors.lastName,
-          value: profile.lastName,
-          name: "lastName"
-        },
-        { selector: selectors.email, value: profile.email, name: "email" },
-        { selector: selectors.phone, value: profile.phone, name: "phone" }
-      ];
-      for (const { selector, value, name } of textFields) {
-        if (value) {
-          const field = document.querySelector(selector);
-          if (field) {
-            try {
-              field.value = value;
-              field.dispatchEvent(new Event("input", { bubbles: true }));
-              field.dispatchEvent(new Event("change", { bubbles: true }));
-              await new Promise((resolve) => setTimeout(resolve, 300));
-              if (field.validationMessage) {
-                warnings.push(`${name}: ${field.validationMessage}`);
-              }
-            } catch (e) {
-              errors.push(`Failed to fill ${name}: ${e}`);
-            }
-          } else {
-            warnings.push(`${name} field not found`);
-          }
-        }
-      }
-      return {
-        success: errors.length === 0,
-        errors,
-        warnings
-      };
-    } catch (e) {
-      return {
-        success: false,
-        errors: [`Form filling failed: ${e}`]
-      };
-    }
-  },
-  async clickApply() {
-    try {
-      const applySelectors = [
-        '[data-automation-id="apply"]',
-        'button[type="submit"]',
-        ".css-1psuvku"
-      ];
-      for (const selector of applySelectors) {
-        const button = document.querySelector(selector);
-        if (button && button.offsetParent !== null) {
-          button.click();
-          return { success: true, details: { selector } };
-        }
-      }
-      return {
-        success: false,
-        errors: ["Apply button not found"]
-      };
-    } catch (e) {
-      return {
-        success: false,
-        errors: [`Click apply failed: ${e}`]
-      };
-    }
-  }
-};
-const ADAPTERS = {
-  greenhouse: greenhouseAdapter,
-  lever: leverAdapter,
-  workday: workdayAdapter
-  // Ready for expansion
-  // smartrecruiters: smartrecruitersAdapter,
-  // icims: icimsAdapter,
-  // bamboohr: bamboohrAdapter,
-  // jobvite: jobviteAdapter,
-  // taleo: taleoAdapter,
-};
 
-console.log("🚀 USwift Advanced Auto-Apply loaded");
+console.log("ðŸš€ USwift Advanced Auto-Apply loaded");
+const JOB_BOARD_SELECTORS = {
+  greenhouse: {
+    applyButton: '[data-source="apply_button"], .application-header .btn-primary',
+    nameField: '#first_name, input[name="first_name"]',
+    lastNameField: '#last_name, input[name="last_name"]',
+    emailField: '#email, input[name="email"]',
+    phoneField: '#phone, input[name="phone"]',
+    resumeField: 'input[type="file"][name*="resume"]',
+    coverLetterField: 'input[type="file"][name*="cover"]'
+  },
+  lever: {
+    applyButton: ".apply-button, .postings-btn",
+    nameField: '.application-form input[name="name"]',
+    lastNameField: '.application-form input[name="lastname"]',
+    emailField: '.application-form input[name="email"]',
+    phoneField: '.application-form input[name="phone"]',
+    resumeField: 'input[type="file"]',
+    coverLetterField: 'input[type="file"]'
+  },
+  workday: {
+    applyButton: '[data-automation-id="apply"], .css-1psuvku',
+    nameField: 'input[data-automation-id*="firstName"]',
+    lastNameField: 'input[data-automation-id*="lastName"]',
+    emailField: 'input[data-automation-id*="email"]',
+    phoneField: 'input[data-automation-id*="phone"]',
+    resumeField: 'input[type="file"]',
+    coverLetterField: 'input[type="file"]'
+  },
+  smartrecruiters: {
+    applyButton: '.apply-button, [data-test="apply-button"]',
+    nameField: 'input[name="firstName"]',
+    lastNameField: 'input[name="lastName"]',
+    emailField: 'input[name="email"]',
+    phoneField: 'input[name="phone"]',
+    resumeField: 'input[type="file"]',
+    coverLetterField: 'input[type="file"]'
+  },
+  // New supported platforms
+  linkedin: {
+    applyButton: '.jobs-apply-button, [data-control-name="job_application"]',
+    nameField: '#firstName, input[name*="first"], input[placeholder*="first name" i]',
+    lastNameField: '#lastName, input[name*="last"], input[placeholder*="last name" i]',
+    emailField: '#email, input[type="email"], input[name="email"]',
+    phoneField: '#phone, input[name="phone"], input[type="tel"]',
+    resumeField: 'input[type="file"]',
+    coverLetterField: 'input[type="file"]'
+  },
+  indeed: {
+    applyButton: ".jobsearch-IndeedApplyButton, .indeed-apply-button",
+    nameField: 'input[name*="first"], input[id*="first"]',
+    lastNameField: 'input[name*="last"], input[id*="last"]',
+    emailField: 'input[type="email"], input[name="email"]',
+    phoneField: 'input[name="phone"], input[type="tel"]',
+    resumeField: 'input[type="file"]',
+    coverLetterField: 'input[type="file"]'
+  },
+  glassdoor: {
+    applyButton: ".apply-button, .gd-btn-apply",
+    nameField: 'input[name="firstName"], input[id="firstName"]',
+    lastNameField: 'input[name="lastName"], input[id="lastName"]',
+    emailField: 'input[type="email"], input[name="email"]',
+    phoneField: 'input[name="phone"], input[type="tel"]',
+    resumeField: 'input[type="file"]',
+    coverLetterField: 'input[type="file"]'
+  },
+  ziprecruiter: {
+    applyButton: ".apply-button, .job-apply-btn",
+    nameField: 'input[name*="first"], input[placeholder*="first name" i]',
+    lastNameField: 'input[name*="last"], input[placeholder*="last name" i]',
+    emailField: 'input[type="email"], input[name="email"]',
+    phoneField: 'input[name="phone"], input[type="tel"]',
+    resumeField: 'input[type="file"]',
+    coverLetterField: 'input[type="file"]'
+  },
+  // Generic selectors for unknown platforms
+  generic: {
+    applyButton: 'button[type="submit"], .apply-button, .submit, .apply, input[type="submit"]',
+    nameField: 'input[name*="first"], input[name*="given"], input[placeholder*="first name" i], input[id*="first"]',
+    lastNameField: 'input[name*="last"], input[name*="family"], input[placeholder*="last name" i], input[id*="last"]',
+    emailField: 'input[type="email"], input[name="email"], input[placeholder*="email" i]',
+    phoneField: 'input[type="tel"], input[name="phone"], input[placeholder*="phone" i]',
+    resumeField: 'input[type="file"]',
+    coverLetterField: 'input[type="file"]'
+  }
+};
 function detectJobBoard() {
+  const startTime = Date.now();
   const hostname = window.location.hostname.toLowerCase();
   const pathname = window.location.pathname.toLowerCase();
   const url = window.location.href.toLowerCase();
+  document.title.toLowerCase();
+  console.log(`ðŸ” Analyzing page: ${hostname}${pathname}`);
   if (hostname.includes("greenhouse.io") || hostname.includes("boards.greenhouse.io")) {
     return {
       name: "greenhouse",
@@ -708,6 +295,8 @@ function detectJobBoard() {
       notes: "Potential application form detected"
     };
   }
+  const analysisTime = Date.now() - startTime;
+  console.log(`âš¡ Job board detection completed in ${analysisTime}ms`);
   return {
     name: "unknown",
     confidence: 0,
@@ -715,54 +304,241 @@ function detectJobBoard() {
     notes: "No job application patterns detected"
   };
 }
-async function waitForFormReady(jobBoard, timeout = 1e4) {
-  const startTime = Date.now();
-  while (Date.now() - startTime < timeout) {
-    try {
-      if (ADAPTERS[jobBoard] && ADAPTERS[jobBoard].detectFormReady) {
-        const isReady = await ADAPTERS[jobBoard].detectFormReady();
-        if (isReady)
-          return true;
-      }
-      const formIndicators = [
-        'form[action*="apply"]',
-        ".application-form",
-        ".job-application",
-        '[data-test*="application"]',
-        ".apply-form"
-      ];
-      for (const indicator of formIndicators) {
-        const element = document.querySelector(indicator);
-        if (element && element.offsetParent !== null) {
-          console.log(`✅ Form ready detected with: ${indicator}`);
-          return true;
+function analyzePageStructure() {
+  const forms = document.querySelectorAll("form");
+  const inputs = document.querySelectorAll("input");
+  const fileInputs = document.querySelectorAll('input[type="file"]');
+  const buttons = document.querySelectorAll('button, input[type="submit"]');
+  const applicationKeywords = [
+    "apply",
+    "application",
+    "submit",
+    "job",
+    "career",
+    "resume",
+    "cv",
+    "position",
+    "opening",
+    "hiring",
+    "recruit",
+    "employment"
+  ];
+  const foundKeywords = applicationKeywords.filter(
+    (keyword) => document.body?.textContent?.toLowerCase().includes(keyword) || document.title.toLowerCase().includes(keyword)
+  );
+  let estimatedDifficulty = "easy";
+  if (forms.length > 3 || inputs.length > 15) {
+    estimatedDifficulty = "hard";
+  } else if (forms.length > 1 || inputs.length > 8) {
+    estimatedDifficulty = "medium";
+  }
+  return {
+    hasApplicationForm: forms.length > 0,
+    formCount: forms.length,
+    inputFields: inputs.length,
+    fileInputs: fileInputs.length,
+    submitButtons: buttons.length,
+    applicationKeywords: foundKeywords,
+    estimatedDifficulty
+  };
+}
+function findFormFieldsAdvanced() {
+  const fields = {};
+  const detectedFields = [];
+  const detectionStrategies = [
+    // Strategy 1: Standard HTML attributes
+    () => findByAttributes(["name", "id", "placeholder"]),
+    // Strategy 2: Label association
+    () => findByLabels(),
+    // Strategy 3: Data attributes (ATS specific)
+    () => findByDataAttributes(),
+    // Strategy 4: Proximity and context
+    () => findByContext(),
+    // Strategy 5: Pattern matching
+    () => findByPatterns()
+  ];
+  function findByAttributes(attrs) {
+    const fieldMappings = {
+      firstName: ["first", "firstname", "given", "fname"],
+      lastName: ["last", "lastname", "family", "lname", "surname"],
+      email: ["email", "e-mail", "mail"],
+      phone: ["phone", "telephone", "tel", "mobile", "cell"],
+      linkedin: ["linkedin", "linked-in"],
+      portfolio: ["portfolio", "website", "site", "url"]
+    };
+    for (const [fieldName, keywords] of Object.entries(fieldMappings)) {
+      for (const attr of attrs) {
+        for (const keyword of keywords) {
+          const selectors = [
+            `input[${attr}*="${keyword}" i]`,
+            `input[${attr}*="${keyword.replace("-", "")}" i]`
+          ];
+          for (const selector of selectors) {
+            const element = document.querySelector(
+              selector
+            );
+            if (element && isVisible(element)) {
+              fields[fieldName] = element;
+              detectedFields.push(`${fieldName} (${attr}: ${keyword})`);
+              break;
+            }
+          }
+          if (fields[fieldName])
+            break;
         }
+        if (fields[fieldName])
+          break;
       }
-      const fields = findFormFields();
-      const hasRequiredFields = fields.firstName || fields.lastName || fields.email;
-      if (hasRequiredFields) {
-        console.log("✅ Form ready detected with required fields");
-        return true;
-      }
-      await new Promise((resolve) => setTimeout(resolve, 500));
-    } catch (e) {
-      console.warn("Form readiness check failed:", e);
     }
   }
-  console.warn("⏰ Form readiness timeout");
-  return false;
-}
-async function autoFillForm(profile, jobBoard, session) {
-  session.steps.push("Starting form fill");
-  try {
-    const fields = findFormFields();
-    console.log("🔍 Detected fields:", Object.keys(fields));
-    if (!profile.firstName || !profile.lastName || !profile.email) {
-      throw new Error(
-        "Missing required profile data (firstName, lastName, email)"
-      );
+  function findByLabels() {
+    const labels = document.querySelectorAll("label");
+    labels.forEach((label) => {
+      const text = label.textContent?.toLowerCase() || "";
+      const input = label.querySelector("input") || document.querySelector(`#${label.getAttribute("for")}`);
+      if (input && isVisible(input)) {
+        if (text.includes("first") && text.includes("name")) {
+          fields.firstName = input;
+          detectedFields.push("firstName (label)");
+        } else if (text.includes("last") && text.includes("name")) {
+          fields.lastName = input;
+          detectedFields.push("lastName (label)");
+        } else if (text.includes("email")) {
+          fields.email = input;
+          detectedFields.push("email (label)");
+        } else if (text.includes("phone") || text.includes("tel")) {
+          fields.phone = input;
+          detectedFields.push("phone (label)");
+        }
+      }
+    });
+  }
+  function findByDataAttributes() {
+    const dataAttrs = [
+      "data-automation-id",
+      "data-testid",
+      "data-cy",
+      "data-qa"
+    ];
+    const fieldPatterns = {
+      firstName: /first.?name|given.?name/i,
+      lastName: /last.?name|family.?name|surname/i,
+      email: /email/i,
+      phone: /phone|tel|mobile/i
+    };
+    for (const attr of dataAttrs) {
+      for (const [fieldName, pattern] of Object.entries(fieldPatterns)) {
+        const element = document.querySelector(
+          `input[${attr}*="${fieldName}" i]`
+        );
+        if (element && isVisible(element)) {
+          fields[fieldName] = element;
+          detectedFields.push(`${fieldName} (${attr})`);
+        }
+      }
     }
-    const textFields = [
+  }
+  function findByContext() {
+    const forms = document.querySelectorAll("form");
+    forms.forEach((form) => {
+      const inputs = form.querySelectorAll("input");
+      inputs.forEach((input, index) => {
+        if (input.type === "email" && !fields.email) {
+          fields.email = input;
+          detectedFields.push("email (type)");
+        } else if (input.type === "tel" && !fields.phone) {
+          fields.phone = input;
+          detectedFields.push("phone (type)");
+        } else if (input.type === "text" && !fields.firstName && index === 0) {
+          fields.firstName = input;
+          detectedFields.push("firstName (position)");
+        } else if (input.type === "text" && !fields.lastName && fields.firstName && index === 1) {
+          fields.lastName = input;
+          detectedFields.push("lastName (position)");
+        }
+      });
+    });
+  }
+  function findByPatterns() {
+    const allInputs = document.querySelectorAll(
+      'input[type="text"], input[type="email"], input[type="tel"]'
+    );
+    allInputs.forEach((input) => {
+      if (!isVisible(input))
+        return;
+      const htmlInput = input;
+      const placeholder = htmlInput.placeholder?.toLowerCase() || "";
+      const name = htmlInput.name?.toLowerCase() || "";
+      const id = input.id?.toLowerCase() || "";
+      if (!fields.firstName && (placeholder.includes("first") || name.includes("first") || id.includes("first"))) {
+        fields.firstName = input;
+        detectedFields.push("firstName (pattern)");
+      } else if (!fields.lastName && (placeholder.includes("last") || name.includes("last") || id.includes("last"))) {
+        fields.lastName = input;
+        detectedFields.push("lastName (pattern)");
+      }
+    });
+  }
+  function isVisible(element) {
+    const rect = element.getBoundingClientRect();
+    return rect.width > 0 && rect.height > 0 && window.getComputedStyle(element).visibility !== "hidden" && window.getComputedStyle(element).display !== "none";
+  }
+  detectionStrategies.forEach((strategy) => strategy());
+  const fileInputs = document.querySelectorAll('input[type="file"]');
+  fileInputs.forEach((input) => {
+    if (!isVisible(input))
+      return;
+    const htmlInput = input;
+    const label = htmlInput.labels?.[0]?.textContent?.toLowerCase() || "";
+    const name = htmlInput.name?.toLowerCase() || "";
+    const id = input.id?.toLowerCase() || "";
+    if (name.includes("resume") || label.includes("resume") || id.includes("resume")) {
+      fields.resumeInput = input;
+      detectedFields.push("resume (file)");
+    } else if (name.includes("cover") || label.includes("cover") || id.includes("cover")) {
+      fields.coverLetterInput = input;
+      detectedFields.push("coverLetter (file)");
+    } else if (!fields.resumeInput) {
+      fields.resumeInput = input;
+      detectedFields.push("resume (default file)");
+    }
+  });
+  const requiredFields = ["firstName", "lastName", "email"];
+  const optionalFields = ["phone", "resumeInput"];
+  const detectedRequired = requiredFields.filter(
+    (field) => fields[field]
+  ).length;
+  const detectedOptional = optionalFields.filter(
+    (field) => fields[field]
+  ).length;
+  const confidence = Math.min(
+    1,
+    detectedRequired * 0.4 + detectedOptional * 0.2 + detectedFields.length * 0.1
+  );
+  console.log(
+    `ðŸŽ¯ Advanced field detection: ${detectedFields.length} fields found, ${confidence.toFixed(2)} confidence`
+  );
+  return {
+    ...fields,
+    confidence,
+    detectedFields
+  };
+}
+async function fillFormUltraFast(profile, session) {
+  const startTime = Date.now();
+  try {
+    const fields = findFormFieldsAdvanced();
+    session.steps.push(
+      `Advanced field detection: ${fields.detectedFields.join(", ")}`
+    );
+    if (fields.confidence < 0.3) {
+      session.errors.push(
+        `Low confidence field detection (${fields.confidence.toFixed(2)})`
+      );
+      return false;
+    }
+    const fillOperations = [];
+    const fieldMappings = [
       { field: fields.firstName, value: profile.firstName, name: "firstName" },
       { field: fields.lastName, value: profile.lastName, name: "lastName" },
       { field: fields.email, value: profile.email, name: "email" },
@@ -770,425 +546,417 @@ async function autoFillForm(profile, jobBoard, session) {
       { field: fields.linkedin, value: profile.linkedin, name: "linkedin" },
       { field: fields.portfolio, value: profile.portfolio, name: "portfolio" }
     ];
-    let filledFields = 0;
-    for (const { field, value, name } of textFields) {
-      if (field && value) {
-        try {
-          field.value = "";
-          field.dispatchEvent(new Event("input", { bubbles: true }));
-          field.value = value;
-          field.dispatchEvent(new Event("input", { bubbles: true }));
-          field.dispatchEvent(new Event("change", { bubbles: true }));
-          field.dispatchEvent(new Event("blur", { bubbles: true }));
-          await new Promise((resolve) => setTimeout(resolve, 200));
-          if (field.validationMessage) {
-            session.errors.push(
-              `${name} validation: ${field.validationMessage}`
-            );
-            console.warn(
-              `⚠️ ${name} validation warning:`,
-              field.validationMessage
-            );
-          } else {
-            filledFields++;
-            console.log(`✅ Filled ${name}: ${value}`);
-          }
-        } catch (e) {
-          session.errors.push(`Failed to fill ${name}: ${e}`);
-          console.error(`❌ Failed to fill ${name}:`, e);
-        }
+    for (const mapping of fieldMappings) {
+      if (mapping.field && mapping.value) {
+        fillOperations.push(
+          fillFieldSmart(mapping.field, mapping.value, mapping.name)
+        );
       }
     }
-    session.steps.push(`Filled ${filledFields} text fields`);
-    if (profile.resume || profile.coverLetter) {
-      session.steps.push("Starting file uploads");
-      const fileFields = [
-        { file: profile.resume, field: fields.resumeInput, name: "resume" },
-        {
-          file: profile.coverLetter,
-          field: fields.coverLetterInput,
-          name: "cover letter"
-        }
-      ];
-      for (const { file, field, name } of fileFields) {
-        if (file && field) {
-          try {
-            console.log(`📎 Uploading ${name}...`);
-            const result = await attachFileToInput(field, file);
-            if (result.success) {
-              session.steps.push(`Uploaded ${name} successfully`);
-              console.log(`✅ ${name} uploaded successfully`);
-            } else {
-              session.errors.push(
-                `${name} upload failed: ${result.errors?.join(", ")}`
-              );
-              console.error(`❌ ${name} upload failed:`, result.errors);
-            }
-          } catch (e) {
-            session.errors.push(`${name} upload error: ${e}`);
-            console.error(`❌ ${name} upload error:`, e);
-          }
-        }
-      }
-    }
-    const validationErrors = await validateForm(jobBoard);
-    if (validationErrors.length > 0) {
-      session.errors.push(...validationErrors);
-      console.warn("⚠️ Form validation errors:", validationErrors);
-    }
-    return filledFields > 0;
-  } catch (e) {
-    session.errors.push(`Form fill failed: ${e}`);
-    console.error("❌ Form fill failed:", e);
+    const results = await Promise.allSettled(fillOperations);
+    const successful = results.filter(
+      (r) => r.status === "fulfilled" && r.value
+    ).length;
+    session.steps.push(
+      `Ultra-fast filling: ${successful}/${fillOperations.length} fields successful`
+    );
+    console.log(
+      `âš¡ Ultra-fast form filling completed in ${Date.now() - startTime}ms`
+    );
+    return successful >= 3;
+  } catch (error) {
+    session.errors.push(`Ultra-fast filling failed: ${error}`);
     return false;
   }
 }
-async function validateForm(jobBoard) {
-  const errors = [];
+async function fillFieldSmart(field, value, name) {
   try {
-    const fields = findFormFields();
-    const requiredFields = [
-      { field: fields.firstName, name: "First Name" },
-      { field: fields.lastName, name: "Last Name" },
-      { field: fields.email, name: "Email" }
-    ];
-    for (const { field, name } of requiredFields) {
-      if (!field) {
-        errors.push(`${name} field not found`);
-      } else if (!field.value.trim()) {
-        errors.push(`${name} field is empty`);
-      } else if (field.validationMessage) {
-        errors.push(`${name}: ${field.validationMessage}`);
-      }
+    field.value = "";
+    field.dispatchEvent(new Event("input", { bubbles: true }));
+    field.value = value;
+    field.dispatchEvent(new Event("input", { bubbles: true }));
+    field.dispatchEvent(new Event("change", { bubbles: true }));
+    if (field.form) {
+      field.form.dispatchEvent(new Event("input", { bubbles: true }));
     }
-    if (fields.email && fields.email.value) {
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(fields.email.value)) {
-        errors.push("Email format is invalid");
-      }
+    await new Promise((resolve) => setTimeout(resolve, 50));
+    if (field.validationMessage) {
+      console.warn(`âš ï¸ ${name} validation: ${field.validationMessage}`);
+      return false;
     }
-    if (fields.resumeInput) {
-      const label = fields.resumeInput.labels?.[0]?.textContent || "";
-      if (label.toLowerCase().includes("required") && (!fields.resumeInput.files || fields.resumeInput.files.length === 0)) {
-        errors.push("Resume is required but not uploaded");
-      }
-    }
-  } catch (e) {
-    errors.push(`Validation failed: ${e}`);
+    console.log(`âœ… ${name} filled successfully`);
+    return true;
+  } catch (error) {
+    console.error(`âŒ ${name} filling failed:`, error);
+    return false;
   }
-  return errors;
 }
-async function clickApplyButton(jobBoard, session) {
-  session.steps.push("Attempting to click apply button");
-  try {
-    const applySelectors = [
-      '[data-source="apply_button"]',
-      '[data-automation-id="apply"]',
-      '[data-test="apply-button"]',
-      '[data-qa="apply-button"]',
+async function findAndClickApplyButton(jobBoard, session) {
+  const startTime = Date.now();
+  const strategies = [
+    () => findByStandardSelectors(jobBoard),
+    () => findByAdvancedSelectors(),
+    () => findByContextAndBehavior(),
+    () => findByTextContent()
+  ];
+  for (const strategy of strategies) {
+    const button = await strategy();
+    if (button) {
+      const clicked = await clickButtonSmart(button, session);
+      if (clicked) {
+        console.log(`ðŸŽ¯ Apply button clicked in ${Date.now() - startTime}ms`);
+        return true;
+      }
+    }
+  }
+  session.errors.push("No clickable apply button found");
+  return false;
+  async function findByStandardSelectors(board) {
+    const selectors = JOB_BOARD_SELECTORS[board]?.applyButton;
+    if (selectors) {
+      return document.querySelector(selectors);
+    }
+    return null;
+  }
+  async function findByAdvancedSelectors() {
+    const advancedSelectors = [
       'button[type="submit"]',
+      'input[type="submit"]',
       ".apply-button",
-      ".btn-primary",
-      ".submit-application",
-      ".apply-submit",
-      ".application-submit"
+      ".submit-button",
+      ".job-apply-btn",
+      '[data-automation-id*="apply"]',
+      '[data-testid*="apply"]',
+      'button:contains("Apply")',
+      'button:contains("Submit")'
     ];
-    for (const selector of applySelectors) {
-      const button = document.querySelector(selector);
-      if (button && button.offsetParent !== null) {
-        const rect = button.getBoundingClientRect();
-        const isVisible = rect.width > 0 && rect.height > 0;
-        const isEnabled = !button.hasAttribute("disabled") && button.getAttribute("aria-disabled") !== "true";
-        if (isVisible && isEnabled) {
-          try {
-            console.log(`🎯 Clicking apply button: ${selector}`);
-            button.scrollIntoView({ behavior: "smooth", block: "center" });
-            await new Promise((resolve) => setTimeout(resolve, 500));
-            button.click();
-            await new Promise((resolve) => setTimeout(resolve, 1e3));
-            session.steps.push(
-              `Clicked apply button with selector: ${selector}`
-            );
-            console.log("✅ Apply button clicked successfully");
-            return true;
-          } catch (e) {
-            console.warn(
-              `Native click failed for ${selector}, trying dispatch:`,
-              e
-            );
-            try {
-              button.dispatchEvent(
-                new MouseEvent("click", {
-                  bubbles: true,
-                  cancelable: true,
-                  view: window
-                })
-              );
-              session.steps.push(
-                `Dispatched click event for selector: ${selector}`
-              );
-              console.log("✅ Apply button clicked with dispatchEvent");
-              return true;
-            } catch (dispatchError) {
-              console.error(
-                `Dispatch click failed for ${selector}:`,
-                dispatchError
-              );
-            }
-          }
-        } else {
-          console.log(
-            `Button ${selector} is not clickable (visible: ${isVisible}, enabled: ${isEnabled})`
-          );
+    for (const selector of advancedSelectors) {
+      const element = document.querySelector(selector);
+      if (element && isButtonVisible(element)) {
+        return element;
+      }
+    }
+    return null;
+  }
+  async function findByContextAndBehavior() {
+    const forms = document.querySelectorAll("form");
+    for (const form of forms) {
+      const buttons = form.querySelectorAll('button, input[type="submit"]');
+      for (const button of buttons) {
+        if (isButtonVisible(button) && isLikelyApplyButton(button)) {
+          return button;
         }
       }
     }
-    session.errors.push("No clickable apply button found");
-    console.error("❌ No clickable apply button found");
-    return false;
-  } catch (e) {
-    session.errors.push(`Apply button click failed: ${e}`);
-    console.error("❌ Apply button click failed:", e);
-    return false;
+    return null;
+  }
+  async function findByTextContent() {
+    const applyKeywords = ["apply", "submit", "send", "join", "start"];
+    const buttons = document.querySelectorAll('button, input[type="submit"]');
+    for (const button of buttons) {
+      const text = button.textContent?.toLowerCase() || "";
+      if (applyKeywords.some((keyword) => text.includes(keyword)) && isButtonVisible(button)) {
+        return button;
+      }
+    }
+    return null;
+  }
+  function isButtonVisible(button) {
+    const rect = button.getBoundingClientRect();
+    const style = window.getComputedStyle(button);
+    return rect.width > 0 && rect.height > 0 && style.visibility !== "hidden" && style.display !== "none" && !button.hasAttribute("disabled");
+  }
+  function isLikelyApplyButton(button) {
+    const text = button.textContent?.toLowerCase() || "";
+    const className = button.className?.toLowerCase() || "";
+    const id = button.id?.toLowerCase() || "";
+    return text.includes("apply") || text.includes("submit") || className.includes("apply") || className.includes("submit") || id.includes("apply") || id.includes("submit");
   }
 }
-async function verifyApplicationSuccess(jobBoard, session) {
-  session.steps.push("Verifying application success");
+async function clickButtonSmart(button, session) {
   try {
-    await new Promise((resolve) => setTimeout(resolve, 2e3));
-    const successIndicators = [
+    if (button.hasAttribute("disabled")) {
+      session.errors.push("Apply button is disabled");
+      return false;
+    }
+    button.scrollIntoView({ behavior: "smooth", block: "center" });
+    await new Promise((resolve) => setTimeout(resolve, 300));
+    const clickMethods = [
+      () => {
+        button.click();
+      },
+      () => {
+        button.dispatchEvent(
+          new MouseEvent("click", { bubbles: true, cancelable: true })
+        );
+      },
+      () => {
+        button.dispatchEvent(new MouseEvent("mousedown", { bubbles: true }));
+        button.dispatchEvent(new MouseEvent("mouseup", { bubbles: true }));
+        button.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+      }
+    ];
+    for (const method of clickMethods) {
+      try {
+        method();
+        await new Promise((resolve) => setTimeout(resolve, 200));
+        if (didPageChange() || hasSuccessIndicators()) {
+          session.steps.push("Apply button clicked successfully");
+          return true;
+        }
+      } catch (error) {
+        console.warn("Click method failed:", error);
+      }
+    }
+    return false;
+  } catch (error) {
+    session.errors.push(`Button click failed: ${error}`);
+    return false;
+  }
+  function didPageChange() {
+    return window.location.href !== session.url || document.querySelectorAll(".success, .submitted, .confirmation").length > 0;
+  }
+  function hasSuccessIndicators() {
+    const indicators = [
       ".application-success",
       ".success-message",
       ".application-submitted",
       ".thank-you",
-      '[data-test*="success"]',
       ".confirmation"
     ];
-    for (const indicator of successIndicators) {
-      const element = document.querySelector(indicator);
-      if (element && element.offsetParent !== null) {
-        console.log("✅ Application success detected:", indicator);
-        session.steps.push(`Success indicator found: ${indicator}`);
-        return true;
-      }
+    return indicators.some((selector) => document.querySelector(selector));
+  }
+}
+class AutoApplyPerformanceMonitor {
+  metrics = {
+    detectionTime: 0,
+    fillingTime: 0,
+    clickTime: 0,
+    totalTime: 0,
+    successRate: 0,
+    retryCount: 0
+  };
+  startTimer(metric) {
+    this.metrics[`${metric}Start`] = Date.now();
+  }
+  endTimer(metric) {
+    const startKey = `${metric}Start`;
+    const startTime = this.metrics[startKey];
+    if (startTime) {
+      this.metrics[metric] = Date.now() - startTime;
     }
-    const currentUrl = window.location.href;
-    if (currentUrl.includes("success") || currentUrl.includes("thank") || currentUrl.includes("confirm")) {
-      console.log("✅ Application success detected via URL:", currentUrl);
-      session.steps.push("Success detected via URL change");
-      return true;
-    }
-    const errorIndicators = [
-      ".error-message",
-      ".application-error",
-      ".validation-error",
-      '[data-test*="error"]'
-    ];
-    for (const indicator of errorIndicators) {
-      const element = document.querySelector(indicator);
-      if (element && element.offsetParent !== null) {
-        console.log("❌ Application error detected:", indicator);
-        session.errors.push(`Application error: ${element.textContent}`);
-        return false;
-      }
-    }
-    console.log("⚠️ Application success uncertain - no clear indicators found");
-    session.steps.push("Success verification inconclusive");
-    return false;
-  } catch (e) {
-    console.warn("Success verification failed:", e);
-    session.errors.push(`Success verification failed: ${e}`);
-    return false;
+  }
+  recordSuccess(success) {
+    this.metrics.successRate = success ? 1 : 0;
+  }
+  incrementRetry() {
+    this.metrics.retryCount++;
+  }
+  getReport() {
+    return { ...this.metrics };
+  }
+  logPerformance() {
+    console.log("ðŸ“Š Auto-Apply Performance Report:");
+    console.log(`   Detection: ${this.metrics.detectionTime}ms`);
+    console.log(`   Filling: ${this.metrics.fillingTime}ms`);
+    console.log(`   Clicking: ${this.metrics.clickTime}ms`);
+    console.log(`   Total: ${this.metrics.totalTime}ms`);
+    console.log(`   Success: ${this.metrics.successRate ? "âœ…" : "âŒ"}`);
+    console.log(`   Retries: ${this.metrics.retryCount}`);
   }
 }
 async function performAdvancedAutoApply(profile) {
+  const monitor = new AutoApplyPerformanceMonitor();
   const session = {
     jobBoard: "",
     startTime: Date.now(),
     steps: [],
     errors: [],
-    success: false
+    success: false,
+    url: window.location.href
   };
+  monitor.startTimer("totalTime");
   try {
+    console.log("ðŸš€ Starting Ultra-Advanced Auto-Apply...");
+    monitor.startTimer("detectionTime");
+    const pageAnalysis = analyzePageStructure();
+    session.steps.push(
+      `Page analysis: ${pageAnalysis.formCount} forms, ${pageAnalysis.inputFields} inputs, difficulty: ${pageAnalysis.estimatedDifficulty}`
+    );
     const detection = detectJobBoard();
     session.jobBoard = detection.name;
     session.steps.push(
-      `Detected job board: ${detection.name} (confidence: ${(detection.confidence * 100).toFixed(1)}%)`
+      `Job board: ${detection.name} (${(detection.confidence * 100).toFixed(
+        1
+      )}% confidence)`
     );
-    console.log(
-      `🎯 Detected job board: ${detection.name} (${(detection.confidence * 100).toFixed(1)}% confidence)`
-    );
-    if (detection.name === "unknown" || detection.confidence < 0.4) {
+    monitor.endTimer("detectionTime");
+    if (detection.name === "unknown" || detection.confidence < 0.3) {
       session.errors.push("Job board detection failed or confidence too low");
-      let guidanceMessage = "This job board is not fully supported yet.";
-      if (detection.confidence >= 0.4) {
-        guidanceMessage = "This appears to be a job application page, but the system needs more information to proceed safely.";
-      }
-      const detailedMessage = detection.confidence > 0 ? `${guidanceMessage}
-
-Detected: ${detection.url}
-Confidence: ${(detection.confidence * 100).toFixed(1)}%
-${detection.notes || ""}
-
-Try using manual application or contact support for this platform.` : `Unable to detect job application form on this page.
-
-Please ensure you're on a job application page with a visible application form.
-
-Current URL: ${detection.url}`;
       return {
         status: "error",
-        message: detailedMessage,
+        message: `Unable to identify job application form. Please ensure you're on a job application page.`,
         details: {
-          detectedBoard: detection.name,
-          confidence: detection.confidence,
-          url: detection.url,
-          notes: detection.notes
+          detection,
+          pageAnalysis
         },
         session
       };
     }
-    session.steps.push("Waiting for form to be ready");
-    console.log("⏳ Waiting for form to be ready...");
-    const formReady = await waitForFormReady(detection.name, 15e3);
+    const formReady = await waitForFormAdvanced(pageAnalysis, session);
     if (!formReady) {
-      session.errors.push("Form did not become ready within timeout");
       return {
         status: "error",
-        message: "Application form not found or not ready",
+        message: "Application form not ready. Please wait for the page to fully load.",
         session
       };
     }
-    session.steps.push("Form is ready for interaction");
-    console.log("✅ Form is ready for interaction");
-    let fillSuccess = false;
-    let fileSuccess = false;
-    let clickSuccess = false;
-    if (ADAPTERS[detection.name]) {
-      session.steps.push(`Using advanced ${detection.name} adapter`);
-      if (ADAPTERS[detection.name].fillForm) {
-        try {
-          console.log("📝 Filling form using adapter...");
-          const fillResult = await ADAPTERS[detection.name].fillForm(profile);
-          fillSuccess = fillResult.success;
-          if (fillResult.errors)
-            session.errors.push(...fillResult.errors);
-          if (fillResult.warnings)
-            session.steps.push(
-              ...fillResult.warnings.map((w) => `Warning: ${w}`)
-            );
-          session.steps.push(
-            `Adapter form fill: ${fillSuccess ? "SUCCESS" : "FAILED"}`
-          );
-          console.log(`📝 Form fill result:`, fillResult);
-        } catch (e) {
-          session.errors.push(`Adapter form fill error: ${e}`);
-          console.error("❌ Adapter form fill error:", e);
-        }
-      }
-      if (ADAPTERS[detection.name].handleFileUpload && (profile.resume || profile.coverLetter)) {
-        try {
-          console.log("📎 Handling file uploads using adapter...");
-          const fileResult = await ADAPTERS[detection.name].handleFileUpload(
-            profile
-          );
-          fileSuccess = fileResult.success;
-          if (fileResult.errors)
-            session.errors.push(...fileResult.errors);
-          if (fileResult.warnings)
-            session.steps.push(
-              ...fileResult.warnings.map((w) => `Warning: ${w}`)
-            );
-          session.steps.push(
-            `Adapter file upload: ${fileSuccess ? "SUCCESS" : "FAILED"}`
-          );
-          console.log(`📎 File upload result:`, fileResult);
-        } catch (e) {
-          session.errors.push(`Adapter file upload error: ${e}`);
-          console.error("❌ Adapter file upload error:", e);
-        }
-      }
-      if (ADAPTERS[detection.name].validateForm) {
-        try {
-          const validationResult = await ADAPTERS[detection.name].validateForm();
-          if (!validationResult.success && validationResult.errors) {
-            session.errors.push(...validationResult.errors);
-            console.warn("⚠️ Form validation errors:", validationResult.errors);
-          }
-        } catch (e) {
-          console.warn("Form validation failed:", e);
-        }
-      }
-      if (ADAPTERS[detection.name].clickApply) {
-        try {
-          console.log("🎯 Clicking apply button using adapter...");
-          const clickResult = await ADAPTERS[detection.name].clickApply();
-          clickSuccess = clickResult.success;
-          session.steps.push(
-            `Adapter apply click: ${clickSuccess ? "SUCCESS" : "FAILED"}`
-          );
-          console.log(`🎯 Apply click result:`, clickResult);
-        } catch (e) {
-          session.errors.push(`Adapter apply click error: ${e}`);
-          console.error("❌ Adapter apply click error:", e);
-        }
-      }
-    } else {
-      session.steps.push("Using generic fallback approach");
-      console.log("🔄 Using generic fallback approach");
-      fillSuccess = await autoFillForm(profile, detection.name, session);
-      clickSuccess = await clickApplyButton(detection.name, session);
+    monitor.startTimer("fillingTime");
+    const fillSuccess = await fillFormUltraFast(profile, session);
+    monitor.endTimer("fillingTime");
+    if (!fillSuccess) {
+      return {
+        status: "error",
+        message: "Unable to fill application form. Some required fields may be missing.",
+        session
+      };
     }
+    if (profile.resume && pageAnalysis.fileInputs > 0) {
+      const fileSuccess = await handleFileUploadsAdvanced(profile, session);
+      if (!fileSuccess) {
+        session.errors.push(
+          "File upload failed - you may need to upload files manually"
+        );
+      }
+    }
+    monitor.startTimer("clickTime");
+    const clickSuccess = await findAndClickApplyButton(detection.name, session);
+    monitor.endTimer("clickTime");
+    monitor.endTimer("totalTime");
     if (fillSuccess && clickSuccess) {
-      session.steps.push("Verifying application success");
-      console.log("🔍 Verifying application success...");
-      const verificationSuccess = await verifyApplicationSuccess(
+      monitor.recordSuccess(true);
+      session.success = true;
+      const verificationSuccess = await verifyApplicationSuccessAdvanced(
         detection.name,
         session
       );
-      if (verificationSuccess) {
-        session.success = true;
-        session.steps.push("Application submitted successfully");
-        console.log("🎉 Application submitted successfully!");
-        return {
-          status: "success",
-          message: `Successfully applied to job on ${detection.name}`,
-          jobBoard: detection.name,
-          session
-        };
-      } else {
-        session.steps.push("Application success verification inconclusive");
-        console.log("⚠️ Application success verification inconclusive");
-        session.success = true;
-        return {
-          status: "success",
-          message: `Application submitted (verification inconclusive)`,
-          jobBoard: detection.name,
-          session
-        };
-      }
+      monitor.logPerformance();
+      return {
+        status: "success",
+        message: verificationSuccess ? `Application submitted successfully on ${detection.name}!` : `Application submitted on ${detection.name} (verification pending)`,
+        jobBoard: detection.name,
+        session,
+        performance: monitor.getReport()
+      };
     } else {
-      const failures = [];
-      if (!fillSuccess)
-        failures.push("form filling");
-      if (!clickSuccess)
-        failures.push("apply button click");
-      session.errors.push(`Failed steps: ${failures.join(", ")}`);
-      console.error("❌ Auto-apply failed:", failures);
+      monitor.recordSuccess(false);
+      monitor.logPerformance();
       return {
         status: "error",
-        message: `Auto-apply failed: ${failures.join(", ")}`,
+        message: `Auto-apply failed: ${session.errors[session.errors.length - 1] || "Unknown error"}`,
         jobBoard: detection.name,
-        session
+        session,
+        performance: monitor.getReport()
       };
     }
   } catch (e) {
+    monitor.endTimer("totalTime");
+    monitor.recordSuccess(false);
+    monitor.logPerformance();
     session.errors.push(`Unexpected error: ${e}`);
-    console.error("💥 Unexpected error during auto-apply:", e);
+    console.error("ðŸ’¥ Unexpected error during auto-apply:", e);
     return {
       status: "error",
       message: `Unexpected error: ${e}`,
-      session
+      session,
+      performance: monitor.getReport()
     };
+  }
+}
+async function waitForFormAdvanced(analysis, session) {
+  const timeout = analysis.estimatedDifficulty === "hard" ? 2e4 : analysis.estimatedDifficulty === "medium" ? 15e3 : 1e4;
+  const startTime = Date.now();
+  console.log(
+    `â³ Waiting for form (timeout: ${timeout}ms, difficulty: ${analysis.estimatedDifficulty})`
+  );
+  while (Date.now() - startTime < timeout) {
+    const forms = document.querySelectorAll("form");
+    const inputs = document.querySelectorAll("input");
+    const buttons = document.querySelectorAll('button, input[type="submit"]');
+    if (forms.length > 0 && inputs.length >= 3 && buttons.length > 0) {
+      const emailInput = document.querySelector('input[type="email"]');
+      const textInputs = document.querySelectorAll('input[type="text"]');
+      if (emailInput || textInputs.length >= 2) {
+        console.log(`âœ… Form ready after ${Date.now() - startTime}ms`);
+        return true;
+      }
+    }
+    await new Promise((resolve) => setTimeout(resolve, 200));
+  }
+  console.log(`â° Form readiness timeout after ${Date.now() - startTime}ms`);
+  return false;
+}
+async function handleFileUploadsAdvanced(profile, session) {
+  try {
+    const fileInputs = document.querySelectorAll('input[type="file"]');
+    let successCount = 0;
+    for (const input of fileInputs) {
+      if (profile.resume && input) {
+        try {
+          const htmlInput = input;
+          const result = await attachFileToInput(htmlInput, profile.resume);
+          if (result.success) {
+            successCount++;
+            session.steps.push(`File uploaded successfully`);
+          } else {
+            session.errors.push(
+              `File upload failed: ${result.errors?.join(", ")}`
+            );
+          }
+        } catch (error) {
+          session.errors.push(`File upload error: ${error}`);
+        }
+      }
+    }
+    return successCount > 0;
+  } catch (error) {
+    session.errors.push(`File handling failed: ${error}`);
+    return false;
+  }
+}
+async function verifyApplicationSuccessAdvanced(jobBoard, session) {
+  await new Promise((resolve) => setTimeout(resolve, 3e3));
+  const successIndicators = [
+    ".application-success",
+    ".success-message",
+    ".application-submitted",
+    ".thank-you",
+    ".confirmation",
+    ".submitted-message",
+    '[data-testid*="success"]',
+    '[data-testid*="submitted"]'
+  ];
+  for (const indicator of successIndicators) {
+    const element = document.querySelector(indicator);
+    if (element && isElementVisible(element)) {
+      session.steps.push(`Success indicator found: ${indicator}`);
+      return true;
+    }
+  }
+  const currentUrl = window.location.href;
+  if (currentUrl.includes("success") || currentUrl.includes("thank") || currentUrl.includes("confirm") || currentUrl.includes("submitted")) {
+    session.steps.push("Success detected via URL change");
+    return true;
+  }
+  const bodyText = document.body?.textContent?.toLowerCase() || "";
+  if (bodyText.includes("success") || bodyText.includes("submitted") || bodyText.includes("thank you") || bodyText.includes("confirmed")) {
+    session.steps.push("Success detected via page content");
+    return true;
+  }
+  return false;
+  function isElementVisible(element) {
+    const rect = element.getBoundingClientRect();
+    return rect.width > 0 && rect.height > 0 && window.getComputedStyle(element).visibility !== "hidden";
   }
 }
 chrome.runtime.onMessage.addListener(
@@ -1196,155 +964,120 @@ chrome.runtime.onMessage.addListener(
     switch (message.action || message.type) {
       case "autoApply":
       case "AUTO_APPLY":
-        console.log("🚀 Advanced Auto-Apply triggered");
-        console.log("📋 Profile data:", message.profile);
+        console.log("ðŸš€ Ultra-Advanced Auto-Apply triggered");
+        console.log("ðŸ“‹ Profile data received:", {
+          hasFirstName: !!message.profile?.firstName,
+          hasLastName: !!message.profile?.lastName,
+          hasEmail: !!message.profile?.email,
+          hasPhone: !!message.profile?.phone,
+          hasResume: !!message.profile?.resume
+        });
         try {
           const result = await performAdvancedAutoApply(message.profile);
+          console.log("âœ… Auto-apply result:", result);
           sendResponse(result);
-        } catch (e) {
-          console.error("💥 Auto-apply failed with exception:", e);
+        } catch (error) {
+          console.error("âŒ Auto-apply error:", error);
           sendResponse({
             status: "error",
-            message: `Exception during auto-apply: ${e}`,
-            session: {
-              jobBoard: "unknown",
-              startTime: Date.now(),
-              steps: ["Exception occurred"],
-              errors: [`Exception: ${e}`],
-              success: false
-            }
+            message: error.message || "Auto-apply failed"
           });
         }
         break;
       case "ping":
-        sendResponse({ status: "pong", timestamp: Date.now() });
+        console.log("ðŸ“ Ping received from popup");
+        sendResponse({ status: "pong" });
         break;
       default:
-        sendResponse({ status: "error", message: "Unknown action" });
+        console.warn(
+          "â“ Unknown message type:",
+          message.action || message.type
+        );
+        sendResponse({ status: "error", message: "Unknown message type" });
         break;
     }
     return true;
   }
 );
-function injectIndicator() {
-  const indicator = document.createElement("div");
-  indicator.id = "uswift-indicator";
-  indicator.innerHTML = "🚀 Uswift Active";
-  indicator.style.cssText = `
-    position: fixed;
-    top: 10px;
-    right: 10px;
-    background: #6D28D9;
-    color: white;
-    padding: 8px 12px;
-    border-radius: 8px;
-    font-size: 12px;
-    font-weight: 600;
-    z-index: 10000;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-  `;
-  document.body.appendChild(indicator);
-  setTimeout(() => {
-    indicator.remove();
-  }, 3e3);
-}
 function testCurrentPage() {
+  console.log("ðŸ§ª Testing current page...");
   const detection = detectJobBoard();
-  console.log("🔍 USwift Job Board Detection Test");
-  console.log("=====================================");
-  console.log(`📍 Current URL: ${detection.url}`);
-  console.log(`🎯 Detected Platform: ${detection.name}`);
-  console.log(`📊 Confidence: ${(detection.confidence * 100).toFixed(1)}%`);
-  console.log(`📝 Notes: ${detection.notes || "None"}`);
-  if (detection.name === "unknown") {
-    console.log("❌ This page is not recognized as a job application page.");
-    console.log(
-      "💡 Make sure you're on a job application page with a visible form."
-    );
-  } else if (detection.confidence >= 0.8) {
-    console.log("✅ This platform is well supported!");
-    console.log("🚀 Auto-apply should work reliably here.");
-  } else if (detection.confidence >= 0.5) {
-    console.log("⚠️ This platform has basic support.");
-    console.log("🔄 Auto-apply may work but could need improvements.");
-  } else {
-    console.log(
-      "❓ This page might be a job application but needs verification."
-    );
-    console.log("🧪 Test auto-apply to see if it works.");
-  }
-  console.log("=====================================");
-  console.log(
-    "💡 Tip: Run this function on different job pages to see support levels."
-  );
-}
-window.testJobBoard = testCurrentPage;
-function init() {
-  const detection = detectJobBoard();
-  if (detection.name !== "unknown") {
-    console.log(
-      `Uswift loaded on ${detection.name} (${detection.url}) - ${(detection.confidence * 100).toFixed(1)}% confidence`
-    );
-    injectIndicator();
-  }
+  console.log("ðŸŽ¯ Detection result:", detection);
+  const pageAnalysis = analyzePageStructure();
+  console.log("ðŸ“Š Page analysis:", pageAnalysis);
+  return {
+    detection,
+    pageAnalysis,
+    url: window.location.href
+  };
 }
 function healthCheck() {
-  console.log("🔍 USwift Content Script Health Check");
-  console.log("=====================================");
-  console.log(`📍 Current URL: ${window.location.href}`);
-  console.log(`🏷️  Hostname: ${window.location.hostname}`);
-  console.log(`📄 Page Title: ${document.title}`);
-  console.log(`🔧 Content Script Status: ✅ LOADED`);
-  const emailInputs = document.querySelectorAll('input[type="email"]');
-  const fileInputs = document.querySelectorAll('input[type="file"]');
-  const applyButtons = document.querySelectorAll(
-    'button, input[type="submit"]'
-  );
-  console.log(`📧 Email inputs found: ${emailInputs.length}`);
-  console.log(`📎 File inputs found: ${fileInputs.length}`);
-  console.log(`🔘 Submit buttons found: ${applyButtons.length}`);
-  const hasJobKeywords = /\b(job|career|apply|application|hiring|recruit)\b/i.test(document.title) || /\b(job|career|apply|application|hiring|recruit)\b/i.test(
-    document.body?.textContent || ""
-  );
-  console.log(
-    `🎯 Job-related content detected: ${hasJobKeywords ? "✅ YES" : "❌ NO"}`
-  );
-  console.log("=====================================");
-  console.log("💡 If you see this message, the content script is working!");
-  console.log(
-    "🚀 Try auto-apply now or run testJobBoard() for platform detection."
-  );
+  console.log("ðŸ¥ USwift Content Script Health Check");
+  console.log("âœ… Content script loaded and responding");
+  console.log("ðŸŒ Current URL:", window.location.href);
+  console.log("ðŸ“„ Document ready state:", document.readyState);
+  const jobBoard = detectJobBoard();
+  console.log("ðŸŽ¯ Job board detection:", jobBoard);
+  return {
+    status: "healthy",
+    url: window.location.href,
+    readyState: document.readyState,
+    jobBoard
+  };
 }
+window.testJobBoard = testCurrentPage;
 window.checkUSwiftHealth = healthCheck;
-function initWithRetry() {
-  try {
-    console.log("🚀 USwift Content Script initializing...");
-    init();
-    console.log("✅ USwift Content Script initialized successfully");
-  } catch (error) {
-    console.error("❌ USwift Content Script initialization failed:", error);
-    setTimeout(() => {
-      try {
-        console.log("🔄 Retrying USwift Content Script initialization...");
-        init();
-        console.log("✅ USwift Content Script initialized on retry");
-      } catch (retryError) {
-        console.error("❌ USwift Content Script retry failed:", retryError);
+function initWithRetry(maxRetries = 3) {
+  let attempts = 0;
+  function init() {
+    try {
+      console.log("ðŸš€ USwift Content Script Initializing...");
+      if (document.readyState === "loading") {
+        console.log("â³ Document still loading, waiting...");
+        document.addEventListener("DOMContentLoaded", () => init());
+        return;
       }
-    }, 1e3);
+      const jobBoard = detectJobBoard();
+      if (jobBoard.name !== "unknown") {
+        console.log(
+          `âœ… USwift Content Script Ready on ${jobBoard.name} (${(jobBoard.confidence * 100).toFixed(1)}% confidence)`
+        );
+        window.uswiftInitialized = true;
+      } else {
+        console.log(
+          "âš ï¸ USwift Content Script loaded but job board not detected"
+        );
+      }
+    } catch (error) {
+      attempts++;
+      console.error(
+        `âŒ USwift initialization attempt ${attempts} failed:`,
+        error
+      );
+      if (attempts < maxRetries) {
+        console.log(
+          `ðŸ”„ Retrying initialization in 1 second... (${attempts}/${maxRetries})`
+        );
+        setTimeout(init, 1e3);
+      } else {
+        console.error(
+          `ðŸ’¥ USwift initialization failed after ${maxRetries} attempts`
+        );
+      }
+    }
   }
+  init();
 }
 if (document.readyState === "loading") {
-  document.addEventListener("DOMContentLoaded", initWithRetry);
+  document.addEventListener("DOMContentLoaded", () => initWithRetry());
 } else if (document.readyState === "interactive") {
-  setTimeout(initWithRetry, 100);
+  setTimeout(() => initWithRetry(), 100);
 } else {
   initWithRetry();
 }
 setTimeout(() => {
   if (!window.uswiftInitialized) {
-    console.log("🔄 Late initialization attempt for USwift Content Script");
+    console.log("ðŸ”„ Late initialization attempt for USwift Content Script");
     initWithRetry();
   }
 }, 3e3);
-window.uswiftInitialized = true;

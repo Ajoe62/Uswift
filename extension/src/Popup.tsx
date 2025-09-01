@@ -18,7 +18,7 @@ import { getSupabaseClient } from "./supabaseClient";
 export default function Popup() {
   const { user, signOut, isAuthenticated, loading, refreshAuth } = useAuth();
   const [forceRerender, setForceRerender] = useState(0);
-  
+
   // Toggle a body class so CSS can change colors for authenticated state
   useEffect(() => {
     try {
@@ -177,10 +177,10 @@ export default function Popup() {
       try {
         console.log("🔍 Checking if content script is responding...");
         await new Promise((resolve, reject) => {
-        chrome.tabs.sendMessage(
+          chrome.tabs.sendMessage(
             tab.id!,
             { action: "ping" },
-          (response: any) => {
+            (response: any) => {
               if (chrome.runtime.lastError) {
                 reject(new Error(chrome.runtime.lastError.message));
               } else if (response?.status === "pong") {
@@ -257,12 +257,12 @@ export default function Popup() {
               "5. 🚫 Try incognito mode (may have different permissions)",
               "6. 🔌 Disable other extensions temporarily",
               "7. 🛡️ Check if site uses anti-bot protection",
-              "8. 📄 Ensure you're on actual application page (not job listing)"
+              "8. 📄 Ensure you're on actual application page (not job listing)",
             ],
             quickTests: [
               "checkUSwiftHealth() - Check if extension is loaded",
               "testJobBoard() - Test platform detection",
-              "console.log(window.location.href) - Verify current URL"
+              "console.log(window.location.href) - Verify current URL",
             ],
             currentUrl: window.location?.href || "Unknown",
           },
@@ -422,10 +422,10 @@ export default function Popup() {
   }
 
   if (page === "chat") {
-  return (
+    return (
       <div>
-    <div
-      style={{
+        <div
+          style={{
             display: "flex",
             justifyContent: "space-between",
             alignItems: "center",
@@ -457,31 +457,31 @@ export default function Popup() {
   if (page === "resume") {
     return (
       <div>
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
             margin: "1rem",
           }}
         >
           <button className="uswift-btn" onClick={() => setPage("home")}>
             ← Back
           </button>
-        <button
-          onClick={signOut}
-          style={{
-            background: "#EDE9FE",
-            color: "#6D28D9",
-            border: "none",
-            borderRadius: 8,
+          <button
+            onClick={signOut}
+            style={{
+              background: "#EDE9FE",
+              color: "#6D28D9",
+              border: "none",
+              borderRadius: 8,
               padding: "8px 12px",
-            cursor: "pointer",
-          }}
-        >
-          Sign Out
-        </button>
-      </div>
+              cursor: "pointer",
+            }}
+          >
+            Sign Out
+          </button>
+        </div>
         <ResumeEnhancement />
       </div>
     );
@@ -766,7 +766,7 @@ export default function Popup() {
                 height: "60px",
                 background:
                   "radial-gradient(circle, rgba(59, 130, 246, 0.1) 0%, transparent 70%)",
-            borderRadius: "50%",
+                borderRadius: "50%",
               }}
             />
 
@@ -785,14 +785,14 @@ export default function Popup() {
                   background:
                     "linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)",
                   borderRadius: "12px",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
                   boxShadow: "0 4px 12px rgba(59, 130, 246, 0.3)",
                 }}
               >
                 <span style={{ fontSize: "1.2rem", color: "white" }}>⚡</span>
-        </div>
+              </div>
               <div>
                 <h3
                   style={{
@@ -816,8 +816,8 @@ export default function Popup() {
               </div>
             </div>
 
-        <button
-          onClick={handleAutoApply}
+            <button
+              onClick={handleAutoApply}
               style={{
                 width: "100%",
                 background: "linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)",
@@ -847,10 +847,10 @@ export default function Popup() {
               }}
             >
               <span>🚀</span>
-          Auto-Apply to Job
-        </button>
+              Auto-Apply to Job
+            </button>
 
-        {autoStatus && (
+            {autoStatus && (
               <div
                 style={{
                   marginTop: "1rem",
@@ -897,7 +897,7 @@ export default function Popup() {
                         animation: "spin 1s linear infinite",
                       }}
                     />
-              <div>
+                    <div>
                       <div style={{ fontWeight: 600, marginBottom: "4px" }}>
                         🚀 Advanced Auto-Apply in Progress
                       </div>
@@ -942,10 +942,10 @@ export default function Popup() {
                         }}
                       >
                         Platform: {autoStatus.jobBoard}
-              </div>
-            )}
-          </div>
-        )}
+                      </div>
+                    )}
+                  </div>
+                )}
                 {autoStatus.status === "error" && (
                   <div>
                     <div
@@ -1000,7 +1000,7 @@ export default function Popup() {
                           )}
                         </div>
                       )}
-          <button
+                    <button
                       onClick={handleAutoApply}
                       style={{
                         background:
@@ -1055,7 +1055,7 @@ export default function Popup() {
               }}
             >
               <button
-            onClick={() => setPage("profile")}
+                onClick={() => setPage("profile")}
                 style={{
                   background: "#ffffff",
                   border: "2px solid #e5e7eb",
@@ -1102,17 +1102,17 @@ export default function Popup() {
                       fontWeight: 600,
                       color: "#1f2937",
                     }}
-          >
-            Profile Vault
+                  >
+                    Profile Vault
                   </div>
                   <div style={{ fontSize: "0.75rem", color: "#6b7280" }}>
                     Manage profiles
                   </div>
                 </div>
-          </button>
+              </button>
 
-          <button
-            onClick={() => setPage("tracker")}
+              <button
+                onClick={() => setPage("tracker")}
                 style={{
                   background: "#ffffff",
                   border: "2px solid #e5e7eb",
@@ -1159,16 +1159,16 @@ export default function Popup() {
                       fontWeight: 600,
                       color: "#1f2937",
                     }}
-          >
-            Job Tracker
+                  >
+                    Job Tracker
                   </div>
                   <div style={{ fontSize: "0.75rem", color: "#6b7280" }}>
                     Track applications
                   </div>
                 </div>
-          </button>
-        </div>
-      </div>
+              </button>
+            </div>
+          </div>
 
           {/* AI Tools Section */}
           <div>
@@ -1235,7 +1235,7 @@ export default function Popup() {
                   }}
                 >
                   <span style={{ fontSize: "1rem" }}>💬</span>
-      </div>
+                </div>
                 <div>
                   <div style={{ fontSize: "0.85rem", fontWeight: 600 }}>
                     AI Assistant
@@ -1289,16 +1289,16 @@ export default function Popup() {
                 >
                   <span style={{ fontSize: "1rem" }}>📄</span>
                 </div>
-      <div>
+                <div>
                   <div style={{ fontSize: "0.85rem", fontWeight: 600 }}>
                     Resume AI
-        </div>
+                  </div>
                   <div style={{ fontSize: "0.7rem", opacity: 0.9 }}>
                     Enhance & optimize
-        </div>
-        </div>
+                  </div>
+                </div>
               </button>
-        </div>
+            </div>
 
             {/* Secondary AI Tools */}
             <div

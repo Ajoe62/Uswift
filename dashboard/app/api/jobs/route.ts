@@ -1,11 +1,10 @@
-import { createClient } from "@/lib/supabaseClient";
+import { supabase } from "@/lib/supabaseClient";
 import { NextRequest, NextResponse } from "next/server";
 import { JobApplication } from "@/lib/types";
 
 // GET /api/jobs - Fetch all job applications for the current user
 export async function GET(req: NextRequest) {
   try {
-    const supabase = createClient();
 
     const {
       data: { user },
@@ -43,7 +42,6 @@ export async function GET(req: NextRequest) {
 // POST /api/jobs - Create a new job application
 export async function POST(req: NextRequest) {
   try {
-    const supabase = createClient();
 
     const {
       data: { user },
