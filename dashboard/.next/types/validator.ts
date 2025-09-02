@@ -65,6 +65,24 @@ type RouteHandlerConfig<Route extends AppRouteHandlerRoutes = AppRouteHandlerRou
 }
 
 
+// Validate ../../app/(marketing)/features/page.tsx
+{
+  const handler = {} as typeof import("../../app/(marketing)/features/page.js")
+  handler satisfies AppPageConfig<"/features">
+}
+
+// Validate ../../app/(marketing)/home/page.tsx
+{
+  const handler = {} as typeof import("../../app/(marketing)/home/page.js")
+  handler satisfies AppPageConfig<"/home">
+}
+
+// Validate ../../app/(marketing)/pricing/page.tsx
+{
+  const handler = {} as typeof import("../../app/(marketing)/pricing/page.js")
+  handler satisfies AppPageConfig<"/pricing">
+}
+
 // Validate ../../app/auth/reset-password/page.tsx
 {
   const handler = {} as typeof import("../../app/auth/reset-password/page.js")
@@ -95,22 +113,10 @@ type RouteHandlerConfig<Route extends AppRouteHandlerRoutes = AppRouteHandlerRou
   handler satisfies AppPageConfig<"/dashboard/settings">
 }
 
-// Validate ../../app/features/page.tsx
-{
-  const handler = {} as typeof import("../../app/features/page.js")
-  handler satisfies AppPageConfig<"/features">
-}
-
 // Validate ../../app/page.tsx
 {
   const handler = {} as typeof import("../../app/page.js")
   handler satisfies AppPageConfig<"/">
-}
-
-// Validate ../../app/pricing/page.tsx
-{
-  const handler = {} as typeof import("../../app/pricing/page.js")
-  handler satisfies AppPageConfig<"/pricing">
 }
 
 // Validate ../../app/api/dashboard/stats/route.ts
