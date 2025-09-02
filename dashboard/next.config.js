@@ -5,9 +5,6 @@ const nextConfig = {
   // Force Next.js to treat the dashboard folder as the tracing root
   outputFileTracingRoot: path.resolve(__dirname),
 
-  // Remove deprecated options - these are now defaults in Next.js 15
-  // swcMinify: true, // ❌ REMOVED - deprecated in Next.js 15
-
   // typedRoutes is now stable, no longer experimental
   typedRoutes: false,
 
@@ -22,18 +19,17 @@ const nextConfig = {
         splitChunks: false,
       };
 
-      config.devtool = "eval-cheap-module-source-map";
+      // The problematic line has been removed here.
       config.stats = "errors-warnings";
     }
-
+    
     return config;
   },
 
-  // Single Turbopack configuration - FIXED: removed duplicate
+  // Single Turbopack configuration
   turbopack: {
     rules: {
       // Add any Turbopack-specific rules here if needed
-      // Using object format instead of array
     },
   },
 
@@ -57,7 +53,7 @@ const nextConfig = {
     maxInactiveAge: 25 * 1000,
     pagesBufferLength: 2,
   },
-
+  
   // Experimental features for Next.js 15
   experimental: {
     // Enable if you want to use the latest Turbopack features
