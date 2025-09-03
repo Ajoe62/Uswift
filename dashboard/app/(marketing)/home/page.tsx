@@ -4,8 +4,11 @@ import HowItWorks from "@/components/HowItWorks";
 import ResumeBuilder from "@/components/ResumeBuilder";
 import TrustStats from "@/components/TrustStats";
 import Testimonials from "@/components/Testimonials";
-import CTAButton from "@/components/ui/CTAButton";
-import ScrollEffects from "./ScrollEffects";
+// import CTAButton from "@/components/ui/CTAButton";
+// import ScrollEffects from "./ScrollEffects";
+import { ModernShowcase, SiteFooter } from "@/components/ModernShowcaseAndFooter";
+import NewsletterForm from "@/components/NewsletterForm";
+import ScrollEffects from "@/components/ScrollEffects";
 
 const HomePage = () => {
   return (
@@ -15,14 +18,17 @@ const HomePage = () => {
         <LandingHero />
         <FeaturesSection />
         <ResumeBuilder />
-        <TrustStats />
         <HowItWorks />
+        <TrustStats />
         <Testimonials />
-        <section className="text-center mt-8" data-animate="reveal">
+        <ModernShowcase />
+        <NewsletterForm />      
+        <SiteFooter />
+        {/* <section className="text-center mt-8" data-animate="reveal">
           <CTAButton href="/pricing" className="px-6 py-3">
             See Pricing
           </CTAButton>
-        </section>
+        </section> */}
       </div>
     </>
   );

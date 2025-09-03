@@ -64,12 +64,21 @@ export default function JobCard({ job, onUpdate, onDelete }: JobCardProps) {
   };
 
   return (
-    <div className="bg-white text-black rounded-lg shadow p-6 mb-4 card-magic card-magic--glow hover:shadow-lg transition-shadow">
+    <div
+  data-animate="reveal"
+  className="card bg-white text-black rounded-lg shadow p-6 mb-4 card-magic card-magic--glow transform-gpu hover:-translate-y-1 hover:shadow-lg transition"
+  role="article"
+  aria-labelledby={`job-${job.id}-title`}
+>
       <div className="flex justify-between items-start mb-4">
         <div className="flex-1">
           {isEditing ? (
             <div className="space-y-3">
+              <label className="sr-only" htmlFor={`company-${job.id}`}>
+                Company Name
+              </label>
               <input
+                id={`company-${job.id}`}
                 type="text"
                 value={editForm.company_name}
                 onChange={(e) =>
@@ -80,8 +89,13 @@ export default function JobCard({ job, onUpdate, onDelete }: JobCardProps) {
                 }
                 className="w-full p-2 border rounded"
                 placeholder="Company Name"
+                aria-label="Company name"
               />
+              <label className="sr-only" htmlFor={`title-${job.id}`}>
+                Job Title
+              </label>
               <input
+                id={`title-${job.id}`}
                 type="text"
                 value={editForm.job_title}
                 onChange={(e) =>
@@ -92,8 +106,13 @@ export default function JobCard({ job, onUpdate, onDelete }: JobCardProps) {
                 }
                 className="w-full p-2 border rounded"
                 placeholder="Job Title"
+                aria-label="Job title"
               />
+              <label className="sr-only" htmlFor={`notes-${job.id}`}>
+                Notes
+              </label>
               <textarea
+                id={`notes-${job.id}`}
                 value={editForm.notes}
                 onChange={(e) =>
                   setEditForm((prev) => ({ ...prev, notes: e.target.value }))
@@ -101,8 +120,13 @@ export default function JobCard({ job, onUpdate, onDelete }: JobCardProps) {
                 className="w-full p-2 border rounded"
                 placeholder="Notes"
                 rows={3}
+                aria-label="Notes"
               />
+              <label className="sr-only" htmlFor={`url-${job.id}`}>
+                Application URL
+              </label>
               <input
+                id={`url-${job.id}`}
                 type="url"
                 value={editForm.application_url}
                 onChange={(e) =>
@@ -113,11 +137,15 @@ export default function JobCard({ job, onUpdate, onDelete }: JobCardProps) {
                 }
                 className="w-full p-2 border rounded"
                 placeholder="Application URL"
+                aria-label="Application URL"
               />
             </div>
           ) : (
             <>
-              <h4 className="font-bold text-xl text-gray-900">
+              <h4
+                id={`job-${job.id}-title`}
+                className="font-bold text-xl text-gray-900"
+              >
                 {job.job_title}
               </h4>
               <p className="text-gray-600 text-lg">{job.company_name}</p>
@@ -152,19 +180,22 @@ export default function JobCard({ job, onUpdate, onDelete }: JobCardProps) {
 
         <div className="flex flex-col gap-2 ml-4">
           {/* Status Quick Actions */}
-          <div className="flex flex-wrap gap-1">
+          <div className="flex flex-wrap gap-1" role="group" aria-label="Quick status actions">
             {Object.entries(statusLabels).map(([status, label]) => (
               <button
                 key={status}
                 onClick={() =>
                   handleStatusChange(status as JobApplication["status"])
                 }
-                className={`px-2 py-1 text-xs rounded transition-colors ${
+                className={`px-2 py-1 text-xs rounded transition-colors focus:outline-none focus:ring-2 focus:ring-offset-1 ${
                   job.status === status
                     ? "bg-blue-500 text-white"
                     : "bg-gray-100 text-gray-600 hover:bg-gray-200"
                 }`}
                 disabled={isEditing}
+                aria-pressed={job.status === status}
+                aria-label={`Mark as ${label}`}
+                title={label}
               >
                 {label}
               </button>
@@ -177,6 +208,7 @@ export default function JobCard({ job, onUpdate, onDelete }: JobCardProps) {
               onClick={handleEdit}
               className="px-3 py-1 text-sm"
               variant={isEditing ? "primary" : "secondary"}
+              aria-label={isEditing ? "Save job" : "Edit job"}
             >
               {isEditing ? "Save" : "Edit"}
             </Button>
@@ -184,6 +216,7 @@ export default function JobCard({ job, onUpdate, onDelete }: JobCardProps) {
               onClick={handleDelete}
               className="px-3 py-1 text-sm"
               variant="danger"
+              aria-label="Delete job"
             >
               Delete
             </Button>
