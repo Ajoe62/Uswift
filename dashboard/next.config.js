@@ -59,6 +59,16 @@ const nextConfig = {
     // Enable if you want to use the latest Turbopack features
     optimizePackageImports: ["lucide-react", "react-icons"],
   },
+  // Permanent redirect from root to /home
+async redirects() {
+  return [
+    {
+      source: "/",
+      destination: "/home",
+      permanent: true,
+    },
+  ];
+},
 };
 
 module.exports = nextConfig;
