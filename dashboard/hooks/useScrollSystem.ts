@@ -1,8 +1,9 @@
 "use client";
 
 import { useLayoutEffect, useState } from "react";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { gsap } from "gsap";
-import Lenis from "@studio-freight/lenis";
+import Lenis from "@studio-freight/lenis"; // Changed back to the original import
 // dynamically load initScroll to avoid compile-time "is not a module" error
 // import initScroll from "@/lib/scroll/initScroll";
 
