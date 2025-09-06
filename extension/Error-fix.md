@@ -293,7 +293,7 @@ Permanent prevention (do this once)
 
 Verification
 
-- Rebuilt (or patched) `dist/popup.html`; reloaded unpacked extension from `extension/dist`; popup renders when clicking the extension icon.
+- Rebuilt (or patched) `dist/popup.html`; reloaded unpacked extension from `extension/dist`; popup renders when clicking the extension icon to project.
 
 ---
 
