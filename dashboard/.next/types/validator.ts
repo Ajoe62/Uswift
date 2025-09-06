@@ -21,24 +21,6 @@ type AppPageConfig<Route extends AppRoutes = AppRoutes> = {
   viewport?: any
 }
 
-type PagesPageConfig = {
-  default: React.ComponentType<any> | ((props: any) => React.ReactNode | Promise<React.ReactNode> | never | void)
-  getStaticProps?: (context: any) => Promise<any> | any
-  getStaticPaths?: (context: any) => Promise<any> | any
-  getServerSideProps?: (context: any) => Promise<any> | any
-  getInitialProps?: (context: any) => Promise<any> | any
-  /**
-   * Segment configuration for legacy Pages Router pages.
-   * Validated at build-time by parsePagesSegmentConfig.
-   */
-  config?: {
-    amp?: boolean | 'hybrid' | string // necessary for JS
-    maxDuration?: number
-    runtime?: 'edge' | 'experimental-edge' | 'nodejs' | string // necessary unless config is exported as const
-    regions?: string[]
-  }
-}
-
 type LayoutConfig<Route extends LayoutRoutes = LayoutRoutes> = {
   default: React.ComponentType<LayoutProps<Route>> | ((props: LayoutProps<Route>) => React.ReactNode | Promise<React.ReactNode> | never | void | Promise<void>)
   generateStaticParams?: (props: { params: ParamMap[Route] }) => Promise<any[]> | any[]
@@ -83,10 +65,28 @@ type RouteHandlerConfig<Route extends AppRouteHandlerRoutes = AppRouteHandlerRou
   handler satisfies AppPageConfig<"/pricing">
 }
 
+// Validate ../../app/auth/forgot-password/page.tsx
+{
+  const handler = {} as typeof import("../../app/auth/forgot-password/page.js")
+  handler satisfies AppPageConfig<"/auth/forgot-password">
+}
+
 // Validate ../../app/auth/reset-password/page.tsx
 {
   const handler = {} as typeof import("../../app/auth/reset-password/page.js")
   handler satisfies AppPageConfig<"/auth/reset-password">
+}
+
+// Validate ../../app/auth/signin/page.tsx
+{
+  const handler = {} as typeof import("../../app/auth/signin/page.js")
+  handler satisfies AppPageConfig<"/auth/signin">
+}
+
+// Validate ../../app/auth/signup/page.tsx
+{
+  const handler = {} as typeof import("../../app/auth/signup/page.js")
+  handler satisfies AppPageConfig<"/auth/signup">
 }
 
 // Validate ../../app/dashboard/jobs/page.tsx
@@ -149,53 +149,7 @@ type RouteHandlerConfig<Route extends AppRouteHandlerRoutes = AppRouteHandlerRou
   handler satisfies RouteHandlerConfig<"/api/mistral/files">
 }
 
-// Validate ../../src/pages/Analytics.tsx
-{
-  const handler = {} as typeof import("../../src/pages/Analytics.js")
-  handler satisfies PagesPageConfig
-}
 
-// Validate ../../src/pages/Dashboard.tsx
-{
-  const handler = {} as typeof import("../../src/pages/Dashboard.js")
-  handler satisfies PagesPageConfig
-}
-
-// Validate ../../src/pages/Dashboard_New.tsx
-{
-  const handler = {} as typeof import("../../src/pages/Dashboard_New.js")
-  handler satisfies PagesPageConfig
-}
-
-// Validate ../../src/pages/JobTracker.tsx
-{
-  const handler = {} as typeof import("../../src/pages/JobTracker.js")
-  handler satisfies PagesPageConfig
-}
-
-// Validate ../../src/pages/LandingPage.tsx
-{
-  const handler = {} as typeof import("../../src/pages/LandingPage.js")
-  handler satisfies PagesPageConfig
-}
-
-// Validate ../../src/pages/Pricing.tsx
-{
-  const handler = {} as typeof import("../../src/pages/Pricing.js")
-  handler satisfies PagesPageConfig
-}
-
-// Validate ../../src/pages/Profile.tsx
-{
-  const handler = {} as typeof import("../../src/pages/Profile.js")
-  handler satisfies PagesPageConfig
-}
-
-// Validate ../../src/pages/Support.tsx
-{
-  const handler = {} as typeof import("../../src/pages/Support.js")
-  handler satisfies PagesPageConfig
-}
 
 
 

@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
-export default function ResetPasswordPage() {
+// Component that uses useSearchParams (needs to be wrapped in Suspense)
+function ResetPasswordContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [token, setToken] = useState<string | null>(null);
@@ -26,7 +27,10 @@ export default function ResetPasswordPage() {
     };
 
     const accessToken =
-      searchParams?.get("access_token") || searchParams?.get("token") || getTokenFromHash() || null;
+      searchParams?.get("access_token") || 
+      searchParams?.get("token") || 
+      getTokenFromHash() || 
+      null;
     setToken(accessToken);
   }, [searchParams]);
 
@@ -120,7 +124,7 @@ export default function ResetPasswordPage() {
         </button>
       </form>
 
-  {message && <div className="mt-4 text-center text-uswift-accent">{message}</div>}
+      {message && <div className="mt-4 text-center text-uswift-accent">{message}</div>}
 
       {!token && (
         <div className="mt-4 text-sm text-gray-500">
@@ -128,5 +132,31 @@ export default function ResetPasswordPage() {
         </div>
       )}
     </main>
+  );
+}
+
+// Loading fallback component
+function ResetPasswordLoading() {
+  return (
+    <div className="max-w-md mx-auto mt-16 p-8 bg-white/95 rounded-xl shadow-lg animate-pulse">
+      <div className="mb-6 text-center">
+        <div className="h-8 bg-gray-300 rounded mb-2"></div>
+        <div className="h-4 bg-gray-200 rounded w-3/4 mx-auto"></div>
+      </div>
+      <div className="grid gap-4">
+        <div className="h-12 bg-gray-200 rounded"></div>
+        <div className="h-12 bg-gray-200 rounded"></div>
+        <div className="h-10 bg-gray-300 rounded"></div>
+      </div>
+    </div>
+  );
+}
+
+// Main page component with Suspense boundary
+export default function ResetPasswordPage() {
+  return (
+    <Suspense fallback={<ResetPasswordLoading />}>
+      <ResetPasswordContent />
+    </Suspense>
   );
 }

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { JobApplication } from "@/lib/types";
+import type { JobApplication } from "@/lib/types";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
 

@@ -3,42 +3,43 @@
 import { useLayoutEffect, useState } from "react";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { gsap } from "gsap";
-import Lenis from "@studio-freight/lenis"; // Changed back to the original import
-// dynamically load initScroll to avoid compile-time "is not a module" error
-// import initScroll from "@/lib/scroll/initScroll";
+import Lenis from "lenis"; // Updated to new package
 
 const useScrollSystem = () => {
   const [isGsapReady, setIsGsapReady] = useState(false);
 
   useLayoutEffect(() => {
-    let cleanup: () => void = () => {};
-    let mounted = true;
+    // Register the GSAP ScrollTrigger plugin
+    gsap.registerPlugin(ScrollTrigger);
 
-    (async () => {
-      try {
-        const path = "@/lib/scroll/initScroll";
-        const mod = await import(path);
-        // support either default export or named export/init function fallback
-        const init =
-          (mod && (mod.default ?? (mod as any).initScroll)) ??
-          (() => () => {});
-        if (!mounted) return;
-        cleanup = init(Lenis, gsap) ?? (() => {});
-        setIsGsapReady(true);
-      } catch (e) {
-        // if module cannot be loaded, keep a safe no-op cleanup
-        // console.warn("initScroll dynamic import failed:", e);
-      }
-    })();
+    // Initialize Lenis for smooth scrolling
+    const lenis = new Lenis({
+      duration: 1.2,
+      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+    });
 
+    // Sync GSAP ScrollTrigger with Lenis's scroll events
+    lenis.on('scroll', ScrollTrigger.update);
+
+    // Create a GSAP ticker to drive Lenis's animation frame updates
+    const update = (time: number) => {
+      lenis.raf(time * 1000);
+    };
+    gsap.ticker.add(update);
+    gsap.ticker.lagSmoothing(0);
+
+    // Set state to true once setup is complete
+    setIsGsapReady(true);
+
+    // Return a cleanup function to run when the component unmounts
     return () => {
-      mounted = false;
-      try {
-        cleanup();
-      } catch {
-        // ignore cleanup errors
-      }
       setIsGsapReady(false);
+      // Remove the ticker function
+      gsap.ticker.remove(update);
+      // Destroy the Lenis instance to prevent memory leaks
+      lenis.destroy();
+      // Optional: kill all scroll triggers
+      ScrollTrigger.getAll().forEach(trigger => trigger.kill());
     };
   }, []);
 

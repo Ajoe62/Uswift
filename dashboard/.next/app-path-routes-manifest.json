@@ -1,0 +1,20 @@
+{
+  "/_not-found/page": "/_not-found",
+  "/api/dashboard/stats/route": "/api/dashboard/stats",
+  "/api/jobs/[id]/route": "/api/jobs/[id]",
+  "/api/jobs/route": "/api/jobs",
+  "/api/mistral/chat/route": "/api/mistral/chat",
+  "/api/mistral/embeddings/route": "/api/mistral/embeddings",
+  "/api/mistral/files/route": "/api/mistral/files",
+  "/(marketing)/features/page": "/features",
+  "/(marketing)/home/page": "/home",
+  "/(marketing)/pricing/page": "/pricing",
+  "/auth/forgot-password/page": "/auth/forgot-password",
+  "/auth/signin/page": "/auth/signin",
+  "/auth/reset-password/page": "/auth/reset-password",
+  "/auth/signup/page": "/auth/signup",
+  "/dashboard/jobs/page": "/dashboard/jobs",
+  "/dashboard/page": "/dashboard",
+  "/dashboard/settings/page": "/dashboard/settings",
+  "/dashboard/profile/page": "/dashboard/profile"
+}

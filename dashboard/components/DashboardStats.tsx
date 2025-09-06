@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { DashboardStats as DashboardStatsType } from "@/lib/types";
+import type { DashboardStats as DashboardStatsType } from "@/lib/types";
 
 export default function DashboardStats() {
   const [stats, setStats] = useState<DashboardStatsType | null>(null);
