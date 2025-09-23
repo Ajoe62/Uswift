@@ -1,6 +1,6 @@
 import FeaturesHero from "./FeaturesHero";
 import FeatureShowcase from "./FeatureShowcase";
-import ScrollEffects from "./ScrollEffects";
+import ScrollEffects from "@/components/ScrollEffects";
 
 const FeaturesPage = () => {
   return (

@@ -1,7 +1,7 @@
 import React from "react";
 
 type AccordionProps = React.HTMLAttributes<HTMLDivElement> & { type?: string; collapsible?: boolean };
-const Accordion: React.FC<AccordionProps> = ({ children, ...props }) => {
+const Accordion: React.FC<AccordionProps> = ({ children, collapsible, type, ...props }) => {
   return <div {...props}>{children}</div>;
 };
 
