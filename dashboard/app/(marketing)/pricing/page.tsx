@@ -1,7 +1,7 @@
 import PricingHeader from "./PricingHeader";
 import PricingTiers from "./PricingTiers";
 import FAQ from "./FAQ";
-import ScrollEffects from "./ScrollEffects";
+import  ScrollEffects from "@/components/ScrollEffects";
 
 const PricingPage = () => {
   return (

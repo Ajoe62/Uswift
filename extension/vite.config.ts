@@ -5,7 +5,6 @@ import { copyFileSync } from "fs";
 
 export default defineConfig({
   plugins: [
-    react(),
     {
       name: "copy-manifest",
       generateBundle() {
@@ -17,6 +16,13 @@ export default defineConfig({
   ],
   // Use Vite's public directory so files in `extension/public` are copied to `dist`
   publicDir: "public",
+   css: {
+  postcss: {
+      plugins: [        require("autoprefixer"),
+       // require("tailwindcss")({ config: "./tailwind.config.js" }),
+      ],
+    },
+},
   build: {
     outDir: "dist",
     rollupOptions: {
