@@ -1,7 +1,4 @@
-import CardPkg from "@/components/ui/Card";
-const Card: any = (CardPkg as any).default ?? CardPkg;
-const CardContent: any = (CardPkg as any).CardContent ?? (CardPkg as any).default ?? (() => null);
-const CardHeader: any = (CardPkg as any).CardHeader ?? (() => null);
+import Card from "@/components/ui/Card"; // Changed: import only Card, no CardHeader or CardContent
 import {
   Zap,
   BrainCircuit,
@@ -52,22 +49,20 @@ const features = [
 
 const FeatureShowcase = () => {
   return (
-    <section className="py-20 md:py-28">
-      <div className="container mx-auto px-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+    <section className="py-10 sm:py-20 md:py-28">
+      <div className="container mx-auto px-2 sm:px-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-8">
           {features.map((feature, index) => (
             <div key={index} data-animate="reveal">
-              <div className="h-full bg-gray-800/30 border-gray-700 hover:border-purple-400 transition-colors duration-300">
-                <Card>
-                  <CardHeader className="flex flex-row items-center gap-4">
-                    {feature.icon}
-                    <h3 className="text-white text-lg font-semibold">{feature.title}</h3>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-gray-400">{feature.description}</p>
-                  </CardContent>
-                </Card>
-              </div>
+              <Card>
+                <div className="flex flex-row items-center gap-3 sm:gap-4 mb-2">
+                  {feature.icon}
+                  <h3 className="text-black text-base sm:text-lg font-semibold">
+                    {feature.title}
+                  </h3>
+                </div>
+                <p className="text-gray-700 text-sm sm:text-base mt-2">{feature.description}</p>
+              </Card>
             </div>
           ))}
         </div>

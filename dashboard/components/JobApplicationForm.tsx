@@ -41,15 +41,15 @@ export default function JobApplicationForm({
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-lg p-6">
-      <h3 className="text-xl font-bold mb-6 text-gray-900">
+    <div className="bg-white rounded-lg shadow-lg p-4 sm:p-6"> {/* Changed: p-4 for mobile, sm:p-6 for larger screens */}
+      <h3 className="text-lg sm:text-xl font-bold mb-4 sm:mb-6 text-gray-900"> {/* Changed: text-lg for mobile, sm:text-xl for larger screens; mb-4 for mobile, sm:mb-6 for larger screens */}
         Add New Job Application
       </h3>
 
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4"> {/* Changed: space-y-3 for mobile, sm:space-y-4 for larger screens */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4"> {/* Changed: grid-cols-1 for mobile, sm:grid-cols-2 for desktop; gap-3 for mobile, sm:gap-4 for larger screens */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1"> {/* Changed: text-xs for mobile, sm:text-sm for larger screens */}
               Company Name *
             </label>
             <Input
@@ -62,7 +62,7 @@ export default function JobApplicationForm({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
               Job Title *
             </label>
             <Input
@@ -75,9 +75,9 @@ export default function JobApplicationForm({
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4"> {/* Changed: grid-cols-1 for mobile, sm:grid-cols-2 for desktop; gap-3 for mobile, sm:gap-4 for larger screens */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
               Application Status
             </label>
             <select
@@ -94,7 +94,7 @@ export default function JobApplicationForm({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
               Application Date
             </label>
             <Input
@@ -106,7 +106,7 @@ export default function JobApplicationForm({
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
             Application URL
           </label>
           <Input
@@ -118,7 +118,7 @@ export default function JobApplicationForm({
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
             Notes
           </label>
           <textarea
@@ -130,7 +130,7 @@ export default function JobApplicationForm({
           />
         </div>
 
-        <div className="flex justify-end gap-3 pt-4">
+        <div className="flex flex-col sm:flex-row justify-end gap-2 sm:gap-3 pt-2 sm:pt-4"> {/* Changed: flex-col for mobile, sm:flex-row for desktop; gap-2 for mobile, sm:gap-3 for larger screens; pt-2 for mobile, sm:pt-4 for larger screens */}
           <Button
             type="button"
             onClick={onCancel}

@@ -7,6 +7,11 @@ import Lenis from "lenis";
 
 gsap.registerPlugin(ScrollTrigger);
 
+function isMobile() {
+  if (typeof window === "undefined") return false;
+  return window.innerWidth < 640; // Tailwind's 'sm' breakpoint
+}
+
 export default function ScrollEffects(): null {
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -31,29 +36,31 @@ export default function ScrollEffects(): null {
         return { top: 0, left: 0, width: window.innerWidth, height: window.innerHeight };
       },
     });
-    // Lenis doesn't expose `update()` in all versions — call its raf method once on refresh
-ScrollTrigger.addEventListener("refresh", () => {
-  try {
-    if (lenis && typeof (lenis as any).raf === "function")
-      (lenis as any).raf(performance.now());
-  } catch (e) {
-    // ignore if raf is not available
-  }
-});
+
+    ScrollTrigger.addEventListener("refresh", () => {
+      try {
+        if (lenis && typeof (lenis as any).raf === "function")
+          (lenis as any).raf(performance.now());
+      } catch (e) {
+        // ignore if raf is not available
+      }
+    });
     ScrollTrigger.refresh();
 
     // REVEAL: general fade+slide for elements with data-animate="reveal"
     gsap.utils.toArray<HTMLElement>("[data-animate='reveal']").forEach((el) => {
       gsap.fromTo(
         el,
-        { y: 28, opacity: 0, willChange: "transform,opacity" },
+        isMobile()
+          ? { y: 16, opacity: 0, willChange: "transform,opacity" } // smaller movement on mobile
+          : { y: 28, opacity: 0, willChange: "transform,opacity" },
         {
           y: 0,
           opacity: 1,
-          duration: 0.75,
+          duration: isMobile() ? 0.5 : 0.75, // faster on mobile
           ease: "power3.out",
           overwrite: true,
-          scrollTrigger: { trigger: el, start: "top 85%", toggleActions: "play none none reverse" },
+          scrollTrigger: { trigger: el, start: isMobile() ? "top 92%" : "top 85%", toggleActions: "play none none reverse" },
         }
       );
     });
@@ -63,12 +70,12 @@ ScrollTrigger.addEventListener("refresh", () => {
       const cards = container.querySelectorAll<HTMLElement>(".card");
       if (!cards.length) return;
       gsap.from(cards, {
-        y: 30,
+        y: isMobile() ? 12 : 30,
         opacity: 0,
-        stagger: 0.12,
-        duration: 0.72,
+        stagger: isMobile() ? 0.08 : 0.12,
+        duration: isMobile() ? 0.5 : 0.72,
         ease: "power3.out",
-        scrollTrigger: { trigger: container, start: "top 78%" },
+        scrollTrigger: { trigger: container, start: isMobile() ? "top 90%" : "top 78%" },
       });
     });
 
@@ -80,8 +87,8 @@ ScrollTrigger.addEventListener("refresh", () => {
         end: "bottom top",
         scrub: true,
         onUpdate: (self) => {
-          // subtle movement proportional to progress
-          const move = (self.progress - 0.5) * -20; // tweak multiplier
+          // less movement on mobile
+          const move = (self.progress - 0.5) * (isMobile() ? -8 : -20);
           gsap.to(el, { y: move, ease: "none", overwrite: true });
         },
       });

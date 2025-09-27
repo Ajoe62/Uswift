@@ -14,7 +14,7 @@ const HomePage = () => {
   return (
     <>
       <ScrollEffects />
-      <div className="container mx-auto px-4">
+      <div className="container mx-auto px-2 sm:px-4"> {/* Changed: px-2 for mobile, sm:px-4 for tablets and up */}
         <LandingHero />
         <FeaturesSection />
         <ResumeBuilder />
