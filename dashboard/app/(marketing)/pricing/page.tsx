@@ -2,6 +2,7 @@ import PricingHeader from "./PricingHeader";
 import PricingTiers from "./PricingTiers";
 import FAQ from "./FAQ";
 import ScrollEffects from "@/components/ScrollEffects";
+import Footer from "@/components/Footer";
 
 const PricingPage = () => {
   return (
@@ -12,6 +13,7 @@ const PricingPage = () => {
         <PricingTiers />
         <FAQ />
       </div>
+      <Footer />
     </>
   );
 };

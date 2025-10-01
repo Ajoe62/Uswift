@@ -1,6 +1,7 @@
 import FeaturesHero from "./FeaturesHero";
 import FeatureShowcase from "./FeatureShowcase";
 import ScrollEffects from "@/components/ScrollEffects";
+import Footer from "@/components/Footer";
 
 const FeaturesPage = () => {
   return (
@@ -8,6 +9,7 @@ const FeaturesPage = () => {
       <ScrollEffects />
       <FeaturesHero />
       <FeatureShowcase />
+      <Footer />
     </>
   );
 };

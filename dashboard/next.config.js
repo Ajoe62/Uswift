@@ -42,9 +42,15 @@ const nextConfig = {
   // These options are still valid in Next.js 15
   productionBrowserSourceMaps: false,
 
-  // Image optimization
+  // Image optimization - CRITICAL FOR PERFORMANCE
   images: {
-    unoptimized: true, // Faster dev, optimize in production if needed
+    formats: ['image/avif', 'image/webp'], // Modern formats for better compression
+    deviceSizes: [640, 750, 828, 1080, 1200, 1920], // Responsive breakpoints
+    imageSizes: [16, 32, 48, 64, 96, 128, 256, 384], // Fixed sizes for smaller images
+    minimumCacheTTL: 60, // Cache optimized images for 60 seconds
+    dangerouslyAllowSVG: true,
+    contentDispositionType: 'attachment',
+    contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
   },
 
   // Suppress the specific warnings
