@@ -48,9 +48,26 @@ function getDefaultExportFromCjs (x) {
 	return x && x.__esModule && Object.prototype.hasOwnProperty.call(x, 'default') ? x['default'] : x;
 }
 
-var jsxRuntime = {exports: {}};
+var jsxDevRuntime = {exports: {}};
 
-var reactJsxRuntime_production_min = {};
+var reactJsxDevRuntime_production_min = {};
+
+/**
+ * @license React
+ * react-jsx-dev-runtime.production.min.js
+ *
+ * Copyright (c) Facebook, Inc. and its affiliates.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+var a=Symbol.for("react.fragment");reactJsxDevRuntime_production_min.Fragment=a;reactJsxDevRuntime_production_min.jsxDEV=void 0;
+
+{
+  jsxDevRuntime.exports = reactJsxDevRuntime_production_min;
+}
+
+var jsxDevRuntimeExports = jsxDevRuntime.exports;
 
 var react = {exports: {}};
 
@@ -65,20 +82,20 @@ var react_production_min = {};
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  */
-var l$1=Symbol.for("react.element"),n$1=Symbol.for("react.portal"),p$2=Symbol.for("react.fragment"),q$1=Symbol.for("react.strict_mode"),r=Symbol.for("react.profiler"),t=Symbol.for("react.provider"),u=Symbol.for("react.context"),v$1=Symbol.for("react.forward_ref"),w=Symbol.for("react.suspense"),x=Symbol.for("react.memo"),y=Symbol.for("react.lazy"),z$1=Symbol.iterator;function A$1(a){if(null===a||"object"!==typeof a)return null;a=z$1&&a[z$1]||a["@@iterator"];return "function"===typeof a?a:null}
+var l=Symbol.for("react.element"),n=Symbol.for("react.portal"),p$1=Symbol.for("react.fragment"),q=Symbol.for("react.strict_mode"),r=Symbol.for("react.profiler"),t=Symbol.for("react.provider"),u=Symbol.for("react.context"),v$1=Symbol.for("react.forward_ref"),w=Symbol.for("react.suspense"),x=Symbol.for("react.memo"),y=Symbol.for("react.lazy"),z$1=Symbol.iterator;function A$1(a){if(null===a||"object"!==typeof a)return null;a=z$1&&a[z$1]||a["@@iterator"];return "function"===typeof a?a:null}
 var B$1={isMounted:function(){return !1},enqueueForceUpdate:function(){},enqueueReplaceState:function(){},enqueueSetState:function(){}},C$1=Object.assign,D$1={};function E$1(a,b,e){this.props=a;this.context=b;this.refs=D$1;this.updater=e||B$1;}E$1.prototype.isReactComponent={};
 E$1.prototype.setState=function(a,b){if("object"!==typeof a&&"function"!==typeof a&&null!=a)throw Error("setState(...): takes an object of state variables to update or a function which returns an object of state variables.");this.updater.enqueueSetState(this,a,b,"setState");};E$1.prototype.forceUpdate=function(a){this.updater.enqueueForceUpdate(this,a,"forceUpdate");};function F(){}F.prototype=E$1.prototype;function G$1(a,b,e){this.props=a;this.context=b;this.refs=D$1;this.updater=e||B$1;}var H$1=G$1.prototype=new F;
 H$1.constructor=G$1;C$1(H$1,E$1.prototype);H$1.isPureReactComponent=!0;var I$1=Array.isArray,J=Object.prototype.hasOwnProperty,K$1={current:null},L$1={key:!0,ref:!0,__self:!0,__source:!0};
-function M$1(a,b,e){var d,c={},k=null,h=null;if(null!=b)for(d in void 0!==b.ref&&(h=b.ref),void 0!==b.key&&(k=""+b.key),b)J.call(b,d)&&!L$1.hasOwnProperty(d)&&(c[d]=b[d]);var g=arguments.length-2;if(1===g)c.children=e;else if(1<g){for(var f=Array(g),m=0;m<g;m++)f[m]=arguments[m+2];c.children=f;}if(a&&a.defaultProps)for(d in g=a.defaultProps,g)void 0===c[d]&&(c[d]=g[d]);return {$$typeof:l$1,type:a,key:k,ref:h,props:c,_owner:K$1.current}}
-function N$1(a,b){return {$$typeof:l$1,type:a.type,key:b,ref:a.ref,props:a.props,_owner:a._owner}}function O$1(a){return "object"===typeof a&&null!==a&&a.$$typeof===l$1}function escape(a){var b={"=":"=0",":":"=2"};return "$"+a.replace(/[=:]/g,function(a){return b[a]})}var P$1=/\/+/g;function Q$1(a,b){return "object"===typeof a&&null!==a&&null!=a.key?escape(""+a.key):b.toString(36)}
-function R$1(a,b,e,d,c){var k=typeof a;if("undefined"===k||"boolean"===k)a=null;var h=!1;if(null===a)h=!0;else switch(k){case "string":case "number":h=!0;break;case "object":switch(a.$$typeof){case l$1:case n$1:h=!0;}}if(h)return h=a,c=c(h),a=""===d?"."+Q$1(h,0):d,I$1(c)?(e="",null!=a&&(e=a.replace(P$1,"$&/")+"/"),R$1(c,b,e,"",function(a){return a})):null!=c&&(O$1(c)&&(c=N$1(c,e+(!c.key||h&&h.key===c.key?"":(""+c.key).replace(P$1,"$&/")+"/")+a)),b.push(c)),1;h=0;d=""===d?".":d+":";if(I$1(a))for(var g=0;g<a.length;g++){k=
+function M$1(a,b,e){var d,c={},k=null,h=null;if(null!=b)for(d in void 0!==b.ref&&(h=b.ref),void 0!==b.key&&(k=""+b.key),b)J.call(b,d)&&!L$1.hasOwnProperty(d)&&(c[d]=b[d]);var g=arguments.length-2;if(1===g)c.children=e;else if(1<g){for(var f=Array(g),m=0;m<g;m++)f[m]=arguments[m+2];c.children=f;}if(a&&a.defaultProps)for(d in g=a.defaultProps,g)void 0===c[d]&&(c[d]=g[d]);return {$$typeof:l,type:a,key:k,ref:h,props:c,_owner:K$1.current}}
+function N$1(a,b){return {$$typeof:l,type:a.type,key:b,ref:a.ref,props:a.props,_owner:a._owner}}function O$1(a){return "object"===typeof a&&null!==a&&a.$$typeof===l}function escape(a){var b={"=":"=0",":":"=2"};return "$"+a.replace(/[=:]/g,function(a){return b[a]})}var P$1=/\/+/g;function Q$1(a,b){return "object"===typeof a&&null!==a&&null!=a.key?escape(""+a.key):b.toString(36)}
+function R$1(a,b,e,d,c){var k=typeof a;if("undefined"===k||"boolean"===k)a=null;var h=!1;if(null===a)h=!0;else switch(k){case "string":case "number":h=!0;break;case "object":switch(a.$$typeof){case l:case n:h=!0;}}if(h)return h=a,c=c(h),a=""===d?"."+Q$1(h,0):d,I$1(c)?(e="",null!=a&&(e=a.replace(P$1,"$&/")+"/"),R$1(c,b,e,"",function(a){return a})):null!=c&&(O$1(c)&&(c=N$1(c,e+(!c.key||h&&h.key===c.key?"":(""+c.key).replace(P$1,"$&/")+"/")+a)),b.push(c)),1;h=0;d=""===d?".":d+":";if(I$1(a))for(var g=0;g<a.length;g++){k=
 a[g];var f=d+Q$1(k,g);h+=R$1(k,b,e,f,c);}else if(f=A$1(a),"function"===typeof f)for(a=f.call(a),g=0;!(k=a.next()).done;)k=k.value,f=d+Q$1(k,g++),h+=R$1(k,b,e,f,c);else if("object"===k)throw b=String(a),Error("Objects are not valid as a React child (found: "+("[object Object]"===b?"object with keys {"+Object.keys(a).join(", ")+"}":b)+"). If you meant to render a collection of children, use an array instead.");return h}
 function S$1(a,b,e){if(null==a)return a;var d=[],c=0;R$1(a,d,"","",function(a){return b.call(e,a,c++)});return d}function T$1(a){if(-1===a._status){var b=a._result;b=b();b.then(function(b){if(0===a._status||-1===a._status)a._status=1,a._result=b;},function(b){if(0===a._status||-1===a._status)a._status=2,a._result=b;});-1===a._status&&(a._status=0,a._result=b);}if(1===a._status)return a._result.default;throw a._result;}
 var U$1={current:null},V$1={transition:null},W$1={ReactCurrentDispatcher:U$1,ReactCurrentBatchConfig:V$1,ReactCurrentOwner:K$1};function X$1(){throw Error("act(...) is not supported in production builds of React.");}
-react_production_min.Children={map:S$1,forEach:function(a,b,e){S$1(a,function(){b.apply(this,arguments);},e);},count:function(a){var b=0;S$1(a,function(){b++;});return b},toArray:function(a){return S$1(a,function(a){return a})||[]},only:function(a){if(!O$1(a))throw Error("React.Children.only expected to receive a single React element child.");return a}};react_production_min.Component=E$1;react_production_min.Fragment=p$2;react_production_min.Profiler=r;react_production_min.PureComponent=G$1;react_production_min.StrictMode=q$1;react_production_min.Suspense=w;
+react_production_min.Children={map:S$1,forEach:function(a,b,e){S$1(a,function(){b.apply(this,arguments);},e);},count:function(a){var b=0;S$1(a,function(){b++;});return b},toArray:function(a){return S$1(a,function(a){return a})||[]},only:function(a){if(!O$1(a))throw Error("React.Children.only expected to receive a single React element child.");return a}};react_production_min.Component=E$1;react_production_min.Fragment=p$1;react_production_min.Profiler=r;react_production_min.PureComponent=G$1;react_production_min.StrictMode=q;react_production_min.Suspense=w;
 react_production_min.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED=W$1;react_production_min.act=X$1;
 react_production_min.cloneElement=function(a,b,e){if(null===a||void 0===a)throw Error("React.cloneElement(...): The argument must be a React element, but you passed "+a+".");var d=C$1({},a.props),c=a.key,k=a.ref,h=a._owner;if(null!=b){void 0!==b.ref&&(k=b.ref,h=K$1.current);void 0!==b.key&&(c=""+b.key);if(a.type&&a.type.defaultProps)var g=a.type.defaultProps;for(f in b)J.call(b,f)&&!L$1.hasOwnProperty(f)&&(d[f]=void 0===b[f]&&void 0!==g?g[f]:b[f]);}var f=arguments.length-2;if(1===f)d.children=e;else if(1<f){g=Array(f);
-for(var m=0;m<f;m++)g[m]=arguments[m+2];d.children=g;}return {$$typeof:l$1,type:a.type,key:c,ref:k,props:d,_owner:h}};react_production_min.createContext=function(a){a={$$typeof:u,_currentValue:a,_currentValue2:a,_threadCount:0,Provider:null,Consumer:null,_defaultValue:null,_globalName:null};a.Provider={$$typeof:t,_context:a};return a.Consumer=a};react_production_min.createElement=M$1;react_production_min.createFactory=function(a){var b=M$1.bind(null,a);b.type=a;return b};react_production_min.createRef=function(){return {current:null}};
+for(var m=0;m<f;m++)g[m]=arguments[m+2];d.children=g;}return {$$typeof:l,type:a.type,key:c,ref:k,props:d,_owner:h}};react_production_min.createContext=function(a){a={$$typeof:u,_currentValue:a,_currentValue2:a,_threadCount:0,Provider:null,Consumer:null,_defaultValue:null,_globalName:null};a.Provider={$$typeof:t,_context:a};return a.Consumer=a};react_production_min.createElement=M$1;react_production_min.createFactory=function(a){var b=M$1.bind(null,a);b.type=a;return b};react_production_min.createRef=function(){return {current:null}};
 react_production_min.forwardRef=function(a){return {$$typeof:v$1,render:a}};react_production_min.isValidElement=O$1;react_production_min.lazy=function(a){return {$$typeof:y,_payload:{_status:-1,_result:a},_init:T$1}};react_production_min.memo=function(a,b){return {$$typeof:x,type:a,compare:void 0===b?null:b}};react_production_min.startTransition=function(a){var b=V$1.transition;V$1.transition={};try{a();}finally{V$1.transition=b;}};react_production_min.unstable_act=X$1;react_production_min.useCallback=function(a,b){return U$1.current.useCallback(a,b)};react_production_min.useContext=function(a){return U$1.current.useContext(a)};
 react_production_min.useDebugValue=function(){};react_production_min.useDeferredValue=function(a){return U$1.current.useDeferredValue(a)};react_production_min.useEffect=function(a,b){return U$1.current.useEffect(a,b)};react_production_min.useId=function(){return U$1.current.useId()};react_production_min.useImperativeHandle=function(a,b,e){return U$1.current.useImperativeHandle(a,b,e)};react_production_min.useInsertionEffect=function(a,b){return U$1.current.useInsertionEffect(a,b)};react_production_min.useLayoutEffect=function(a,b){return U$1.current.useLayoutEffect(a,b)};
 react_production_min.useMemo=function(a,b){return U$1.current.useMemo(a,b)};react_production_min.useReducer=function(a,b,e){return U$1.current.useReducer(a,b,e)};react_production_min.useRef=function(a){return U$1.current.useRef(a)};react_production_min.useState=function(a){return U$1.current.useState(a)};react_production_min.useSyncExternalStore=function(a,b,e){return U$1.current.useSyncExternalStore(a,b,e)};react_production_min.useTransition=function(){return U$1.current.useTransition()};react_production_min.version="18.3.1";
@@ -89,24 +106,6 @@ react_production_min.useMemo=function(a,b){return U$1.current.useMemo(a,b)};reac
 
 var reactExports = react.exports;
 const React = /*@__PURE__*/getDefaultExportFromCjs(reactExports);
-
-/**
- * @license React
- * react-jsx-runtime.production.min.js
- *
- * Copyright (c) Facebook, Inc. and its affiliates.
- *
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
- */
-var f=reactExports,k=Symbol.for("react.element"),l=Symbol.for("react.fragment"),m$1=Object.prototype.hasOwnProperty,n=f.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED.ReactCurrentOwner,p$1={key:!0,ref:!0,__self:!0,__source:!0};
-function q(c,a,g){var b,d={},e=null,h=null;void 0!==g&&(e=""+g);void 0!==a.key&&(e=""+a.key);void 0!==a.ref&&(h=a.ref);for(b in a)m$1.call(a,b)&&!p$1.hasOwnProperty(b)&&(d[b]=a[b]);if(c&&c.defaultProps)for(b in a=c.defaultProps,a)void 0===d[b]&&(d[b]=a[b]);return {$$typeof:k,type:c,key:e,ref:h,props:d,_owner:n.current}}reactJsxRuntime_production_min.Fragment=l;reactJsxRuntime_production_min.jsx=q;reactJsxRuntime_production_min.jsxs=q;
-
-{
-  jsxRuntime.exports = reactJsxRuntime_production_min;
-}
-
-var jsxRuntimeExports = jsxRuntime.exports;
 
 var client = {};
 
@@ -783,7 +782,7 @@ function ProfileVault() {
     }
   }, [isAuthenticated, user]);
   const TourGuide = () => {
-    return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: {
+    return /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: {
       background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
       color: "white",
       padding: "1.5rem",
@@ -791,84 +790,232 @@ function ProfileVault() {
       marginBottom: "1.5rem",
       position: "relative"
     }, children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { style: {
+      /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: {
         position: "absolute",
         top: "10px",
         right: "10px",
         cursor: "pointer",
         fontSize: "1.2rem"
-      }, onClick: () => setShowTour(false), children: "✕" }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { style: { margin: "0 0 1rem 0", fontSize: "1.2rem" }, children: "🚀 Auto-Apply Setup Guide" }),
-      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { fontSize: "0.9rem", lineHeight: "1.5" }, children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { marginBottom: "1rem" }, children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "📋 Required Information:" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("ul", { style: { margin: "0.5rem 0", paddingLeft: "1.2rem" }, children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Basic Info:" }),
+      }, onClick: () => setShowTour(false), children: "✕" }, void 0, false, {
+        fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
+        lineNumber: 211,
+        columnNumber: 9
+      }, this),
+      /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("h3", { style: { margin: "0 0 1rem 0", fontSize: "1.2rem" }, children: "🚀 Auto-Apply Setup Guide" }, void 0, false, {
+        fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
+        lineNumber: 221,
+        columnNumber: 9
+      }, this),
+      /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { fontSize: "0.9rem", lineHeight: "1.5" }, children: [
+        /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { marginBottom: "1rem" }, children: [
+          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("strong", { children: "📋 Required Information:" }, void 0, false, {
+            fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
+            lineNumber: 227,
+            columnNumber: 13
+          }, this),
+          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("ul", { style: { margin: "0.5rem 0", paddingLeft: "1.2rem" }, children: [
+            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("li", { children: [
+              /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("strong", { children: "Basic Info:" }, void 0, false, {
+                fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
+                lineNumber: 229,
+                columnNumber: 19
+              }, this),
               " First Name, Last Name, Email, Phone"
-            ] }),
-            /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Resume:" }),
+            ] }, void 0, true, {
+              fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
+              lineNumber: 229,
+              columnNumber: 15
+            }, this),
+            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("li", { children: [
+              /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("strong", { children: "Resume:" }, void 0, false, {
+                fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
+                lineNumber: 230,
+                columnNumber: 19
+              }, this),
               " Upload your resume file (PDF/DOC)"
-            ] })
-          ] })
-        ] }),
-        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { marginBottom: "1rem" }, children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "📝 Optional but Recommended:" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("ul", { style: { margin: "0.5rem 0", paddingLeft: "1.2rem" }, children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Cover Letter:" }),
+            ] }, void 0, true, {
+              fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
+              lineNumber: 230,
+              columnNumber: 15
+            }, this)
+          ] }, void 0, true, {
+            fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
+            lineNumber: 228,
+            columnNumber: 13
+          }, this)
+        ] }, void 0, true, {
+          fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
+          lineNumber: 226,
+          columnNumber: 11
+        }, this),
+        /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { marginBottom: "1rem" }, children: [
+          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("strong", { children: "📝 Optional but Recommended:" }, void 0, false, {
+            fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
+            lineNumber: 235,
+            columnNumber: 13
+          }, this),
+          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("ul", { style: { margin: "0.5rem 0", paddingLeft: "1.2rem" }, children: [
+            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("li", { children: [
+              /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("strong", { children: "Cover Letter:" }, void 0, false, {
+                fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
+                lineNumber: 237,
+                columnNumber: 19
+              }, this),
               " Template or custom content"
-            ] }),
-            /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "LinkedIn:" }),
+            ] }, void 0, true, {
+              fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
+              lineNumber: 237,
+              columnNumber: 15
+            }, this),
+            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("li", { children: [
+              /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("strong", { children: "LinkedIn:" }, void 0, false, {
+                fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
+                lineNumber: 238,
+                columnNumber: 19
+              }, this),
               " Your LinkedIn profile URL"
-            ] }),
-            /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Portfolio:" }),
+            ] }, void 0, true, {
+              fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
+              lineNumber: 238,
+              columnNumber: 15
+            }, this),
+            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("li", { children: [
+              /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("strong", { children: "Portfolio:" }, void 0, false, {
+                fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
+                lineNumber: 239,
+                columnNumber: 19
+              }, this),
               " Website or portfolio link"
-            ] }),
-            /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Q&A Profile:" }),
+            ] }, void 0, true, {
+              fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
+              lineNumber: 239,
+              columnNumber: 15
+            }, this),
+            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("li", { children: [
+              /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("strong", { children: "Q&A Profile:" }, void 0, false, {
+                fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
+                lineNumber: 240,
+                columnNumber: 19
+              }, this),
               " Interview answers and skills"
-            ] })
-          ] })
-        ] }),
-        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { marginBottom: "1rem" }, children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "🎯 How Auto-Apply Works:" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("ol", { style: { margin: "0.5rem 0", paddingLeft: "1.2rem" }, children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Opens job application page" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Detects form fields automatically" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Fills your information" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Uploads your resume" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Submits the application" })
-          ] })
-        ] }),
-        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { marginTop: "1rem", padding: "0.8rem", background: "rgba(255,255,255,0.1)", borderRadius: "8px" }, children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "💡 Pro Tip:" }),
+            ] }, void 0, true, {
+              fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
+              lineNumber: 240,
+              columnNumber: 15
+            }, this)
+          ] }, void 0, true, {
+            fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
+            lineNumber: 236,
+            columnNumber: 13
+          }, this)
+        ] }, void 0, true, {
+          fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
+          lineNumber: 234,
+          columnNumber: 11
+        }, this),
+        /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { marginBottom: "1rem" }, children: [
+          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("strong", { children: "🎯 How Auto-Apply Works:" }, void 0, false, {
+            fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
+            lineNumber: 245,
+            columnNumber: 13
+          }, this),
+          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("ol", { style: { margin: "0.5rem 0", paddingLeft: "1.2rem" }, children: [
+            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("li", { children: "Opens job application page" }, void 0, false, {
+              fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
+              lineNumber: 247,
+              columnNumber: 15
+            }, this),
+            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("li", { children: "Detects form fields automatically" }, void 0, false, {
+              fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
+              lineNumber: 248,
+              columnNumber: 15
+            }, this),
+            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("li", { children: "Fills your information" }, void 0, false, {
+              fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
+              lineNumber: 249,
+              columnNumber: 15
+            }, this),
+            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("li", { children: "Uploads your resume" }, void 0, false, {
+              fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
+              lineNumber: 250,
+              columnNumber: 15
+            }, this),
+            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("li", { children: "Submits the application" }, void 0, false, {
+              fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
+              lineNumber: 251,
+              columnNumber: 15
+            }, this)
+          ] }, void 0, true, {
+            fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
+            lineNumber: 246,
+            columnNumber: 13
+          }, this)
+        ] }, void 0, true, {
+          fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
+          lineNumber: 244,
+          columnNumber: 11
+        }, this),
+        /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { marginTop: "1rem", padding: "0.8rem", background: "rgba(255,255,255,0.1)", borderRadius: "8px" }, children: [
+          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("strong", { children: "💡 Pro Tip:" }, void 0, false, {
+            fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
+            lineNumber: 256,
+            columnNumber: 13
+          }, this),
           " Complete all required fields to ensure successful auto-application on all major job boards!"
-        ] })
-      ] })
-    ] });
+        ] }, void 0, true, {
+          fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
+          lineNumber: 255,
+          columnNumber: 11
+        }, this)
+      ] }, void 0, true, {
+        fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
+        lineNumber: 225,
+        columnNumber: 9
+      }, this)
+    ] }, void 0, true, {
+      fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
+      lineNumber: 203,
+      columnNumber: 7
+    }, this);
   };
-  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { background: "#FFFFFF", borderRadius: "1.5rem", padding: "2rem" }, children: [
-    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "uswift-gradient", style: { height: 8, borderRadius: 8, marginBottom: 24 } }),
-    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: {
+  return /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { background: "#FFFFFF", borderRadius: "1.5rem", padding: "2rem" }, children: [
+    /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { className: "uswift-gradient", style: { height: 8, borderRadius: 8, marginBottom: 24 } }, void 0, false, {
+      fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
+      lineNumber: 265,
+      columnNumber: 7
+    }, this),
+    /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: {
       display: "flex",
       justifyContent: "space-between",
       alignItems: "center",
       marginBottom: 16
     }, children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx("h2", { className: "uswift-text-gradient", style: { fontSize: "1.5rem", margin: 0 }, children: "Profile Vault" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { style: { color: "#6B7280", fontSize: "0.9rem", margin: "4px 0 0 0" }, children: "Manage your career documents and auto-apply settings" })
-      ] }),
-      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { display: "flex", alignItems: "center", gap: "12px" }, children: [
-        lastSaved && /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { style: { fontSize: "0.8rem", color: "#10B981" }, children: [
+      /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { children: [
+        /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("h2", { className: "uswift-text-gradient", style: { fontSize: "1.5rem", margin: 0 }, children: "Profile Vault" }, void 0, false, {
+          fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
+          lineNumber: 274,
+          columnNumber: 11
+        }, this),
+        /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("p", { style: { color: "#6B7280", fontSize: "0.9rem", margin: "4px 0 0 0" }, children: "Manage your career documents and auto-apply settings" }, void 0, false, {
+          fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
+          lineNumber: 277,
+          columnNumber: 11
+        }, this)
+      ] }, void 0, true, {
+        fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
+        lineNumber: 273,
+        columnNumber: 9
+      }, this),
+      /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { display: "flex", alignItems: "center", gap: "12px" }, children: [
+        lastSaved && /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("span", { style: { fontSize: "0.8rem", color: "#10B981" }, children: [
           "✓ Saved ",
           lastSaved
-        ] }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(
+        ] }, void 0, true, {
+          fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
+          lineNumber: 283,
+          columnNumber: 13
+        }, this),
+        /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
           "button",
           {
             onClick: () => setShowTour(!showTour),
@@ -882,20 +1029,52 @@ function ProfileVault() {
               color: "#374151"
             },
             children: "❓ Guide"
-          }
+          },
+          void 0,
+          false,
+          {
+            fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
+            lineNumber: 287,
+            columnNumber: 11
+          },
+          this
         )
-      ] })
-    ] }),
-    showTour && /* @__PURE__ */ jsxRuntimeExports.jsx(TourGuide, {}),
-    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { marginBottom: "1.5rem" }, children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsxs("h3", { style: { fontSize: "1.1rem", fontWeight: 600, color: "#111827", marginBottom: "1rem", display: "flex", alignItems: "center", gap: "8px" }, children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { style: { color: "#EF4444" }, children: "●" }),
+      ] }, void 0, true, {
+        fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
+        lineNumber: 281,
+        columnNumber: 9
+      }, this)
+    ] }, void 0, true, {
+      fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
+      lineNumber: 267,
+      columnNumber: 7
+    }, this),
+    showTour && /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(TourGuide, {}, void 0, false, {
+      fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
+      lineNumber: 304,
+      columnNumber: 20
+    }, this),
+    /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { marginBottom: "1.5rem" }, children: [
+      /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("h3", { style: { fontSize: "1.1rem", fontWeight: 600, color: "#111827", marginBottom: "1rem", display: "flex", alignItems: "center", gap: "8px" }, children: [
+        /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("span", { style: { color: "#EF4444" }, children: "●" }, void 0, false, {
+          fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
+          lineNumber: 309,
+          columnNumber: 11
+        }, this),
         "Required for Auto-Apply"
-      ] }),
-      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem", marginBottom: "1rem" }, children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "uswift-card", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx("label", { style: { fontWeight: 600, display: "block", marginBottom: 8 }, children: "First Name *" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(
+      ] }, void 0, true, {
+        fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
+        lineNumber: 308,
+        columnNumber: 9
+      }, this),
+      /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem", marginBottom: "1rem" }, children: [
+        /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { className: "uswift-card", children: [
+          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("label", { style: { fontWeight: 600, display: "block", marginBottom: 8 }, children: "First Name *" }, void 0, false, {
+            fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
+            lineNumber: 316,
+            columnNumber: 13
+          }, this),
+          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
             "input",
             {
               type: "text",
@@ -910,12 +1089,28 @@ function ProfileVault() {
               },
               placeholder: "Your first name",
               disabled: loading
-            }
+            },
+            void 0,
+            false,
+            {
+              fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
+              lineNumber: 319,
+              columnNumber: 13
+            },
+            this
           )
-        ] }),
-        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "uswift-card", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx("label", { style: { fontWeight: 600, display: "block", marginBottom: 8 }, children: "Last Name *" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(
+        ] }, void 0, true, {
+          fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
+          lineNumber: 315,
+          columnNumber: 11
+        }, this),
+        /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { className: "uswift-card", children: [
+          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("label", { style: { fontWeight: 600, display: "block", marginBottom: 8 }, children: "Last Name *" }, void 0, false, {
+            fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
+            lineNumber: 336,
+            columnNumber: 13
+          }, this),
+          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
             "input",
             {
               type: "text",
@@ -930,14 +1125,34 @@ function ProfileVault() {
               },
               placeholder: "Your last name",
               disabled: loading
-            }
+            },
+            void 0,
+            false,
+            {
+              fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
+              lineNumber: 339,
+              columnNumber: 13
+            },
+            this
           )
-        ] })
-      ] }),
-      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { display: "grid", gridTemplateColumns: "2fr 1fr", gap: "1rem", marginBottom: "1rem" }, children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "uswift-card", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx("label", { style: { fontWeight: 600, display: "block", marginBottom: 8 }, children: "Email Address *" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(
+        ] }, void 0, true, {
+          fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
+          lineNumber: 335,
+          columnNumber: 11
+        }, this)
+      ] }, void 0, true, {
+        fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
+        lineNumber: 314,
+        columnNumber: 9
+      }, this),
+      /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { display: "grid", gridTemplateColumns: "2fr 1fr", gap: "1rem", marginBottom: "1rem" }, children: [
+        /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { className: "uswift-card", children: [
+          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("label", { style: { fontWeight: 600, display: "block", marginBottom: 8 }, children: "Email Address *" }, void 0, false, {
+            fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
+            lineNumber: 358,
+            columnNumber: 13
+          }, this),
+          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
             "input",
             {
               type: "email",
@@ -952,12 +1167,28 @@ function ProfileVault() {
               },
               placeholder: "your.email@example.com",
               disabled: loading
-            }
+            },
+            void 0,
+            false,
+            {
+              fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
+              lineNumber: 361,
+              columnNumber: 13
+            },
+            this
           )
-        ] }),
-        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "uswift-card", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx("label", { style: { fontWeight: 600, display: "block", marginBottom: 8 }, children: "Phone Number *" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(
+        ] }, void 0, true, {
+          fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
+          lineNumber: 357,
+          columnNumber: 11
+        }, this),
+        /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { className: "uswift-card", children: [
+          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("label", { style: { fontWeight: 600, display: "block", marginBottom: 8 }, children: "Phone Number *" }, void 0, false, {
+            fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
+            lineNumber: 378,
+            columnNumber: 13
+          }, this),
+          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
             "input",
             {
               type: "tel",
@@ -972,14 +1203,34 @@ function ProfileVault() {
               },
               placeholder: "+1 (555) 123-4567",
               disabled: loading
-            }
+            },
+            void 0,
+            false,
+            {
+              fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
+              lineNumber: 381,
+              columnNumber: 13
+            },
+            this
           )
-        ] })
-      ] }),
-      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "uswift-card", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx("label", { style: { fontWeight: 600, display: "block", marginBottom: 8 }, children: "Resume File *" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { display: "flex", alignItems: "center", gap: "12px" }, children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx(
+        ] }, void 0, true, {
+          fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
+          lineNumber: 377,
+          columnNumber: 11
+        }, this)
+      ] }, void 0, true, {
+        fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
+        lineNumber: 356,
+        columnNumber: 9
+      }, this),
+      /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { className: "uswift-card", children: [
+        /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("label", { style: { fontWeight: 600, display: "block", marginBottom: 8 }, children: "Resume File *" }, void 0, false, {
+          fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
+          lineNumber: 400,
+          columnNumber: 11
+        }, this),
+        /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { display: "flex", alignItems: "center", gap: "12px" }, children: [
+          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
             "input",
             {
               type: "file",
@@ -993,25 +1244,65 @@ function ProfileVault() {
                 fontSize: "0.9rem"
               },
               disabled: loading
-            }
+            },
+            void 0,
+            false,
+            {
+              fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
+              lineNumber: 404,
+              columnNumber: 13
+            },
+            this
           ),
-          resumeFile && /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { style: { color: "#10B981", fontSize: "0.8rem", fontWeight: 500 }, children: [
+          resumeFile && /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("span", { style: { color: "#10B981", fontSize: "0.8rem", fontWeight: 500 }, children: [
             "✓ ",
             resumeFile.name
-          ] })
-        ] }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("small", { style: { color: "#6B7280", fontSize: "0.8rem", marginTop: "4px", display: "block" }, children: "Supported formats: PDF, DOC, DOCX (Max 10MB)" })
-      ] })
-    ] }),
-    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { marginBottom: "1.5rem" }, children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsxs("h3", { style: { fontSize: "1.1rem", fontWeight: 600, color: "#111827", marginBottom: "1rem", display: "flex", alignItems: "center", gap: "8px" }, children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { style: { color: "#F59E0B" }, children: "●" }),
+          ] }, void 0, true, {
+            fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
+            lineNumber: 418,
+            columnNumber: 15
+          }, this)
+        ] }, void 0, true, {
+          fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
+          lineNumber: 403,
+          columnNumber: 11
+        }, this),
+        /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("small", { style: { color: "#6B7280", fontSize: "0.8rem", marginTop: "4px", display: "block" }, children: "Supported formats: PDF, DOC, DOCX (Max 10MB)" }, void 0, false, {
+          fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
+          lineNumber: 423,
+          columnNumber: 11
+        }, this)
+      ] }, void 0, true, {
+        fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
+        lineNumber: 399,
+        columnNumber: 9
+      }, this)
+    ] }, void 0, true, {
+      fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
+      lineNumber: 307,
+      columnNumber: 7
+    }, this),
+    /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { marginBottom: "1.5rem" }, children: [
+      /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("h3", { style: { fontSize: "1.1rem", fontWeight: 600, color: "#111827", marginBottom: "1rem", display: "flex", alignItems: "center", gap: "8px" }, children: [
+        /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("span", { style: { color: "#F59E0B" }, children: "●" }, void 0, false, {
+          fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
+          lineNumber: 432,
+          columnNumber: 11
+        }, this),
         "Optional (Recommended)"
-      ] }),
-      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem", marginBottom: "1rem" }, children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "uswift-card", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx("label", { style: { fontWeight: 600, display: "block", marginBottom: 8 }, children: "LinkedIn Profile" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(
+      ] }, void 0, true, {
+        fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
+        lineNumber: 431,
+        columnNumber: 9
+      }, this),
+      /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem", marginBottom: "1rem" }, children: [
+        /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { className: "uswift-card", children: [
+          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("label", { style: { fontWeight: 600, display: "block", marginBottom: 8 }, children: "LinkedIn Profile" }, void 0, false, {
+            fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
+            lineNumber: 438,
+            columnNumber: 13
+          }, this),
+          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
             "input",
             {
               type: "url",
@@ -1026,12 +1317,28 @@ function ProfileVault() {
               },
               placeholder: "https://linkedin.com/in/yourprofile",
               disabled: loading
-            }
+            },
+            void 0,
+            false,
+            {
+              fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
+              lineNumber: 441,
+              columnNumber: 13
+            },
+            this
           )
-        ] }),
-        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "uswift-card", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx("label", { style: { fontWeight: 600, display: "block", marginBottom: 8 }, children: "Portfolio/Website" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(
+        ] }, void 0, true, {
+          fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
+          lineNumber: 437,
+          columnNumber: 11
+        }, this),
+        /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { className: "uswift-card", children: [
+          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("label", { style: { fontWeight: 600, display: "block", marginBottom: 8 }, children: "Portfolio/Website" }, void 0, false, {
+            fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
+            lineNumber: 458,
+            columnNumber: 13
+          }, this),
+          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
             "input",
             {
               type: "url",
@@ -1046,13 +1353,33 @@ function ProfileVault() {
               },
               placeholder: "https://yourportfolio.com",
               disabled: loading
-            }
+            },
+            void 0,
+            false,
+            {
+              fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
+              lineNumber: 461,
+              columnNumber: 13
+            },
+            this
           )
-        ] })
-      ] }),
-      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "uswift-card", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx("label", { style: { fontWeight: 600, display: "block", marginBottom: 8 }, children: "Cover Letter Template" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(
+        ] }, void 0, true, {
+          fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
+          lineNumber: 457,
+          columnNumber: 11
+        }, this)
+      ] }, void 0, true, {
+        fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
+        lineNumber: 436,
+        columnNumber: 9
+      }, this),
+      /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { className: "uswift-card", children: [
+        /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("label", { style: { fontWeight: 600, display: "block", marginBottom: 8 }, children: "Cover Letter Template" }, void 0, false, {
+          fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
+          lineNumber: 479,
+          columnNumber: 11
+        }, this),
+        /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
           "textarea",
           {
             value: coverLetter,
@@ -1068,13 +1395,33 @@ function ProfileVault() {
             },
             placeholder: "Write your cover letter template here. Use [COMPANY] and [POSITION] as placeholders...",
             disabled: loading
-          }
+          },
+          void 0,
+          false,
+          {
+            fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
+            lineNumber: 482,
+            columnNumber: 11
+          },
+          this
         ),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("small", { style: { color: "#6B7280", fontSize: "0.8rem", marginTop: "4px", display: "block" }, children: "Tip: Use placeholders like [COMPANY] and [POSITION] for auto-customization" })
-      ] }),
-      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "uswift-card", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx("label", { style: { fontWeight: 600, display: "block", marginBottom: 8 }, children: "Interview Q&A Profile" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(
+        /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("small", { style: { color: "#6B7280", fontSize: "0.8rem", marginTop: "4px", display: "block" }, children: "Tip: Use placeholders like [COMPANY] and [POSITION] for auto-customization" }, void 0, false, {
+          fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
+          lineNumber: 497,
+          columnNumber: 11
+        }, this)
+      ] }, void 0, true, {
+        fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
+        lineNumber: 478,
+        columnNumber: 9
+      }, this),
+      /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { className: "uswift-card", children: [
+        /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("label", { style: { fontWeight: 600, display: "block", marginBottom: 8 }, children: "Interview Q&A Profile" }, void 0, false, {
+          fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
+          lineNumber: 503,
+          columnNumber: 11
+        }, this),
+        /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
           "textarea",
           {
             value: qaProfile,
@@ -1090,37 +1437,113 @@ function ProfileVault() {
             },
             placeholder: "List your key skills, experience highlights, and common interview answers...",
             disabled: loading
-          }
+          },
+          void 0,
+          false,
+          {
+            fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
+            lineNumber: 506,
+            columnNumber: 11
+          },
+          this
         ),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("small", { style: { color: "#6B7280", fontSize: "0.8rem", marginTop: "4px", display: "block" }, children: "Used by AI interview preparation features" })
-      ] })
-    ] }),
-    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: {
+        /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("small", { style: { color: "#6B7280", fontSize: "0.8rem", marginTop: "4px", display: "block" }, children: "Used by AI interview preparation features" }, void 0, false, {
+          fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
+          lineNumber: 521,
+          columnNumber: 11
+        }, this)
+      ] }, void 0, true, {
+        fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
+        lineNumber: 502,
+        columnNumber: 9
+      }, this)
+    ] }, void 0, true, {
+      fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
+      lineNumber: 430,
+      columnNumber: 7
+    }, this),
+    /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: {
       marginTop: "1.5rem",
       padding: "1rem",
       borderRadius: "8px",
       background: isProfileCompleteForAutoApply() ? "linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(16, 185, 129, 0.05) 100%)" : "linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(245, 158, 11, 0.05) 100%)",
       border: `1px solid ${isProfileCompleteForAutoApply() ? "#10B981" : "#F59E0B"}`
     }, children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { display: "flex", alignItems: "center", gap: "8px", marginBottom: "0.5rem" }, children: [
-        isProfileCompleteForAutoApply() ? /* @__PURE__ */ jsxRuntimeExports.jsx("span", { style: { color: "#10B981", fontSize: "1.2rem" }, children: "✅" }) : /* @__PURE__ */ jsxRuntimeExports.jsx("span", { style: { color: "#F59E0B", fontSize: "1.2rem" }, children: "⚠️" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { style: { fontWeight: 600, color: "#111827" }, children: [
+      /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { display: "flex", alignItems: "center", gap: "8px", marginBottom: "0.5rem" }, children: [
+        isProfileCompleteForAutoApply() ? /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("span", { style: { color: "#10B981", fontSize: "1.2rem" }, children: "✅" }, void 0, false, {
+          fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
+          lineNumber: 539,
+          columnNumber: 13
+        }, this) : /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("span", { style: { color: "#F59E0B", fontSize: "1.2rem" }, children: "⚠️" }, void 0, false, {
+          fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
+          lineNumber: 541,
+          columnNumber: 13
+        }, this),
+        /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("span", { style: { fontWeight: 600, color: "#111827" }, children: [
           "Auto-Apply Status: ",
           isProfileCompleteForAutoApply() ? "Ready" : "Incomplete"
-        ] })
-      ] }),
-      isProfileCompleteForAutoApply() ? /* @__PURE__ */ jsxRuntimeExports.jsx("p", { style: { color: "#10B981", fontSize: "0.9rem", margin: 0 }, children: "🎉 Your profile is complete! You can now use auto-apply on supported job boards." }) : /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { fontSize: "0.9rem", color: "#92400E" }, children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { style: { margin: "0 0 0.5rem 0", fontWeight: 500 }, children: "Complete these fields to enable auto-apply:" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsxs("ul", { style: { margin: 0, paddingLeft: "1.2rem" }, children: [
-          !firstName.trim() && /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "First Name" }),
-          !lastName.trim() && /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Last Name" }),
-          !email.trim() && /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Email Address" }),
-          !phone.trim() && /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Phone Number" }),
-          !resume.trim() && /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Resume File" })
-        ] })
-      ] })
-    ] }),
-    /* @__PURE__ */ jsxRuntimeExports.jsx(
+        ] }, void 0, true, {
+          fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
+          lineNumber: 543,
+          columnNumber: 11
+        }, this)
+      ] }, void 0, true, {
+        fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
+        lineNumber: 537,
+        columnNumber: 9
+      }, this),
+      isProfileCompleteForAutoApply() ? /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("p", { style: { color: "#10B981", fontSize: "0.9rem", margin: 0 }, children: "🎉 Your profile is complete! You can now use auto-apply on supported job boards." }, void 0, false, {
+        fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
+        lineNumber: 549,
+        columnNumber: 11
+      }, this) : /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { fontSize: "0.9rem", color: "#92400E" }, children: [
+        /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("p", { style: { margin: "0 0 0.5rem 0", fontWeight: 500 }, children: "Complete these fields to enable auto-apply:" }, void 0, false, {
+          fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
+          lineNumber: 554,
+          columnNumber: 13
+        }, this),
+        /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("ul", { style: { margin: 0, paddingLeft: "1.2rem" }, children: [
+          !firstName.trim() && /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("li", { children: "First Name" }, void 0, false, {
+            fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
+            lineNumber: 558,
+            columnNumber: 37
+          }, this),
+          !lastName.trim() && /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("li", { children: "Last Name" }, void 0, false, {
+            fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
+            lineNumber: 559,
+            columnNumber: 36
+          }, this),
+          !email.trim() && /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("li", { children: "Email Address" }, void 0, false, {
+            fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
+            lineNumber: 560,
+            columnNumber: 33
+          }, this),
+          !phone.trim() && /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("li", { children: "Phone Number" }, void 0, false, {
+            fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
+            lineNumber: 561,
+            columnNumber: 33
+          }, this),
+          !resume.trim() && /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("li", { children: "Resume File" }, void 0, false, {
+            fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
+            lineNumber: 562,
+            columnNumber: 34
+          }, this)
+        ] }, void 0, true, {
+          fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
+          lineNumber: 557,
+          columnNumber: 13
+        }, this)
+      ] }, void 0, true, {
+        fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
+        lineNumber: 553,
+        columnNumber: 11
+      }, this)
+    ] }, void 0, true, {
+      fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
+      lineNumber: 528,
+      columnNumber: 7
+    }, this),
+    /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
       "button",
       {
         className: "uswift-btn",
@@ -1128,9 +1551,17 @@ function ProfileVault() {
         onClick: saveProfile,
         disabled: loading,
         children: loading ? "Saving..." : isAuthenticated ? "Save to Cloud" : "Save Locally"
-      }
+      },
+      void 0,
+      false,
+      {
+        fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
+        lineNumber: 568,
+        columnNumber: 7
+      },
+      this
     ),
-    isProfileCompleteForAutoApply() && /* @__PURE__ */ jsxRuntimeExports.jsx(
+    isProfileCompleteForAutoApply() && /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
       "button",
       {
         onClick: () => {
@@ -1151,9 +1582,21 @@ function ProfileVault() {
           cursor: "pointer"
         },
         children: "📋 Export Profile"
-      }
+      },
+      void 0,
+      false,
+      {
+        fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
+        lineNumber: 582,
+        columnNumber: 9
+      },
+      this
     )
-  ] });
+  ] }, void 0, true, {
+    fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
+    lineNumber: 264,
+    columnNumber: 5
+  }, this);
 }
 
 const JobTracker = () => {
@@ -1425,7 +1868,7 @@ const JobTracker = () => {
     a.click();
     URL.revokeObjectURL(url);
   };
-  return /* @__PURE__ */ jsxRuntimeExports.jsxs(
+  return /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
     "div",
     {
       style: {
@@ -1436,14 +1879,22 @@ const JobTracker = () => {
         overflow: "hidden"
       },
       children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(
+        /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
           "div",
           {
             className: "uswift-gradient",
             style: { height: 8, borderRadius: 8, marginBottom: 24 }
-          }
+          },
+          void 0,
+          false,
+          {
+            fileName: "C:/Users/DELL/Uswift/extension/src/JobTracker.tsx",
+            lineNumber: 350,
+            columnNumber: 7
+          },
+          globalThis
         ),
-        /* @__PURE__ */ jsxRuntimeExports.jsxs(
+        /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
           "div",
           {
             style: {
@@ -1453,18 +1904,38 @@ const JobTracker = () => {
               marginBottom: 16
             },
             children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx("h2", { style: { fontSize: "1.4rem", fontWeight: 700, color: "#111827" }, children: "Job Tracker" }),
-              isAuthenticated && /* @__PURE__ */ jsxRuntimeExports.jsx(
+              /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("h2", { style: { fontSize: "1.4rem", fontWeight: 700, color: "#111827" }, children: "Job Tracker" }, void 0, false, {
+                fileName: "C:/Users/DELL/Uswift/extension/src/JobTracker.tsx",
+                lineNumber: 362,
+                columnNumber: 9
+              }, globalThis),
+              isAuthenticated && /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                 "span",
                 {
                   style: { color: "#10B981", fontSize: "0.8rem", fontWeight: 600 },
                   children: "☁️ Cloud Sync"
-                }
+                },
+                void 0,
+                false,
+                {
+                  fileName: "C:/Users/DELL/Uswift/extension/src/JobTracker.tsx",
+                  lineNumber: 366,
+                  columnNumber: 11
+                },
+                globalThis
               )
             ]
-          }
+          },
+          void 0,
+          true,
+          {
+            fileName: "C:/Users/DELL/Uswift/extension/src/JobTracker.tsx",
+            lineNumber: 354,
+            columnNumber: 7
+          },
+          globalThis
         ),
-        /* @__PURE__ */ jsxRuntimeExports.jsxs(
+        /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
           "div",
           {
             style: {
@@ -1474,7 +1945,7 @@ const JobTracker = () => {
               marginBottom: 20
             },
             children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsxs(
+              /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                 "div",
                 {
                   style: {
@@ -1484,18 +1955,38 @@ const JobTracker = () => {
                     textAlign: "center"
                   },
                   children: [
-                    /* @__PURE__ */ jsxRuntimeExports.jsx(
+                    /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                       "div",
                       {
                         style: { fontSize: "1.5rem", fontWeight: 700, color: "#3B82F6" },
                         children: getStatusCount("applied")
-                      }
+                      },
+                      void 0,
+                      false,
+                      {
+                        fileName: "C:/Users/DELL/Uswift/extension/src/JobTracker.tsx",
+                        lineNumber: 390,
+                        columnNumber: 11
+                      },
+                      globalThis
                     ),
-                    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { style: { fontSize: "0.8rem", color: "#6B7280" }, children: "Applied" })
+                    /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { fontSize: "0.8rem", color: "#6B7280" }, children: "Applied" }, void 0, false, {
+                      fileName: "C:/Users/DELL/Uswift/extension/src/JobTracker.tsx",
+                      lineNumber: 395,
+                      columnNumber: 11
+                    }, globalThis)
                   ]
-                }
+                },
+                void 0,
+                true,
+                {
+                  fileName: "C:/Users/DELL/Uswift/extension/src/JobTracker.tsx",
+                  lineNumber: 382,
+                  columnNumber: 9
+                },
+                globalThis
               ),
-              /* @__PURE__ */ jsxRuntimeExports.jsxs(
+              /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                 "div",
                 {
                   style: {
@@ -1505,18 +1996,38 @@ const JobTracker = () => {
                     textAlign: "center"
                   },
                   children: [
-                    /* @__PURE__ */ jsxRuntimeExports.jsx(
+                    /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                       "div",
                       {
                         style: { fontSize: "1.5rem", fontWeight: 700, color: "#F59E0B" },
                         children: getStatusCount("interviewing")
-                      }
+                      },
+                      void 0,
+                      false,
+                      {
+                        fileName: "C:/Users/DELL/Uswift/extension/src/JobTracker.tsx",
+                        lineNumber: 405,
+                        columnNumber: 11
+                      },
+                      globalThis
                     ),
-                    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { style: { fontSize: "0.8rem", color: "#6B7280" }, children: "Interviewing" })
+                    /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { fontSize: "0.8rem", color: "#6B7280" }, children: "Interviewing" }, void 0, false, {
+                      fileName: "C:/Users/DELL/Uswift/extension/src/JobTracker.tsx",
+                      lineNumber: 410,
+                      columnNumber: 11
+                    }, globalThis)
                   ]
-                }
+                },
+                void 0,
+                true,
+                {
+                  fileName: "C:/Users/DELL/Uswift/extension/src/JobTracker.tsx",
+                  lineNumber: 397,
+                  columnNumber: 9
+                },
+                globalThis
               ),
-              /* @__PURE__ */ jsxRuntimeExports.jsxs(
+              /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                 "div",
                 {
                   style: {
@@ -1526,18 +2037,38 @@ const JobTracker = () => {
                     textAlign: "center"
                   },
                   children: [
-                    /* @__PURE__ */ jsxRuntimeExports.jsx(
+                    /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                       "div",
                       {
                         style: { fontSize: "1.5rem", fontWeight: 700, color: "#10B981" },
                         children: getStatusCount("offer")
-                      }
+                      },
+                      void 0,
+                      false,
+                      {
+                        fileName: "C:/Users/DELL/Uswift/extension/src/JobTracker.tsx",
+                        lineNumber: 422,
+                        columnNumber: 11
+                      },
+                      globalThis
                     ),
-                    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { style: { fontSize: "0.8rem", color: "#6B7280" }, children: "Offers" })
+                    /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { fontSize: "0.8rem", color: "#6B7280" }, children: "Offers" }, void 0, false, {
+                      fileName: "C:/Users/DELL/Uswift/extension/src/JobTracker.tsx",
+                      lineNumber: 427,
+                      columnNumber: 11
+                    }, globalThis)
                   ]
-                }
+                },
+                void 0,
+                true,
+                {
+                  fileName: "C:/Users/DELL/Uswift/extension/src/JobTracker.tsx",
+                  lineNumber: 414,
+                  columnNumber: 9
+                },
+                globalThis
               ),
-              /* @__PURE__ */ jsxRuntimeExports.jsxs(
+              /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                 "div",
                 {
                   style: {
@@ -1547,26 +2078,54 @@ const JobTracker = () => {
                     textAlign: "center"
                   },
                   children: [
-                    /* @__PURE__ */ jsxRuntimeExports.jsx(
+                    /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                       "div",
                       {
                         style: { fontSize: "1.5rem", fontWeight: 700, color: "#EF4444" },
                         children: getStatusCount("rejected")
-                      }
+                      },
+                      void 0,
+                      false,
+                      {
+                        fileName: "C:/Users/DELL/Uswift/extension/src/JobTracker.tsx",
+                        lineNumber: 437,
+                        columnNumber: 11
+                      },
+                      globalThis
                     ),
-                    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { style: { fontSize: "0.8rem", color: "#6B7280" }, children: "Rejected" })
+                    /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { fontSize: "0.8rem", color: "#6B7280" }, children: "Rejected" }, void 0, false, {
+                      fileName: "C:/Users/DELL/Uswift/extension/src/JobTracker.tsx",
+                      lineNumber: 442,
+                      columnNumber: 11
+                    }, globalThis)
                   ]
-                }
+                },
+                void 0,
+                true,
+                {
+                  fileName: "C:/Users/DELL/Uswift/extension/src/JobTracker.tsx",
+                  lineNumber: 429,
+                  columnNumber: 9
+                },
+                globalThis
               )
             ]
-          }
+          },
+          void 0,
+          true,
+          {
+            fileName: "C:/Users/DELL/Uswift/extension/src/JobTracker.tsx",
+            lineNumber: 374,
+            columnNumber: 7
+          },
+          globalThis
         ),
-        /* @__PURE__ */ jsxRuntimeExports.jsxs(
+        /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
           "div",
           {
             style: { display: "flex", gap: 8, marginBottom: 16, flexWrap: "wrap" },
             children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx(
+              /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                 "input",
                 {
                   type: "text",
@@ -1581,9 +2140,17 @@ const JobTracker = () => {
                     border: "1px solid #E5E7EB",
                     fontSize: "0.9rem"
                   }
-                }
+                },
+                void 0,
+                false,
+                {
+                  fileName: "C:/Users/DELL/Uswift/extension/src/JobTracker.tsx",
+                  lineNumber: 449,
+                  columnNumber: 9
+                },
+                globalThis
               ),
-              /* @__PURE__ */ jsxRuntimeExports.jsxs(
+              /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                 "select",
                 {
                   value: statusFilter,
@@ -1595,16 +2162,48 @@ const JobTracker = () => {
                     fontSize: "0.9rem"
                   },
                   children: [
-                    /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "all", children: "All Status" }),
-                    /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "applied", children: "Applied" }),
-                    /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "interviewing", children: "Interviewing" }),
-                    /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "offer", children: "Offer" }),
-                    /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "rejected", children: "Rejected" }),
-                    /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "archived", children: "Archived" })
+                    /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("option", { value: "all", children: "All Status" }, void 0, false, {
+                      fileName: "C:/Users/DELL/Uswift/extension/src/JobTracker.tsx",
+                      lineNumber: 473,
+                      columnNumber: 11
+                    }, globalThis),
+                    /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("option", { value: "applied", children: "Applied" }, void 0, false, {
+                      fileName: "C:/Users/DELL/Uswift/extension/src/JobTracker.tsx",
+                      lineNumber: 474,
+                      columnNumber: 11
+                    }, globalThis),
+                    /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("option", { value: "interviewing", children: "Interviewing" }, void 0, false, {
+                      fileName: "C:/Users/DELL/Uswift/extension/src/JobTracker.tsx",
+                      lineNumber: 475,
+                      columnNumber: 11
+                    }, globalThis),
+                    /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("option", { value: "offer", children: "Offer" }, void 0, false, {
+                      fileName: "C:/Users/DELL/Uswift/extension/src/JobTracker.tsx",
+                      lineNumber: 476,
+                      columnNumber: 11
+                    }, globalThis),
+                    /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("option", { value: "rejected", children: "Rejected" }, void 0, false, {
+                      fileName: "C:/Users/DELL/Uswift/extension/src/JobTracker.tsx",
+                      lineNumber: 477,
+                      columnNumber: 11
+                    }, globalThis),
+                    /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("option", { value: "archived", children: "Archived" }, void 0, false, {
+                      fileName: "C:/Users/DELL/Uswift/extension/src/JobTracker.tsx",
+                      lineNumber: 478,
+                      columnNumber: 11
+                    }, globalThis)
                   ]
-                }
+                },
+                void 0,
+                true,
+                {
+                  fileName: "C:/Users/DELL/Uswift/extension/src/JobTracker.tsx",
+                  lineNumber: 463,
+                  columnNumber: 9
+                },
+                globalThis
               ),
-              /* @__PURE__ */ jsxRuntimeExports.jsxs(
+              /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                 "select",
                 {
                   value: sortBy,
@@ -1616,22 +2215,50 @@ const JobTracker = () => {
                     fontSize: "0.9rem"
                   },
                   children: [
-                    /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "date", children: "Sort by Date" }),
-                    /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "company", children: "Sort by Company" }),
-                    /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "status", children: "Sort by Status" })
+                    /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("option", { value: "date", children: "Sort by Date" }, void 0, false, {
+                      fileName: "C:/Users/DELL/Uswift/extension/src/JobTracker.tsx",
+                      lineNumber: 492,
+                      columnNumber: 11
+                    }, globalThis),
+                    /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("option", { value: "company", children: "Sort by Company" }, void 0, false, {
+                      fileName: "C:/Users/DELL/Uswift/extension/src/JobTracker.tsx",
+                      lineNumber: 493,
+                      columnNumber: 11
+                    }, globalThis),
+                    /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("option", { value: "status", children: "Sort by Status" }, void 0, false, {
+                      fileName: "C:/Users/DELL/Uswift/extension/src/JobTracker.tsx",
+                      lineNumber: 494,
+                      columnNumber: 11
+                    }, globalThis)
                   ]
-                }
+                },
+                void 0,
+                true,
+                {
+                  fileName: "C:/Users/DELL/Uswift/extension/src/JobTracker.tsx",
+                  lineNumber: 480,
+                  columnNumber: 9
+                },
+                globalThis
               ),
-              /* @__PURE__ */ jsxRuntimeExports.jsx(
+              /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                 "button",
                 {
                   className: "uswift-btn",
                   style: { fontSize: "0.9rem", padding: "8px 12px" },
                   onClick: () => setShowAddForm(true),
                   children: "+ Add Job"
-                }
+                },
+                void 0,
+                false,
+                {
+                  fileName: "C:/Users/DELL/Uswift/extension/src/JobTracker.tsx",
+                  lineNumber: 496,
+                  columnNumber: 9
+                },
+                globalThis
               ),
-              /* @__PURE__ */ jsxRuntimeExports.jsx(
+              /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                 "button",
                 {
                   onClick: exportToCSV,
@@ -1645,12 +2272,28 @@ const JobTracker = () => {
                     fontSize: "0.9rem"
                   },
                   children: "Export CSV"
-                }
+                },
+                void 0,
+                false,
+                {
+                  fileName: "C:/Users/DELL/Uswift/extension/src/JobTracker.tsx",
+                  lineNumber: 503,
+                  columnNumber: 9
+                },
+                globalThis
               )
             ]
-          }
+          },
+          void 0,
+          true,
+          {
+            fileName: "C:/Users/DELL/Uswift/extension/src/JobTracker.tsx",
+            lineNumber: 446,
+            columnNumber: 7
+          },
+          globalThis
         ),
-        showAddForm && /* @__PURE__ */ jsxRuntimeExports.jsxs(
+        showAddForm && /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
           "div",
           {
             style: {
@@ -1660,8 +2303,12 @@ const JobTracker = () => {
               marginBottom: 16
             },
             children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { style: { marginBottom: 12, fontSize: "1rem", fontWeight: 600 }, children: "Add New Application" }),
-              /* @__PURE__ */ jsxRuntimeExports.jsxs(
+              /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("h3", { style: { marginBottom: 12, fontSize: "1rem", fontWeight: 600 }, children: "Add New Application" }, void 0, false, {
+                fileName: "C:/Users/DELL/Uswift/extension/src/JobTracker.tsx",
+                lineNumber: 528,
+                columnNumber: 11
+              }, globalThis),
+              /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                 "div",
                 {
                   style: {
@@ -1671,7 +2318,7 @@ const JobTracker = () => {
                     marginBottom: 12
                   },
                   children: [
-                    /* @__PURE__ */ jsxRuntimeExports.jsx(
+                    /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                       "input",
                       {
                         type: "text",
@@ -1686,9 +2333,17 @@ const JobTracker = () => {
                           borderRadius: 6,
                           border: "1px solid #E5E7EB"
                         }
-                      }
+                      },
+                      void 0,
+                      false,
+                      {
+                        fileName: "C:/Users/DELL/Uswift/extension/src/JobTracker.tsx",
+                        lineNumber: 539,
+                        columnNumber: 13
+                      },
+                      globalThis
                     ),
-                    /* @__PURE__ */ jsxRuntimeExports.jsx(
+                    /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                       "input",
                       {
                         type: "text",
@@ -1703,12 +2358,28 @@ const JobTracker = () => {
                           borderRadius: 6,
                           border: "1px solid #E5E7EB"
                         }
-                      }
+                      },
+                      void 0,
+                      false,
+                      {
+                        fileName: "C:/Users/DELL/Uswift/extension/src/JobTracker.tsx",
+                        lineNumber: 555,
+                        columnNumber: 13
+                      },
+                      globalThis
                     )
                   ]
-                }
+                },
+                void 0,
+                true,
+                {
+                  fileName: "C:/Users/DELL/Uswift/extension/src/JobTracker.tsx",
+                  lineNumber: 531,
+                  columnNumber: 11
+                },
+                globalThis
               ),
-              /* @__PURE__ */ jsxRuntimeExports.jsxs(
+              /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                 "div",
                 {
                   style: {
@@ -1718,7 +2389,7 @@ const JobTracker = () => {
                     marginBottom: 12
                   },
                   children: [
-                    /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                    /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                       "select",
                       {
                         value: newApplication.status,
@@ -1732,15 +2403,43 @@ const JobTracker = () => {
                           border: "1px solid #E5E7EB"
                         },
                         children: [
-                          /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "applied", children: "Applied" }),
-                          /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "interviewing", children: "Interviewing" }),
-                          /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "offer", children: "Offer" }),
-                          /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "rejected", children: "Rejected" }),
-                          /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "archived", children: "Archived" })
+                          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("option", { value: "applied", children: "Applied" }, void 0, false, {
+                            fileName: "C:/Users/DELL/Uswift/extension/src/JobTracker.tsx",
+                            lineNumber: 594,
+                            columnNumber: 15
+                          }, globalThis),
+                          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("option", { value: "interviewing", children: "Interviewing" }, void 0, false, {
+                            fileName: "C:/Users/DELL/Uswift/extension/src/JobTracker.tsx",
+                            lineNumber: 595,
+                            columnNumber: 15
+                          }, globalThis),
+                          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("option", { value: "offer", children: "Offer" }, void 0, false, {
+                            fileName: "C:/Users/DELL/Uswift/extension/src/JobTracker.tsx",
+                            lineNumber: 596,
+                            columnNumber: 15
+                          }, globalThis),
+                          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("option", { value: "rejected", children: "Rejected" }, void 0, false, {
+                            fileName: "C:/Users/DELL/Uswift/extension/src/JobTracker.tsx",
+                            lineNumber: 597,
+                            columnNumber: 15
+                          }, globalThis),
+                          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("option", { value: "archived", children: "Archived" }, void 0, false, {
+                            fileName: "C:/Users/DELL/Uswift/extension/src/JobTracker.tsx",
+                            lineNumber: 598,
+                            columnNumber: 15
+                          }, globalThis)
                         ]
-                      }
+                      },
+                      void 0,
+                      true,
+                      {
+                        fileName: "C:/Users/DELL/Uswift/extension/src/JobTracker.tsx",
+                        lineNumber: 580,
+                        columnNumber: 13
+                      },
+                      globalThis
                     ),
-                    /* @__PURE__ */ jsxRuntimeExports.jsx(
+                    /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                       "input",
                       {
                         type: "date",
@@ -1754,12 +2453,28 @@ const JobTracker = () => {
                           borderRadius: 6,
                           border: "1px solid #E5E7EB"
                         }
-                      }
+                      },
+                      void 0,
+                      false,
+                      {
+                        fileName: "C:/Users/DELL/Uswift/extension/src/JobTracker.tsx",
+                        lineNumber: 600,
+                        columnNumber: 13
+                      },
+                      globalThis
                     )
                   ]
-                }
+                },
+                void 0,
+                true,
+                {
+                  fileName: "C:/Users/DELL/Uswift/extension/src/JobTracker.tsx",
+                  lineNumber: 572,
+                  columnNumber: 11
+                },
+                globalThis
               ),
-              /* @__PURE__ */ jsxRuntimeExports.jsx(
+              /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                 "input",
                 {
                   type: "url",
@@ -1773,9 +2488,17 @@ const JobTracker = () => {
                     border: "1px solid #E5E7EB",
                     marginBottom: 12
                   }
-                }
+                },
+                void 0,
+                false,
+                {
+                  fileName: "C:/Users/DELL/Uswift/extension/src/JobTracker.tsx",
+                  lineNumber: 616,
+                  columnNumber: 11
+                },
+                globalThis
               ),
-              /* @__PURE__ */ jsxRuntimeExports.jsx(
+              /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                 "textarea",
                 {
                   placeholder: "Notes (optional)",
@@ -1790,10 +2513,18 @@ const JobTracker = () => {
                     marginBottom: 12,
                     resize: "vertical"
                   }
-                }
+                },
+                void 0,
+                false,
+                {
+                  fileName: "C:/Users/DELL/Uswift/extension/src/JobTracker.tsx",
+                  lineNumber: 631,
+                  columnNumber: 11
+                },
+                globalThis
               ),
-              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { display: "flex", gap: 8 }, children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx(
+              /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { display: "flex", gap: 8 }, children: [
+                /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                   "button",
                   {
                     className: "uswift-btn",
@@ -1801,9 +2532,17 @@ const JobTracker = () => {
                     disabled: loading,
                     style: { opacity: loading ? 0.6 : 1 },
                     children: loading ? "Adding..." : "Add Application"
-                  }
+                  },
+                  void 0,
+                  false,
+                  {
+                    fileName: "C:/Users/DELL/Uswift/extension/src/JobTracker.tsx",
+                    lineNumber: 648,
+                    columnNumber: 13
+                  },
+                  globalThis
                 ),
-                /* @__PURE__ */ jsxRuntimeExports.jsx(
+                /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                   "button",
                   {
                     onClick: () => setShowAddForm(false),
@@ -1816,13 +2555,41 @@ const JobTracker = () => {
                       cursor: "pointer"
                     },
                     children: "Cancel"
-                  }
+                  },
+                  void 0,
+                  false,
+                  {
+                    fileName: "C:/Users/DELL/Uswift/extension/src/JobTracker.tsx",
+                    lineNumber: 656,
+                    columnNumber: 13
+                  },
+                  globalThis
                 )
-              ] })
+              ] }, void 0, true, {
+                fileName: "C:/Users/DELL/Uswift/extension/src/JobTracker.tsx",
+                lineNumber: 647,
+                columnNumber: 11
+              }, globalThis)
             ]
-          }
+          },
+          void 0,
+          true,
+          {
+            fileName: "C:/Users/DELL/Uswift/extension/src/JobTracker.tsx",
+            lineNumber: 520,
+            columnNumber: 9
+          },
+          globalThis
         ),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { style: { maxHeight: 400, overflowY: "auto" }, children: loading && applications.length === 0 ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { style: { textAlign: "center", padding: 40, color: "#6B7280" }, children: "Loading applications..." }) : filteredApplications.length === 0 ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { style: { textAlign: "center", padding: 40, color: "#6B7280" }, children: applications.length === 0 ? 'No applications yet. Click "Add Job" to get started!' : "No applications match your search." }) : filteredApplications.map((app) => /* @__PURE__ */ jsxRuntimeExports.jsx(
+        /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { maxHeight: 400, overflowY: "auto" }, children: loading && applications.length === 0 ? /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { textAlign: "center", padding: 40, color: "#6B7280" }, children: "Loading applications..." }, void 0, false, {
+          fileName: "C:/Users/DELL/Uswift/extension/src/JobTracker.tsx",
+          lineNumber: 675,
+          columnNumber: 11
+        }, globalThis) : filteredApplications.length === 0 ? /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { textAlign: "center", padding: 40, color: "#6B7280" }, children: applications.length === 0 ? 'No applications yet. Click "Add Job" to get started!' : "No applications match your search." }, void 0, false, {
+          fileName: "C:/Users/DELL/Uswift/extension/src/JobTracker.tsx",
+          lineNumber: 679,
+          columnNumber: 11
+        }, globalThis) : filteredApplications.map((app) => /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
           "div",
           {
             style: {
@@ -1832,7 +2599,7 @@ const JobTracker = () => {
               marginBottom: 12,
               border: "1px solid #E5E7EB"
             },
-            children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
+            children: /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
               "div",
               {
                 style: {
@@ -1842,8 +2609,8 @@ const JobTracker = () => {
                   marginBottom: 8
                 },
                 children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { flex: 1 }, children: [
-                    /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { flex: 1 }, children: [
+                    /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                       "h3",
                       {
                         style: {
@@ -1853,9 +2620,17 @@ const JobTracker = () => {
                           color: "#111827"
                         },
                         children: app.position
-                      }
+                      },
+                      void 0,
+                      false,
+                      {
+                        fileName: "C:/Users/DELL/Uswift/extension/src/JobTracker.tsx",
+                        lineNumber: 705,
+                        columnNumber: 19
+                      },
+                      globalThis
                     ),
-                    /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                    /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                       "p",
                       {
                         style: {
@@ -1869,9 +2644,17 @@ const JobTracker = () => {
                           " ",
                           new Date(app.dateApplied).toLocaleDateString()
                         ]
-                      }
+                      },
+                      void 0,
+                      true,
+                      {
+                        fileName: "C:/Users/DELL/Uswift/extension/src/JobTracker.tsx",
+                        lineNumber: 715,
+                        columnNumber: 19
+                      },
+                      globalThis
                     ),
-                    app.jobUrl && /* @__PURE__ */ jsxRuntimeExports.jsx(
+                    app.jobUrl && /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                       "a",
                       {
                         href: app.jobUrl,
@@ -1883,9 +2666,17 @@ const JobTracker = () => {
                           textDecoration: "none"
                         },
                         children: "View Job Posting →"
-                      }
+                      },
+                      void 0,
+                      false,
+                      {
+                        fileName: "C:/Users/DELL/Uswift/extension/src/JobTracker.tsx",
+                        lineNumber: 726,
+                        columnNumber: 21
+                      },
+                      globalThis
                     ),
-                    app.notes && /* @__PURE__ */ jsxRuntimeExports.jsx(
+                    app.notes && /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                       "p",
                       {
                         style: {
@@ -1894,11 +2685,23 @@ const JobTracker = () => {
                           marginTop: 8
                         },
                         children: app.notes
-                      }
+                      },
+                      void 0,
+                      false,
+                      {
+                        fileName: "C:/Users/DELL/Uswift/extension/src/JobTracker.tsx",
+                        lineNumber: 740,
+                        columnNumber: 21
+                      },
+                      globalThis
                     )
-                  ] }),
-                  /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { display: "flex", alignItems: "center", gap: 8 }, children: [
-                    /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                  ] }, void 0, true, {
+                    fileName: "C:/Users/DELL/Uswift/extension/src/JobTracker.tsx",
+                    lineNumber: 704,
+                    columnNumber: 17
+                  }, globalThis),
+                  /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { display: "flex", alignItems: "center", gap: 8 }, children: [
+                    /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                       "select",
                       {
                         value: app.status,
@@ -1912,15 +2715,43 @@ const JobTracker = () => {
                           fontWeight: 600
                         },
                         children: [
-                          /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "applied", children: "Applied" }),
-                          /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "interviewing", children: "Interviewing" }),
-                          /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "offer", children: "Offer" }),
-                          /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "rejected", children: "Rejected" }),
-                          /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "archived", children: "Archived" })
+                          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("option", { value: "applied", children: "Applied" }, void 0, false, {
+                            fileName: "C:/Users/DELL/Uswift/extension/src/JobTracker.tsx",
+                            lineNumber: 766,
+                            columnNumber: 21
+                          }, globalThis),
+                          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("option", { value: "interviewing", children: "Interviewing" }, void 0, false, {
+                            fileName: "C:/Users/DELL/Uswift/extension/src/JobTracker.tsx",
+                            lineNumber: 767,
+                            columnNumber: 21
+                          }, globalThis),
+                          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("option", { value: "offer", children: "Offer" }, void 0, false, {
+                            fileName: "C:/Users/DELL/Uswift/extension/src/JobTracker.tsx",
+                            lineNumber: 768,
+                            columnNumber: 21
+                          }, globalThis),
+                          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("option", { value: "rejected", children: "Rejected" }, void 0, false, {
+                            fileName: "C:/Users/DELL/Uswift/extension/src/JobTracker.tsx",
+                            lineNumber: 769,
+                            columnNumber: 21
+                          }, globalThis),
+                          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("option", { value: "archived", children: "Archived" }, void 0, false, {
+                            fileName: "C:/Users/DELL/Uswift/extension/src/JobTracker.tsx",
+                            lineNumber: 770,
+                            columnNumber: 21
+                          }, globalThis)
                         ]
-                      }
+                      },
+                      void 0,
+                      true,
+                      {
+                        fileName: "C:/Users/DELL/Uswift/extension/src/JobTracker.tsx",
+                        lineNumber: 752,
+                        columnNumber: 19
+                      },
+                      globalThis
                     ),
-                    /* @__PURE__ */ jsxRuntimeExports.jsx(
+                    /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                       "button",
                       {
                         onClick: () => deleteApplication(app.id),
@@ -1934,17 +2765,56 @@ const JobTracker = () => {
                           fontSize: "0.8rem"
                         },
                         children: "Delete"
-                      }
+                      },
+                      void 0,
+                      false,
+                      {
+                        fileName: "C:/Users/DELL/Uswift/extension/src/JobTracker.tsx",
+                        lineNumber: 772,
+                        columnNumber: 19
+                      },
+                      globalThis
                     )
-                  ] })
+                  ] }, void 0, true, {
+                    fileName: "C:/Users/DELL/Uswift/extension/src/JobTracker.tsx",
+                    lineNumber: 751,
+                    columnNumber: 17
+                  }, globalThis)
                 ]
-              }
+              },
+              void 0,
+              true,
+              {
+                fileName: "C:/Users/DELL/Uswift/extension/src/JobTracker.tsx",
+                lineNumber: 696,
+                columnNumber: 15
+              },
+              globalThis
             )
           },
-          app.id
-        )) })
+          app.id,
+          false,
+          {
+            fileName: "C:/Users/DELL/Uswift/extension/src/JobTracker.tsx",
+            lineNumber: 686,
+            columnNumber: 13
+          },
+          globalThis
+        )) }, void 0, false, {
+          fileName: "C:/Users/DELL/Uswift/extension/src/JobTracker.tsx",
+          lineNumber: 673,
+          columnNumber: 7
+        }, globalThis)
       ]
-    }
+    },
+    void 0,
+    true,
+    {
+      fileName: "C:/Users/DELL/Uswift/extension/src/JobTracker.tsx",
+      lineNumber: 341,
+      columnNumber: 5
+    },
+    globalThis
   );
 };
 
@@ -2327,12 +3197,20 @@ function ChatInterface() {
     ]);
   };
   const formatMessage = (content) => {
-    return content.split("\n").map((line, index) => /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { children: [
+    return content.split("\n").map((line, index) => /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("span", { children: [
       line,
-      index < content.split("\n").length - 1 && /* @__PURE__ */ jsxRuntimeExports.jsx("br", {})
-    ] }, index));
+      index < content.split("\n").length - 1 && /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("br", {}, void 0, false, {
+        fileName: "C:/Users/DELL/Uswift/extension/src/ChatInterface.tsx",
+        lineNumber: 205,
+        columnNumber: 52
+      }, this)
+    ] }, index, true, {
+      fileName: "C:/Users/DELL/Uswift/extension/src/ChatInterface.tsx",
+      lineNumber: 203,
+      columnNumber: 7
+    }, this));
   };
-  return /* @__PURE__ */ jsxRuntimeExports.jsxs(
+  return /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
     "div",
     {
       style: {
@@ -2345,7 +3223,7 @@ function ChatInterface() {
         flexDirection: "column"
       },
       children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(
+        /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
           "div",
           {
             className: "uswift-gradient",
@@ -2354,9 +3232,17 @@ function ChatInterface() {
               borderRadius: 8,
               marginBottom: 16
             }
-          }
+          },
+          void 0,
+          false,
+          {
+            fileName: "C:/Users/DELL/Uswift/extension/src/ChatInterface.tsx",
+            lineNumber: 223,
+            columnNumber: 7
+          },
+          this
         ),
-        /* @__PURE__ */ jsxRuntimeExports.jsxs(
+        /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
           "div",
           {
             style: {
@@ -2366,7 +3252,7 @@ function ChatInterface() {
               marginBottom: 16
             },
             children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx(
+              /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                 "h2",
                 {
                   style: {
@@ -2376,9 +3262,17 @@ function ChatInterface() {
                     margin: 0
                   },
                   children: "AI Assistant"
-                }
+                },
+                void 0,
+                false,
+                {
+                  fileName: "C:/Users/DELL/Uswift/extension/src/ChatInterface.tsx",
+                  lineNumber: 240,
+                  columnNumber: 9
+                },
+                this
               ),
-              /* @__PURE__ */ jsxRuntimeExports.jsx(
+              /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                 "button",
                 {
                   onClick: clearChat,
@@ -2392,13 +3286,29 @@ function ChatInterface() {
                     fontSize: "0.8rem"
                   },
                   children: "Clear Chat"
-                }
+                },
+                void 0,
+                false,
+                {
+                  fileName: "C:/Users/DELL/Uswift/extension/src/ChatInterface.tsx",
+                  lineNumber: 250,
+                  columnNumber: 9
+                },
+                this
               )
             ]
-          }
+          },
+          void 0,
+          true,
+          {
+            fileName: "C:/Users/DELL/Uswift/extension/src/ChatInterface.tsx",
+            lineNumber: 232,
+            columnNumber: 7
+          },
+          this
         ),
-        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { marginBottom: 16 }, children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx(
+        /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { marginBottom: 16 }, children: [
+          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
             "div",
             {
               style: {
@@ -2407,7 +3317,7 @@ function ChatInterface() {
                 marginBottom: 12,
                 flexWrap: "wrap"
               },
-              children: categories.map((category) => /* @__PURE__ */ jsxRuntimeExports.jsx(
+              children: categories.map((category) => /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                 "button",
                 {
                   onClick: () => setSelectedCategory(category),
@@ -2423,11 +3333,26 @@ function ChatInterface() {
                   },
                   children: category
                 },
-                category
+                category,
+                false,
+                {
+                  fileName: "C:/Users/DELL/Uswift/extension/src/ChatInterface.tsx",
+                  lineNumber: 277,
+                  columnNumber: 13
+                },
+                this
               ))
-            }
+            },
+            void 0,
+            false,
+            {
+              fileName: "C:/Users/DELL/Uswift/extension/src/ChatInterface.tsx",
+              lineNumber: 268,
+              columnNumber: 9
+            },
+            this
           ),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(
+          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
             "div",
             {
               style: {
@@ -2437,7 +3362,7 @@ function ChatInterface() {
                 maxHeight: 120,
                 overflowY: "auto"
               },
-              children: filteredPrompts.slice(0, 6).map((prompt) => /* @__PURE__ */ jsxRuntimeExports.jsx(
+              children: filteredPrompts.slice(0, 6).map((prompt) => /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                 "button",
                 {
                   onClick: () => handleQuickPrompt(prompt),
@@ -2473,12 +3398,31 @@ function ChatInterface() {
                   },
                   children: prompt.label
                 },
-                prompt.id
+                prompt.id,
+                false,
+                {
+                  fileName: "C:/Users/DELL/Uswift/extension/src/ChatInterface.tsx",
+                  lineNumber: 307,
+                  columnNumber: 13
+                },
+                this
               ))
-            }
+            },
+            void 0,
+            false,
+            {
+              fileName: "C:/Users/DELL/Uswift/extension/src/ChatInterface.tsx",
+              lineNumber: 297,
+              columnNumber: 9
+            },
+            this
           )
-        ] }),
-        /* @__PURE__ */ jsxRuntimeExports.jsxs(
+        ] }, void 0, true, {
+          fileName: "C:/Users/DELL/Uswift/extension/src/ChatInterface.tsx",
+          lineNumber: 267,
+          columnNumber: 7
+        }, this),
+        /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
           "div",
           {
             style: {
@@ -2488,7 +3432,7 @@ function ChatInterface() {
               maxHeight: 300
             },
             children: [
-              messages.map((message) => /* @__PURE__ */ jsxRuntimeExports.jsx(
+              messages.map((message) => /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                 "div",
                 {
                   style: {
@@ -2496,7 +3440,7 @@ function ChatInterface() {
                     display: "flex",
                     flexDirection: message.role === "user" ? "row-reverse" : "row"
                   },
-                  children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                  children: /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                     "div",
                     {
                       style: {
@@ -2510,8 +3454,8 @@ function ChatInterface() {
                         position: "relative"
                       },
                       children: [
-                        message.isLoading ? /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { display: "flex", alignItems: "center", gap: 8 }, children: [
-                          /* @__PURE__ */ jsxRuntimeExports.jsx(
+                        message.isLoading ? /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { display: "flex", alignItems: "center", gap: 8 }, children: [
+                          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                             "div",
                             {
                               style: {
@@ -2522,11 +3466,27 @@ function ChatInterface() {
                                 borderRadius: "50%",
                                 animation: "spin 1s linear infinite"
                               }
-                            }
+                            },
+                            void 0,
+                            false,
+                            {
+                              fileName: "C:/Users/DELL/Uswift/extension/src/ChatInterface.tsx",
+                              lineNumber: 379,
+                              columnNumber: 19
+                            },
+                            this
                           ),
-                          /* @__PURE__ */ jsxRuntimeExports.jsx("span", { style: { color: "#6B7280" }, children: "Thinking..." })
-                        ] }) : formatMessage(message.content),
-                        /* @__PURE__ */ jsxRuntimeExports.jsx(
+                          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("span", { style: { color: "#6B7280" }, children: "Thinking..." }, void 0, false, {
+                            fileName: "C:/Users/DELL/Uswift/extension/src/ChatInterface.tsx",
+                            lineNumber: 389,
+                            columnNumber: 19
+                          }, this)
+                        ] }, void 0, true, {
+                          fileName: "C:/Users/DELL/Uswift/extension/src/ChatInterface.tsx",
+                          lineNumber: 378,
+                          columnNumber: 17
+                        }, this) : formatMessage(message.content),
+                        /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                           "div",
                           {
                             style: {
@@ -2539,20 +3499,55 @@ function ChatInterface() {
                               hour: "2-digit",
                               minute: "2-digit"
                             })
-                          }
+                          },
+                          void 0,
+                          false,
+                          {
+                            fileName: "C:/Users/DELL/Uswift/extension/src/ChatInterface.tsx",
+                            lineNumber: 395,
+                            columnNumber: 15
+                          },
+                          this
                         )
                       ]
-                    }
+                    },
+                    void 0,
+                    true,
+                    {
+                      fileName: "C:/Users/DELL/Uswift/extension/src/ChatInterface.tsx",
+                      lineNumber: 365,
+                      columnNumber: 13
+                    },
+                    this
                   )
                 },
-                message.id
+                message.id,
+                false,
+                {
+                  fileName: "C:/Users/DELL/Uswift/extension/src/ChatInterface.tsx",
+                  lineNumber: 357,
+                  columnNumber: 11
+                },
+                this
               )),
-              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { ref: messagesEndRef })
+              /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { ref: messagesEndRef }, void 0, false, {
+                fileName: "C:/Users/DELL/Uswift/extension/src/ChatInterface.tsx",
+                lineNumber: 411,
+                columnNumber: 9
+              }, this)
             ]
-          }
+          },
+          void 0,
+          true,
+          {
+            fileName: "C:/Users/DELL/Uswift/extension/src/ChatInterface.tsx",
+            lineNumber: 348,
+            columnNumber: 7
+          },
+          this
         ),
-        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { display: "flex", gap: 8 }, children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx(
+        /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { display: "flex", gap: 8 }, children: [
+          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
             "input",
             {
               type: "text",
@@ -2575,9 +3570,17 @@ function ChatInterface() {
                 outline: "none",
                 opacity: isLoading ? 0.6 : 1
               }
-            }
+            },
+            void 0,
+            false,
+            {
+              fileName: "C:/Users/DELL/Uswift/extension/src/ChatInterface.tsx",
+              lineNumber: 416,
+              columnNumber: 9
+            },
+            this
           ),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(
+          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
             "button",
             {
               onClick: () => sendMessage(inputMessage),
@@ -2590,10 +3593,22 @@ function ChatInterface() {
                 minWidth: 60
               },
               children: isLoading ? "..." : "Send"
-            }
+            },
+            void 0,
+            false,
+            {
+              fileName: "C:/Users/DELL/Uswift/extension/src/ChatInterface.tsx",
+              lineNumber: 438,
+              columnNumber: 9
+            },
+            this
           )
-        ] }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(
+        ] }, void 0, true, {
+          fileName: "C:/Users/DELL/Uswift/extension/src/ChatInterface.tsx",
+          lineNumber: 415,
+          columnNumber: 7
+        }, this),
+        /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
           "div",
           {
             style: {
@@ -2603,10 +3618,26 @@ function ChatInterface() {
               color: "#6B7280"
             },
             children: "Powered by Mistral AI • Ask me about career advice, resume help, or interview tips!"
-          }
+          },
+          void 0,
+          false,
+          {
+            fileName: "C:/Users/DELL/Uswift/extension/src/ChatInterface.tsx",
+            lineNumber: 455,
+            columnNumber: 7
+          },
+          this
         )
       ]
-    }
+    },
+    void 0,
+    true,
+    {
+      fileName: "C:/Users/DELL/Uswift/extension/src/ChatInterface.tsx",
+      lineNumber: 211,
+      columnNumber: 5
+    },
+    this
   );
 }
 
@@ -2707,7 +3738,7 @@ function ResumeEnhancement() {
       alert("Copied to clipboard!");
     });
   };
-  return /* @__PURE__ */ jsxRuntimeExports.jsxs(
+  return /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
     "div",
     {
       style: {
@@ -2718,7 +3749,7 @@ function ResumeEnhancement() {
         minHeight: 520
       },
       children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(
+        /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
           "div",
           {
             className: "uswift-gradient",
@@ -2727,9 +3758,17 @@ function ResumeEnhancement() {
               borderRadius: 8,
               marginBottom: 16
             }
-          }
+          },
+          void 0,
+          false,
+          {
+            fileName: "C:/Users/DELL/Uswift/extension/src/ResumeEnhancement.tsx",
+            lineNumber: 158,
+            columnNumber: 7
+          },
+          this
         ),
-        /* @__PURE__ */ jsxRuntimeExports.jsxs(
+        /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
           "div",
           {
             style: {
@@ -2739,7 +3778,7 @@ function ResumeEnhancement() {
               marginBottom: 16
             },
             children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx(
+              /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                 "h2",
                 {
                   style: {
@@ -2749,9 +3788,17 @@ function ResumeEnhancement() {
                     margin: 0
                   },
                   children: "Resume Enhancement"
-                }
+                },
+                void 0,
+                false,
+                {
+                  fileName: "C:/Users/DELL/Uswift/extension/src/ResumeEnhancement.tsx",
+                  lineNumber: 175,
+                  columnNumber: 9
+                },
+                this
               ),
-              activeTab === "result" && /* @__PURE__ */ jsxRuntimeExports.jsx(
+              activeTab === "result" && /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                 "button",
                 {
                   onClick: () => setActiveTab("input"),
@@ -2765,12 +3812,28 @@ function ResumeEnhancement() {
                     fontSize: "0.8rem"
                   },
                   children: "← Back to Edit"
-                }
+                },
+                void 0,
+                false,
+                {
+                  fileName: "C:/Users/DELL/Uswift/extension/src/ResumeEnhancement.tsx",
+                  lineNumber: 186,
+                  columnNumber: 11
+                },
+                this
               )
             ]
-          }
+          },
+          void 0,
+          true,
+          {
+            fileName: "C:/Users/DELL/Uswift/extension/src/ResumeEnhancement.tsx",
+            lineNumber: 167,
+            columnNumber: 7
+          },
+          this
         ),
-        /* @__PURE__ */ jsxRuntimeExports.jsxs(
+        /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
           "div",
           {
             style: {
@@ -2779,7 +3842,7 @@ function ResumeEnhancement() {
               borderBottom: "1px solid #E5E7EB"
             },
             children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx(
+              /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                 "button",
                 {
                   onClick: () => setActiveTab("input"),
@@ -2794,9 +3857,17 @@ function ResumeEnhancement() {
                     borderBottom: activeTab === "input" ? "2px solid #6D28D9" : "none"
                   },
                   children: "Input"
-                }
+                },
+                void 0,
+                false,
+                {
+                  fileName: "C:/Users/DELL/Uswift/extension/src/ResumeEnhancement.tsx",
+                  lineNumber: 211,
+                  columnNumber: 9
+                },
+                this
               ),
-              /* @__PURE__ */ jsxRuntimeExports.jsx(
+              /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                 "button",
                 {
                   onClick: () => setActiveTab("result"),
@@ -2813,14 +3884,30 @@ function ResumeEnhancement() {
                     opacity: result ? 1 : 0.5
                   },
                   children: "Enhanced Resume"
-                }
+                },
+                void 0,
+                false,
+                {
+                  fileName: "C:/Users/DELL/Uswift/extension/src/ResumeEnhancement.tsx",
+                  lineNumber: 226,
+                  columnNumber: 9
+                },
+                this
               )
             ]
-          }
+          },
+          void 0,
+          true,
+          {
+            fileName: "C:/Users/DELL/Uswift/extension/src/ResumeEnhancement.tsx",
+            lineNumber: 204,
+            columnNumber: 7
+          },
+          this
         ),
-        activeTab === "input" && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { marginBottom: 16 }, children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(
+        activeTab === "input" && /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { children: [
+          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { marginBottom: 16 }, children: [
+            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
               "label",
               {
                 style: {
@@ -2831,10 +3918,18 @@ function ResumeEnhancement() {
                   marginBottom: 8
                 },
                 children: "Enhancement Type:"
-              }
+              },
+              void 0,
+              false,
+              {
+                fileName: "C:/Users/DELL/Uswift/extension/src/ResumeEnhancement.tsx",
+                lineNumber: 249,
+                columnNumber: 13
+              },
+              this
             ),
-            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { display: "flex", gap: 8 }, children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx(
+            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { display: "flex", gap: 8 }, children: [
+              /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                 "button",
                 {
                   onClick: () => setEnhancementType("general"),
@@ -2849,9 +3944,17 @@ function ResumeEnhancement() {
                     fontWeight: 500
                   },
                   children: "General Enhancement"
-                }
+                },
+                void 0,
+                false,
+                {
+                  fileName: "C:/Users/DELL/Uswift/extension/src/ResumeEnhancement.tsx",
+                  lineNumber: 261,
+                  columnNumber: 15
+                },
+                this
               ),
-              /* @__PURE__ */ jsxRuntimeExports.jsx(
+              /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                 "button",
                 {
                   onClick: () => setEnhancementType("job-specific"),
@@ -2866,12 +3969,28 @@ function ResumeEnhancement() {
                     fontWeight: 500
                   },
                   children: "Job-Specific Tailoring"
-                }
+                },
+                void 0,
+                false,
+                {
+                  fileName: "C:/Users/DELL/Uswift/extension/src/ResumeEnhancement.tsx",
+                  lineNumber: 277,
+                  columnNumber: 15
+                },
+                this
               )
-            ] })
-          ] }),
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "uswift-card", style: { marginBottom: 16 }, children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(
+            ] }, void 0, true, {
+              fileName: "C:/Users/DELL/Uswift/extension/src/ResumeEnhancement.tsx",
+              lineNumber: 260,
+              columnNumber: 13
+            }, this)
+          ] }, void 0, true, {
+            fileName: "C:/Users/DELL/Uswift/extension/src/ResumeEnhancement.tsx",
+            lineNumber: 248,
+            columnNumber: 11
+          }, this),
+          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { className: "uswift-card", style: { marginBottom: 16 }, children: [
+            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
               "label",
               {
                 style: {
@@ -2881,9 +4000,17 @@ function ResumeEnhancement() {
                   color: "#374151"
                 },
                 children: "Your Resume Content:"
-              }
+              },
+              void 0,
+              false,
+              {
+                fileName: "C:/Users/DELL/Uswift/extension/src/ResumeEnhancement.tsx",
+                lineNumber: 299,
+                columnNumber: 13
+              },
+              this
             ),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(
+            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
               "textarea",
               {
                 value: resumeContent,
@@ -2899,11 +4026,23 @@ function ResumeEnhancement() {
                   resize: "vertical",
                   fontFamily: "monospace"
                 }
-              }
+              },
+              void 0,
+              false,
+              {
+                fileName: "C:/Users/DELL/Uswift/extension/src/ResumeEnhancement.tsx",
+                lineNumber: 309,
+                columnNumber: 13
+              },
+              this
             )
-          ] }),
-          enhancementType === "job-specific" && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "uswift-card", style: { marginBottom: 16 }, children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(
+          ] }, void 0, true, {
+            fileName: "C:/Users/DELL/Uswift/extension/src/ResumeEnhancement.tsx",
+            lineNumber: 298,
+            columnNumber: 11
+          }, this),
+          enhancementType === "job-specific" && /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { className: "uswift-card", style: { marginBottom: 16 }, children: [
+            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
               "label",
               {
                 style: {
@@ -2913,9 +4052,17 @@ function ResumeEnhancement() {
                   color: "#374151"
                 },
                 children: "Job Description (Optional):"
-              }
+              },
+              void 0,
+              false,
+              {
+                fileName: "C:/Users/DELL/Uswift/extension/src/ResumeEnhancement.tsx",
+                lineNumber: 329,
+                columnNumber: 15
+              },
+              this
             ),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(
+            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
               "textarea",
               {
                 value: jobDescription,
@@ -2930,10 +4077,22 @@ function ResumeEnhancement() {
                   fontSize: "0.9rem",
                   resize: "vertical"
                 }
-              }
+              },
+              void 0,
+              false,
+              {
+                fileName: "C:/Users/DELL/Uswift/extension/src/ResumeEnhancement.tsx",
+                lineNumber: 339,
+                columnNumber: 15
+              },
+              this
             )
-          ] }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(
+          ] }, void 0, true, {
+            fileName: "C:/Users/DELL/Uswift/extension/src/ResumeEnhancement.tsx",
+            lineNumber: 328,
+            columnNumber: 13
+          }, this),
+          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
             "button",
             {
               onClick: handleEnhance,
@@ -2944,7 +4103,7 @@ function ResumeEnhancement() {
                 opacity: isLoading || !resumeContent.trim() ? 0.6 : 1,
                 cursor: isLoading || !resumeContent.trim() ? "not-allowed" : "pointer"
               },
-              children: isLoading ? /* @__PURE__ */ jsxRuntimeExports.jsxs(
+              children: isLoading ? /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                 "div",
                 {
                   style: {
@@ -2954,7 +4113,7 @@ function ResumeEnhancement() {
                     gap: 8
                   },
                   children: [
-                    /* @__PURE__ */ jsxRuntimeExports.jsx(
+                    /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                       "div",
                       {
                         style: {
@@ -2965,15 +4124,39 @@ function ResumeEnhancement() {
                           borderRadius: "50%",
                           animation: "spin 1s linear infinite"
                         }
-                      }
+                      },
+                      void 0,
+                      false,
+                      {
+                        fileName: "C:/Users/DELL/Uswift/extension/src/ResumeEnhancement.tsx",
+                        lineNumber: 377,
+                        columnNumber: 17
+                      },
+                      this
                     ),
                     "Enhancing Resume..."
                   ]
-                }
+                },
+                void 0,
+                true,
+                {
+                  fileName: "C:/Users/DELL/Uswift/extension/src/ResumeEnhancement.tsx",
+                  lineNumber: 369,
+                  columnNumber: 15
+                },
+                this
               ) : "Enhance My Resume"
-            }
+            },
+            void 0,
+            false,
+            {
+              fileName: "C:/Users/DELL/Uswift/extension/src/ResumeEnhancement.tsx",
+              lineNumber: 357,
+              columnNumber: 11
+            },
+            this
           ),
-          /* @__PURE__ */ jsxRuntimeExports.jsxs(
+          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
             "div",
             {
               style: {
@@ -2985,19 +4168,55 @@ function ResumeEnhancement() {
                 color: "#6B7280"
               },
               children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Tips:" }),
-                /* @__PURE__ */ jsxRuntimeExports.jsxs("ul", { style: { margin: "8px 0 0 16px", padding: 0 }, children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Include your full work history and key achievements" }),
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Use quantifiable metrics where possible" }),
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Keep it concise but comprehensive" }),
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "For job-specific enhancement, include relevant keywords from the job posting" })
-                ] })
+                /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("strong", { children: "Tips:" }, void 0, false, {
+                  fileName: "C:/Users/DELL/Uswift/extension/src/ResumeEnhancement.tsx",
+                  lineNumber: 405,
+                  columnNumber: 13
+                }, this),
+                /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("ul", { style: { margin: "8px 0 0 16px", padding: 0 }, children: [
+                  /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("li", { children: "Include your full work history and key achievements" }, void 0, false, {
+                    fileName: "C:/Users/DELL/Uswift/extension/src/ResumeEnhancement.tsx",
+                    lineNumber: 407,
+                    columnNumber: 15
+                  }, this),
+                  /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("li", { children: "Use quantifiable metrics where possible" }, void 0, false, {
+                    fileName: "C:/Users/DELL/Uswift/extension/src/ResumeEnhancement.tsx",
+                    lineNumber: 408,
+                    columnNumber: 15
+                  }, this),
+                  /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("li", { children: "Keep it concise but comprehensive" }, void 0, false, {
+                    fileName: "C:/Users/DELL/Uswift/extension/src/ResumeEnhancement.tsx",
+                    lineNumber: 409,
+                    columnNumber: 15
+                  }, this),
+                  /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("li", { children: "For job-specific enhancement, include relevant keywords from the job posting" }, void 0, false, {
+                    fileName: "C:/Users/DELL/Uswift/extension/src/ResumeEnhancement.tsx",
+                    lineNumber: 410,
+                    columnNumber: 15
+                  }, this)
+                ] }, void 0, true, {
+                  fileName: "C:/Users/DELL/Uswift/extension/src/ResumeEnhancement.tsx",
+                  lineNumber: 406,
+                  columnNumber: 13
+                }, this)
               ]
-            }
+            },
+            void 0,
+            true,
+            {
+              fileName: "C:/Users/DELL/Uswift/extension/src/ResumeEnhancement.tsx",
+              lineNumber: 395,
+              columnNumber: 11
+            },
+            this
           )
-        ] }),
-        activeTab === "result" && result && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsxs(
+        ] }, void 0, true, {
+          fileName: "C:/Users/DELL/Uswift/extension/src/ResumeEnhancement.tsx",
+          lineNumber: 246,
+          columnNumber: 9
+        }, this),
+        activeTab === "result" && result && /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { children: [
+          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
             "div",
             {
               style: {
@@ -3010,8 +4229,8 @@ function ResumeEnhancement() {
                 borderRadius: 8
               },
               children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { textAlign: "center" }, children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { textAlign: "center" }, children: [
+                  /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                     "div",
                     {
                       style: {
@@ -3024,9 +4243,17 @@ function ResumeEnhancement() {
                         result.score,
                         "/100"
                       ]
-                    }
+                    },
+                    void 0,
+                    true,
+                    {
+                      fileName: "C:/Users/DELL/Uswift/extension/src/ResumeEnhancement.tsx",
+                      lineNumber: 434,
+                      columnNumber: 15
+                    },
+                    this
                   ),
-                  /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                     "div",
                     {
                       style: {
@@ -3035,11 +4262,23 @@ function ResumeEnhancement() {
                         fontWeight: 500
                       },
                       children: getScoreLabel(result.score)
-                    }
+                    },
+                    void 0,
+                    false,
+                    {
+                      fileName: "C:/Users/DELL/Uswift/extension/src/ResumeEnhancement.tsx",
+                      lineNumber: 444,
+                      columnNumber: 15
+                    },
+                    this
                   )
-                ] }),
-                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { flex: 1 }, children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsx(
+                ] }, void 0, true, {
+                  fileName: "C:/Users/DELL/Uswift/extension/src/ResumeEnhancement.tsx",
+                  lineNumber: 433,
+                  columnNumber: 13
+                }, this),
+                /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { flex: 1 }, children: [
+                  /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                     "h3",
                     {
                       style: {
@@ -3048,15 +4287,39 @@ function ResumeEnhancement() {
                         color: "#111827"
                       },
                       children: "Resume Quality Score"
-                    }
+                    },
+                    void 0,
+                    false,
+                    {
+                      fileName: "C:/Users/DELL/Uswift/extension/src/ResumeEnhancement.tsx",
+                      lineNumber: 455,
+                      columnNumber: 15
+                    },
+                    this
                   ),
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("p", { style: { margin: 0, fontSize: "0.8rem", color: "#6B7280" }, children: "Based on content relevance, formatting, and impact statements" })
-                ] })
+                  /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("p", { style: { margin: 0, fontSize: "0.8rem", color: "#6B7280" }, children: "Based on content relevance, formatting, and impact statements" }, void 0, false, {
+                    fileName: "C:/Users/DELL/Uswift/extension/src/ResumeEnhancement.tsx",
+                    lineNumber: 464,
+                    columnNumber: 15
+                  }, this)
+                ] }, void 0, true, {
+                  fileName: "C:/Users/DELL/Uswift/extension/src/ResumeEnhancement.tsx",
+                  lineNumber: 454,
+                  columnNumber: 13
+                }, this)
               ]
-            }
+            },
+            void 0,
+            true,
+            {
+              fileName: "C:/Users/DELL/Uswift/extension/src/ResumeEnhancement.tsx",
+              lineNumber: 422,
+              columnNumber: 11
+            },
+            this
           ),
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "uswift-card", style: { marginBottom: 16 }, children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(
+          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { className: "uswift-card", style: { marginBottom: 16 }, children: [
+            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
               "h3",
               {
                 style: {
@@ -3066,18 +4329,38 @@ function ResumeEnhancement() {
                   marginBottom: 12
                 },
                 children: "Key Suggestions"
-              }
+              },
+              void 0,
+              false,
+              {
+                fileName: "C:/Users/DELL/Uswift/extension/src/ResumeEnhancement.tsx",
+                lineNumber: 472,
+                columnNumber: 13
+              },
+              this
             ),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(
+            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
               "div",
               {
                 style: { fontSize: "0.9rem", lineHeight: 1.6, color: "#4B5563" },
                 children: result.suggestions
-              }
+              },
+              void 0,
+              false,
+              {
+                fileName: "C:/Users/DELL/Uswift/extension/src/ResumeEnhancement.tsx",
+                lineNumber: 482,
+                columnNumber: 13
+              },
+              this
             )
-          ] }),
-          result.improvements.length > 0 && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "uswift-card", style: { marginBottom: 16 }, children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(
+          ] }, void 0, true, {
+            fileName: "C:/Users/DELL/Uswift/extension/src/ResumeEnhancement.tsx",
+            lineNumber: 471,
+            columnNumber: 11
+          }, this),
+          result.improvements.length > 0 && /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { className: "uswift-card", style: { marginBottom: 16 }, children: [
+            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
               "h3",
               {
                 style: {
@@ -3087,9 +4370,17 @@ function ResumeEnhancement() {
                   marginBottom: 12
                 },
                 children: "Top Improvements Made"
-              }
+              },
+              void 0,
+              false,
+              {
+                fileName: "C:/Users/DELL/Uswift/extension/src/ResumeEnhancement.tsx",
+                lineNumber: 492,
+                columnNumber: 15
+              },
+              this
             ),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("ul", { style: { margin: 0, paddingLeft: 20 }, children: result.improvements.map((improvement, index) => /* @__PURE__ */ jsxRuntimeExports.jsx(
+            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("ul", { style: { margin: 0, paddingLeft: 20 }, children: result.improvements.map((improvement, index) => /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
               "li",
               {
                 style: {
@@ -3099,11 +4390,26 @@ function ResumeEnhancement() {
                 },
                 children: improvement
               },
-              index
-            )) })
-          ] }),
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "uswift-card", style: { marginBottom: 16 }, children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsxs(
+              index,
+              false,
+              {
+                fileName: "C:/Users/DELL/Uswift/extension/src/ResumeEnhancement.tsx",
+                lineNumber: 504,
+                columnNumber: 19
+              },
+              this
+            )) }, void 0, false, {
+              fileName: "C:/Users/DELL/Uswift/extension/src/ResumeEnhancement.tsx",
+              lineNumber: 502,
+              columnNumber: 15
+            }, this)
+          ] }, void 0, true, {
+            fileName: "C:/Users/DELL/Uswift/extension/src/ResumeEnhancement.tsx",
+            lineNumber: 491,
+            columnNumber: 13
+          }, this),
+          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { className: "uswift-card", style: { marginBottom: 16 }, children: [
+            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
               "div",
               {
                 style: {
@@ -3113,7 +4419,7 @@ function ResumeEnhancement() {
                   marginBottom: 12
                 },
                 children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                     "h3",
                     {
                       style: {
@@ -3123,9 +4429,17 @@ function ResumeEnhancement() {
                         margin: 0
                       },
                       children: "Enhanced Resume"
-                    }
+                    },
+                    void 0,
+                    false,
+                    {
+                      fileName: "C:/Users/DELL/Uswift/extension/src/ResumeEnhancement.tsx",
+                      lineNumber: 529,
+                      columnNumber: 15
+                    },
+                    this
                   ),
-                  /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                     "button",
                     {
                       onClick: () => copyToClipboard(result.enhancedResume),
@@ -3139,12 +4453,28 @@ function ResumeEnhancement() {
                         fontSize: "0.8rem"
                       },
                       children: "Copy"
-                    }
+                    },
+                    void 0,
+                    false,
+                    {
+                      fileName: "C:/Users/DELL/Uswift/extension/src/ResumeEnhancement.tsx",
+                      lineNumber: 539,
+                      columnNumber: 15
+                    },
+                    this
                   )
                 ]
-              }
+              },
+              void 0,
+              true,
+              {
+                fileName: "C:/Users/DELL/Uswift/extension/src/ResumeEnhancement.tsx",
+                lineNumber: 521,
+                columnNumber: 13
+              },
+              this
             ),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(
+            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
               "div",
               {
                 style: {
@@ -3159,20 +4489,40 @@ function ResumeEnhancement() {
                   border: "1px solid #E5E7EB"
                 },
                 children: result.enhancedResume
-              }
+              },
+              void 0,
+              false,
+              {
+                fileName: "C:/Users/DELL/Uswift/extension/src/ResumeEnhancement.tsx",
+                lineNumber: 554,
+                columnNumber: 13
+              },
+              this
             )
-          ] }),
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { display: "flex", gap: 8 }, children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(
+          ] }, void 0, true, {
+            fileName: "C:/Users/DELL/Uswift/extension/src/ResumeEnhancement.tsx",
+            lineNumber: 520,
+            columnNumber: 11
+          }, this),
+          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { display: "flex", gap: 8 }, children: [
+            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
               "button",
               {
                 onClick: () => copyToClipboard(result.enhancedResume),
                 className: "uswift-btn",
                 style: { flex: 1 },
                 children: "Copy Enhanced Resume"
-              }
+              },
+              void 0,
+              false,
+              {
+                fileName: "C:/Users/DELL/Uswift/extension/src/ResumeEnhancement.tsx",
+                lineNumber: 573,
+                columnNumber: 13
+              },
+              this
             ),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(
+            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
               "button",
               {
                 onClick: () => setActiveTab("input"),
@@ -3186,11 +4536,27 @@ function ResumeEnhancement() {
                   cursor: "pointer"
                 },
                 children: "Make Another Edit"
-              }
+              },
+              void 0,
+              false,
+              {
+                fileName: "C:/Users/DELL/Uswift/extension/src/ResumeEnhancement.tsx",
+                lineNumber: 580,
+                columnNumber: 13
+              },
+              this
             )
-          ] })
-        ] }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          ] }, void 0, true, {
+            fileName: "C:/Users/DELL/Uswift/extension/src/ResumeEnhancement.tsx",
+            lineNumber: 572,
+            columnNumber: 11
+          }, this)
+        ] }, void 0, true, {
+          fileName: "C:/Users/DELL/Uswift/extension/src/ResumeEnhancement.tsx",
+          lineNumber: 420,
+          columnNumber: 9
+        }, this),
+        /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
           "div",
           {
             style: {
@@ -3200,10 +4566,26 @@ function ResumeEnhancement() {
               color: "#6B7280"
             },
             children: "Powered by Mistral AI • Get professional resume enhancement suggestions"
-          }
+          },
+          void 0,
+          false,
+          {
+            fileName: "C:/Users/DELL/Uswift/extension/src/ResumeEnhancement.tsx",
+            lineNumber: 599,
+            columnNumber: 7
+          },
+          this
         )
       ]
-    }
+    },
+    void 0,
+    true,
+    {
+      fileName: "C:/Users/DELL/Uswift/extension/src/ResumeEnhancement.tsx",
+      lineNumber: 148,
+      columnNumber: 5
+    },
+    this
   );
 }
 
@@ -3307,7 +4689,7 @@ function CoverLetterGenerator() {
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
   };
-  return /* @__PURE__ */ jsxRuntimeExports.jsxs(
+  return /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
     "div",
     {
       style: {
@@ -3318,7 +4700,7 @@ function CoverLetterGenerator() {
         minHeight: 520
       },
       children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(
+        /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
           "div",
           {
             className: "uswift-gradient",
@@ -3327,9 +4709,17 @@ function CoverLetterGenerator() {
               borderRadius: 8,
               marginBottom: 16
             }
-          }
+          },
+          void 0,
+          false,
+          {
+            fileName: "C:/Users/DELL/Uswift/extension/src/CoverLetterGenerator.tsx",
+            lineNumber: 156,
+            columnNumber: 7
+          },
+          this
         ),
-        /* @__PURE__ */ jsxRuntimeExports.jsxs(
+        /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
           "div",
           {
             style: {
@@ -3339,7 +4729,7 @@ function CoverLetterGenerator() {
               marginBottom: 16
             },
             children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx(
+              /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                 "h2",
                 {
                   style: {
@@ -3349,9 +4739,17 @@ function CoverLetterGenerator() {
                     margin: 0
                   },
                   children: "Cover Letter Generator"
-                }
+                },
+                void 0,
+                false,
+                {
+                  fileName: "C:/Users/DELL/Uswift/extension/src/CoverLetterGenerator.tsx",
+                  lineNumber: 173,
+                  columnNumber: 9
+                },
+                this
               ),
-              activeTab === "result" && /* @__PURE__ */ jsxRuntimeExports.jsx(
+              activeTab === "result" && /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                 "button",
                 {
                   onClick: () => setActiveTab("input"),
@@ -3365,12 +4763,28 @@ function CoverLetterGenerator() {
                     fontSize: "0.8rem"
                   },
                   children: "← Back to Edit"
-                }
+                },
+                void 0,
+                false,
+                {
+                  fileName: "C:/Users/DELL/Uswift/extension/src/CoverLetterGenerator.tsx",
+                  lineNumber: 184,
+                  columnNumber: 11
+                },
+                this
               )
             ]
-          }
+          },
+          void 0,
+          true,
+          {
+            fileName: "C:/Users/DELL/Uswift/extension/src/CoverLetterGenerator.tsx",
+            lineNumber: 165,
+            columnNumber: 7
+          },
+          this
         ),
-        /* @__PURE__ */ jsxRuntimeExports.jsxs(
+        /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
           "div",
           {
             style: {
@@ -3379,7 +4793,7 @@ function CoverLetterGenerator() {
               borderBottom: "1px solid #E5E7EB"
             },
             children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx(
+              /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                 "button",
                 {
                   onClick: () => setActiveTab("input"),
@@ -3394,9 +4808,17 @@ function CoverLetterGenerator() {
                     borderBottom: activeTab === "input" ? "2px solid #6D28D9" : "none"
                   },
                   children: "Input"
-                }
+                },
+                void 0,
+                false,
+                {
+                  fileName: "C:/Users/DELL/Uswift/extension/src/CoverLetterGenerator.tsx",
+                  lineNumber: 209,
+                  columnNumber: 9
+                },
+                this
               ),
-              /* @__PURE__ */ jsxRuntimeExports.jsx(
+              /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                 "button",
                 {
                   onClick: () => setActiveTab("result"),
@@ -3413,15 +4835,31 @@ function CoverLetterGenerator() {
                     opacity: result ? 1 : 0.5
                   },
                   children: "Generated Letter"
-                }
+                },
+                void 0,
+                false,
+                {
+                  fileName: "C:/Users/DELL/Uswift/extension/src/CoverLetterGenerator.tsx",
+                  lineNumber: 224,
+                  columnNumber: 9
+                },
+                this
               )
             ]
-          }
+          },
+          void 0,
+          true,
+          {
+            fileName: "C:/Users/DELL/Uswift/extension/src/CoverLetterGenerator.tsx",
+            lineNumber: 202,
+            columnNumber: 7
+          },
+          this
         ),
-        activeTab === "input" && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { display: "flex", gap: 12, marginBottom: 16 }, children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { flex: 1 }, children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx(
+        activeTab === "input" && /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { children: [
+          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { display: "flex", gap: 12, marginBottom: 16 }, children: [
+            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { flex: 1 }, children: [
+              /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                 "label",
                 {
                   style: {
@@ -3432,9 +4870,17 @@ function CoverLetterGenerator() {
                     marginBottom: 4
                   },
                   children: "Job Title"
-                }
+                },
+                void 0,
+                false,
+                {
+                  fileName: "C:/Users/DELL/Uswift/extension/src/CoverLetterGenerator.tsx",
+                  lineNumber: 248,
+                  columnNumber: 15
+                },
+                this
               ),
-              /* @__PURE__ */ jsxRuntimeExports.jsx(
+              /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                 "input",
                 {
                   type: "text",
@@ -3448,11 +4894,23 @@ function CoverLetterGenerator() {
                     border: "1px solid #E5E7EB",
                     fontSize: "0.9rem"
                   }
-                }
+                },
+                void 0,
+                false,
+                {
+                  fileName: "C:/Users/DELL/Uswift/extension/src/CoverLetterGenerator.tsx",
+                  lineNumber: 259,
+                  columnNumber: 15
+                },
+                this
               )
-            ] }),
-            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { flex: 1 }, children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx(
+            ] }, void 0, true, {
+              fileName: "C:/Users/DELL/Uswift/extension/src/CoverLetterGenerator.tsx",
+              lineNumber: 247,
+              columnNumber: 13
+            }, this),
+            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { flex: 1 }, children: [
+              /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                 "label",
                 {
                   style: {
@@ -3463,9 +4921,17 @@ function CoverLetterGenerator() {
                     marginBottom: 4
                   },
                   children: "Company Name"
-                }
+                },
+                void 0,
+                false,
+                {
+                  fileName: "C:/Users/DELL/Uswift/extension/src/CoverLetterGenerator.tsx",
+                  lineNumber: 274,
+                  columnNumber: 15
+                },
+                this
               ),
-              /* @__PURE__ */ jsxRuntimeExports.jsx(
+              /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                 "input",
                 {
                   type: "text",
@@ -3479,12 +4945,28 @@ function CoverLetterGenerator() {
                     border: "1px solid #E5E7EB",
                     fontSize: "0.9rem"
                   }
-                }
+                },
+                void 0,
+                false,
+                {
+                  fileName: "C:/Users/DELL/Uswift/extension/src/CoverLetterGenerator.tsx",
+                  lineNumber: 285,
+                  columnNumber: 15
+                },
+                this
               )
-            ] })
-          ] }),
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { marginBottom: 16 }, children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(
+            ] }, void 0, true, {
+              fileName: "C:/Users/DELL/Uswift/extension/src/CoverLetterGenerator.tsx",
+              lineNumber: 273,
+              columnNumber: 13
+            }, this)
+          ] }, void 0, true, {
+            fileName: "C:/Users/DELL/Uswift/extension/src/CoverLetterGenerator.tsx",
+            lineNumber: 246,
+            columnNumber: 11
+          }, this),
+          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { marginBottom: 16 }, children: [
+            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
               "label",
               {
                 style: {
@@ -3495,9 +4977,17 @@ function CoverLetterGenerator() {
                   marginBottom: 8
                 },
                 children: "Cover Letter Tone:"
-              }
+              },
+              void 0,
+              false,
+              {
+                fileName: "C:/Users/DELL/Uswift/extension/src/CoverLetterGenerator.tsx",
+                lineNumber: 303,
+                columnNumber: 13
+              },
+              this
             ),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { style: { display: "flex", gap: 8, flexWrap: "wrap" }, children: toneOptions.map((option) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
+            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { display: "flex", gap: 8, flexWrap: "wrap" }, children: toneOptions.map((option) => /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
               "button",
               {
                 onClick: () => setTone(option.value),
@@ -3515,15 +5005,38 @@ function CoverLetterGenerator() {
                 },
                 title: option.description,
                 children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("div", { style: { fontWeight: 600 }, children: option.label }),
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("div", { style: { fontSize: "0.7rem", opacity: 0.8 }, children: option.description })
+                  /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { fontWeight: 600 }, children: option.label }, void 0, false, {
+                    fileName: "C:/Users/DELL/Uswift/extension/src/CoverLetterGenerator.tsx",
+                    lineNumber: 333,
+                    columnNumber: 19
+                  }, this),
+                  /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { fontSize: "0.7rem", opacity: 0.8 }, children: option.description }, void 0, false, {
+                    fileName: "C:/Users/DELL/Uswift/extension/src/CoverLetterGenerator.tsx",
+                    lineNumber: 334,
+                    columnNumber: 19
+                  }, this)
                 ]
               },
-              option.value
-            )) })
-          ] }),
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "uswift-card", style: { marginBottom: 16 }, children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              option.value,
+              true,
+              {
+                fileName: "C:/Users/DELL/Uswift/extension/src/CoverLetterGenerator.tsx",
+                lineNumber: 316,
+                columnNumber: 17
+              },
+              this
+            )) }, void 0, false, {
+              fileName: "C:/Users/DELL/Uswift/extension/src/CoverLetterGenerator.tsx",
+              lineNumber: 314,
+              columnNumber: 13
+            }, this)
+          ] }, void 0, true, {
+            fileName: "C:/Users/DELL/Uswift/extension/src/CoverLetterGenerator.tsx",
+            lineNumber: 302,
+            columnNumber: 11
+          }, this),
+          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { className: "uswift-card", style: { marginBottom: 16 }, children: [
+            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
               "label",
               {
                 style: {
@@ -3533,9 +5046,17 @@ function CoverLetterGenerator() {
                   color: "#374151"
                 },
                 children: "Your Resume Content:"
-              }
+              },
+              void 0,
+              false,
+              {
+                fileName: "C:/Users/DELL/Uswift/extension/src/CoverLetterGenerator.tsx",
+                lineNumber: 344,
+                columnNumber: 13
+              },
+              this
             ),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(
+            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
               "textarea",
               {
                 value: resumeContent,
@@ -3550,11 +5071,23 @@ function CoverLetterGenerator() {
                   fontSize: "0.9rem",
                   resize: "vertical"
                 }
-              }
+              },
+              void 0,
+              false,
+              {
+                fileName: "C:/Users/DELL/Uswift/extension/src/CoverLetterGenerator.tsx",
+                lineNumber: 354,
+                columnNumber: 13
+              },
+              this
             )
-          ] }),
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "uswift-card", style: { marginBottom: 16 }, children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(
+          ] }, void 0, true, {
+            fileName: "C:/Users/DELL/Uswift/extension/src/CoverLetterGenerator.tsx",
+            lineNumber: 343,
+            columnNumber: 11
+          }, this),
+          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { className: "uswift-card", style: { marginBottom: 16 }, children: [
+            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
               "label",
               {
                 style: {
@@ -3564,9 +5097,17 @@ function CoverLetterGenerator() {
                   color: "#374151"
                 },
                 children: "Job Description:"
-              }
+              },
+              void 0,
+              false,
+              {
+                fileName: "C:/Users/DELL/Uswift/extension/src/CoverLetterGenerator.tsx",
+                lineNumber: 372,
+                columnNumber: 13
+              },
+              this
             ),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(
+            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
               "textarea",
               {
                 value: jobDescription,
@@ -3581,10 +5122,22 @@ function CoverLetterGenerator() {
                   fontSize: "0.9rem",
                   resize: "vertical"
                 }
-              }
+              },
+              void 0,
+              false,
+              {
+                fileName: "C:/Users/DELL/Uswift/extension/src/CoverLetterGenerator.tsx",
+                lineNumber: 382,
+                columnNumber: 13
+              },
+              this
             )
-          ] }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(
+          ] }, void 0, true, {
+            fileName: "C:/Users/DELL/Uswift/extension/src/CoverLetterGenerator.tsx",
+            lineNumber: 371,
+            columnNumber: 11
+          }, this),
+          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
             "button",
             {
               onClick: handleGenerate,
@@ -3595,7 +5148,7 @@ function CoverLetterGenerator() {
                 opacity: isLoading || !resumeContent.trim() || !jobDescription.trim() ? 0.6 : 1,
                 cursor: isLoading || !resumeContent.trim() || !jobDescription.trim() ? "not-allowed" : "pointer"
               },
-              children: isLoading ? /* @__PURE__ */ jsxRuntimeExports.jsxs(
+              children: isLoading ? /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                 "div",
                 {
                   style: {
@@ -3605,7 +5158,7 @@ function CoverLetterGenerator() {
                     gap: 8
                   },
                   children: [
-                    /* @__PURE__ */ jsxRuntimeExports.jsx(
+                    /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                       "div",
                       {
                         style: {
@@ -3616,15 +5169,39 @@ function CoverLetterGenerator() {
                           borderRadius: "50%",
                           animation: "spin 1s linear infinite"
                         }
-                      }
+                      },
+                      void 0,
+                      false,
+                      {
+                        fileName: "C:/Users/DELL/Uswift/extension/src/CoverLetterGenerator.tsx",
+                        lineNumber: 426,
+                        columnNumber: 17
+                      },
+                      this
                     ),
                     "Generating Cover Letter..."
                   ]
-                }
+                },
+                void 0,
+                true,
+                {
+                  fileName: "C:/Users/DELL/Uswift/extension/src/CoverLetterGenerator.tsx",
+                  lineNumber: 418,
+                  columnNumber: 15
+                },
+                this
               ) : "Generate Cover Letter"
-            }
+            },
+            void 0,
+            false,
+            {
+              fileName: "C:/Users/DELL/Uswift/extension/src/CoverLetterGenerator.tsx",
+              lineNumber: 399,
+              columnNumber: 11
+            },
+            this
           ),
-          /* @__PURE__ */ jsxRuntimeExports.jsxs(
+          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
             "div",
             {
               style: {
@@ -3636,19 +5213,55 @@ function CoverLetterGenerator() {
                 color: "#6B7280"
               },
               children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Tips for Better Results:" }),
-                /* @__PURE__ */ jsxRuntimeExports.jsxs("ul", { style: { margin: "8px 0 0 16px", padding: 0 }, children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Include specific achievements and metrics from your resume" }),
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Highlight relevant skills that match the job requirements" }),
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Keep the job description comprehensive for better tailoring" }),
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Choose a tone that matches the company culture" })
-                ] })
+                /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("strong", { children: "Tips for Better Results:" }, void 0, false, {
+                  fileName: "C:/Users/DELL/Uswift/extension/src/CoverLetterGenerator.tsx",
+                  lineNumber: 454,
+                  columnNumber: 13
+                }, this),
+                /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("ul", { style: { margin: "8px 0 0 16px", padding: 0 }, children: [
+                  /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("li", { children: "Include specific achievements and metrics from your resume" }, void 0, false, {
+                    fileName: "C:/Users/DELL/Uswift/extension/src/CoverLetterGenerator.tsx",
+                    lineNumber: 456,
+                    columnNumber: 15
+                  }, this),
+                  /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("li", { children: "Highlight relevant skills that match the job requirements" }, void 0, false, {
+                    fileName: "C:/Users/DELL/Uswift/extension/src/CoverLetterGenerator.tsx",
+                    lineNumber: 459,
+                    columnNumber: 15
+                  }, this),
+                  /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("li", { children: "Keep the job description comprehensive for better tailoring" }, void 0, false, {
+                    fileName: "C:/Users/DELL/Uswift/extension/src/CoverLetterGenerator.tsx",
+                    lineNumber: 460,
+                    columnNumber: 15
+                  }, this),
+                  /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("li", { children: "Choose a tone that matches the company culture" }, void 0, false, {
+                    fileName: "C:/Users/DELL/Uswift/extension/src/CoverLetterGenerator.tsx",
+                    lineNumber: 463,
+                    columnNumber: 15
+                  }, this)
+                ] }, void 0, true, {
+                  fileName: "C:/Users/DELL/Uswift/extension/src/CoverLetterGenerator.tsx",
+                  lineNumber: 455,
+                  columnNumber: 13
+                }, this)
               ]
-            }
+            },
+            void 0,
+            true,
+            {
+              fileName: "C:/Users/DELL/Uswift/extension/src/CoverLetterGenerator.tsx",
+              lineNumber: 444,
+              columnNumber: 11
+            },
+            this
           )
-        ] }),
-        activeTab === "result" && result && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsxs(
+        ] }, void 0, true, {
+          fileName: "C:/Users/DELL/Uswift/extension/src/CoverLetterGenerator.tsx",
+          lineNumber: 244,
+          columnNumber: 9
+        }, this),
+        activeTab === "result" && result && /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { children: [
+          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
             "div",
             {
               style: {
@@ -3660,8 +5273,8 @@ function CoverLetterGenerator() {
                 borderRadius: 8
               },
               children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { textAlign: "center", flex: 1 }, children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsx(
+                /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { textAlign: "center", flex: 1 }, children: [
+                  /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                     "div",
                     {
                       style: {
@@ -3671,9 +5284,17 @@ function CoverLetterGenerator() {
                         marginBottom: 4
                       },
                       children: result.wordCount
-                    }
+                    },
+                    void 0,
+                    false,
+                    {
+                      fileName: "C:/Users/DELL/Uswift/extension/src/CoverLetterGenerator.tsx",
+                      lineNumber: 483,
+                      columnNumber: 15
+                    },
+                    this
                   ),
-                  /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                     "div",
                     {
                       style: {
@@ -3682,11 +5303,23 @@ function CoverLetterGenerator() {
                         fontWeight: 500
                       },
                       children: "Words"
-                    }
+                    },
+                    void 0,
+                    false,
+                    {
+                      fileName: "C:/Users/DELL/Uswift/extension/src/CoverLetterGenerator.tsx",
+                      lineNumber: 493,
+                      columnNumber: 15
+                    },
+                    this
                   )
-                ] }),
-                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { textAlign: "center", flex: 1 }, children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsx(
+                ] }, void 0, true, {
+                  fileName: "C:/Users/DELL/Uswift/extension/src/CoverLetterGenerator.tsx",
+                  lineNumber: 482,
+                  columnNumber: 13
+                }, this),
+                /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { textAlign: "center", flex: 1 }, children: [
+                  /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                     "div",
                     {
                       style: {
@@ -3696,9 +5329,17 @@ function CoverLetterGenerator() {
                         marginBottom: 4
                       },
                       children: result.tone
-                    }
+                    },
+                    void 0,
+                    false,
+                    {
+                      fileName: "C:/Users/DELL/Uswift/extension/src/CoverLetterGenerator.tsx",
+                      lineNumber: 504,
+                      columnNumber: 15
+                    },
+                    this
                   ),
-                  /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                     "div",
                     {
                       style: {
@@ -3707,14 +5348,34 @@ function CoverLetterGenerator() {
                         fontWeight: 500
                       },
                       children: "Tone"
-                    }
+                    },
+                    void 0,
+                    false,
+                    {
+                      fileName: "C:/Users/DELL/Uswift/extension/src/CoverLetterGenerator.tsx",
+                      lineNumber: 514,
+                      columnNumber: 15
+                    },
+                    this
                   )
-                ] })
+                ] }, void 0, true, {
+                  fileName: "C:/Users/DELL/Uswift/extension/src/CoverLetterGenerator.tsx",
+                  lineNumber: 503,
+                  columnNumber: 13
+                }, this)
               ]
-            }
+            },
+            void 0,
+            true,
+            {
+              fileName: "C:/Users/DELL/Uswift/extension/src/CoverLetterGenerator.tsx",
+              lineNumber: 472,
+              columnNumber: 11
+            },
+            this
           ),
-          result.keyPoints.length > 0 && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "uswift-card", style: { marginBottom: 16 }, children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(
+          result.keyPoints.length > 0 && /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { className: "uswift-card", style: { marginBottom: 16 }, children: [
+            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
               "h3",
               {
                 style: {
@@ -3724,9 +5385,17 @@ function CoverLetterGenerator() {
                   marginBottom: 12
                 },
                 children: "Key Highlights"
-              }
+              },
+              void 0,
+              false,
+              {
+                fileName: "C:/Users/DELL/Uswift/extension/src/CoverLetterGenerator.tsx",
+                lineNumber: 529,
+                columnNumber: 15
+              },
+              this
             ),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("ul", { style: { margin: 0, paddingLeft: 20 }, children: result.keyPoints.map((point, index) => /* @__PURE__ */ jsxRuntimeExports.jsx(
+            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("ul", { style: { margin: 0, paddingLeft: 20 }, children: result.keyPoints.map((point, index) => /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
               "li",
               {
                 style: {
@@ -3736,11 +5405,26 @@ function CoverLetterGenerator() {
                 },
                 children: point
               },
-              index
-            )) })
-          ] }),
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "uswift-card", style: { marginBottom: 16 }, children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsxs(
+              index,
+              false,
+              {
+                fileName: "C:/Users/DELL/Uswift/extension/src/CoverLetterGenerator.tsx",
+                lineNumber: 541,
+                columnNumber: 19
+              },
+              this
+            )) }, void 0, false, {
+              fileName: "C:/Users/DELL/Uswift/extension/src/CoverLetterGenerator.tsx",
+              lineNumber: 539,
+              columnNumber: 15
+            }, this)
+          ] }, void 0, true, {
+            fileName: "C:/Users/DELL/Uswift/extension/src/CoverLetterGenerator.tsx",
+            lineNumber: 528,
+            columnNumber: 13
+          }, this),
+          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { className: "uswift-card", style: { marginBottom: 16 }, children: [
+            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
               "div",
               {
                 style: {
@@ -3750,7 +5434,7 @@ function CoverLetterGenerator() {
                   marginBottom: 12
                 },
                 children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                     "h3",
                     {
                       style: {
@@ -3760,10 +5444,18 @@ function CoverLetterGenerator() {
                         margin: 0
                       },
                       children: "Your Cover Letter"
-                    }
+                    },
+                    void 0,
+                    false,
+                    {
+                      fileName: "C:/Users/DELL/Uswift/extension/src/CoverLetterGenerator.tsx",
+                      lineNumber: 566,
+                      columnNumber: 15
+                    },
+                    this
                   ),
-                  /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { display: "flex", gap: 8 }, children: [
-                    /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { display: "flex", gap: 8 }, children: [
+                    /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                       "button",
                       {
                         onClick: () => copyToClipboard(result.content),
@@ -3777,9 +5469,17 @@ function CoverLetterGenerator() {
                           fontSize: "0.8rem"
                         },
                         children: "Copy"
-                      }
+                      },
+                      void 0,
+                      false,
+                      {
+                        fileName: "C:/Users/DELL/Uswift/extension/src/CoverLetterGenerator.tsx",
+                        lineNumber: 577,
+                        columnNumber: 17
+                      },
+                      this
                     ),
-                    /* @__PURE__ */ jsxRuntimeExports.jsx(
+                    /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                       "button",
                       {
                         onClick: () => downloadAsText(result.content, "cover-letter.txt"),
@@ -3793,13 +5493,33 @@ function CoverLetterGenerator() {
                           fontSize: "0.8rem"
                         },
                         children: "Download"
-                      }
+                      },
+                      void 0,
+                      false,
+                      {
+                        fileName: "C:/Users/DELL/Uswift/extension/src/CoverLetterGenerator.tsx",
+                        lineNumber: 591,
+                        columnNumber: 17
+                      },
+                      this
                     )
-                  ] })
+                  ] }, void 0, true, {
+                    fileName: "C:/Users/DELL/Uswift/extension/src/CoverLetterGenerator.tsx",
+                    lineNumber: 576,
+                    columnNumber: 15
+                  }, this)
                 ]
-              }
+              },
+              void 0,
+              true,
+              {
+                fileName: "C:/Users/DELL/Uswift/extension/src/CoverLetterGenerator.tsx",
+                lineNumber: 558,
+                columnNumber: 13
+              },
+              this
             ),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(
+            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
               "div",
               {
                 style: {
@@ -3814,20 +5534,40 @@ function CoverLetterGenerator() {
                   border: "1px solid #E5E7EB"
                 },
                 children: result.content
-              }
+              },
+              void 0,
+              false,
+              {
+                fileName: "C:/Users/DELL/Uswift/extension/src/CoverLetterGenerator.tsx",
+                lineNumber: 609,
+                columnNumber: 13
+              },
+              this
             )
-          ] }),
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { display: "flex", gap: 8 }, children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(
+          ] }, void 0, true, {
+            fileName: "C:/Users/DELL/Uswift/extension/src/CoverLetterGenerator.tsx",
+            lineNumber: 557,
+            columnNumber: 11
+          }, this),
+          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { display: "flex", gap: 8 }, children: [
+            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
               "button",
               {
                 onClick: () => copyToClipboard(result.content),
                 className: "uswift-btn",
                 style: { flex: 1 },
                 children: "Copy to Clipboard"
-              }
+              },
+              void 0,
+              false,
+              {
+                fileName: "C:/Users/DELL/Uswift/extension/src/CoverLetterGenerator.tsx",
+                lineNumber: 628,
+                columnNumber: 13
+              },
+              this
             ),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(
+            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
               "button",
               {
                 onClick: () => setActiveTab("input"),
@@ -3841,11 +5581,27 @@ function CoverLetterGenerator() {
                   cursor: "pointer"
                 },
                 children: "Generate Another"
-              }
+              },
+              void 0,
+              false,
+              {
+                fileName: "C:/Users/DELL/Uswift/extension/src/CoverLetterGenerator.tsx",
+                lineNumber: 635,
+                columnNumber: 13
+              },
+              this
             )
-          ] })
-        ] }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          ] }, void 0, true, {
+            fileName: "C:/Users/DELL/Uswift/extension/src/CoverLetterGenerator.tsx",
+            lineNumber: 627,
+            columnNumber: 11
+          }, this)
+        ] }, void 0, true, {
+          fileName: "C:/Users/DELL/Uswift/extension/src/CoverLetterGenerator.tsx",
+          lineNumber: 470,
+          columnNumber: 9
+        }, this),
+        /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
           "div",
           {
             style: {
@@ -3855,10 +5611,26 @@ function CoverLetterGenerator() {
               color: "#6B7280"
             },
             children: "Powered by Mistral AI • Create professional cover letters tailored to each job"
-          }
+          },
+          void 0,
+          false,
+          {
+            fileName: "C:/Users/DELL/Uswift/extension/src/CoverLetterGenerator.tsx",
+            lineNumber: 654,
+            columnNumber: 7
+          },
+          this
         )
       ]
-    }
+    },
+    void 0,
+    true,
+    {
+      fileName: "C:/Users/DELL/Uswift/extension/src/CoverLetterGenerator.tsx",
+      lineNumber: 146,
+      columnNumber: 5
+    },
+    this
   );
 }
 
@@ -4083,7 +5855,7 @@ ${file.content}`;
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
   };
-  return /* @__PURE__ */ jsxRuntimeExports.jsxs(
+  return /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
     "div",
     {
       style: {
@@ -4094,7 +5866,7 @@ ${file.content}`;
         minHeight: 520
       },
       children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(
+        /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
           "div",
           {
             className: "uswift-gradient",
@@ -4103,9 +5875,17 @@ ${file.content}`;
               borderRadius: 8,
               marginBottom: 16
             }
-          }
+          },
+          void 0,
+          false,
+          {
+            fileName: "C:/Users/DELL/Uswift/extension/src/FileManager.tsx",
+            lineNumber: 319,
+            columnNumber: 7
+          },
+          this
         ),
-        /* @__PURE__ */ jsxRuntimeExports.jsxs(
+        /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
           "div",
           {
             style: {
@@ -4115,7 +5895,7 @@ ${file.content}`;
               marginBottom: 16
             },
             children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx(
+              /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                 "h2",
                 {
                   style: {
@@ -4125,9 +5905,17 @@ ${file.content}`;
                     margin: 0
                   },
                   children: "File Manager"
-                }
+                },
+                void 0,
+                false,
+                {
+                  fileName: "C:/Users/DELL/Uswift/extension/src/FileManager.tsx",
+                  lineNumber: 336,
+                  columnNumber: 9
+                },
+                this
               ),
-              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { style: { display: "flex", gap: 8 }, children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
+              /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { display: "flex", gap: 8 }, children: /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                 "span",
                 {
                   style: {
@@ -4139,12 +5927,32 @@ ${file.content}`;
                     files.length,
                     " files"
                   ]
-                }
-              ) })
+                },
+                void 0,
+                true,
+                {
+                  fileName: "C:/Users/DELL/Uswift/extension/src/FileManager.tsx",
+                  lineNumber: 347,
+                  columnNumber: 11
+                },
+                this
+              ) }, void 0, false, {
+                fileName: "C:/Users/DELL/Uswift/extension/src/FileManager.tsx",
+                lineNumber: 346,
+                columnNumber: 9
+              }, this)
             ]
-          }
+          },
+          void 0,
+          true,
+          {
+            fileName: "C:/Users/DELL/Uswift/extension/src/FileManager.tsx",
+            lineNumber: 328,
+            columnNumber: 7
+          },
+          this
         ),
-        /* @__PURE__ */ jsxRuntimeExports.jsxs(
+        /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
           "div",
           {
             style: {
@@ -4153,7 +5961,7 @@ ${file.content}`;
               borderBottom: "1px solid #E5E7EB"
             },
             children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx(
+              /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                 "button",
                 {
                   onClick: () => setActiveTab("upload"),
@@ -4168,9 +5976,17 @@ ${file.content}`;
                     borderBottom: activeTab === "upload" ? "2px solid #6D28D9" : "none"
                   },
                   children: "Upload"
-                }
+                },
+                void 0,
+                false,
+                {
+                  fileName: "C:/Users/DELL/Uswift/extension/src/FileManager.tsx",
+                  lineNumber: 367,
+                  columnNumber: 9
+                },
+                this
               ),
-              /* @__PURE__ */ jsxRuntimeExports.jsxs(
+              /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                 "button",
                 {
                   onClick: () => setActiveTab("manage"),
@@ -4189,9 +6005,17 @@ ${file.content}`;
                     files.length,
                     ")"
                   ]
-                }
+                },
+                void 0,
+                true,
+                {
+                  fileName: "C:/Users/DELL/Uswift/extension/src/FileManager.tsx",
+                  lineNumber: 382,
+                  columnNumber: 9
+                },
+                this
               ),
-              /* @__PURE__ */ jsxRuntimeExports.jsx(
+              /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                 "button",
                 {
                   onClick: () => setActiveTab("analyze"),
@@ -4208,14 +6032,30 @@ ${file.content}`;
                     opacity: selectedFile ? 1 : 0.5
                   },
                   children: "Analyze"
-                }
+                },
+                void 0,
+                false,
+                {
+                  fileName: "C:/Users/DELL/Uswift/extension/src/FileManager.tsx",
+                  lineNumber: 397,
+                  columnNumber: 9
+                },
+                this
               )
             ]
-          }
+          },
+          void 0,
+          true,
+          {
+            fileName: "C:/Users/DELL/Uswift/extension/src/FileManager.tsx",
+            lineNumber: 360,
+            columnNumber: 7
+          },
+          this
         ),
-        activeTab === "upload" && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { marginBottom: 16 }, children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(
+        activeTab === "upload" && /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { children: [
+          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { marginBottom: 16 }, children: [
+            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
               "label",
               {
                 style: {
@@ -4226,15 +6066,23 @@ ${file.content}`;
                   marginBottom: 8
                 },
                 children: "Document Type:"
-              }
+              },
+              void 0,
+              false,
+              {
+                fileName: "C:/Users/DELL/Uswift/extension/src/FileManager.tsx",
+                lineNumber: 421,
+                columnNumber: 13
+              },
+              this
             ),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { style: { display: "flex", gap: 8, flexWrap: "wrap" }, children: [
+            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { display: "flex", gap: 8, flexWrap: "wrap" }, children: [
               { value: "resume", label: "Resume", icon: "📄" },
               { value: "cover_letter", label: "Cover Letter", icon: "✉️" },
               { value: "portfolio", label: "Portfolio", icon: "💼" },
               { value: "certificate", label: "Certificate", icon: "🏆" },
               { value: "other", label: "Other", icon: "📎" }
-            ].map((option) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
+            ].map((option) => /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
               "button",
               {
                 onClick: () => setFileType(option.value),
@@ -4252,14 +6100,33 @@ ${file.content}`;
                   gap: 4
                 },
                 children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: option.icon }),
+                  /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("span", { children: option.icon }, void 0, false, {
+                    fileName: "C:/Users/DELL/Uswift/extension/src/FileManager.tsx",
+                    lineNumber: 458,
+                    columnNumber: 19
+                  }, this),
                   option.label
                 ]
               },
-              option.value
-            )) })
-          ] }),
-          /* @__PURE__ */ jsxRuntimeExports.jsxs(
+              option.value,
+              true,
+              {
+                fileName: "C:/Users/DELL/Uswift/extension/src/FileManager.tsx",
+                lineNumber: 440,
+                columnNumber: 17
+              },
+              this
+            )) }, void 0, false, {
+              fileName: "C:/Users/DELL/Uswift/extension/src/FileManager.tsx",
+              lineNumber: 432,
+              columnNumber: 13
+            }, this)
+          ] }, void 0, true, {
+            fileName: "C:/Users/DELL/Uswift/extension/src/FileManager.tsx",
+            lineNumber: 420,
+            columnNumber: 11
+          }, this),
+          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
             "div",
             {
               className: "uswift-card",
@@ -4276,8 +6143,8 @@ ${file.content}`;
                 marginBottom: 16
               },
               children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { marginBottom: 16 }, children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsx(
+                /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { marginBottom: 16 }, children: [
+                  /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                     "div",
                     {
                       style: {
@@ -4286,9 +6153,17 @@ ${file.content}`;
                         color: dragActive ? "#6D28D9" : "#6B7280"
                       },
                       children: "📁"
-                    }
+                    },
+                    void 0,
+                    false,
+                    {
+                      fileName: "C:/Users/DELL/Uswift/extension/src/FileManager.tsx",
+                      lineNumber: 482,
+                      columnNumber: 15
+                    },
+                    this
                   ),
-                  /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                     "h3",
                     {
                       style: {
@@ -4298,9 +6173,17 @@ ${file.content}`;
                         marginBottom: 8
                       },
                       children: "Drop your file here"
-                    }
+                    },
+                    void 0,
+                    false,
+                    {
+                      fileName: "C:/Users/DELL/Uswift/extension/src/FileManager.tsx",
+                      lineNumber: 491,
+                      columnNumber: 15
+                    },
+                    this
                   ),
-                  /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                     "p",
                     {
                       style: {
@@ -4309,10 +6192,22 @@ ${file.content}`;
                         marginBottom: 16
                       },
                       children: "or click to browse"
-                    }
+                    },
+                    void 0,
+                    false,
+                    {
+                      fileName: "C:/Users/DELL/Uswift/extension/src/FileManager.tsx",
+                      lineNumber: 501,
+                      columnNumber: 15
+                    },
+                    this
                   )
-                ] }),
-                /* @__PURE__ */ jsxRuntimeExports.jsx(
+                ] }, void 0, true, {
+                  fileName: "C:/Users/DELL/Uswift/extension/src/FileManager.tsx",
+                  lineNumber: 481,
+                  columnNumber: 13
+                }, this),
+                /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                   "input",
                   {
                     type: "file",
@@ -4320,9 +6215,17 @@ ${file.content}`;
                     onChange: handleFileSelect,
                     style: { display: "none" },
                     id: "file-input"
-                  }
+                  },
+                  void 0,
+                  false,
+                  {
+                    fileName: "C:/Users/DELL/Uswift/extension/src/FileManager.tsx",
+                    lineNumber: 512,
+                    columnNumber: 13
+                  },
+                  this
                 ),
-                /* @__PURE__ */ jsxRuntimeExports.jsx(
+                /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                   "label",
                   {
                     htmlFor: "file-input",
@@ -4337,12 +6240,28 @@ ${file.content}`;
                       fontWeight: 500
                     },
                     children: "Choose File"
-                  }
+                  },
+                  void 0,
+                  false,
+                  {
+                    fileName: "C:/Users/DELL/Uswift/extension/src/FileManager.tsx",
+                    lineNumber: 519,
+                    columnNumber: 13
+                  },
+                  this
                 )
               ]
-            }
+            },
+            void 0,
+            true,
+            {
+              fileName: "C:/Users/DELL/Uswift/extension/src/FileManager.tsx",
+              lineNumber: 466,
+              columnNumber: 11
+            },
+            this
           ),
-          /* @__PURE__ */ jsxRuntimeExports.jsxs(
+          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
             "div",
             {
               style: {
@@ -4353,19 +6272,51 @@ ${file.content}`;
                 color: "#6B7280"
               },
               children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Supported formats:" }),
+                /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("strong", { children: "Supported formats:" }, void 0, false, {
+                  fileName: "C:/Users/DELL/Uswift/extension/src/FileManager.tsx",
+                  lineNumber: 546,
+                  columnNumber: 13
+                }, this),
                 " .txt, .pdf, .doc, .docx",
-                /* @__PURE__ */ jsxRuntimeExports.jsx("br", {}),
-                /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Max file size:" }),
+                /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("br", {}, void 0, false, {
+                  fileName: "C:/Users/DELL/Uswift/extension/src/FileManager.tsx",
+                  lineNumber: 547,
+                  columnNumber: 13
+                }, this),
+                /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("strong", { children: "Max file size:" }, void 0, false, {
+                  fileName: "C:/Users/DELL/Uswift/extension/src/FileManager.tsx",
+                  lineNumber: 548,
+                  columnNumber: 13
+                }, this),
                 " 5MB",
-                /* @__PURE__ */ jsxRuntimeExports.jsx("br", {}),
-                /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Recommended:" }),
+                /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("br", {}, void 0, false, {
+                  fileName: "C:/Users/DELL/Uswift/extension/src/FileManager.tsx",
+                  lineNumber: 549,
+                  columnNumber: 13
+                }, this),
+                /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("strong", { children: "Recommended:" }, void 0, false, {
+                  fileName: "C:/Users/DELL/Uswift/extension/src/FileManager.tsx",
+                  lineNumber: 550,
+                  columnNumber: 13
+                }, this),
                 " Plain text files work best for AI analysis"
               ]
-            }
+            },
+            void 0,
+            true,
+            {
+              fileName: "C:/Users/DELL/Uswift/extension/src/FileManager.tsx",
+              lineNumber: 537,
+              columnNumber: 11
+            },
+            this
           )
-        ] }),
-        activeTab === "manage" && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { children: files.length === 0 ? /* @__PURE__ */ jsxRuntimeExports.jsxs(
+        ] }, void 0, true, {
+          fileName: "C:/Users/DELL/Uswift/extension/src/FileManager.tsx",
+          lineNumber: 418,
+          columnNumber: 9
+        }, this),
+        activeTab === "manage" && /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { children: files.length === 0 ? /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
           "div",
           {
             style: {
@@ -4374,12 +6325,32 @@ ${file.content}`;
               color: "#6B7280"
             },
             children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { style: { fontSize: "3rem", marginBottom: 16 }, children: "📂" }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { style: { fontSize: "1.1rem", marginBottom: 8 }, children: "No files uploaded yet" }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx("p", { style: { fontSize: "0.9rem" }, children: "Upload your first document to get started" })
+              /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { fontSize: "3rem", marginBottom: 16 }, children: "📂" }, void 0, false, {
+                fileName: "C:/Users/DELL/Uswift/extension/src/FileManager.tsx",
+                lineNumber: 566,
+                columnNumber: 15
+              }, this),
+              /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("h3", { style: { fontSize: "1.1rem", marginBottom: 8 }, children: "No files uploaded yet" }, void 0, false, {
+                fileName: "C:/Users/DELL/Uswift/extension/src/FileManager.tsx",
+                lineNumber: 567,
+                columnNumber: 15
+              }, this),
+              /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("p", { style: { fontSize: "0.9rem" }, children: "Upload your first document to get started" }, void 0, false, {
+                fileName: "C:/Users/DELL/Uswift/extension/src/FileManager.tsx",
+                lineNumber: 570,
+                columnNumber: 15
+              }, this)
             ]
-          }
-        ) : /* @__PURE__ */ jsxRuntimeExports.jsx("div", { style: { maxHeight: 400, overflowY: "auto" }, children: files.map((file) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
+          },
+          void 0,
+          true,
+          {
+            fileName: "C:/Users/DELL/Uswift/extension/src/FileManager.tsx",
+            lineNumber: 559,
+            columnNumber: 13
+          },
+          this
+        ) : /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { maxHeight: 400, overflowY: "auto" }, children: files.map((file) => /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
           "div",
           {
             className: "uswift-card",
@@ -4390,7 +6361,7 @@ ${file.content}`;
               justifyContent: "space-between"
             },
             children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { style: { flex: 1 }, children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
+              /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { flex: 1 }, children: /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                 "div",
                 {
                   style: {
@@ -4400,9 +6371,13 @@ ${file.content}`;
                     marginBottom: 4
                   },
                   children: [
-                    /* @__PURE__ */ jsxRuntimeExports.jsx("span", { style: { fontSize: "1.2rem" }, children: getFileTypeIcon(file.type) }),
-                    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-                      /* @__PURE__ */ jsxRuntimeExports.jsx(
+                    /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("span", { style: { fontSize: "1.2rem" }, children: getFileTypeIcon(file.type) }, void 0, false, {
+                      fileName: "C:/Users/DELL/Uswift/extension/src/FileManager.tsx",
+                      lineNumber: 596,
+                      columnNumber: 23
+                    }, this),
+                    /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { children: [
+                      /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                         "h4",
                         {
                           style: {
@@ -4412,9 +6387,17 @@ ${file.content}`;
                             margin: 0
                           },
                           children: file.name
-                        }
+                        },
+                        void 0,
+                        false,
+                        {
+                          fileName: "C:/Users/DELL/Uswift/extension/src/FileManager.tsx",
+                          lineNumber: 600,
+                          columnNumber: 25
+                        },
+                        this
                       ),
-                      /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                      /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                         "p",
                         {
                           style: {
@@ -4431,14 +6414,38 @@ ${file.content}`;
                             " ",
                             file.uploadedAt.toLocaleDateString()
                           ]
-                        }
+                        },
+                        void 0,
+                        true,
+                        {
+                          fileName: "C:/Users/DELL/Uswift/extension/src/FileManager.tsx",
+                          lineNumber: 610,
+                          columnNumber: 25
+                        },
+                        this
                       )
-                    ] })
+                    ] }, void 0, true, {
+                      fileName: "C:/Users/DELL/Uswift/extension/src/FileManager.tsx",
+                      lineNumber: 599,
+                      columnNumber: 23
+                    }, this)
                   ]
-                }
-              ) }),
-              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { display: "flex", gap: 4 }, children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx(
+                },
+                void 0,
+                true,
+                {
+                  fileName: "C:/Users/DELL/Uswift/extension/src/FileManager.tsx",
+                  lineNumber: 588,
+                  columnNumber: 21
+                },
+                this
+              ) }, void 0, false, {
+                fileName: "C:/Users/DELL/Uswift/extension/src/FileManager.tsx",
+                lineNumber: 587,
+                columnNumber: 19
+              }, this),
+              /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { display: "flex", gap: 4 }, children: [
+                /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                   "button",
                   {
                     onClick: () => analyzeFile(file),
@@ -4453,9 +6460,17 @@ ${file.content}`;
                       fontSize: "0.7rem"
                     },
                     children: "Analyze"
-                  }
+                  },
+                  void 0,
+                  false,
+                  {
+                    fileName: "C:/Users/DELL/Uswift/extension/src/FileManager.tsx",
+                    lineNumber: 626,
+                    columnNumber: 21
+                  },
+                  this
                 ),
-                /* @__PURE__ */ jsxRuntimeExports.jsx(
+                /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                   "button",
                   {
                     onClick: () => deleteFile(file.id),
@@ -4469,16 +6484,43 @@ ${file.content}`;
                       fontSize: "0.7rem"
                     },
                     children: "Delete"
-                  }
+                  },
+                  void 0,
+                  false,
+                  {
+                    fileName: "C:/Users/DELL/Uswift/extension/src/FileManager.tsx",
+                    lineNumber: 641,
+                    columnNumber: 21
+                  },
+                  this
                 )
-              ] })
+              ] }, void 0, true, {
+                fileName: "C:/Users/DELL/Uswift/extension/src/FileManager.tsx",
+                lineNumber: 625,
+                columnNumber: 19
+              }, this)
             ]
           },
-          file.id
-        )) }) }),
-        activeTab === "analyze" && selectedFile && analysis && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "uswift-card", style: { marginBottom: 16 }, children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsxs(
+          file.id,
+          true,
+          {
+            fileName: "C:/Users/DELL/Uswift/extension/src/FileManager.tsx",
+            lineNumber: 577,
+            columnNumber: 17
+          },
+          this
+        )) }, void 0, false, {
+          fileName: "C:/Users/DELL/Uswift/extension/src/FileManager.tsx",
+          lineNumber: 575,
+          columnNumber: 13
+        }, this) }, void 0, false, {
+          fileName: "C:/Users/DELL/Uswift/extension/src/FileManager.tsx",
+          lineNumber: 557,
+          columnNumber: 9
+        }, this),
+        activeTab === "analyze" && selectedFile && analysis && /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { children: [
+          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { className: "uswift-card", style: { marginBottom: 16 }, children: [
+            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
               "div",
               {
                 style: {
@@ -4488,9 +6530,13 @@ ${file.content}`;
                   marginBottom: 12
                 },
                 children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("span", { style: { fontSize: "1.5rem" }, children: getFileTypeIcon(selectedFile.type) }),
-                  /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-                    /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("span", { style: { fontSize: "1.5rem" }, children: getFileTypeIcon(selectedFile.type) }, void 0, false, {
+                    fileName: "C:/Users/DELL/Uswift/extension/src/FileManager.tsx",
+                    lineNumber: 675,
+                    columnNumber: 15
+                  }, this),
+                  /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { children: [
+                    /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                       "h3",
                       {
                         style: {
@@ -4500,9 +6546,17 @@ ${file.content}`;
                           margin: 0
                         },
                         children: selectedFile.name
-                      }
+                      },
+                      void 0,
+                      false,
+                      {
+                        fileName: "C:/Users/DELL/Uswift/extension/src/FileManager.tsx",
+                        lineNumber: 679,
+                        columnNumber: 17
+                      },
+                      this
                     ),
-                    /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                    /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                       "p",
                       {
                         style: {
@@ -4516,13 +6570,33 @@ ${file.content}`;
                           " ",
                           formatFileSize(selectedFile.size)
                         ]
-                      }
+                      },
+                      void 0,
+                      true,
+                      {
+                        fileName: "C:/Users/DELL/Uswift/extension/src/FileManager.tsx",
+                        lineNumber: 689,
+                        columnNumber: 17
+                      },
+                      this
                     )
-                  ] })
+                  ] }, void 0, true, {
+                    fileName: "C:/Users/DELL/Uswift/extension/src/FileManager.tsx",
+                    lineNumber: 678,
+                    columnNumber: 15
+                  }, this)
                 ]
-              }
+              },
+              void 0,
+              true,
+              {
+                fileName: "C:/Users/DELL/Uswift/extension/src/FileManager.tsx",
+                lineNumber: 667,
+                columnNumber: 13
+              },
+              this
             ),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(
+            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
               "div",
               {
                 style: {
@@ -4534,8 +6608,8 @@ ${file.content}`;
                   borderRadius: 8,
                   marginBottom: 12
                 },
-                children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { textAlign: "center" }, children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                children: /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { textAlign: "center" }, children: [
+                  /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                     "div",
                     {
                       style: {
@@ -4548,9 +6622,17 @@ ${file.content}`;
                         analysis.score,
                         "/100"
                       ]
-                    }
+                    },
+                    void 0,
+                    true,
+                    {
+                      fileName: "C:/Users/DELL/Uswift/extension/src/FileManager.tsx",
+                      lineNumber: 715,
+                      columnNumber: 17
+                    },
+                    this
                   ),
-                  /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                     "div",
                     {
                       style: {
@@ -4559,14 +6641,38 @@ ${file.content}`;
                         fontWeight: 500
                       },
                       children: "Quality Score"
-                    }
+                    },
+                    void 0,
+                    false,
+                    {
+                      fileName: "C:/Users/DELL/Uswift/extension/src/FileManager.tsx",
+                      lineNumber: 730,
+                      columnNumber: 17
+                    },
+                    this
                   )
-                ] })
-              }
+                ] }, void 0, true, {
+                  fileName: "C:/Users/DELL/Uswift/extension/src/FileManager.tsx",
+                  lineNumber: 714,
+                  columnNumber: 15
+                }, this)
+              },
+              void 0,
+              false,
+              {
+                fileName: "C:/Users/DELL/Uswift/extension/src/FileManager.tsx",
+                lineNumber: 703,
+                columnNumber: 13
+              },
+              this
             )
-          ] }),
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "uswift-card", style: { marginBottom: 16 }, children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(
+          ] }, void 0, true, {
+            fileName: "C:/Users/DELL/Uswift/extension/src/FileManager.tsx",
+            lineNumber: 666,
+            columnNumber: 11
+          }, this),
+          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { className: "uswift-card", style: { marginBottom: 16 }, children: [
+            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
               "h3",
               {
                 style: {
@@ -4576,9 +6682,17 @@ ${file.content}`;
                   marginBottom: 12
                 },
                 children: "Analysis Summary"
-              }
+              },
+              void 0,
+              false,
+              {
+                fileName: "C:/Users/DELL/Uswift/extension/src/FileManager.tsx",
+                lineNumber: 745,
+                columnNumber: 13
+              },
+              this
             ),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(
+            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
               "p",
               {
                 style: {
@@ -4588,11 +6702,23 @@ ${file.content}`;
                   margin: 0
                 },
                 children: analysis.summary
-              }
+              },
+              void 0,
+              false,
+              {
+                fileName: "C:/Users/DELL/Uswift/extension/src/FileManager.tsx",
+                lineNumber: 755,
+                columnNumber: 13
+              },
+              this
             )
-          ] }),
-          analysis.keywords.length > 0 && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "uswift-card", style: { marginBottom: 16 }, children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(
+          ] }, void 0, true, {
+            fileName: "C:/Users/DELL/Uswift/extension/src/FileManager.tsx",
+            lineNumber: 744,
+            columnNumber: 11
+          }, this),
+          analysis.keywords.length > 0 && /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { className: "uswift-card", style: { marginBottom: 16 }, children: [
+            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
               "h3",
               {
                 style: {
@@ -4602,9 +6728,17 @@ ${file.content}`;
                   marginBottom: 12
                 },
                 children: "Key Keywords"
-              }
+              },
+              void 0,
+              false,
+              {
+                fileName: "C:/Users/DELL/Uswift/extension/src/FileManager.tsx",
+                lineNumber: 770,
+                columnNumber: 15
+              },
+              this
             ),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { style: { display: "flex", gap: 4, flexWrap: "wrap" }, children: analysis.keywords.map((keyword, index) => /* @__PURE__ */ jsxRuntimeExports.jsx(
+            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { display: "flex", gap: 4, flexWrap: "wrap" }, children: analysis.keywords.map((keyword, index) => /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
               "span",
               {
                 style: {
@@ -4617,11 +6751,26 @@ ${file.content}`;
                 },
                 children: keyword
               },
-              index
-            )) })
-          ] }),
-          analysis.suggestions.length > 0 && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "uswift-card", style: { marginBottom: 16 }, children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              index,
+              false,
+              {
+                fileName: "C:/Users/DELL/Uswift/extension/src/FileManager.tsx",
+                lineNumber: 782,
+                columnNumber: 19
+              },
+              this
+            )) }, void 0, false, {
+              fileName: "C:/Users/DELL/Uswift/extension/src/FileManager.tsx",
+              lineNumber: 780,
+              columnNumber: 15
+            }, this)
+          ] }, void 0, true, {
+            fileName: "C:/Users/DELL/Uswift/extension/src/FileManager.tsx",
+            lineNumber: 769,
+            columnNumber: 13
+          }, this),
+          analysis.suggestions.length > 0 && /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { className: "uswift-card", style: { marginBottom: 16 }, children: [
+            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
               "h3",
               {
                 style: {
@@ -4631,9 +6780,17 @@ ${file.content}`;
                   marginBottom: 12
                 },
                 children: "Improvement Suggestions"
-              }
+              },
+              void 0,
+              false,
+              {
+                fileName: "C:/Users/DELL/Uswift/extension/src/FileManager.tsx",
+                lineNumber: 803,
+                columnNumber: 15
+              },
+              this
             ),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("ul", { style: { margin: 0, paddingLeft: 20 }, children: analysis.suggestions.map((suggestion, index) => /* @__PURE__ */ jsxRuntimeExports.jsx(
+            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("ul", { style: { margin: 0, paddingLeft: 20 }, children: analysis.suggestions.map((suggestion, index) => /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
               "li",
               {
                 style: {
@@ -4643,20 +6800,43 @@ ${file.content}`;
                 },
                 children: suggestion
               },
-              index
-            )) })
-          ] }),
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { display: "flex", gap: 8 }, children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              index,
+              false,
+              {
+                fileName: "C:/Users/DELL/Uswift/extension/src/FileManager.tsx",
+                lineNumber: 815,
+                columnNumber: 19
+              },
+              this
+            )) }, void 0, false, {
+              fileName: "C:/Users/DELL/Uswift/extension/src/FileManager.tsx",
+              lineNumber: 813,
+              columnNumber: 15
+            }, this)
+          ] }, void 0, true, {
+            fileName: "C:/Users/DELL/Uswift/extension/src/FileManager.tsx",
+            lineNumber: 802,
+            columnNumber: 13
+          }, this),
+          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { display: "flex", gap: 8 }, children: [
+            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
               "button",
               {
                 onClick: () => setActiveTab("upload"),
                 className: "uswift-btn",
                 style: { flex: 1 },
                 children: "Upload Another File"
-              }
+              },
+              void 0,
+              false,
+              {
+                fileName: "C:/Users/DELL/Uswift/extension/src/FileManager.tsx",
+                lineNumber: 832,
+                columnNumber: 13
+              },
+              this
             ),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(
+            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
               "button",
               {
                 onClick: () => setActiveTab("manage"),
@@ -4670,11 +6850,27 @@ ${file.content}`;
                   cursor: "pointer"
                 },
                 children: "Back to Files"
-              }
+              },
+              void 0,
+              false,
+              {
+                fileName: "C:/Users/DELL/Uswift/extension/src/FileManager.tsx",
+                lineNumber: 839,
+                columnNumber: 13
+              },
+              this
             )
-          ] })
-        ] }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          ] }, void 0, true, {
+            fileName: "C:/Users/DELL/Uswift/extension/src/FileManager.tsx",
+            lineNumber: 831,
+            columnNumber: 11
+          }, this)
+        ] }, void 0, true, {
+          fileName: "C:/Users/DELL/Uswift/extension/src/FileManager.tsx",
+          lineNumber: 664,
+          columnNumber: 9
+        }, this),
+        /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
           "div",
           {
             style: {
@@ -4684,10 +6880,26 @@ ${file.content}`;
               color: "#6B7280"
             },
             children: "Powered by Mistral AI • Secure file storage and AI-powered analysis"
-          }
+          },
+          void 0,
+          false,
+          {
+            fileName: "C:/Users/DELL/Uswift/extension/src/FileManager.tsx",
+            lineNumber: 858,
+            columnNumber: 7
+          },
+          this
         )
       ]
-    }
+    },
+    void 0,
+    true,
+    {
+      fileName: "C:/Users/DELL/Uswift/extension/src/FileManager.tsx",
+      lineNumber: 309,
+      columnNumber: 5
+    },
+    this
   );
 }
 
@@ -4853,7 +7065,7 @@ Format your response clearly with sections and bullet points.`;
       alert("Analysis copied to clipboard!");
     });
   };
-  return /* @__PURE__ */ jsxRuntimeExports.jsxs(
+  return /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
     "div",
     {
       style: {
@@ -4864,7 +7076,7 @@ Format your response clearly with sections and bullet points.`;
         minHeight: 520
       },
       children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(
+        /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
           "div",
           {
             className: "uswift-gradient",
@@ -4873,9 +7085,17 @@ Format your response clearly with sections and bullet points.`;
               borderRadius: 8,
               marginBottom: 16
             }
-          }
+          },
+          void 0,
+          false,
+          {
+            fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
+            lineNumber: 242,
+            columnNumber: 7
+          },
+          this
         ),
-        /* @__PURE__ */ jsxRuntimeExports.jsxs(
+        /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
           "div",
           {
             style: {
@@ -4885,7 +7105,7 @@ Format your response clearly with sections and bullet points.`;
               marginBottom: 16
             },
             children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx(
+              /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                 "h2",
                 {
                   style: {
@@ -4895,9 +7115,17 @@ Format your response clearly with sections and bullet points.`;
                     margin: 0
                   },
                   children: "Job Analysis"
-                }
+                },
+                void 0,
+                false,
+                {
+                  fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
+                  lineNumber: 259,
+                  columnNumber: 9
+                },
+                this
               ),
-              activeTab === "analysis" && /* @__PURE__ */ jsxRuntimeExports.jsx(
+              activeTab === "analysis" && /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                 "button",
                 {
                   onClick: () => setActiveTab("input"),
@@ -4911,12 +7139,28 @@ Format your response clearly with sections and bullet points.`;
                     fontSize: "0.8rem"
                   },
                   children: "← Back to Input"
-                }
+                },
+                void 0,
+                false,
+                {
+                  fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
+                  lineNumber: 270,
+                  columnNumber: 11
+                },
+                this
               )
             ]
-          }
+          },
+          void 0,
+          true,
+          {
+            fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
+            lineNumber: 251,
+            columnNumber: 7
+          },
+          this
         ),
-        /* @__PURE__ */ jsxRuntimeExports.jsxs(
+        /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
           "div",
           {
             style: {
@@ -4925,7 +7169,7 @@ Format your response clearly with sections and bullet points.`;
               borderBottom: "1px solid #E5E7EB"
             },
             children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx(
+              /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                 "button",
                 {
                   onClick: () => setActiveTab("input"),
@@ -4940,9 +7184,17 @@ Format your response clearly with sections and bullet points.`;
                     borderBottom: activeTab === "input" ? "2px solid #6D28D9" : "none"
                   },
                   children: "Input"
-                }
+                },
+                void 0,
+                false,
+                {
+                  fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
+                  lineNumber: 295,
+                  columnNumber: 9
+                },
+                this
               ),
-              /* @__PURE__ */ jsxRuntimeExports.jsx(
+              /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                 "button",
                 {
                   onClick: () => setActiveTab("analysis"),
@@ -4959,14 +7211,30 @@ Format your response clearly with sections and bullet points.`;
                     opacity: result ? 1 : 0.5
                   },
                   children: "Analysis"
-                }
+                },
+                void 0,
+                false,
+                {
+                  fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
+                  lineNumber: 310,
+                  columnNumber: 9
+                },
+                this
               )
             ]
-          }
+          },
+          void 0,
+          true,
+          {
+            fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
+            lineNumber: 288,
+            columnNumber: 7
+          },
+          this
         ),
-        activeTab === "input" && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "uswift-card", style: { marginBottom: 16 }, children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(
+        activeTab === "input" && /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { children: [
+          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { className: "uswift-card", style: { marginBottom: 16 }, children: [
+            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
               "h3",
               {
                 style: {
@@ -4976,11 +7244,19 @@ Format your response clearly with sections and bullet points.`;
                   marginBottom: 12
                 },
                 children: "Job Details"
-              }
+              },
+              void 0,
+              false,
+              {
+                fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
+                lineNumber: 334,
+                columnNumber: 13
+              },
+              this
             ),
-            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { display: "flex", gap: 12, marginBottom: 12 }, children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { flex: 1 }, children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx(
+            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { display: "flex", gap: 12, marginBottom: 12 }, children: [
+              /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { flex: 1 }, children: [
+                /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                   "label",
                   {
                     style: {
@@ -4991,9 +7267,17 @@ Format your response clearly with sections and bullet points.`;
                       marginBottom: 4
                     },
                     children: "Job Title"
-                  }
+                  },
+                  void 0,
+                  false,
+                  {
+                    fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
+                    lineNumber: 347,
+                    columnNumber: 17
+                  },
+                  this
                 ),
-                /* @__PURE__ */ jsxRuntimeExports.jsx(
+                /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                   "input",
                   {
                     type: "text",
@@ -5007,11 +7291,23 @@ Format your response clearly with sections and bullet points.`;
                       border: "1px solid #E5E7EB",
                       fontSize: "0.9rem"
                     }
-                  }
+                  },
+                  void 0,
+                  false,
+                  {
+                    fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
+                    lineNumber: 358,
+                    columnNumber: 17
+                  },
+                  this
                 )
-              ] }),
-              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { flex: 1 }, children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx(
+              ] }, void 0, true, {
+                fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
+                lineNumber: 346,
+                columnNumber: 15
+              }, this),
+              /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { flex: 1 }, children: [
+                /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                   "label",
                   {
                     style: {
@@ -5022,9 +7318,17 @@ Format your response clearly with sections and bullet points.`;
                       marginBottom: 4
                     },
                     children: "Company"
-                  }
+                  },
+                  void 0,
+                  false,
+                  {
+                    fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
+                    lineNumber: 375,
+                    columnNumber: 17
+                  },
+                  this
                 ),
-                /* @__PURE__ */ jsxRuntimeExports.jsx(
+                /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                   "input",
                   {
                     type: "text",
@@ -5038,13 +7342,29 @@ Format your response clearly with sections and bullet points.`;
                       border: "1px solid #E5E7EB",
                       fontSize: "0.9rem"
                     }
-                  }
+                  },
+                  void 0,
+                  false,
+                  {
+                    fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
+                    lineNumber: 386,
+                    columnNumber: 17
+                  },
+                  this
                 )
-              ] })
-            ] }),
-            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { display: "flex", gap: 12, marginBottom: 12 }, children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { flex: 1 }, children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx(
+              ] }, void 0, true, {
+                fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
+                lineNumber: 374,
+                columnNumber: 15
+              }, this)
+            ] }, void 0, true, {
+              fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
+              lineNumber: 345,
+              columnNumber: 13
+            }, this),
+            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { display: "flex", gap: 12, marginBottom: 12 }, children: [
+              /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { flex: 1 }, children: [
+                /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                   "label",
                   {
                     style: {
@@ -5055,9 +7375,17 @@ Format your response clearly with sections and bullet points.`;
                       marginBottom: 4
                     },
                     children: "Location"
-                  }
+                  },
+                  void 0,
+                  false,
+                  {
+                    fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
+                    lineNumber: 406,
+                    columnNumber: 17
+                  },
+                  this
                 ),
-                /* @__PURE__ */ jsxRuntimeExports.jsx(
+                /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                   "input",
                   {
                     type: "text",
@@ -5071,11 +7399,23 @@ Format your response clearly with sections and bullet points.`;
                       border: "1px solid #E5E7EB",
                       fontSize: "0.9rem"
                     }
-                  }
+                  },
+                  void 0,
+                  false,
+                  {
+                    fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
+                    lineNumber: 417,
+                    columnNumber: 17
+                  },
+                  this
                 )
-              ] }),
-              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { flex: 1 }, children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx(
+              ] }, void 0, true, {
+                fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
+                lineNumber: 405,
+                columnNumber: 15
+              }, this),
+              /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { flex: 1 }, children: [
+                /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                   "label",
                   {
                     style: {
@@ -5086,9 +7426,17 @@ Format your response clearly with sections and bullet points.`;
                       marginBottom: 4
                     },
                     children: "Job Type"
-                  }
+                  },
+                  void 0,
+                  false,
+                  {
+                    fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
+                    lineNumber: 434,
+                    columnNumber: 17
+                  },
+                  this
                 ),
-                /* @__PURE__ */ jsxRuntimeExports.jsx(
+                /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                   "select",
                   {
                     value: jobDetails.type,
@@ -5101,13 +7449,33 @@ Format your response clearly with sections and bullet points.`;
                       fontSize: "0.9rem",
                       background: "#FFFFFF"
                     },
-                    children: jobTypes.map((type) => /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: type, children: type.charAt(0).toUpperCase() + type.slice(1) }, type))
-                  }
+                    children: jobTypes.map((type) => /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("option", { value: type, children: type.charAt(0).toUpperCase() + type.slice(1) }, type, false, {
+                      fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
+                      lineNumber: 460,
+                      columnNumber: 21
+                    }, this))
+                  },
+                  void 0,
+                  false,
+                  {
+                    fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
+                    lineNumber: 445,
+                    columnNumber: 17
+                  },
+                  this
                 )
-              ] })
-            ] }),
-            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { marginBottom: 12 }, children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx(
+              ] }, void 0, true, {
+                fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
+                lineNumber: 433,
+                columnNumber: 15
+              }, this)
+            ] }, void 0, true, {
+              fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
+              lineNumber: 404,
+              columnNumber: 13
+            }, this),
+            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { marginBottom: 12 }, children: [
+              /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                 "label",
                 {
                   style: {
@@ -5118,9 +7486,17 @@ Format your response clearly with sections and bullet points.`;
                     marginBottom: 4
                   },
                   children: "Salary Range (Optional)"
-                }
+                },
+                void 0,
+                false,
+                {
+                  fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
+                  lineNumber: 469,
+                  columnNumber: 15
+                },
+                this
               ),
-              /* @__PURE__ */ jsxRuntimeExports.jsx(
+              /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                 "input",
                 {
                   type: "text",
@@ -5134,12 +7510,28 @@ Format your response clearly with sections and bullet points.`;
                     border: "1px solid #E5E7EB",
                     fontSize: "0.9rem"
                   }
-                }
+                },
+                void 0,
+                false,
+                {
+                  fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
+                  lineNumber: 480,
+                  columnNumber: 15
+                },
+                this
               )
-            ] })
-          ] }),
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "uswift-card", style: { marginBottom: 16 }, children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(
+            ] }, void 0, true, {
+              fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
+              lineNumber: 468,
+              columnNumber: 13
+            }, this)
+          ] }, void 0, true, {
+            fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
+            lineNumber: 333,
+            columnNumber: 11
+          }, this),
+          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { className: "uswift-card", style: { marginBottom: 16 }, children: [
+            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
               "label",
               {
                 style: {
@@ -5149,9 +7541,17 @@ Format your response clearly with sections and bullet points.`;
                   color: "#374151"
                 },
                 children: "Job Description:"
-              }
+              },
+              void 0,
+              false,
+              {
+                fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
+                lineNumber: 500,
+                columnNumber: 13
+              },
+              this
             ),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(
+            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
               "textarea",
               {
                 value: jobDescription,
@@ -5166,11 +7566,23 @@ Format your response clearly with sections and bullet points.`;
                   fontSize: "0.9rem",
                   resize: "vertical"
                 }
-              }
+              },
+              void 0,
+              false,
+              {
+                fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
+                lineNumber: 510,
+                columnNumber: 13
+              },
+              this
             )
-          ] }),
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "uswift-card", style: { marginBottom: 16 }, children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(
+          ] }, void 0, true, {
+            fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
+            lineNumber: 499,
+            columnNumber: 11
+          }, this),
+          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { className: "uswift-card", style: { marginBottom: 16 }, children: [
+            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
               "label",
               {
                 style: {
@@ -5180,9 +7592,17 @@ Format your response clearly with sections and bullet points.`;
                   color: "#374151"
                 },
                 children: "Your Profile/Skills (Optional):"
-              }
+              },
+              void 0,
+              false,
+              {
+                fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
+                lineNumber: 528,
+                columnNumber: 13
+              },
+              this
             ),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(
+            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
               "textarea",
               {
                 value: userProfile,
@@ -5197,10 +7617,22 @@ Format your response clearly with sections and bullet points.`;
                   fontSize: "0.9rem",
                   resize: "vertical"
                 }
-              }
+              },
+              void 0,
+              false,
+              {
+                fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
+                lineNumber: 538,
+                columnNumber: 13
+              },
+              this
             )
-          ] }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(
+          ] }, void 0, true, {
+            fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
+            lineNumber: 527,
+            columnNumber: 11
+          }, this),
+          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
             "button",
             {
               onClick: handleAnalyze,
@@ -5211,7 +7643,7 @@ Format your response clearly with sections and bullet points.`;
                 opacity: isLoading || !jobDescription.trim() ? 0.6 : 1,
                 cursor: isLoading || !jobDescription.trim() ? "not-allowed" : "pointer"
               },
-              children: isLoading ? /* @__PURE__ */ jsxRuntimeExports.jsxs(
+              children: isLoading ? /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                 "div",
                 {
                   style: {
@@ -5221,7 +7653,7 @@ Format your response clearly with sections and bullet points.`;
                     gap: 8
                   },
                   children: [
-                    /* @__PURE__ */ jsxRuntimeExports.jsx(
+                    /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                       "div",
                       {
                         style: {
@@ -5232,15 +7664,39 @@ Format your response clearly with sections and bullet points.`;
                           borderRadius: "50%",
                           animation: "spin 1s linear infinite"
                         }
-                      }
+                      },
+                      void 0,
+                      false,
+                      {
+                        fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
+                        lineNumber: 575,
+                        columnNumber: 17
+                      },
+                      this
                     ),
                     "Analyzing Job..."
                   ]
-                }
+                },
+                void 0,
+                true,
+                {
+                  fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
+                  lineNumber: 567,
+                  columnNumber: 15
+                },
+                this
               ) : "Analyze Job"
-            }
+            },
+            void 0,
+            false,
+            {
+              fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
+              lineNumber: 555,
+              columnNumber: 11
+            },
+            this
           ),
-          /* @__PURE__ */ jsxRuntimeExports.jsxs(
+          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
             "div",
             {
               style: {
@@ -5252,19 +7708,55 @@ Format your response clearly with sections and bullet points.`;
                 color: "#6B7280"
               },
               children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Pro Tips:" }),
-                /* @__PURE__ */ jsxRuntimeExports.jsxs("ul", { style: { margin: "8px 0 0 16px", padding: 0 }, children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Include your skills section for personalized matching analysis" }),
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "The more detailed the job description, the better the analysis" }),
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Look for key requirements, responsibilities, and qualifications" }),
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Consider both technical skills and soft skills mentioned" })
-                ] })
+                /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("strong", { children: "Pro Tips:" }, void 0, false, {
+                  fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
+                  lineNumber: 603,
+                  columnNumber: 13
+                }, this),
+                /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("ul", { style: { margin: "8px 0 0 16px", padding: 0 }, children: [
+                  /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("li", { children: "Include your skills section for personalized matching analysis" }, void 0, false, {
+                    fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
+                    lineNumber: 605,
+                    columnNumber: 15
+                  }, this),
+                  /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("li", { children: "The more detailed the job description, the better the analysis" }, void 0, false, {
+                    fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
+                    lineNumber: 608,
+                    columnNumber: 15
+                  }, this),
+                  /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("li", { children: "Look for key requirements, responsibilities, and qualifications" }, void 0, false, {
+                    fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
+                    lineNumber: 611,
+                    columnNumber: 15
+                  }, this),
+                  /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("li", { children: "Consider both technical skills and soft skills mentioned" }, void 0, false, {
+                    fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
+                    lineNumber: 614,
+                    columnNumber: 15
+                  }, this)
+                ] }, void 0, true, {
+                  fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
+                  lineNumber: 604,
+                  columnNumber: 13
+                }, this)
               ]
-            }
+            },
+            void 0,
+            true,
+            {
+              fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
+              lineNumber: 593,
+              columnNumber: 11
+            },
+            this
           )
-        ] }),
-        activeTab === "analysis" && result && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsxs(
+        ] }, void 0, true, {
+          fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
+          lineNumber: 331,
+          columnNumber: 9
+        }, this),
+        activeTab === "analysis" && result && /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { children: [
+          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
             "div",
             {
               style: {
@@ -5277,8 +7769,8 @@ Format your response clearly with sections and bullet points.`;
                 borderRadius: 8
               },
               children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { textAlign: "center" }, children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { textAlign: "center" }, children: [
+                  /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                     "div",
                     {
                       style: {
@@ -5291,9 +7783,17 @@ Format your response clearly with sections and bullet points.`;
                         result.overallMatch,
                         "/100"
                       ]
-                    }
+                    },
+                    void 0,
+                    true,
+                    {
+                      fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
+                      lineNumber: 635,
+                      columnNumber: 15
+                    },
+                    this
                   ),
-                  /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                     "div",
                     {
                       style: {
@@ -5302,11 +7802,23 @@ Format your response clearly with sections and bullet points.`;
                         fontWeight: 600
                       },
                       children: getMatchLabel(result.overallMatch)
-                    }
+                    },
+                    void 0,
+                    false,
+                    {
+                      fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
+                      lineNumber: 645,
+                      columnNumber: 15
+                    },
+                    this
                   )
-                ] }),
-                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { flex: 1 }, children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsx(
+                ] }, void 0, true, {
+                  fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
+                  lineNumber: 634,
+                  columnNumber: 13
+                }, this),
+                /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { flex: 1 }, children: [
+                  /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                     "h3",
                     {
                       style: {
@@ -5315,15 +7827,39 @@ Format your response clearly with sections and bullet points.`;
                         color: "#111827"
                       },
                       children: "Job Match Analysis"
-                    }
+                    },
+                    void 0,
+                    false,
+                    {
+                      fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
+                      lineNumber: 656,
+                      columnNumber: 15
+                    },
+                    this
                   ),
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("p", { style: { margin: 0, fontSize: "0.9rem", color: "#6B7280" }, children: "Based on requirements analysis and market standards" })
-                ] })
+                  /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("p", { style: { margin: 0, fontSize: "0.9rem", color: "#6B7280" }, children: "Based on requirements analysis and market standards" }, void 0, false, {
+                    fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
+                    lineNumber: 665,
+                    columnNumber: 15
+                  }, this)
+                ] }, void 0, true, {
+                  fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
+                  lineNumber: 655,
+                  columnNumber: 13
+                }, this)
               ]
-            }
+            },
+            void 0,
+            true,
+            {
+              fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
+              lineNumber: 623,
+              columnNumber: 11
+            },
+            this
           ),
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "uswift-card", style: { marginBottom: 16 }, children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(
+          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { className: "uswift-card", style: { marginBottom: 16 }, children: [
+            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
               "h3",
               {
                 style: {
@@ -5333,9 +7869,17 @@ Format your response clearly with sections and bullet points.`;
                   marginBottom: 12
                 },
                 children: "Key Requirements"
-              }
+              },
+              void 0,
+              false,
+              {
+                fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
+                lineNumber: 673,
+                columnNumber: 13
+              },
+              this
             ),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { style: { display: "flex", gap: 4, flexWrap: "wrap" }, children: result.keyRequirements.map((req, index) => /* @__PURE__ */ jsxRuntimeExports.jsx(
+            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { display: "flex", gap: 4, flexWrap: "wrap" }, children: result.keyRequirements.map((req, index) => /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
               "span",
               {
                 style: {
@@ -5350,11 +7894,26 @@ Format your response clearly with sections and bullet points.`;
                 },
                 children: req
               },
-              index
-            )) })
-          ] }),
-          result.matchingSkills.length > 0 && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "uswift-card", style: { marginBottom: 16 }, children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              index,
+              false,
+              {
+                fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
+                lineNumber: 685,
+                columnNumber: 17
+              },
+              this
+            )) }, void 0, false, {
+              fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
+              lineNumber: 683,
+              columnNumber: 13
+            }, this)
+          ] }, void 0, true, {
+            fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
+            lineNumber: 672,
+            columnNumber: 11
+          }, this),
+          result.matchingSkills.length > 0 && /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { className: "uswift-card", style: { marginBottom: 16 }, children: [
+            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
               "h3",
               {
                 style: {
@@ -5364,9 +7923,17 @@ Format your response clearly with sections and bullet points.`;
                   marginBottom: 12
                 },
                 children: "Matching Skills"
-              }
+              },
+              void 0,
+              false,
+              {
+                fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
+                lineNumber: 707,
+                columnNumber: 15
+              },
+              this
             ),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { style: { display: "flex", gap: 4, flexWrap: "wrap" }, children: result.matchingSkills.map((skill, index) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
+            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { display: "flex", gap: 4, flexWrap: "wrap" }, children: result.matchingSkills.map((skill, index) => /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
               "span",
               {
                 style: {
@@ -5382,11 +7949,26 @@ Format your response clearly with sections and bullet points.`;
                   skill
                 ]
               },
-              index
-            )) })
-          ] }),
-          result.missingSkills.length > 0 && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "uswift-card", style: { marginBottom: 16 }, children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              index,
+              true,
+              {
+                fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
+                lineNumber: 719,
+                columnNumber: 19
+              },
+              this
+            )) }, void 0, false, {
+              fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
+              lineNumber: 717,
+              columnNumber: 15
+            }, this)
+          ] }, void 0, true, {
+            fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
+            lineNumber: 706,
+            columnNumber: 13
+          }, this),
+          result.missingSkills.length > 0 && /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { className: "uswift-card", style: { marginBottom: 16 }, children: [
+            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
               "h3",
               {
                 style: {
@@ -5396,9 +7978,17 @@ Format your response clearly with sections and bullet points.`;
                   marginBottom: 12
                 },
                 children: "Beneficial Skills (Not Required)"
-              }
+              },
+              void 0,
+              false,
+              {
+                fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
+                lineNumber: 739,
+                columnNumber: 15
+              },
+              this
             ),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { style: { display: "flex", gap: 4, flexWrap: "wrap" }, children: result.missingSkills.map((skill, index) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
+            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { display: "flex", gap: 4, flexWrap: "wrap" }, children: result.missingSkills.map((skill, index) => /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
               "span",
               {
                 style: {
@@ -5414,11 +8004,26 @@ Format your response clearly with sections and bullet points.`;
                   skill
                 ]
               },
-              index
-            )) })
-          ] }),
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "uswift-card", style: { marginBottom: 16 }, children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              index,
+              true,
+              {
+                fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
+                lineNumber: 751,
+                columnNumber: 19
+              },
+              this
+            )) }, void 0, false, {
+              fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
+              lineNumber: 749,
+              columnNumber: 15
+            }, this)
+          ] }, void 0, true, {
+            fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
+            lineNumber: 738,
+            columnNumber: 13
+          }, this),
+          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { className: "uswift-card", style: { marginBottom: 16 }, children: [
+            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
               "h3",
               {
                 style: {
@@ -5428,9 +8033,17 @@ Format your response clearly with sections and bullet points.`;
                   marginBottom: 12
                 },
                 children: "💰 Salary Insights"
-              }
+              },
+              void 0,
+              false,
+              {
+                fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
+                lineNumber: 771,
+                columnNumber: 13
+              },
+              this
             ),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(
+            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
               "p",
               {
                 style: {
@@ -5440,11 +8053,23 @@ Format your response clearly with sections and bullet points.`;
                   margin: 0
                 },
                 children: result.salaryInsights
-              }
+              },
+              void 0,
+              false,
+              {
+                fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
+                lineNumber: 781,
+                columnNumber: 13
+              },
+              this
             )
-          ] }),
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "uswift-card", style: { marginBottom: 16 }, children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(
+          ] }, void 0, true, {
+            fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
+            lineNumber: 770,
+            columnNumber: 11
+          }, this),
+          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { className: "uswift-card", style: { marginBottom: 16 }, children: [
+            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
               "h3",
               {
                 style: {
@@ -5454,9 +8079,17 @@ Format your response clearly with sections and bullet points.`;
                   marginBottom: 12
                 },
                 children: "🏢 Company Culture Indicators"
-              }
+              },
+              void 0,
+              false,
+              {
+                fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
+                lineNumber: 795,
+                columnNumber: 13
+              },
+              this
             ),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(
+            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
               "p",
               {
                 style: {
@@ -5466,11 +8099,23 @@ Format your response clearly with sections and bullet points.`;
                   margin: 0
                 },
                 children: result.companyCulture
-              }
+              },
+              void 0,
+              false,
+              {
+                fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
+                lineNumber: 805,
+                columnNumber: 13
+              },
+              this
             )
-          ] }),
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "uswift-card", style: { marginBottom: 16 }, children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(
+          ] }, void 0, true, {
+            fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
+            lineNumber: 794,
+            columnNumber: 11
+          }, this),
+          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { className: "uswift-card", style: { marginBottom: 16 }, children: [
+            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
               "h3",
               {
                 style: {
@@ -5480,9 +8125,17 @@ Format your response clearly with sections and bullet points.`;
                   marginBottom: 12
                 },
                 children: "🎯 Application Tips"
-              }
+              },
+              void 0,
+              false,
+              {
+                fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
+                lineNumber: 819,
+                columnNumber: 13
+              },
+              this
             ),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("ul", { style: { margin: 0, paddingLeft: 20 }, children: result.applicationTips.map((tip, index) => /* @__PURE__ */ jsxRuntimeExports.jsx(
+            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("ul", { style: { margin: 0, paddingLeft: 20 }, children: result.applicationTips.map((tip, index) => /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
               "li",
               {
                 style: {
@@ -5492,11 +8145,26 @@ Format your response clearly with sections and bullet points.`;
                 },
                 children: tip
               },
-              index
-            )) })
-          ] }),
-          result.recommendations.length > 0 && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "uswift-card", style: { marginBottom: 16 }, children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              index,
+              false,
+              {
+                fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
+                lineNumber: 831,
+                columnNumber: 17
+              },
+              this
+            )) }, void 0, false, {
+              fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
+              lineNumber: 829,
+              columnNumber: 13
+            }, this)
+          ] }, void 0, true, {
+            fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
+            lineNumber: 818,
+            columnNumber: 11
+          }, this),
+          result.recommendations.length > 0 && /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { className: "uswift-card", style: { marginBottom: 16 }, children: [
+            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
               "h3",
               {
                 style: {
@@ -5506,9 +8174,17 @@ Format your response clearly with sections and bullet points.`;
                   marginBottom: 12
                 },
                 children: "💡 Recommendations"
-              }
+              },
+              void 0,
+              false,
+              {
+                fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
+                lineNumber: 848,
+                columnNumber: 15
+              },
+              this
             ),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("ul", { style: { margin: 0, paddingLeft: 20 }, children: result.recommendations.map((rec, index) => /* @__PURE__ */ jsxRuntimeExports.jsx(
+            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("ul", { style: { margin: 0, paddingLeft: 20 }, children: result.recommendations.map((rec, index) => /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
               "li",
               {
                 style: {
@@ -5518,11 +8194,26 @@ Format your response clearly with sections and bullet points.`;
                 },
                 children: rec
               },
-              index
-            )) })
-          ] }),
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { display: "flex", gap: 8 }, children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              index,
+              false,
+              {
+                fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
+                lineNumber: 860,
+                columnNumber: 19
+              },
+              this
+            )) }, void 0, false, {
+              fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
+              lineNumber: 858,
+              columnNumber: 15
+            }, this)
+          ] }, void 0, true, {
+            fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
+            lineNumber: 847,
+            columnNumber: 13
+          }, this),
+          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { display: "flex", gap: 8 }, children: [
+            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
               "button",
               {
                 onClick: () => copyToClipboard(`
@@ -5555,9 +8246,17 @@ ${result.recommendations.map((rec) => `• ${rec}`).join("\n")}
                 className: "uswift-btn",
                 style: { flex: 1 },
                 children: "Copy Full Report"
-              }
+              },
+              void 0,
+              false,
+              {
+                fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
+                lineNumber: 877,
+                columnNumber: 13
+              },
+              this
             ),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(
+            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
               "button",
               {
                 onClick: () => setActiveTab("input"),
@@ -5571,11 +8270,27 @@ ${result.recommendations.map((rec) => `• ${rec}`).join("\n")}
                   cursor: "pointer"
                 },
                 children: "Analyze Another Job"
-              }
+              },
+              void 0,
+              false,
+              {
+                fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
+                lineNumber: 920,
+                columnNumber: 13
+              },
+              this
             )
-          ] })
-        ] }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          ] }, void 0, true, {
+            fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
+            lineNumber: 876,
+            columnNumber: 11
+          }, this)
+        ] }, void 0, true, {
+          fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
+          lineNumber: 621,
+          columnNumber: 9
+        }, this),
+        /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
           "div",
           {
             style: {
@@ -5585,10 +8300,26 @@ ${result.recommendations.map((rec) => `• ${rec}`).join("\n")}
               color: "#6B7280"
             },
             children: "Powered by Mistral AI • Smart job analysis and career insights"
-          }
+          },
+          void 0,
+          false,
+          {
+            fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
+            lineNumber: 939,
+            columnNumber: 7
+          },
+          this
         )
       ]
-    }
+    },
+    void 0,
+    true,
+    {
+      fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
+      lineNumber: 232,
+      columnNumber: 5
+    },
+    this
   );
 }
 
@@ -5812,7 +8543,7 @@ Format the response clearly with proper sections and structure.`;
   const getDifficultyLabel = (difficulty) => {
     return difficulty.charAt(0).toUpperCase() + difficulty.slice(1);
   };
-  return /* @__PURE__ */ jsxRuntimeExports.jsxs(
+  return /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
     "div",
     {
       style: {
@@ -5823,7 +8554,7 @@ Format the response clearly with proper sections and structure.`;
         minHeight: 520
       },
       children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(
+        /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
           "div",
           {
             className: "uswift-gradient",
@@ -5832,9 +8563,17 @@ Format the response clearly with proper sections and structure.`;
               borderRadius: 8,
               marginBottom: 16
             }
-          }
+          },
+          void 0,
+          false,
+          {
+            fileName: "C:/Users/DELL/Uswift/extension/src/InterviewPrep.tsx",
+            lineNumber: 326,
+            columnNumber: 7
+          },
+          this
         ),
-        /* @__PURE__ */ jsxRuntimeExports.jsxs(
+        /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
           "div",
           {
             style: {
@@ -5844,7 +8583,7 @@ Format the response clearly with proper sections and structure.`;
               marginBottom: 16
             },
             children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx(
+              /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                 "h2",
                 {
                   style: {
@@ -5854,9 +8593,17 @@ Format the response clearly with proper sections and structure.`;
                     margin: 0
                   },
                   children: "Interview Preparation"
-                }
+                },
+                void 0,
+                false,
+                {
+                  fileName: "C:/Users/DELL/Uswift/extension/src/InterviewPrep.tsx",
+                  lineNumber: 343,
+                  columnNumber: 9
+                },
+                this
               ),
-              activeTab !== "input" && /* @__PURE__ */ jsxRuntimeExports.jsx(
+              activeTab !== "input" && /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                 "button",
                 {
                   onClick: () => setActiveTab("input"),
@@ -5870,12 +8617,28 @@ Format the response clearly with proper sections and structure.`;
                     fontSize: "0.8rem"
                   },
                   children: "← Back to Input"
-                }
+                },
+                void 0,
+                false,
+                {
+                  fileName: "C:/Users/DELL/Uswift/extension/src/InterviewPrep.tsx",
+                  lineNumber: 354,
+                  columnNumber: 11
+                },
+                this
               )
             ]
-          }
+          },
+          void 0,
+          true,
+          {
+            fileName: "C:/Users/DELL/Uswift/extension/src/InterviewPrep.tsx",
+            lineNumber: 335,
+            columnNumber: 7
+          },
+          this
         ),
-        /* @__PURE__ */ jsxRuntimeExports.jsxs(
+        /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
           "div",
           {
             style: {
@@ -5884,7 +8647,7 @@ Format the response clearly with proper sections and structure.`;
               borderBottom: "1px solid #E5E7EB"
             },
             children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx(
+              /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                 "button",
                 {
                   onClick: () => setActiveTab("input"),
@@ -5899,9 +8662,17 @@ Format the response clearly with proper sections and structure.`;
                     borderBottom: activeTab === "input" ? "2px solid #6D28D9" : "none"
                   },
                   children: "Input"
-                }
+                },
+                void 0,
+                false,
+                {
+                  fileName: "C:/Users/DELL/Uswift/extension/src/InterviewPrep.tsx",
+                  lineNumber: 379,
+                  columnNumber: 9
+                },
+                this
               ),
-              /* @__PURE__ */ jsxRuntimeExports.jsx(
+              /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                 "button",
                 {
                   onClick: () => setActiveTab("questions"),
@@ -5918,9 +8689,17 @@ Format the response clearly with proper sections and structure.`;
                     opacity: result ? 1 : 0.5
                   },
                   children: "Questions"
-                }
+                },
+                void 0,
+                false,
+                {
+                  fileName: "C:/Users/DELL/Uswift/extension/src/InterviewPrep.tsx",
+                  lineNumber: 394,
+                  columnNumber: 9
+                },
+                this
               ),
-              /* @__PURE__ */ jsxRuntimeExports.jsx(
+              /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                 "button",
                 {
                   onClick: () => setActiveTab("tips"),
@@ -5937,14 +8716,30 @@ Format the response clearly with proper sections and structure.`;
                     opacity: result ? 1 : 0.5
                   },
                   children: "Tips & Plan"
-                }
+                },
+                void 0,
+                false,
+                {
+                  fileName: "C:/Users/DELL/Uswift/extension/src/InterviewPrep.tsx",
+                  lineNumber: 412,
+                  columnNumber: 9
+                },
+                this
               )
             ]
-          }
+          },
+          void 0,
+          true,
+          {
+            fileName: "C:/Users/DELL/Uswift/extension/src/InterviewPrep.tsx",
+            lineNumber: 372,
+            columnNumber: 7
+          },
+          this
         ),
-        activeTab === "input" && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "uswift-card", style: { marginBottom: 16 }, children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(
+        activeTab === "input" && /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { children: [
+          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { className: "uswift-card", style: { marginBottom: 16 }, children: [
+            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
               "label",
               {
                 style: {
@@ -5954,9 +8749,17 @@ Format the response clearly with proper sections and structure.`;
                   color: "#374151"
                 },
                 children: "Job Description:"
-              }
+              },
+              void 0,
+              false,
+              {
+                fileName: "C:/Users/DELL/Uswift/extension/src/InterviewPrep.tsx",
+                lineNumber: 435,
+                columnNumber: 13
+              },
+              this
             ),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(
+            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
               "textarea",
               {
                 value: jobDescription,
@@ -5971,11 +8774,23 @@ Format the response clearly with proper sections and structure.`;
                   fontSize: "0.9rem",
                   resize: "vertical"
                 }
-              }
+              },
+              void 0,
+              false,
+              {
+                fileName: "C:/Users/DELL/Uswift/extension/src/InterviewPrep.tsx",
+                lineNumber: 445,
+                columnNumber: 13
+              },
+              this
             )
-          ] }),
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "uswift-card", style: { marginBottom: 16 }, children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(
+          ] }, void 0, true, {
+            fileName: "C:/Users/DELL/Uswift/extension/src/InterviewPrep.tsx",
+            lineNumber: 434,
+            columnNumber: 11
+          }, this),
+          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { className: "uswift-card", style: { marginBottom: 16 }, children: [
+            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
               "label",
               {
                 style: {
@@ -5985,9 +8800,17 @@ Format the response clearly with proper sections and structure.`;
                   color: "#374151"
                 },
                 children: "Your Experience Level:"
-              }
+              },
+              void 0,
+              false,
+              {
+                fileName: "C:/Users/DELL/Uswift/extension/src/InterviewPrep.tsx",
+                lineNumber: 463,
+                columnNumber: 13
+              },
+              this
             ),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { style: { display: "flex", gap: 8, flexWrap: "wrap" }, children: experienceLevels.map((level) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
+            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { display: "flex", gap: 8, flexWrap: "wrap" }, children: experienceLevels.map((level) => /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
               "button",
               {
                 onClick: () => setExperienceLevel(level.value),
@@ -6005,15 +8828,38 @@ Format the response clearly with proper sections and structure.`;
                 },
                 title: level.description,
                 children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("div", { style: { fontWeight: 600 }, children: level.label }),
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("div", { style: { fontSize: "0.7rem", opacity: 0.8 }, children: level.description })
+                  /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { fontWeight: 600 }, children: level.label }, void 0, false, {
+                    fileName: "C:/Users/DELL/Uswift/extension/src/InterviewPrep.tsx",
+                    lineNumber: 494,
+                    columnNumber: 19
+                  }, this),
+                  /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { fontSize: "0.7rem", opacity: 0.8 }, children: level.description }, void 0, false, {
+                    fileName: "C:/Users/DELL/Uswift/extension/src/InterviewPrep.tsx",
+                    lineNumber: 495,
+                    columnNumber: 19
+                  }, this)
                 ]
               },
-              level.value
-            )) })
-          ] }),
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "uswift-card", style: { marginBottom: 16 }, children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              level.value,
+              true,
+              {
+                fileName: "C:/Users/DELL/Uswift/extension/src/InterviewPrep.tsx",
+                lineNumber: 475,
+                columnNumber: 17
+              },
+              this
+            )) }, void 0, false, {
+              fileName: "C:/Users/DELL/Uswift/extension/src/InterviewPrep.tsx",
+              lineNumber: 473,
+              columnNumber: 13
+            }, this)
+          ] }, void 0, true, {
+            fileName: "C:/Users/DELL/Uswift/extension/src/InterviewPrep.tsx",
+            lineNumber: 462,
+            columnNumber: 11
+          }, this),
+          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { className: "uswift-card", style: { marginBottom: 16 }, children: [
+            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
               "label",
               {
                 style: {
@@ -6023,9 +8869,17 @@ Format the response clearly with proper sections and structure.`;
                   color: "#374151"
                 },
                 children: "Focus Areas (Optional):"
-              }
+              },
+              void 0,
+              false,
+              {
+                fileName: "C:/Users/DELL/Uswift/extension/src/InterviewPrep.tsx",
+                lineNumber: 505,
+                columnNumber: 13
+              },
+              this
             ),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { style: { display: "flex", gap: 4, flexWrap: "wrap" }, children: commonFocusAreas.map((area) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
+            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { display: "flex", gap: 4, flexWrap: "wrap" }, children: commonFocusAreas.map((area) => /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
               "button",
               {
                 onClick: () => toggleFocusArea(area),
@@ -6045,10 +8899,25 @@ Format the response clearly with proper sections and structure.`;
                   area
                 ]
               },
-              area
-            )) })
-          ] }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(
+              area,
+              true,
+              {
+                fileName: "C:/Users/DELL/Uswift/extension/src/InterviewPrep.tsx",
+                lineNumber: 517,
+                columnNumber: 17
+              },
+              this
+            )) }, void 0, false, {
+              fileName: "C:/Users/DELL/Uswift/extension/src/InterviewPrep.tsx",
+              lineNumber: 515,
+              columnNumber: 13
+            }, this)
+          ] }, void 0, true, {
+            fileName: "C:/Users/DELL/Uswift/extension/src/InterviewPrep.tsx",
+            lineNumber: 504,
+            columnNumber: 11
+          }, this),
+          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
             "button",
             {
               onClick: handleGenerate,
@@ -6059,7 +8928,7 @@ Format the response clearly with proper sections and structure.`;
                 opacity: isLoading || !jobDescription.trim() ? 0.6 : 1,
                 cursor: isLoading || !jobDescription.trim() ? "not-allowed" : "pointer"
               },
-              children: isLoading ? /* @__PURE__ */ jsxRuntimeExports.jsxs(
+              children: isLoading ? /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                 "div",
                 {
                   style: {
@@ -6069,7 +8938,7 @@ Format the response clearly with proper sections and structure.`;
                     gap: 8
                   },
                   children: [
-                    /* @__PURE__ */ jsxRuntimeExports.jsx(
+                    /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                       "div",
                       {
                         style: {
@@ -6080,15 +8949,39 @@ Format the response clearly with proper sections and structure.`;
                           borderRadius: "50%",
                           animation: "spin 1s linear infinite"
                         }
-                      }
+                      },
+                      void 0,
+                      false,
+                      {
+                        fileName: "C:/Users/DELL/Uswift/extension/src/InterviewPrep.tsx",
+                        lineNumber: 560,
+                        columnNumber: 17
+                      },
+                      this
                     ),
                     "Generating Interview Prep..."
                   ]
-                }
+                },
+                void 0,
+                true,
+                {
+                  fileName: "C:/Users/DELL/Uswift/extension/src/InterviewPrep.tsx",
+                  lineNumber: 552,
+                  columnNumber: 15
+                },
+                this
               ) : "Generate Interview Preparation"
-            }
+            },
+            void 0,
+            false,
+            {
+              fileName: "C:/Users/DELL/Uswift/extension/src/InterviewPrep.tsx",
+              lineNumber: 540,
+              columnNumber: 11
+            },
+            this
           ),
-          /* @__PURE__ */ jsxRuntimeExports.jsxs(
+          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
             "div",
             {
               style: {
@@ -6100,24 +8993,60 @@ Format the response clearly with proper sections and structure.`;
                 color: "#6B7280"
               },
               children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Interview Preparation Tips:" }),
-                /* @__PURE__ */ jsxRuntimeExports.jsxs("ul", { style: { margin: "8px 0 0 16px", padding: 0 }, children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Use the STAR method (Situation, Task, Action, Result) for behavioral questions" }),
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Practice coding problems on platforms like LeetCode" }),
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Research the company and prepare thoughtful questions" }),
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Review your resume and be ready to discuss any experience" })
-                ] })
+                /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("strong", { children: "Interview Preparation Tips:" }, void 0, false, {
+                  fileName: "C:/Users/DELL/Uswift/extension/src/InterviewPrep.tsx",
+                  lineNumber: 588,
+                  columnNumber: 13
+                }, this),
+                /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("ul", { style: { margin: "8px 0 0 16px", padding: 0 }, children: [
+                  /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("li", { children: "Use the STAR method (Situation, Task, Action, Result) for behavioral questions" }, void 0, false, {
+                    fileName: "C:/Users/DELL/Uswift/extension/src/InterviewPrep.tsx",
+                    lineNumber: 590,
+                    columnNumber: 15
+                  }, this),
+                  /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("li", { children: "Practice coding problems on platforms like LeetCode" }, void 0, false, {
+                    fileName: "C:/Users/DELL/Uswift/extension/src/InterviewPrep.tsx",
+                    lineNumber: 594,
+                    columnNumber: 15
+                  }, this),
+                  /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("li", { children: "Research the company and prepare thoughtful questions" }, void 0, false, {
+                    fileName: "C:/Users/DELL/Uswift/extension/src/InterviewPrep.tsx",
+                    lineNumber: 595,
+                    columnNumber: 15
+                  }, this),
+                  /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("li", { children: "Review your resume and be ready to discuss any experience" }, void 0, false, {
+                    fileName: "C:/Users/DELL/Uswift/extension/src/InterviewPrep.tsx",
+                    lineNumber: 596,
+                    columnNumber: 15
+                  }, this)
+                ] }, void 0, true, {
+                  fileName: "C:/Users/DELL/Uswift/extension/src/InterviewPrep.tsx",
+                  lineNumber: 589,
+                  columnNumber: 13
+                }, this)
               ]
-            }
+            },
+            void 0,
+            true,
+            {
+              fileName: "C:/Users/DELL/Uswift/extension/src/InterviewPrep.tsx",
+              lineNumber: 578,
+              columnNumber: 11
+            },
+            this
           )
-        ] }),
-        activeTab === "questions" && result && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { style: { maxHeight: 400, overflowY: "auto" }, children: result.questions.map((question) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
+        ] }, void 0, true, {
+          fileName: "C:/Users/DELL/Uswift/extension/src/InterviewPrep.tsx",
+          lineNumber: 432,
+          columnNumber: 9
+        }, this),
+        activeTab === "questions" && result && /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { children: /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { maxHeight: 400, overflowY: "auto" }, children: result.questions.map((question) => /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
           "div",
           {
             className: "uswift-card",
             style: { marginBottom: 12 },
             children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsxs(
+              /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                 "div",
                 {
                   style: {
@@ -6127,7 +9056,7 @@ Format the response clearly with proper sections and structure.`;
                     marginBottom: 8
                   },
                   children: [
-                    /* @__PURE__ */ jsxRuntimeExports.jsx(
+                    /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                       "h4",
                       {
                         style: {
@@ -6139,14 +9068,22 @@ Format the response clearly with proper sections and structure.`;
                           marginRight: 12
                         },
                         children: question.question
-                      }
+                      },
+                      void 0,
+                      false,
+                      {
+                        fileName: "C:/Users/DELL/Uswift/extension/src/InterviewPrep.tsx",
+                        lineNumber: 620,
+                        columnNumber: 19
+                      },
+                      this
                     ),
-                    /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                    /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                       "div",
                       {
                         style: { display: "flex", gap: 4, alignItems: "center" },
                         children: [
-                          /* @__PURE__ */ jsxRuntimeExports.jsx(
+                          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                             "span",
                             {
                               style: {
@@ -6158,9 +9095,17 @@ Format the response clearly with proper sections and structure.`;
                                 fontWeight: 500
                               },
                               children: question.category
-                            }
+                            },
+                            void 0,
+                            false,
+                            {
+                              fileName: "C:/Users/DELL/Uswift/extension/src/InterviewPrep.tsx",
+                              lineNumber: 635,
+                              columnNumber: 21
+                            },
+                            this
                           ),
-                          /* @__PURE__ */ jsxRuntimeExports.jsx(
+                          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                             "span",
                             {
                               style: {
@@ -6172,15 +9117,39 @@ Format the response clearly with proper sections and structure.`;
                                 fontWeight: 500
                               },
                               children: getDifficultyLabel(question.difficulty)
-                            }
+                            },
+                            void 0,
+                            false,
+                            {
+                              fileName: "C:/Users/DELL/Uswift/extension/src/InterviewPrep.tsx",
+                              lineNumber: 647,
+                              columnNumber: 21
+                            },
+                            this
                           )
                         ]
-                      }
+                      },
+                      void 0,
+                      true,
+                      {
+                        fileName: "C:/Users/DELL/Uswift/extension/src/InterviewPrep.tsx",
+                        lineNumber: 632,
+                        columnNumber: 19
+                      },
+                      this
                     )
                   ]
-                }
+                },
+                void 0,
+                true,
+                {
+                  fileName: "C:/Users/DELL/Uswift/extension/src/InterviewPrep.tsx",
+                  lineNumber: 612,
+                  columnNumber: 17
+                },
+                this
               ),
-              /* @__PURE__ */ jsxRuntimeExports.jsxs(
+              /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                 "div",
                 {
                   style: {
@@ -6190,15 +9159,31 @@ Format the response clearly with proper sections and structure.`;
                     marginBottom: 8
                   },
                   children: [
-                    /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Suggested Answer:" }),
+                    /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("strong", { children: "Suggested Answer:" }, void 0, false, {
+                      fileName: "C:/Users/DELL/Uswift/extension/src/InterviewPrep.tsx",
+                      lineNumber: 670,
+                      columnNumber: 19
+                    }, this),
                     " ",
                     question.suggestedAnswer
                   ]
-                }
+                },
+                void 0,
+                true,
+                {
+                  fileName: "C:/Users/DELL/Uswift/extension/src/InterviewPrep.tsx",
+                  lineNumber: 662,
+                  columnNumber: 17
+                },
+                this
               ),
-              question.keyPoints.length > 0 && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { style: { fontSize: "0.8rem", color: "#374151" }, children: "Key Points:" }),
-                /* @__PURE__ */ jsxRuntimeExports.jsx("ul", { style: { margin: "4px 0 0 16px", padding: 0 }, children: question.keyPoints.map((point, index) => /* @__PURE__ */ jsxRuntimeExports.jsx(
+              question.keyPoints.length > 0 && /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { children: [
+                /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("strong", { style: { fontSize: "0.8rem", color: "#374151" }, children: "Key Points:" }, void 0, false, {
+                  fileName: "C:/Users/DELL/Uswift/extension/src/InterviewPrep.tsx",
+                  lineNumber: 675,
+                  columnNumber: 21
+                }, this),
+                /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("ul", { style: { margin: "4px 0 0 16px", padding: 0 }, children: question.keyPoints.map((point, index) => /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                   "li",
                   {
                     style: {
@@ -6208,16 +9193,46 @@ Format the response clearly with proper sections and structure.`;
                     },
                     children: point
                   },
-                  index
-                )) })
-              ] })
+                  index,
+                  false,
+                  {
+                    fileName: "C:/Users/DELL/Uswift/extension/src/InterviewPrep.tsx",
+                    lineNumber: 680,
+                    columnNumber: 25
+                  },
+                  this
+                )) }, void 0, false, {
+                  fileName: "C:/Users/DELL/Uswift/extension/src/InterviewPrep.tsx",
+                  lineNumber: 678,
+                  columnNumber: 21
+                }, this)
+              ] }, void 0, true, {
+                fileName: "C:/Users/DELL/Uswift/extension/src/InterviewPrep.tsx",
+                lineNumber: 674,
+                columnNumber: 19
+              }, this)
             ]
           },
-          question.id
-        )) }) }),
-        activeTab === "tips" && result && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "uswift-card", style: { marginBottom: 16 }, children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(
+          question.id,
+          true,
+          {
+            fileName: "C:/Users/DELL/Uswift/extension/src/InterviewPrep.tsx",
+            lineNumber: 607,
+            columnNumber: 15
+          },
+          this
+        )) }, void 0, false, {
+          fileName: "C:/Users/DELL/Uswift/extension/src/InterviewPrep.tsx",
+          lineNumber: 605,
+          columnNumber: 11
+        }, this) }, void 0, false, {
+          fileName: "C:/Users/DELL/Uswift/extension/src/InterviewPrep.tsx",
+          lineNumber: 603,
+          columnNumber: 9
+        }, this),
+        activeTab === "tips" && result && /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { children: [
+          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { className: "uswift-card", style: { marginBottom: 16 }, children: [
+            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
               "h3",
               {
                 style: {
@@ -6227,9 +9242,17 @@ Format the response clearly with proper sections and structure.`;
                   marginBottom: 12
                 },
                 children: "💡 Overall Preparation Tips"
-              }
+              },
+              void 0,
+              false,
+              {
+                fileName: "C:/Users/DELL/Uswift/extension/src/InterviewPrep.tsx",
+                lineNumber: 704,
+                columnNumber: 13
+              },
+              this
             ),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("ul", { style: { margin: 0, paddingLeft: 20 }, children: result.overallTips.map((tip, index) => /* @__PURE__ */ jsxRuntimeExports.jsx(
+            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("ul", { style: { margin: 0, paddingLeft: 20 }, children: result.overallTips.map((tip, index) => /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
               "li",
               {
                 style: {
@@ -6239,11 +9262,26 @@ Format the response clearly with proper sections and structure.`;
                 },
                 children: tip
               },
-              index
-            )) })
-          ] }),
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "uswift-card", style: { marginBottom: 16 }, children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              index,
+              false,
+              {
+                fileName: "C:/Users/DELL/Uswift/extension/src/InterviewPrep.tsx",
+                lineNumber: 716,
+                columnNumber: 17
+              },
+              this
+            )) }, void 0, false, {
+              fileName: "C:/Users/DELL/Uswift/extension/src/InterviewPrep.tsx",
+              lineNumber: 714,
+              columnNumber: 13
+            }, this)
+          ] }, void 0, true, {
+            fileName: "C:/Users/DELL/Uswift/extension/src/InterviewPrep.tsx",
+            lineNumber: 703,
+            columnNumber: 11
+          }, this),
+          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { className: "uswift-card", style: { marginBottom: 16 }, children: [
+            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
               "h3",
               {
                 style: {
@@ -6253,9 +9291,17 @@ Format the response clearly with proper sections and structure.`;
                   marginBottom: 12
                 },
                 children: "🏢 Company-Specific Advice"
-              }
+              },
+              void 0,
+              false,
+              {
+                fileName: "C:/Users/DELL/Uswift/extension/src/InterviewPrep.tsx",
+                lineNumber: 732,
+                columnNumber: 13
+              },
+              this
             ),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(
+            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
               "p",
               {
                 style: {
@@ -6265,11 +9311,23 @@ Format the response clearly with proper sections and structure.`;
                   margin: 0
                 },
                 children: result.companySpecificAdvice
-              }
+              },
+              void 0,
+              false,
+              {
+                fileName: "C:/Users/DELL/Uswift/extension/src/InterviewPrep.tsx",
+                lineNumber: 742,
+                columnNumber: 13
+              },
+              this
             )
-          ] }),
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "uswift-card", style: { marginBottom: 16 }, children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(
+          ] }, void 0, true, {
+            fileName: "C:/Users/DELL/Uswift/extension/src/InterviewPrep.tsx",
+            lineNumber: 731,
+            columnNumber: 11
+          }, this),
+          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { className: "uswift-card", style: { marginBottom: 16 }, children: [
+            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
               "h3",
               {
                 style: {
@@ -6279,9 +9337,17 @@ Format the response clearly with proper sections and structure.`;
                   marginBottom: 12
                 },
                 children: "📅 7-Day Preparation Plan"
-              }
+              },
+              void 0,
+              false,
+              {
+                fileName: "C:/Users/DELL/Uswift/extension/src/InterviewPrep.tsx",
+                lineNumber: 756,
+                columnNumber: 13
+              },
+              this
             ),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { style: { display: "flex", flexDirection: "column", gap: 8 }, children: result.preparationPlan.map((day, index) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
+            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { display: "flex", flexDirection: "column", gap: 8 }, children: result.preparationPlan.map((day, index) => /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
               "div",
               {
                 style: {
@@ -6293,7 +9359,7 @@ Format the response clearly with proper sections and structure.`;
                   borderRadius: 6
                 },
                 children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                     "span",
                     {
                       style: {
@@ -6309,9 +9375,17 @@ Format the response clearly with proper sections and structure.`;
                         fontWeight: 600
                       },
                       children: index + 1
-                    }
+                    },
+                    void 0,
+                    false,
+                    {
+                      fileName: "C:/Users/DELL/Uswift/extension/src/InterviewPrep.tsx",
+                      lineNumber: 779,
+                      columnNumber: 19
+                    },
+                    this
                   ),
-                  /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                     "span",
                     {
                       style: {
@@ -6320,15 +9394,42 @@ Format the response clearly with proper sections and structure.`;
                         flex: 1
                       },
                       children: day
-                    }
+                    },
+                    void 0,
+                    false,
+                    {
+                      fileName: "C:/Users/DELL/Uswift/extension/src/InterviewPrep.tsx",
+                      lineNumber: 795,
+                      columnNumber: 19
+                    },
+                    this
                   )
                 ]
               },
-              index
-            )) })
-          ] })
-        ] }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(
+              index,
+              true,
+              {
+                fileName: "C:/Users/DELL/Uswift/extension/src/InterviewPrep.tsx",
+                lineNumber: 768,
+                columnNumber: 17
+              },
+              this
+            )) }, void 0, false, {
+              fileName: "C:/Users/DELL/Uswift/extension/src/InterviewPrep.tsx",
+              lineNumber: 766,
+              columnNumber: 13
+            }, this)
+          ] }, void 0, true, {
+            fileName: "C:/Users/DELL/Uswift/extension/src/InterviewPrep.tsx",
+            lineNumber: 755,
+            columnNumber: 11
+          }, this)
+        ] }, void 0, true, {
+          fileName: "C:/Users/DELL/Uswift/extension/src/InterviewPrep.tsx",
+          lineNumber: 701,
+          columnNumber: 9
+        }, this),
+        /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
           "div",
           {
             style: {
@@ -6338,10 +9439,26 @@ Format the response clearly with proper sections and structure.`;
               color: "#6B7280"
             },
             children: "Powered by Mistral AI • Comprehensive interview preparation and practice questions"
-          }
+          },
+          void 0,
+          false,
+          {
+            fileName: "C:/Users/DELL/Uswift/extension/src/InterviewPrep.tsx",
+            lineNumber: 812,
+            columnNumber: 7
+          },
+          this
         )
       ]
-    }
+    },
+    void 0,
+    true,
+    {
+      fileName: "C:/Users/DELL/Uswift/extension/src/InterviewPrep.tsx",
+      lineNumber: 316,
+      columnNumber: 5
+    },
+    this
   );
 }
 
@@ -6414,7 +9531,7 @@ function Auth({ onAuthSuccess }) {
     }
   };
   if (authLoading) {
-    return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { style: { padding: "2rem", textAlign: "center" }, children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
+    return /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { padding: "2rem", textAlign: "center" }, children: /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
       "div",
       {
         style: {
@@ -6424,14 +9541,22 @@ function Auth({ onAuthSuccess }) {
           minWidth: 350
         },
         children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx(
+          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
             "div",
             {
               className: "uswift-gradient",
               style: { height: 8, borderRadius: 8, marginBottom: 24 }
-            }
+            },
+            void 0,
+            false,
+            {
+              fileName: "C:/Users/DELL/Uswift/extension/src/Auth.tsx",
+              lineNumber: 96,
+              columnNumber: 11
+            },
+            this
           ),
-          /* @__PURE__ */ jsxRuntimeExports.jsxs(
+          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
             "div",
             {
               style: {
@@ -6441,7 +9566,7 @@ function Auth({ onAuthSuccess }) {
                 gap: 12
               },
               children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx(
+                /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                   "div",
                   {
                     style: {
@@ -6452,17 +9577,49 @@ function Auth({ onAuthSuccess }) {
                       borderRadius: "50%",
                       animation: "spin 1s linear infinite"
                     }
-                  }
+                  },
+                  void 0,
+                  false,
+                  {
+                    fileName: "C:/Users/DELL/Uswift/extension/src/Auth.tsx",
+                    lineNumber: 108,
+                    columnNumber: 13
+                  },
+                  this
                 ),
-                /* @__PURE__ */ jsxRuntimeExports.jsx("p", { style: { margin: 0, color: "#6D28D9", fontWeight: 600 }, children: "Initializing..." })
+                /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("p", { style: { margin: 0, color: "#6D28D9", fontWeight: 600 }, children: "Initializing..." }, void 0, false, {
+                  fileName: "C:/Users/DELL/Uswift/extension/src/Auth.tsx",
+                  lineNumber: 118,
+                  columnNumber: 13
+                }, this)
               ]
-            }
+            },
+            void 0,
+            true,
+            {
+              fileName: "C:/Users/DELL/Uswift/extension/src/Auth.tsx",
+              lineNumber: 100,
+              columnNumber: 11
+            },
+            this
           )
         ]
-      }
-    ) });
+      },
+      void 0,
+      true,
+      {
+        fileName: "C:/Users/DELL/Uswift/extension/src/Auth.tsx",
+        lineNumber: 88,
+        columnNumber: 9
+      },
+      this
+    ) }, void 0, false, {
+      fileName: "C:/Users/DELL/Uswift/extension/src/Auth.tsx",
+      lineNumber: 87,
+      columnNumber: 7
+    }, this);
   }
-  return /* @__PURE__ */ jsxRuntimeExports.jsxs(
+  return /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
     "div",
     {
       style: {
@@ -6472,14 +9629,22 @@ function Auth({ onAuthSuccess }) {
         minWidth: 350
       },
       children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(
+        /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
           "div",
           {
             className: "uswift-gradient",
             style: { height: 8, borderRadius: 8, marginBottom: 24 }
-          }
+          },
+          void 0,
+          false,
+          {
+            fileName: "C:/Users/DELL/Uswift/extension/src/Auth.tsx",
+            lineNumber: 136,
+            columnNumber: 7
+          },
+          this
         ),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(
+        /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
           "h2",
           {
             style: {
@@ -6490,10 +9655,18 @@ function Auth({ onAuthSuccess }) {
               textAlign: "center"
             },
             children: isSignUp ? "Sign Up for Uswift" : "Sign In to Uswift"
-          }
+          },
+          void 0,
+          false,
+          {
+            fileName: "C:/Users/DELL/Uswift/extension/src/Auth.tsx",
+            lineNumber: 141,
+            columnNumber: 7
+          },
+          this
         ),
-        /* @__PURE__ */ jsxRuntimeExports.jsxs("form", { onSubmit: handleSubmit, children: [
-          isSignUp && /* @__PURE__ */ jsxRuntimeExports.jsx(
+        /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("form", { onSubmit: handleSubmit, children: [
+          isSignUp && /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
             "input",
             {
               type: "text",
@@ -6510,9 +9683,17 @@ function Auth({ onAuthSuccess }) {
                 transition: "all 0.2s ease"
               },
               required: true
-            }
+            },
+            void 0,
+            false,
+            {
+              fileName: "C:/Users/DELL/Uswift/extension/src/Auth.tsx",
+              lineNumber: 155,
+              columnNumber: 11
+            },
+            this
           ),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(
+          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
             "input",
             {
               type: "email",
@@ -6529,9 +9710,17 @@ function Auth({ onAuthSuccess }) {
                 transition: "all 0.2s ease"
               },
               required: true
-            }
+            },
+            void 0,
+            false,
+            {
+              fileName: "C:/Users/DELL/Uswift/extension/src/Auth.tsx",
+              lineNumber: 173,
+              columnNumber: 9
+            },
+            this
           ),
-          !isForgot && /* @__PURE__ */ jsxRuntimeExports.jsx(
+          !isForgot && /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
             "input",
             {
               type: "password",
@@ -6548,16 +9737,32 @@ function Auth({ onAuthSuccess }) {
                 transition: "all 0.2s ease"
               },
               required: true
-            }
+            },
+            void 0,
+            false,
+            {
+              fileName: "C:/Users/DELL/Uswift/extension/src/Auth.tsx",
+              lineNumber: 191,
+              columnNumber: 11
+            },
+            this
           ),
-          isForgot && /* @__PURE__ */ jsxRuntimeExports.jsx(
+          isForgot && /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
             "div",
             {
               style: { fontSize: "0.9rem", color: "#6B7280", marginBottom: 12 },
               children: "Enter your email and we'll send a password reset link if an account exists."
-            }
+            },
+            void 0,
+            false,
+            {
+              fileName: "C:/Users/DELL/Uswift/extension/src/Auth.tsx",
+              lineNumber: 210,
+              columnNumber: 11
+            },
+            this
           ),
-          error && /* @__PURE__ */ jsxRuntimeExports.jsx(
+          error && /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
             "div",
             {
               style: {
@@ -6570,9 +9775,17 @@ function Auth({ onAuthSuccess }) {
                 borderRadius: 6
               },
               children: error
-            }
+            },
+            void 0,
+            false,
+            {
+              fileName: "C:/Users/DELL/Uswift/extension/src/Auth.tsx",
+              lineNumber: 219,
+              columnNumber: 11
+            },
+            this
           ),
-          success && /* @__PURE__ */ jsxRuntimeExports.jsxs(
+          success && /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
             "div",
             {
               style: {
@@ -6587,24 +9800,48 @@ function Auth({ onAuthSuccess }) {
               },
               children: [
                 success,
-                pending && /* @__PURE__ */ jsxRuntimeExports.jsx(
+                pending && /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                   "div",
                   {
                     style: { fontSize: "0.85rem", color: "#065F46", marginTop: 8 },
                     children: "Verifying account... this may take a few seconds."
-                  }
+                  },
+                  void 0,
+                  false,
+                  {
+                    fileName: "C:/Users/DELL/Uswift/extension/src/Auth.tsx",
+                    lineNumber: 249,
+                    columnNumber: 15
+                  },
+                  this
                 ),
-                !pending && success.includes("successfully") && /* @__PURE__ */ jsxRuntimeExports.jsx(
+                !pending && success.includes("successfully") && /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                   "div",
                   {
                     style: { fontSize: "0.85rem", color: "#065F46", marginTop: 8 },
                     children: "Redirecting to dashboard..."
-                  }
+                  },
+                  void 0,
+                  false,
+                  {
+                    fileName: "C:/Users/DELL/Uswift/extension/src/Auth.tsx",
+                    lineNumber: 256,
+                    columnNumber: 15
+                  },
+                  this
                 )
               ]
-            }
+            },
+            void 0,
+            true,
+            {
+              fileName: "C:/Users/DELL/Uswift/extension/src/Auth.tsx",
+              lineNumber: 235,
+              columnNumber: 11
+            },
+            this
           ),
-          /* @__PURE__ */ jsxRuntimeExports.jsxs(
+          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
             "button",
             {
               type: "submit",
@@ -6622,7 +9859,7 @@ function Auth({ onAuthSuccess }) {
                 transition: "all 0.2s ease"
               },
               children: [
-                submitting && /* @__PURE__ */ jsxRuntimeExports.jsx(
+                submitting && /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                   "div",
                   {
                     style: {
@@ -6633,13 +9870,29 @@ function Auth({ onAuthSuccess }) {
                       borderRadius: "50%",
                       animation: "spin 1s linear infinite"
                     }
-                  }
+                  },
+                  void 0,
+                  false,
+                  {
+                    fileName: "C:/Users/DELL/Uswift/extension/src/Auth.tsx",
+                    lineNumber: 282,
+                    columnNumber: 13
+                  },
+                  this
                 ),
                 submitting ? isSignUp ? "Creating Account..." : "Signing In..." : isSignUp ? "Sign Up" : "Sign In"
               ]
-            }
+            },
+            void 0,
+            true,
+            {
+              fileName: "C:/Users/DELL/Uswift/extension/src/Auth.tsx",
+              lineNumber: 265,
+              columnNumber: 9
+            },
+            this
           ),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { style: { textAlign: "center", marginTop: 8 }, children: !isForgot ? /* @__PURE__ */ jsxRuntimeExports.jsx(
+          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { textAlign: "center", marginTop: 8 }, children: !isForgot ? /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
             "button",
             {
               type: "button",
@@ -6656,8 +9909,16 @@ function Auth({ onAuthSuccess }) {
                 textDecoration: "underline"
               },
               children: "Forgot password?"
-            }
-          ) : /* @__PURE__ */ jsxRuntimeExports.jsx(
+            },
+            void 0,
+            false,
+            {
+              fileName: "C:/Users/DELL/Uswift/extension/src/Auth.tsx",
+              lineNumber: 304,
+              columnNumber: 13
+            },
+            this
+          ) : /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
             "button",
             {
               type: "button",
@@ -6674,13 +9935,29 @@ function Auth({ onAuthSuccess }) {
                 textDecoration: "underline"
               },
               children: "Back to sign in"
-            }
-          ) })
-        ] }),
-        /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { style: { textAlign: "center", color: "#4B5563" }, children: [
+            },
+            void 0,
+            false,
+            {
+              fileName: "C:/Users/DELL/Uswift/extension/src/Auth.tsx",
+              lineNumber: 322,
+              columnNumber: 13
+            },
+            this
+          ) }, void 0, false, {
+            fileName: "C:/Users/DELL/Uswift/extension/src/Auth.tsx",
+            lineNumber: 302,
+            columnNumber: 9
+          }, this)
+        ] }, void 0, true, {
+          fileName: "C:/Users/DELL/Uswift/extension/src/Auth.tsx",
+          lineNumber: 153,
+          columnNumber: 7
+        }, this),
+        /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("p", { style: { textAlign: "center", color: "#4B5563" }, children: [
           isSignUp ? "Already have an account?" : "Don't have an account?",
           " ",
-          /* @__PURE__ */ jsxRuntimeExports.jsx(
+          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
             "button",
             {
               onClick: () => {
@@ -6704,11 +9981,31 @@ function Auth({ onAuthSuccess }) {
                 e.currentTarget.style.color = "#6D28D9";
               },
               children: isSignUp ? "Sign In" : "Sign Up"
-            }
+            },
+            void 0,
+            false,
+            {
+              fileName: "C:/Users/DELL/Uswift/extension/src/Auth.tsx",
+              lineNumber: 345,
+              columnNumber: 9
+            },
+            this
           )
-        ] })
+        ] }, void 0, true, {
+          fileName: "C:/Users/DELL/Uswift/extension/src/Auth.tsx",
+          lineNumber: 343,
+          columnNumber: 7
+        }, this)
       ]
-    }
+    },
+    void 0,
+    true,
+    {
+      fileName: "C:/Users/DELL/Uswift/extension/src/Auth.tsx",
+      lineNumber: 128,
+      columnNumber: 5
+    },
+    this
   );
 }
 
@@ -6927,7 +10224,7 @@ function Popup() {
     }
   };
   if (!isAuthenticated && !loading) {
-    return /* @__PURE__ */ jsxRuntimeExports.jsx(
+    return /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
       Auth,
       {
         onAuthSuccess: async () => {
@@ -6939,11 +10236,19 @@ function Popup() {
             setForceRerender((prev) => prev + 1);
           }, 500);
         }
-      }
+      },
+      void 0,
+      false,
+      {
+        fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
+        lineNumber: 306,
+        columnNumber: 7
+      },
+      this
     );
   }
   if (loading) {
-    return /* @__PURE__ */ jsxRuntimeExports.jsx(
+    return /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
       "div",
       {
         style: {
@@ -6954,8 +10259,8 @@ function Popup() {
           alignItems: "center",
           justifyContent: "center"
         },
-        children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx(
+        children: /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { children: [
+          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
             "div",
             {
               style: {
@@ -6967,16 +10272,40 @@ function Popup() {
                 animation: "spin 1s linear infinite",
                 margin: "0 auto 16px"
               }
-            }
+            },
+            void 0,
+            false,
+            {
+              fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
+              lineNumber: 341,
+              columnNumber: 11
+            },
+            this
           ),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { style: { color: "#6b7280", margin: 0 }, children: "Loading..." })
-        ] })
-      }
+          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("p", { style: { color: "#6b7280", margin: 0 }, children: "Loading..." }, void 0, false, {
+            fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
+            lineNumber: 352,
+            columnNumber: 11
+          }, this)
+        ] }, void 0, true, {
+          fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
+          lineNumber: 340,
+          columnNumber: 9
+        }, this)
+      },
+      void 0,
+      false,
+      {
+        fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
+        lineNumber: 330,
+        columnNumber: 7
+      },
+      this
     );
   }
   if (page === "profile") {
-    return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsxs(
+    return /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { children: [
+      /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
         "div",
         {
           style: {
@@ -6986,8 +10315,12 @@ function Popup() {
             margin: "1rem"
           },
           children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("button", { className: "uswift-btn", onClick: () => setPage("home"), children: "← Back" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(
+            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("button", { className: "uswift-btn", onClick: () => setPage("home"), children: "← Back" }, void 0, false, {
+              fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
+              lineNumber: 369,
+              columnNumber: 11
+            }, this),
+            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
               "button",
               {
                 onClick: signOut,
@@ -7000,17 +10333,41 @@ function Popup() {
                   cursor: "pointer"
                 },
                 children: "Sign Out"
-              }
+              },
+              void 0,
+              false,
+              {
+                fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
+                lineNumber: 372,
+                columnNumber: 11
+              },
+              this
             )
           ]
-        }
+        },
+        void 0,
+        true,
+        {
+          fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
+          lineNumber: 361,
+          columnNumber: 9
+        },
+        this
       ),
-      /* @__PURE__ */ jsxRuntimeExports.jsx(ProfileVault, {})
-    ] });
+      /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(ProfileVault, {}, void 0, false, {
+        fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
+        lineNumber: 386,
+        columnNumber: 9
+      }, this)
+    ] }, void 0, true, {
+      fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
+      lineNumber: 360,
+      columnNumber: 7
+    }, this);
   }
   if (page === "tracker") {
-    return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsxs(
+    return /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { children: [
+      /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
         "div",
         {
           style: {
@@ -7020,8 +10377,12 @@ function Popup() {
             margin: "1rem"
           },
           children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("button", { className: "uswift-btn", onClick: () => setPage("home"), children: "← Back" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(
+            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("button", { className: "uswift-btn", onClick: () => setPage("home"), children: "← Back" }, void 0, false, {
+              fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
+              lineNumber: 402,
+              columnNumber: 11
+            }, this),
+            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
               "button",
               {
                 onClick: signOut,
@@ -7034,17 +10395,41 @@ function Popup() {
                   cursor: "pointer"
                 },
                 children: "Sign Out"
-              }
+              },
+              void 0,
+              false,
+              {
+                fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
+                lineNumber: 405,
+                columnNumber: 11
+              },
+              this
             )
           ]
-        }
+        },
+        void 0,
+        true,
+        {
+          fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
+          lineNumber: 394,
+          columnNumber: 9
+        },
+        this
       ),
-      /* @__PURE__ */ jsxRuntimeExports.jsx(JobTracker, {})
-    ] });
+      /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(JobTracker, {}, void 0, false, {
+        fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
+        lineNumber: 419,
+        columnNumber: 9
+      }, this)
+    ] }, void 0, true, {
+      fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
+      lineNumber: 393,
+      columnNumber: 7
+    }, this);
   }
   if (page === "chat") {
-    return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsxs(
+    return /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { children: [
+      /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
         "div",
         {
           style: {
@@ -7054,8 +10439,12 @@ function Popup() {
             margin: "1rem"
           },
           children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("button", { className: "uswift-btn", onClick: () => setPage("home"), children: "← Back" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(
+            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("button", { className: "uswift-btn", onClick: () => setPage("home"), children: "← Back" }, void 0, false, {
+              fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
+              lineNumber: 435,
+              columnNumber: 11
+            }, this),
+            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
               "button",
               {
                 onClick: signOut,
@@ -7068,17 +10457,41 @@ function Popup() {
                   cursor: "pointer"
                 },
                 children: "Sign Out"
-              }
+              },
+              void 0,
+              false,
+              {
+                fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
+                lineNumber: 438,
+                columnNumber: 11
+              },
+              this
             )
           ]
-        }
+        },
+        void 0,
+        true,
+        {
+          fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
+          lineNumber: 427,
+          columnNumber: 9
+        },
+        this
       ),
-      /* @__PURE__ */ jsxRuntimeExports.jsx(ChatInterface, {})
-    ] });
+      /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(ChatInterface, {}, void 0, false, {
+        fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
+        lineNumber: 452,
+        columnNumber: 9
+      }, this)
+    ] }, void 0, true, {
+      fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
+      lineNumber: 426,
+      columnNumber: 7
+    }, this);
   }
   if (page === "resume") {
-    return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsxs(
+    return /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { children: [
+      /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
         "div",
         {
           style: {
@@ -7088,8 +10501,12 @@ function Popup() {
             margin: "1rem"
           },
           children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("button", { className: "uswift-btn", onClick: () => setPage("home"), children: "← Back" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(
+            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("button", { className: "uswift-btn", onClick: () => setPage("home"), children: "← Back" }, void 0, false, {
+              fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
+              lineNumber: 468,
+              columnNumber: 11
+            }, this),
+            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
               "button",
               {
                 onClick: signOut,
@@ -7102,17 +10519,41 @@ function Popup() {
                   cursor: "pointer"
                 },
                 children: "Sign Out"
-              }
+              },
+              void 0,
+              false,
+              {
+                fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
+                lineNumber: 471,
+                columnNumber: 11
+              },
+              this
             )
           ]
-        }
+        },
+        void 0,
+        true,
+        {
+          fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
+          lineNumber: 460,
+          columnNumber: 9
+        },
+        this
       ),
-      /* @__PURE__ */ jsxRuntimeExports.jsx(ResumeEnhancement, {})
-    ] });
+      /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(ResumeEnhancement, {}, void 0, false, {
+        fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
+        lineNumber: 485,
+        columnNumber: 9
+      }, this)
+    ] }, void 0, true, {
+      fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
+      lineNumber: 459,
+      columnNumber: 7
+    }, this);
   }
   if (page === "cover-letter") {
-    return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsxs(
+    return /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { children: [
+      /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
         "div",
         {
           style: {
@@ -7122,8 +10563,12 @@ function Popup() {
             margin: "1rem"
           },
           children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("button", { className: "uswift-btn", onClick: () => setPage("home"), children: "← Back" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(
+            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("button", { className: "uswift-btn", onClick: () => setPage("home"), children: "← Back" }, void 0, false, {
+              fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
+              lineNumber: 501,
+              columnNumber: 11
+            }, this),
+            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
               "button",
               {
                 onClick: signOut,
@@ -7136,17 +10581,41 @@ function Popup() {
                   cursor: "pointer"
                 },
                 children: "Sign Out"
-              }
+              },
+              void 0,
+              false,
+              {
+                fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
+                lineNumber: 504,
+                columnNumber: 11
+              },
+              this
             )
           ]
-        }
+        },
+        void 0,
+        true,
+        {
+          fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
+          lineNumber: 493,
+          columnNumber: 9
+        },
+        this
       ),
-      /* @__PURE__ */ jsxRuntimeExports.jsx(CoverLetterGenerator, {})
-    ] });
+      /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(CoverLetterGenerator, {}, void 0, false, {
+        fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
+        lineNumber: 518,
+        columnNumber: 9
+      }, this)
+    ] }, void 0, true, {
+      fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
+      lineNumber: 492,
+      columnNumber: 7
+    }, this);
   }
   if (page === "files") {
-    return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsxs(
+    return /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { children: [
+      /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
         "div",
         {
           style: {
@@ -7156,8 +10625,12 @@ function Popup() {
             margin: "1rem"
           },
           children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("button", { className: "uswift-btn", onClick: () => setPage("home"), children: "← Back" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(
+            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("button", { className: "uswift-btn", onClick: () => setPage("home"), children: "← Back" }, void 0, false, {
+              fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
+              lineNumber: 534,
+              columnNumber: 11
+            }, this),
+            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
               "button",
               {
                 onClick: signOut,
@@ -7170,17 +10643,41 @@ function Popup() {
                   cursor: "pointer"
                 },
                 children: "Sign Out"
-              }
+              },
+              void 0,
+              false,
+              {
+                fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
+                lineNumber: 537,
+                columnNumber: 11
+              },
+              this
             )
           ]
-        }
+        },
+        void 0,
+        true,
+        {
+          fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
+          lineNumber: 526,
+          columnNumber: 9
+        },
+        this
       ),
-      /* @__PURE__ */ jsxRuntimeExports.jsx(FileManager, {})
-    ] });
+      /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(FileManager, {}, void 0, false, {
+        fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
+        lineNumber: 551,
+        columnNumber: 9
+      }, this)
+    ] }, void 0, true, {
+      fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
+      lineNumber: 525,
+      columnNumber: 7
+    }, this);
   }
   if (page === "job-analysis") {
-    return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsxs(
+    return /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { children: [
+      /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
         "div",
         {
           style: {
@@ -7190,8 +10687,12 @@ function Popup() {
             margin: "1rem"
           },
           children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("button", { className: "uswift-btn", onClick: () => setPage("home"), children: "← Back" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(
+            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("button", { className: "uswift-btn", onClick: () => setPage("home"), children: "← Back" }, void 0, false, {
+              fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
+              lineNumber: 567,
+              columnNumber: 11
+            }, this),
+            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
               "button",
               {
                 onClick: signOut,
@@ -7204,17 +10705,41 @@ function Popup() {
                   cursor: "pointer"
                 },
                 children: "Sign Out"
-              }
+              },
+              void 0,
+              false,
+              {
+                fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
+                lineNumber: 570,
+                columnNumber: 11
+              },
+              this
             )
           ]
-        }
+        },
+        void 0,
+        true,
+        {
+          fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
+          lineNumber: 559,
+          columnNumber: 9
+        },
+        this
       ),
-      /* @__PURE__ */ jsxRuntimeExports.jsx(JobAnalysis, {})
-    ] });
+      /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(JobAnalysis, {}, void 0, false, {
+        fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
+        lineNumber: 584,
+        columnNumber: 9
+      }, this)
+    ] }, void 0, true, {
+      fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
+      lineNumber: 558,
+      columnNumber: 7
+    }, this);
   }
   if (page === "interview-prep") {
-    return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsxs(
+    return /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { children: [
+      /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
         "div",
         {
           style: {
@@ -7224,8 +10749,12 @@ function Popup() {
             margin: "1rem"
           },
           children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("button", { className: "uswift-btn", onClick: () => setPage("home"), children: "← Back" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(
+            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("button", { className: "uswift-btn", onClick: () => setPage("home"), children: "← Back" }, void 0, false, {
+              fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
+              lineNumber: 600,
+              columnNumber: 11
+            }, this),
+            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
               "button",
               {
                 onClick: signOut,
@@ -7238,15 +10767,39 @@ function Popup() {
                   cursor: "pointer"
                 },
                 children: "Sign Out"
-              }
+              },
+              void 0,
+              false,
+              {
+                fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
+                lineNumber: 603,
+                columnNumber: 11
+              },
+              this
             )
           ]
-        }
+        },
+        void 0,
+        true,
+        {
+          fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
+          lineNumber: 592,
+          columnNumber: 9
+        },
+        this
       ),
-      /* @__PURE__ */ jsxRuntimeExports.jsx(InterviewPrep, {})
-    ] });
+      /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(InterviewPrep, {}, void 0, false, {
+        fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
+        lineNumber: 617,
+        columnNumber: 9
+      }, this)
+    ] }, void 0, true, {
+      fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
+      lineNumber: 591,
+      columnNumber: 7
+    }, this);
   }
-  return /* @__PURE__ */ jsxRuntimeExports.jsxs(
+  return /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
     "div",
     {
       style: {
@@ -7262,7 +10815,7 @@ function Popup() {
         overflow: "hidden"
       },
       children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(
+        /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
           "div",
           {
             style: {
@@ -7277,100 +10830,155 @@ function Popup() {
           `,
               pointerEvents: "none"
             }
-          }
+          },
+          void 0,
+          false,
+          {
+            fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
+            lineNumber: 640,
+            columnNumber: 7
+          },
+          this
         ),
-        /* @__PURE__ */ jsxRuntimeExports.jsxs(
+        /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
           "div",
           {
             style: {
-              background: "linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%)",
+              background: "#FFFFFF",
               borderRadius: "20px 20px 0 0",
               padding: "2rem 2rem 1.5rem",
               textAlign: "center",
-              color: "#FFFFFF",
+              color: "#1f2937",
               position: "relative",
-              zIndex: 1
+              zIndex: 1,
+              boxShadow: "0 2px 8px rgba(0, 0, 0, 0.05)"
             },
             children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx(
+              /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                 "div",
                 {
                   style: {
                     width: "60px",
                     height: "60px",
-                    background: "rgba(255, 255, 255, 0.2)",
+                    background: "linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%)",
                     borderRadius: "16px",
                     margin: "0 auto 1rem",
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    backdropFilter: "blur(10px)",
-                    border: "2px solid rgba(255, 255, 255, 0.3)"
+                    border: "2px solid rgba(99, 102, 241, 0.2)"
                   },
-                  children: /* @__PURE__ */ jsxRuntimeExports.jsx("span", { style: { fontSize: "1.8rem" }, children: "🚀" })
-                }
+                  children: /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("span", { style: { fontSize: "1.8rem" }, children: "🚀" }, void 0, false, {
+                    fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
+                    lineNumber: 681,
+                    columnNumber: 11
+                  }, this)
+                },
+                void 0,
+                false,
+                {
+                  fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
+                  lineNumber: 668,
+                  columnNumber: 9
+                },
+                this
               ),
-              /* @__PURE__ */ jsxRuntimeExports.jsx(
+              /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                 "h1",
                 {
                   style: {
                     fontSize: "1.8rem",
                     fontWeight: 800,
                     margin: "0 0 0.5rem 0",
-                    background: "linear-gradient(45deg, #ffffff, #f0f9ff)",
-                    WebkitBackgroundClip: "text",
-                    WebkitTextFillColor: "transparent",
-                    backgroundClip: "text",
-                    textShadow: "0 2px 4px rgba(0, 0, 0, 0.1)"
+                    color: "#1f2937"
                   },
                   children: "USwift"
-                }
+                },
+                void 0,
+                false,
+                {
+                  fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
+                  lineNumber: 683,
+                  columnNumber: 9
+                },
+                this
               ),
-              /* @__PURE__ */ jsxRuntimeExports.jsx(
+              /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                 "p",
                 {
                   style: {
                     fontSize: "0.9rem",
                     margin: 0,
-                    opacity: 0.95,
+                    color: "#6b7280",
                     fontWeight: 500
                   },
                   children: "AI-Powered Career Excellence"
-                }
+                },
+                void 0,
+                false,
+                {
+                  fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
+                  lineNumber: 693,
+                  columnNumber: 9
+                },
+                this
               ),
-              /* @__PURE__ */ jsxRuntimeExports.jsx(
+              /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                 "div",
                 {
                   style: {
                     marginTop: "1rem",
                     padding: "0.5rem 1rem",
-                    background: "rgba(255, 255, 255, 0.15)",
+                    background: "#f3f4f6",
                     borderRadius: "12px",
-                    backdropFilter: "blur(10px)",
-                    border: "1px solid rgba(255, 255, 255, 0.2)"
+                    border: "1px solid #e5e7eb"
                   },
-                  children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                  children: /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                     "div",
                     {
                       style: {
                         fontSize: "0.8rem",
-                        opacity: 0.9,
+                        color: "#374151",
                         fontWeight: 600
                       },
                       children: [
                         "Welcome back, ",
                         user?.email?.split("@")[0] || "Professional"
                       ]
-                    }
+                    },
+                    void 0,
+                    true,
+                    {
+                      fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
+                      lineNumber: 714,
+                      columnNumber: 11
+                    },
+                    this
                   )
-                }
+                },
+                void 0,
+                false,
+                {
+                  fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
+                  lineNumber: 705,
+                  columnNumber: 9
+                },
+                this
               )
             ]
-          }
+          },
+          void 0,
+          true,
+          {
+            fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
+            lineNumber: 656,
+            columnNumber: 7
+          },
+          this
         ),
-        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { padding: "1.5rem 2rem", position: "relative", zIndex: 1 }, children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { marginBottom: "2rem" }, children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(
+        /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { padding: "1.5rem 2rem", position: "relative", zIndex: 1 }, children: [
+          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { marginBottom: "2rem" }, children: [
+            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
               "h2",
               {
                 style: {
@@ -7381,9 +10989,17 @@ function Popup() {
                   textAlign: "center"
                 },
                 children: "Quick Actions"
-              }
+              },
+              void 0,
+              false,
+              {
+                fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
+                lineNumber: 730,
+                columnNumber: 11
+              },
+              this
             ),
-            /* @__PURE__ */ jsxRuntimeExports.jsxs(
+            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
               "div",
               {
                 style: {
@@ -7396,7 +11012,7 @@ function Popup() {
                   overflow: "hidden"
                 },
                 children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                     "div",
                     {
                       style: {
@@ -7408,9 +11024,17 @@ function Popup() {
                         background: "radial-gradient(circle, rgba(59, 130, 246, 0.1) 0%, transparent 70%)",
                         borderRadius: "50%"
                       }
-                    }
+                    },
+                    void 0,
+                    false,
+                    {
+                      fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
+                      lineNumber: 754,
+                      columnNumber: 13
+                    },
+                    this
                   ),
-                  /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                  /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                     "div",
                     {
                       style: {
@@ -7420,7 +11044,7 @@ function Popup() {
                         marginBottom: "1rem"
                       },
                       children: [
-                        /* @__PURE__ */ jsxRuntimeExports.jsx(
+                        /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                           "div",
                           {
                             style: {
@@ -7433,11 +11057,23 @@ function Popup() {
                               justifyContent: "center",
                               boxShadow: "0 4px 12px rgba(59, 130, 246, 0.3)"
                             },
-                            children: /* @__PURE__ */ jsxRuntimeExports.jsx("span", { style: { fontSize: "1.2rem", color: "white" }, children: "⚡" })
-                          }
+                            children: /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("span", { style: { fontSize: "1.2rem", color: "white" }, children: "⚡" }, void 0, false, {
+                              fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
+                              lineNumber: 788,
+                              columnNumber: 17
+                            }, this)
+                          },
+                          void 0,
+                          false,
+                          {
+                            fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
+                            lineNumber: 775,
+                            columnNumber: 15
+                          },
+                          this
                         ),
-                        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-                          /* @__PURE__ */ jsxRuntimeExports.jsx(
+                        /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { children: [
+                          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                             "h3",
                             {
                               style: {
@@ -7447,9 +11083,17 @@ function Popup() {
                                 margin: 0
                               },
                               children: "Smart Auto-Apply"
-                            }
+                            },
+                            void 0,
+                            false,
+                            {
+                              fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
+                              lineNumber: 791,
+                              columnNumber: 17
+                            },
+                            this
                           ),
-                          /* @__PURE__ */ jsxRuntimeExports.jsx(
+                          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                             "p",
                             {
                               style: {
@@ -7458,13 +11102,33 @@ function Popup() {
                                 margin: "0.25rem 0 0 0"
                               },
                               children: "Apply to jobs instantly with AI-optimized profiles"
-                            }
+                            },
+                            void 0,
+                            false,
+                            {
+                              fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
+                              lineNumber: 801,
+                              columnNumber: 17
+                            },
+                            this
                           )
-                        ] })
+                        ] }, void 0, true, {
+                          fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
+                          lineNumber: 790,
+                          columnNumber: 15
+                        }, this)
                       ]
-                    }
+                    },
+                    void 0,
+                    true,
+                    {
+                      fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
+                      lineNumber: 767,
+                      columnNumber: 13
+                    },
+                    this
                   ),
-                  /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                  /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                     "button",
                     {
                       onClick: handleAutoApply,
@@ -7494,12 +11158,24 @@ function Popup() {
                         e.currentTarget.style.boxShadow = "0 4px 12px rgba(59, 130, 246, 0.3)";
                       },
                       children: [
-                        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: "🚀" }),
+                        /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("span", { children: "🚀" }, void 0, false, {
+                          fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
+                          lineNumber: 843,
+                          columnNumber: 15
+                        }, this),
                         "Auto-Apply to Job"
                       ]
-                    }
+                    },
+                    void 0,
+                    true,
+                    {
+                      fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
+                      lineNumber: 813,
+                      columnNumber: 13
+                    },
+                    this
                   ),
-                  autoStatus && /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                  autoStatus && /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                     "div",
                     {
                       style: {
@@ -7512,7 +11188,7 @@ function Popup() {
                         border: `1px solid ${autoStatus.status === "success" ? "rgba(34, 197, 94, 0.3)" : autoStatus.status === "error" ? "rgba(239, 68, 68, 0.3)" : "rgba(59, 130, 246, 0.3)"}`
                       },
                       children: [
-                        autoStatus.status === "pending" && /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                        autoStatus.status === "pending" && /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                           "div",
                           {
                             style: {
@@ -7522,7 +11198,7 @@ function Popup() {
                               gap: "12px"
                             },
                             children: [
-                              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                              /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                                 "div",
                                 {
                                   style: {
@@ -7533,17 +11209,45 @@ function Popup() {
                                     borderRadius: "50%",
                                     animation: "spin 1s linear infinite"
                                   }
-                                }
+                                },
+                                void 0,
+                                false,
+                                {
+                                  fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
+                                  lineNumber: 884,
+                                  columnNumber: 21
+                                },
+                                this
                               ),
-                              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-                                /* @__PURE__ */ jsxRuntimeExports.jsx("div", { style: { fontWeight: 600, marginBottom: "4px" }, children: "🚀 Advanced Auto-Apply in Progress" }),
-                                /* @__PURE__ */ jsxRuntimeExports.jsx("div", { style: { fontSize: "0.8rem", opacity: 0.8 }, children: "Detecting job board, filling forms, uploading files..." })
-                              ] })
+                              /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { children: [
+                                /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { fontWeight: 600, marginBottom: "4px" }, children: "🚀 Advanced Auto-Apply in Progress" }, void 0, false, {
+                                  fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
+                                  lineNumber: 895,
+                                  columnNumber: 23
+                                }, this),
+                                /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { fontSize: "0.8rem", opacity: 0.8 }, children: "Detecting job board, filling forms, uploading files..." }, void 0, false, {
+                                  fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
+                                  lineNumber: 898,
+                                  columnNumber: 23
+                                }, this)
+                              ] }, void 0, true, {
+                                fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
+                                lineNumber: 894,
+                                columnNumber: 21
+                              }, this)
                             ]
-                          }
+                          },
+                          void 0,
+                          true,
+                          {
+                            fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
+                            lineNumber: 876,
+                            columnNumber: 19
+                          },
+                          this
                         ),
-                        autoStatus.status === "success" && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-                          /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                        autoStatus.status === "success" && /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { children: [
+                          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                             "div",
                             {
                               style: {
@@ -7554,12 +11258,28 @@ function Popup() {
                                 fontWeight: 600
                               },
                               children: [
-                                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: "✅" }),
-                                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: "Application Submitted Successfully!" })
+                                /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("span", { children: "✅" }, void 0, false, {
+                                  fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
+                                  lineNumber: 915,
+                                  columnNumber: 23
+                                }, this),
+                                /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("span", { children: "Application Submitted Successfully!" }, void 0, false, {
+                                  fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
+                                  lineNumber: 916,
+                                  columnNumber: 23
+                                }, this)
                               ]
-                            }
+                            },
+                            void 0,
+                            true,
+                            {
+                              fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
+                              lineNumber: 906,
+                              columnNumber: 21
+                            },
+                            this
                           ),
-                          /* @__PURE__ */ jsxRuntimeExports.jsx(
+                          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                             "div",
                             {
                               style: {
@@ -7568,9 +11288,17 @@ function Popup() {
                                 marginBottom: "8px"
                               },
                               children: autoStatus.message
-                            }
+                            },
+                            void 0,
+                            false,
+                            {
+                              fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
+                              lineNumber: 918,
+                              columnNumber: 21
+                            },
+                            this
                           ),
-                          autoStatus.jobBoard && /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                          autoStatus.jobBoard && /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                             "div",
                             {
                               style: {
@@ -7585,11 +11313,23 @@ function Popup() {
                                 "Platform: ",
                                 autoStatus.jobBoard
                               ]
-                            }
+                            },
+                            void 0,
+                            true,
+                            {
+                              fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
+                              lineNumber: 928,
+                              columnNumber: 23
+                            },
+                            this
                           )
-                        ] }),
-                        autoStatus.status === "error" && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-                          /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                        ] }, void 0, true, {
+                          fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
+                          lineNumber: 905,
+                          columnNumber: 19
+                        }, this),
+                        autoStatus.status === "error" && /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { children: [
+                          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                             "div",
                             {
                               style: {
@@ -7600,12 +11340,28 @@ function Popup() {
                                 fontWeight: 600
                               },
                               children: [
-                                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: "❌" }),
-                                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: "Auto-Apply Failed" })
+                                /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("span", { children: "❌" }, void 0, false, {
+                                  fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
+                                  lineNumber: 954,
+                                  columnNumber: 23
+                                }, this),
+                                /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("span", { children: "Auto-Apply Failed" }, void 0, false, {
+                                  fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
+                                  lineNumber: 955,
+                                  columnNumber: 23
+                                }, this)
                               ]
-                            }
+                            },
+                            void 0,
+                            true,
+                            {
+                              fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
+                              lineNumber: 945,
+                              columnNumber: 21
+                            },
+                            this
                           ),
-                          /* @__PURE__ */ jsxRuntimeExports.jsx(
+                          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                             "div",
                             {
                               style: {
@@ -7614,9 +11370,17 @@ function Popup() {
                                 marginBottom: "12px"
                               },
                               children: autoStatus.message
-                            }
+                            },
+                            void 0,
+                            false,
+                            {
+                              fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
+                              lineNumber: 957,
+                              columnNumber: 21
+                            },
+                            this
                           ),
-                          autoStatus.session && autoStatus.session.errors && autoStatus.session.errors.length > 0 && /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                          autoStatus.session && autoStatus.session.errors && autoStatus.session.errors.length > 0 && /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                             "div",
                             {
                               style: {
@@ -7628,21 +11392,41 @@ function Popup() {
                                 borderRadius: "6px"
                               },
                               children: [
-                                /* @__PURE__ */ jsxRuntimeExports.jsx("div", { style: { fontWeight: 600, marginBottom: "4px" }, children: "Issues detected:" }),
-                                autoStatus.session.errors.slice(0, 3).map((error, index) => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { marginBottom: "2px" }, children: [
+                                /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { fontWeight: 600, marginBottom: "4px" }, children: "Issues detected:" }, void 0, false, {
+                                  fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
+                                  lineNumber: 979,
+                                  columnNumber: 27
+                                }, this),
+                                autoStatus.session.errors.slice(0, 3).map((error, index) => /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { marginBottom: "2px" }, children: [
                                   "• ",
                                   error
-                                ] }, index)),
-                                autoStatus.session.errors.length > 3 && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+                                ] }, index, true, {
+                                  fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
+                                  lineNumber: 985,
+                                  columnNumber: 31
+                                }, this)),
+                                autoStatus.session.errors.length > 3 && /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { children: [
                                   "... and ",
                                   autoStatus.session.errors.length - 3,
                                   " ",
                                   "more"
-                                ] })
+                                ] }, void 0, true, {
+                                  fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
+                                  lineNumber: 990,
+                                  columnNumber: 29
+                                }, this)
                               ]
-                            }
+                            },
+                            void 0,
+                            true,
+                            {
+                              fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
+                              lineNumber: 969,
+                              columnNumber: 25
+                            },
+                            this
                           ),
-                          /* @__PURE__ */ jsxRuntimeExports.jsx(
+                          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                             "button",
                             {
                               onClick: handleAutoApply,
@@ -7667,17 +11451,45 @@ function Popup() {
                                 e.currentTarget.style.boxShadow = "0 2px 8px rgba(220, 38, 38, 0.3)";
                               },
                               children: "🔄 Retry Auto-Apply"
-                            }
+                            },
+                            void 0,
+                            false,
+                            {
+                              fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
+                              lineNumber: 997,
+                              columnNumber: 21
+                            },
+                            this
                           )
-                        ] })
+                        ] }, void 0, true, {
+                          fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
+                          lineNumber: 944,
+                          columnNumber: 19
+                        }, this)
                       ]
-                    }
+                    },
+                    void 0,
+                    true,
+                    {
+                      fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
+                      lineNumber: 848,
+                      columnNumber: 15
+                    },
+                    this
                   )
                 ]
-              }
+              },
+              void 0,
+              true,
+              {
+                fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
+                lineNumber: 743,
+                columnNumber: 11
+              },
+              this
             ),
-            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { marginBottom: "2rem" }, children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx(
+            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { marginBottom: "2rem" }, children: [
+              /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                 "h3",
                 {
                   style: {
@@ -7688,9 +11500,17 @@ function Popup() {
                     textAlign: "center"
                   },
                   children: "Core Features"
-                }
+                },
+                void 0,
+                false,
+                {
+                  fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
+                  lineNumber: 1033,
+                  columnNumber: 13
+                },
+                this
               ),
-              /* @__PURE__ */ jsxRuntimeExports.jsxs(
+              /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                 "div",
                 {
                   style: {
@@ -7699,7 +11519,7 @@ function Popup() {
                     gap: "0.75rem"
                   },
                   children: [
-                    /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                    /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                       "button",
                       {
                         onClick: () => setPage("profile"),
@@ -7727,7 +11547,7 @@ function Popup() {
                           e.currentTarget.style.boxShadow = "none";
                         },
                         children: [
-                          /* @__PURE__ */ jsxRuntimeExports.jsx(
+                          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                             "div",
                             {
                               style: {
@@ -7739,11 +11559,23 @@ function Popup() {
                                 alignItems: "center",
                                 justifyContent: "center"
                               },
-                              children: /* @__PURE__ */ jsxRuntimeExports.jsx("span", { style: { fontSize: "1rem", color: "white" }, children: "📋" })
-                            }
+                              children: /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("span", { style: { fontSize: "1rem", color: "white" }, children: "📋" }, void 0, false, {
+                                fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
+                                lineNumber: 1090,
+                                columnNumber: 19
+                              }, this)
+                            },
+                            void 0,
+                            false,
+                            {
+                              fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
+                              lineNumber: 1078,
+                              columnNumber: 17
+                            },
+                            this
                           ),
-                          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-                            /* @__PURE__ */ jsxRuntimeExports.jsx(
+                          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { children: [
+                            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                               "div",
                               {
                                 style: {
@@ -7752,14 +11584,38 @@ function Popup() {
                                   color: "#1f2937"
                                 },
                                 children: "Profile Vault"
-                              }
+                              },
+                              void 0,
+                              false,
+                              {
+                                fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
+                                lineNumber: 1093,
+                                columnNumber: 19
+                              },
+                              this
                             ),
-                            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { style: { fontSize: "0.75rem", color: "#6b7280" }, children: "Manage profiles" })
-                          ] })
+                            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { fontSize: "0.75rem", color: "#6b7280" }, children: "Manage profiles" }, void 0, false, {
+                              fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
+                              lineNumber: 1102,
+                              columnNumber: 19
+                            }, this)
+                          ] }, void 0, true, {
+                            fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
+                            lineNumber: 1092,
+                            columnNumber: 17
+                          }, this)
                         ]
-                      }
+                      },
+                      void 0,
+                      true,
+                      {
+                        fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
+                        lineNumber: 1051,
+                        columnNumber: 15
+                      },
+                      this
                     ),
-                    /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                    /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                       "button",
                       {
                         onClick: () => setPage("tracker"),
@@ -7787,7 +11643,7 @@ function Popup() {
                           e.currentTarget.style.boxShadow = "none";
                         },
                         children: [
-                          /* @__PURE__ */ jsxRuntimeExports.jsx(
+                          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                             "div",
                             {
                               style: {
@@ -7799,11 +11655,23 @@ function Popup() {
                                 alignItems: "center",
                                 justifyContent: "center"
                               },
-                              children: /* @__PURE__ */ jsxRuntimeExports.jsx("span", { style: { fontSize: "1rem", color: "white" }, children: "📊" })
-                            }
+                              children: /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("span", { style: { fontSize: "1rem", color: "white" }, children: "📊" }, void 0, false, {
+                                fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
+                                lineNumber: 1147,
+                                columnNumber: 19
+                              }, this)
+                            },
+                            void 0,
+                            false,
+                            {
+                              fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
+                              lineNumber: 1135,
+                              columnNumber: 17
+                            },
+                            this
                           ),
-                          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-                            /* @__PURE__ */ jsxRuntimeExports.jsx(
+                          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { children: [
+                            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                               "div",
                               {
                                 style: {
@@ -7812,19 +11680,55 @@ function Popup() {
                                   color: "#1f2937"
                                 },
                                 children: "Job Tracker"
-                              }
+                              },
+                              void 0,
+                              false,
+                              {
+                                fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
+                                lineNumber: 1150,
+                                columnNumber: 19
+                              },
+                              this
                             ),
-                            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { style: { fontSize: "0.75rem", color: "#6b7280" }, children: "Track applications" })
-                          ] })
+                            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { fontSize: "0.75rem", color: "#6b7280" }, children: "Track applications" }, void 0, false, {
+                              fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
+                              lineNumber: 1159,
+                              columnNumber: 19
+                            }, this)
+                          ] }, void 0, true, {
+                            fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
+                            lineNumber: 1149,
+                            columnNumber: 17
+                          }, this)
                         ]
-                      }
+                      },
+                      void 0,
+                      true,
+                      {
+                        fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
+                        lineNumber: 1108,
+                        columnNumber: 15
+                      },
+                      this
                     )
                   ]
-                }
+                },
+                void 0,
+                true,
+                {
+                  fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
+                  lineNumber: 1044,
+                  columnNumber: 13
+                },
+                this
               )
-            ] }),
-            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx(
+            ] }, void 0, true, {
+              fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
+              lineNumber: 1032,
+              columnNumber: 11
+            }, this),
+            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { children: [
+              /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                 "h3",
                 {
                   style: {
@@ -7835,9 +11739,17 @@ function Popup() {
                     textAlign: "center"
                   },
                   children: "🤖 AI-Powered Tools"
-                }
+                },
+                void 0,
+                false,
+                {
+                  fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
+                  lineNumber: 1169,
+                  columnNumber: 13
+                },
+                this
               ),
-              /* @__PURE__ */ jsxRuntimeExports.jsxs(
+              /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                 "div",
                 {
                   style: {
@@ -7847,7 +11759,7 @@ function Popup() {
                     marginBottom: "1rem"
                   },
                   children: [
-                    /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                    /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                       "button",
                       {
                         onClick: () => setPage("chat"),
@@ -7875,7 +11787,7 @@ function Popup() {
                           e.currentTarget.style.boxShadow = "0 4px 12px rgba(16, 185, 129, 0.3)";
                         },
                         children: [
-                          /* @__PURE__ */ jsxRuntimeExports.jsx(
+                          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                             "div",
                             {
                               style: {
@@ -7888,17 +11800,49 @@ function Popup() {
                                 justifyContent: "center",
                                 backdropFilter: "blur(10px)"
                               },
-                              children: /* @__PURE__ */ jsxRuntimeExports.jsx("span", { style: { fontSize: "1rem" }, children: "💬" })
-                            }
+                              children: /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("span", { style: { fontSize: "1rem" }, children: "💬" }, void 0, false, {
+                                fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
+                                lineNumber: 1231,
+                                columnNumber: 19
+                              }, this)
+                            },
+                            void 0,
+                            false,
+                            {
+                              fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
+                              lineNumber: 1219,
+                              columnNumber: 17
+                            },
+                            this
                           ),
-                          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-                            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { style: { fontSize: "0.85rem", fontWeight: 600 }, children: "AI Assistant" }),
-                            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { style: { fontSize: "0.7rem", opacity: 0.9 }, children: "Career guidance" })
-                          ] })
+                          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { children: [
+                            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { fontSize: "0.85rem", fontWeight: 600 }, children: "AI Assistant" }, void 0, false, {
+                              fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
+                              lineNumber: 1234,
+                              columnNumber: 19
+                            }, this),
+                            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { fontSize: "0.7rem", opacity: 0.9 }, children: "Career guidance" }, void 0, false, {
+                              fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
+                              lineNumber: 1237,
+                              columnNumber: 19
+                            }, this)
+                          ] }, void 0, true, {
+                            fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
+                            lineNumber: 1233,
+                            columnNumber: 17
+                          }, this)
                         ]
-                      }
+                      },
+                      void 0,
+                      true,
+                      {
+                        fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
+                        lineNumber: 1190,
+                        columnNumber: 15
+                      },
+                      this
                     ),
-                    /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                    /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                       "button",
                       {
                         onClick: () => setPage("resume"),
@@ -7926,7 +11870,7 @@ function Popup() {
                           e.currentTarget.style.boxShadow = "0 4px 12px rgba(59, 130, 246, 0.3)";
                         },
                         children: [
-                          /* @__PURE__ */ jsxRuntimeExports.jsx(
+                          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                             "div",
                             {
                               style: {
@@ -7939,20 +11883,60 @@ function Popup() {
                                 justifyContent: "center",
                                 backdropFilter: "blur(10px)"
                               },
-                              children: /* @__PURE__ */ jsxRuntimeExports.jsx("span", { style: { fontSize: "1rem" }, children: "📄" })
-                            }
+                              children: /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("span", { style: { fontSize: "1rem" }, children: "📄" }, void 0, false, {
+                                fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
+                                lineNumber: 1284,
+                                columnNumber: 19
+                              }, this)
+                            },
+                            void 0,
+                            false,
+                            {
+                              fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
+                              lineNumber: 1272,
+                              columnNumber: 17
+                            },
+                            this
                           ),
-                          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-                            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { style: { fontSize: "0.85rem", fontWeight: 600 }, children: "Resume AI" }),
-                            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { style: { fontSize: "0.7rem", opacity: 0.9 }, children: "Enhance & optimize" })
-                          ] })
+                          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { children: [
+                            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { fontSize: "0.85rem", fontWeight: 600 }, children: "Resume AI" }, void 0, false, {
+                              fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
+                              lineNumber: 1287,
+                              columnNumber: 19
+                            }, this),
+                            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { fontSize: "0.7rem", opacity: 0.9 }, children: "Enhance & optimize" }, void 0, false, {
+                              fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
+                              lineNumber: 1290,
+                              columnNumber: 19
+                            }, this)
+                          ] }, void 0, true, {
+                            fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
+                            lineNumber: 1286,
+                            columnNumber: 17
+                          }, this)
                         ]
-                      }
+                      },
+                      void 0,
+                      true,
+                      {
+                        fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
+                        lineNumber: 1243,
+                        columnNumber: 15
+                      },
+                      this
                     )
                   ]
-                }
+                },
+                void 0,
+                true,
+                {
+                  fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
+                  lineNumber: 1182,
+                  columnNumber: 13
+                },
+                this
               ),
-              /* @__PURE__ */ jsxRuntimeExports.jsxs(
+              /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                 "div",
                 {
                   style: {
@@ -7961,7 +11945,7 @@ function Popup() {
                     gap: "0.5rem"
                   },
                   children: [
-                    /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                    /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                       "button",
                       {
                         onClick: () => setPage("cover-letter"),
@@ -7987,8 +11971,12 @@ function Popup() {
                           e.currentTarget.style.background = "#ffffff";
                         },
                         children: [
-                          /* @__PURE__ */ jsxRuntimeExports.jsx("span", { style: { fontSize: "1rem" }, children: "✍️" }),
-                          /* @__PURE__ */ jsxRuntimeExports.jsx(
+                          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("span", { style: { fontSize: "1rem" }, children: "✍️" }, void 0, false, {
+                            fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
+                            lineNumber: 1329,
+                            columnNumber: 17
+                          }, this),
+                          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                             "span",
                             {
                               style: {
@@ -7997,12 +11985,28 @@ function Popup() {
                                 color: "#1f2937"
                               },
                               children: "Cover Letter"
-                            }
+                            },
+                            void 0,
+                            false,
+                            {
+                              fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
+                              lineNumber: 1330,
+                              columnNumber: 17
+                            },
+                            this
                           )
                         ]
-                      }
+                      },
+                      void 0,
+                      true,
+                      {
+                        fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
+                        lineNumber: 1305,
+                        columnNumber: 15
+                      },
+                      this
                     ),
-                    /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                    /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                       "button",
                       {
                         onClick: () => setPage("files"),
@@ -8028,8 +12032,12 @@ function Popup() {
                           e.currentTarget.style.background = "#ffffff";
                         },
                         children: [
-                          /* @__PURE__ */ jsxRuntimeExports.jsx("span", { style: { fontSize: "1rem" }, children: "📁" }),
-                          /* @__PURE__ */ jsxRuntimeExports.jsx(
+                          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("span", { style: { fontSize: "1rem" }, children: "📁" }, void 0, false, {
+                            fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
+                            lineNumber: 1365,
+                            columnNumber: 17
+                          }, this),
+                          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                             "span",
                             {
                               style: {
@@ -8038,12 +12046,28 @@ function Popup() {
                                 color: "#1f2937"
                               },
                               children: "File Manager"
-                            }
+                            },
+                            void 0,
+                            false,
+                            {
+                              fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
+                              lineNumber: 1366,
+                              columnNumber: 17
+                            },
+                            this
                           )
                         ]
-                      }
+                      },
+                      void 0,
+                      true,
+                      {
+                        fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
+                        lineNumber: 1341,
+                        columnNumber: 15
+                      },
+                      this
                     ),
-                    /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                    /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                       "button",
                       {
                         onClick: () => setPage("job-analysis"),
@@ -8069,8 +12093,12 @@ function Popup() {
                           e.currentTarget.style.background = "#ffffff";
                         },
                         children: [
-                          /* @__PURE__ */ jsxRuntimeExports.jsx("span", { style: { fontSize: "1rem" }, children: "🔍" }),
-                          /* @__PURE__ */ jsxRuntimeExports.jsx(
+                          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("span", { style: { fontSize: "1rem" }, children: "🔍" }, void 0, false, {
+                            fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
+                            lineNumber: 1401,
+                            columnNumber: 17
+                          }, this),
+                          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                             "span",
                             {
                               style: {
@@ -8079,15 +12107,39 @@ function Popup() {
                                 color: "#1f2937"
                               },
                               children: "Job Analysis"
-                            }
+                            },
+                            void 0,
+                            false,
+                            {
+                              fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
+                              lineNumber: 1402,
+                              columnNumber: 17
+                            },
+                            this
                           )
                         ]
-                      }
+                      },
+                      void 0,
+                      true,
+                      {
+                        fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
+                        lineNumber: 1377,
+                        columnNumber: 15
+                      },
+                      this
                     )
                   ]
-                }
+                },
+                void 0,
+                true,
+                {
+                  fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
+                  lineNumber: 1298,
+                  columnNumber: 13
+                },
+                this
               ),
-              /* @__PURE__ */ jsxRuntimeExports.jsxs(
+              /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                 "button",
                 {
                   onClick: () => setPage("interview-prep"),
@@ -8115,7 +12167,7 @@ function Popup() {
                     e.currentTarget.style.boxShadow = "0 4px 12px rgba(20, 184, 166, 0.3)";
                   },
                   children: [
-                    /* @__PURE__ */ jsxRuntimeExports.jsx(
+                    /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
                       "div",
                       {
                         style: {
@@ -8128,20 +12180,64 @@ function Popup() {
                           justifyContent: "center",
                           backdropFilter: "blur(10px)"
                         },
-                        children: /* @__PURE__ */ jsxRuntimeExports.jsx("span", { style: { fontSize: "1.2rem" }, children: "🎤" })
-                      }
+                        children: /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("span", { style: { fontSize: "1.2rem" }, children: "🎤" }, void 0, false, {
+                          fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
+                          lineNumber: 1455,
+                          columnNumber: 17
+                        }, this)
+                      },
+                      void 0,
+                      false,
+                      {
+                        fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
+                        lineNumber: 1443,
+                        columnNumber: 15
+                      },
+                      this
                     ),
-                    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { textAlign: "left", flex: 1 }, children: [
-                      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { style: { fontSize: "0.95rem", fontWeight: 600 }, children: "Interview Preparation" }),
-                      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { style: { fontSize: "0.8rem", opacity: 0.9 }, children: "AI-powered practice questions & tips" })
-                    ] }),
-                    /* @__PURE__ */ jsxRuntimeExports.jsx("span", { style: { fontSize: "1rem", opacity: 0.8 }, children: "→" })
+                    /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { textAlign: "left", flex: 1 }, children: [
+                      /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { fontSize: "0.95rem", fontWeight: 600 }, children: "Interview Preparation" }, void 0, false, {
+                        fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
+                        lineNumber: 1458,
+                        columnNumber: 17
+                      }, this),
+                      /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { fontSize: "0.8rem", opacity: 0.9 }, children: "AI-powered practice questions & tips" }, void 0, false, {
+                        fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
+                        lineNumber: 1461,
+                        columnNumber: 17
+                      }, this)
+                    ] }, void 0, true, {
+                      fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
+                      lineNumber: 1457,
+                      columnNumber: 15
+                    }, this),
+                    /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("span", { style: { fontSize: "1rem", opacity: 0.8 }, children: "→" }, void 0, false, {
+                      fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
+                      lineNumber: 1465,
+                      columnNumber: 15
+                    }, this)
                   ]
-                }
+                },
+                void 0,
+                true,
+                {
+                  fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
+                  lineNumber: 1415,
+                  columnNumber: 13
+                },
+                this
               )
-            ] })
-          ] }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { style: { textAlign: "center", marginTop: "1.5rem" }, children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+            ] }, void 0, true, {
+              fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
+              lineNumber: 1168,
+              columnNumber: 11
+            }, this)
+          ] }, void 0, true, {
+            fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
+            lineNumber: 729,
+            columnNumber: 9
+          }, this),
+          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { textAlign: "center", marginTop: "1.5rem" }, children: /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
             "button",
             {
               onClick: signOut,
@@ -8165,16 +12261,48 @@ function Popup() {
                 e.currentTarget.style.color = "#6b7280";
               },
               children: "Sign Out"
-            }
-          ) })
-        ] })
+            },
+            void 0,
+            false,
+            {
+              fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
+              lineNumber: 1472,
+              columnNumber: 11
+            },
+            this
+          ) }, void 0, false, {
+            fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
+            lineNumber: 1471,
+            columnNumber: 9
+          }, this)
+        ] }, void 0, true, {
+          fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
+          lineNumber: 727,
+          columnNumber: 7
+        }, this)
       ]
-    }
+    },
+    void 0,
+    true,
+    {
+      fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
+      lineNumber: 623,
+      columnNumber: 5
+    },
+    this
   );
 }
 
 client.createRoot(document.getElementById("root")).render(
-  /* @__PURE__ */ jsxRuntimeExports.jsx(React.StrictMode, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(Popup, {}) })
+  /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(React.StrictMode, { children: /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(Popup, {}, void 0, false, {
+    fileName: "C:/Users/DELL/Uswift/extension/src/main.tsx",
+    lineNumber: 37,
+    columnNumber: 5
+  }, globalThis) }, void 0, false, {
+    fileName: "C:/Users/DELL/Uswift/extension/src/main.tsx",
+    lineNumber: 36,
+    columnNumber: 3
+  }, globalThis)
 );
 try {
   getSupabaseClient();

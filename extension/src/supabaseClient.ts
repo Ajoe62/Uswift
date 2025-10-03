@@ -166,8 +166,10 @@ class SupabaseClient {
           res.status === 403 ||
           /expired|bad_jwt|invalid token/i.test(txt)
         ) {
+          console.log("Token expired, attempting refresh...");
           const refreshed = await this.tryRefresh();
           if (refreshed) {
+            console.log("Token refreshed successfully, retrying getUser...");
             const retry = await fetch(`${this.config.url}/auth/v1/user`, {
               method: "GET",
               headers: {
@@ -176,20 +178,22 @@ class SupabaseClient {
               },
               mode: "cors",
             });
-            if (retry.ok) return await retry.json();
+            if (retry.ok) {
+              const userData = await retry.json();
+              console.log("getUser succeeded after token refresh");
+              return userData;
+            }
             const rtxt = await retry.text().catch(() => "");
             console.warn("getUser retry failed", retry.status, rtxt);
-            return {
-              error: {
-                status: retry.status,
-                message: `HTTP ${retry.status}`,
-                payload: rtxt,
-              },
-            };
+            return null; // Return null instead of error to trigger re-login
+          } else {
+            console.warn("Token refresh failed, user needs to re-login");
+            await this.clearSession();
+            return null;
           }
         }
 
-        console.warn("getUser HTTP error", res.status, txt);
+        console.warn("getUser HTTP error", res.status, payload);
         const msg =
           (payload && (payload.error || payload.message || payload.msg)) ||
           `HTTP ${res.status}`;
@@ -206,8 +210,12 @@ class SupabaseClient {
     // load session to get refresh token
     const session = await this.loadSession();
     const refreshToken = session?.refresh_token;
-    if (!refreshToken) return false;
+    if (!refreshToken) {
+      console.log("No refresh token available");
+      return false;
+    }
     try {
+      console.log("Attempting token refresh...");
       const res = await fetch(
         `${this.config.url}/auth/v1/token?grant_type=refresh_token`,
         {
@@ -231,10 +239,13 @@ class SupabaseClient {
             data.expires_at = Date.now() + data.expires_in * 1000;
         } catch {}
         await this.saveSession(data);
+        console.log("Token refresh successful");
         return true;
+      } else {
+        console.warn("Token refresh failed:", data);
       }
     } catch (e) {
-      // ignore
+      console.error("Token refresh error:", e);
     }
     await this.clearSession();
     this.authToken = null;

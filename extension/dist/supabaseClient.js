@@ -125,8 +125,10 @@ class SupabaseClient {
         } catch (e) {
         }
         if (res.status === 401 || res.status === 403 || /expired|bad_jwt|invalid token/i.test(txt)) {
+          console.log("Token expired, attempting refresh...");
           const refreshed = await this.tryRefresh();
           if (refreshed) {
+            console.log("Token refreshed successfully, retrying getUser...");
             const retry = await fetch(`${this.config.url}/auth/v1/user`, {
               method: "GET",
               headers: {
@@ -135,20 +137,21 @@ class SupabaseClient {
               },
               mode: "cors"
             });
-            if (retry.ok)
-              return await retry.json();
+            if (retry.ok) {
+              const userData = await retry.json();
+              console.log("getUser succeeded after token refresh");
+              return userData;
+            }
             const rtxt = await retry.text().catch(() => "");
             console.warn("getUser retry failed", retry.status, rtxt);
-            return {
-              error: {
-                status: retry.status,
-                message: `HTTP ${retry.status}`,
-                payload: rtxt
-              }
-            };
+            return null;
+          } else {
+            console.warn("Token refresh failed, user needs to re-login");
+            await this.clearSession();
+            return null;
           }
         }
-        console.warn("getUser HTTP error", res.status, txt);
+        console.warn("getUser HTTP error", res.status, payload);
         const msg = payload && (payload.error || payload.message || payload.msg) || `HTTP ${res.status}`;
         return { error: { status: res.status, message: msg, payload } };
       }
@@ -161,9 +164,12 @@ class SupabaseClient {
   async tryRefresh() {
     const session = await this.loadSession();
     const refreshToken = session?.refresh_token;
-    if (!refreshToken)
+    if (!refreshToken) {
+      console.log("No refresh token available");
       return false;
+    }
     try {
+      console.log("Attempting token refresh...");
       const res = await fetch(
         `${this.config.url}/auth/v1/token?grant_type=refresh_token`,
         {
@@ -188,9 +194,13 @@ class SupabaseClient {
         } catch {
         }
         await this.saveSession(data);
+        console.log("Token refresh successful");
         return true;
+      } else {
+        console.warn("Token refresh failed:", data);
       }
     } catch (e) {
+      console.error("Token refresh error:", e);
     }
     await this.clearSession();
     this.authToken = null;
@@ -324,8 +334,8 @@ class SupabaseClient {
 let singleton = null;
 function resolveConfig() {
   try {
-    const url = typeof import.meta !== "undefined" && {"BASE_URL":"/","MODE":"production","DEV":false,"PROD":true,"SSR":false} && ({}).VITE_SUPABASE_URL || window.SUPABASE_CONFIG?.url;
-    const anonKey = typeof import.meta !== "undefined" && {"BASE_URL":"/","MODE":"production","DEV":false,"PROD":true,"SSR":false} && ({}).VITE_SUPABASE_ANON_KEY || window.SUPABASE_CONFIG?.anonKey || window.SUPABASE_CONFIG?.ANON_KEY;
+    const url = typeof import.meta !== "undefined" && {"VITE_MISTRAL_API_KEY":"","VITE_MISTRAL_BASE_URL":"https://api.mistral.ai","VITE_SUPABASE_URL":"","VITE_SUPABASE_ANON_KEY":"","VITE_BACKEND_API_URL":"","VITE_SENTRY_DSN":"","VITE_ANALYTICS_ID":"","VITE_DEBUG_MODE":false,"VITE_ENABLE_AUTO_APPLY":"true","VITE_ENABLE_AI_FEATURES":"true","VITE_ENABLE_FILE_UPLOADS":"true","VITE_ENABLE_CLOUD_SYNC":"true","VITE_AI_RATE_LIMIT":"10","VITE_AUTO_APPLY_RATE_LIMIT":"20","VITE_USER_NODE_ENV":"development","BASE_URL":"/","MODE":"production","DEV":true,"PROD":false,"SSR":false} && "" || window.SUPABASE_CONFIG?.url;
+    const anonKey = typeof import.meta !== "undefined" && {"VITE_MISTRAL_API_KEY":"","VITE_MISTRAL_BASE_URL":"https://api.mistral.ai","VITE_SUPABASE_URL":"","VITE_SUPABASE_ANON_KEY":"","VITE_BACKEND_API_URL":"","VITE_SENTRY_DSN":"","VITE_ANALYTICS_ID":"","VITE_DEBUG_MODE":false,"VITE_ENABLE_AUTO_APPLY":"true","VITE_ENABLE_AI_FEATURES":"true","VITE_ENABLE_FILE_UPLOADS":"true","VITE_ENABLE_CLOUD_SYNC":"true","VITE_AI_RATE_LIMIT":"10","VITE_AUTO_APPLY_RATE_LIMIT":"20","VITE_USER_NODE_ENV":"development","BASE_URL":"/","MODE":"production","DEV":true,"PROD":false,"SSR":false} && "" || window.SUPABASE_CONFIG?.anonKey || window.SUPABASE_CONFIG?.ANON_KEY;
     if (url && anonKey)
       return { url, anonKey };
   } catch (e) {

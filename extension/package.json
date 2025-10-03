@@ -5,9 +5,18 @@
   "description": "Uswift - Auto-apply to jobs on multiple job boards",
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build",
+    "build": "npm run clean && tsc && vite build",
+    "build:prod": "npm run clean && NODE_ENV=production tsc && vite build",
     "preview": "vite preview",
-    "type-check": "tsc --noEmit"
+    "type-check": "tsc --noEmit",
+    "clean": "node -e \"const fs = require('fs'); if (fs.existsSync('dist')) fs.rmSync('dist', { recursive: true, force: true }); console.log('✅ Cleaned dist directory');\"",
+    "package": "npm run build:prod && node scripts/package.js",
+    "package:dev": "npm run build && node scripts/package.js",
+    "validate": "node scripts/validate.js",
+    "postbuild": "node scripts/postbuild.js",
+    "watch": "vite build --watch",
+    "lint": "tsc --noEmit && echo '✅ TypeScript check passed'",
+    "version:bump": "node scripts/bump-version.js"
   },
   "dependencies": {
     "react": "^18.2.0",
@@ -15,7 +24,7 @@
   },
   "devDependencies": {
     "@types/chrome": "^0.0.268",
-    "@types/node": "^20.0.0",
+    "@types/node": "^20.19.19",
     "@types/react": "^18.2.0",
     "@types/react-dom": "^18.2.0",
     "@vitejs/plugin-react": "^4.7.0",

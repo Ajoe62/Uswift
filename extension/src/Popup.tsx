@@ -655,28 +655,27 @@ export default function Popup() {
       {/* Header */}
       <div
         style={{
-          background:
-            "linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%)",
+          background: "#FFFFFF",
           borderRadius: "20px 20px 0 0",
           padding: "2rem 2rem 1.5rem",
           textAlign: "center",
-          color: "#FFFFFF",
+          color: "#1f2937",
           position: "relative",
           zIndex: 1,
+          boxShadow: "0 2px 8px rgba(0, 0, 0, 0.05)",
         }}
       >
         <div
           style={{
             width: "60px",
             height: "60px",
-            background: "rgba(255, 255, 255, 0.2)",
+            background: "linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%)",
             borderRadius: "16px",
             margin: "0 auto 1rem",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            backdropFilter: "blur(10px)",
-            border: "2px solid rgba(255, 255, 255, 0.3)",
+            border: "2px solid rgba(99, 102, 241, 0.2)",
           }}
         >
           <span style={{ fontSize: "1.8rem" }}>🚀</span>
@@ -686,11 +685,7 @@ export default function Popup() {
             fontSize: "1.8rem",
             fontWeight: 800,
             margin: "0 0 0.5rem 0",
-            background: "linear-gradient(45deg, #ffffff, #f0f9ff)",
-            WebkitBackgroundClip: "text",
-            WebkitTextFillColor: "transparent",
-            backgroundClip: "text",
-            textShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
+            color: "#1f2937",
           }}
         >
           USwift
@@ -699,7 +694,7 @@ export default function Popup() {
           style={{
             fontSize: "0.9rem",
             margin: 0,
-            opacity: 0.95,
+            color: "#6b7280",
             fontWeight: 500,
           }}
         >
@@ -711,16 +706,15 @@ export default function Popup() {
           style={{
             marginTop: "1rem",
             padding: "0.5rem 1rem",
-            background: "rgba(255, 255, 255, 0.15)",
+            background: "#f3f4f6",
             borderRadius: "12px",
-            backdropFilter: "blur(10px)",
-            border: "1px solid rgba(255, 255, 255, 0.2)",
+            border: "1px solid #e5e7eb",
           }}
         >
           <div
             style={{
               fontSize: "0.8rem",
-              opacity: 0.9,
+              color: "#374151",
               fontWeight: 600,
             }}
           >
