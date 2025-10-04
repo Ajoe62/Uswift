@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "./index.css";
 import { useAuth } from "./hooks/useAuth";
-
-// Declare globals for TypeScript
-declare const supabase: any;
+import { getSupabaseClient } from "./supabaseClient";
 
 export default function ProfileVault() {
   // Normalize thrown values so we never throw non-Error values (like Events)
@@ -74,30 +72,46 @@ export default function ProfileVault() {
   const loadFromSupabase = async () => {
     try {
       if (!user?.id) return;
-      
+
+      const supabase = getSupabaseClient();
+      if (!supabase) {
+        console.error('Supabase client not initialized');
+        return;
+      }
+
       // Load basic profile
-      const { data: profileData } = await supabase
-        .from('user_preferences')
+      const { data: profileData, error: profileError } = await supabase
+        .from('preferences')
         .select('*')
         .eq('user_id', user.id)
         .single();
-      
+
+      if (profileError && !profileError.message?.includes('0 rows')) {
+        console.error('Error loading profile from Supabase:', profileError);
+      }
+
       if (profileData) {
         setFirstName(profileData.first_name || '');
         setLastName(profileData.last_name || '');
-        setEmail(profileData.email || '');
+        setEmail(user.email || ''); // Get email from user object, not preferences
         setPhone(profileData.phone || '');
         setLinkedin(profileData.linkedin || '');
         setPortfolio(profileData.portfolio || '');
+        setCoverLetter(profileData.cover_letter || '');
+        setQaProfile(profileData.qa_profile || '');
       }
-      
+
       // Load resume
-      const { data: resumeData } = await supabase
+      const { data: resumeData, error: resumeError } = await supabase
         .from('resumes')
-        .select('content')
+        .select('*')
         .eq('user_id', user.id)
         .single();
-      
+
+      if (resumeError && !resumeError.message?.includes('0 rows')) {
+        console.error('Error loading resume from Supabase:', resumeError);
+      }
+
       if (resumeData) {
         setResume(resumeData.content || '');
       }
@@ -108,29 +122,49 @@ export default function ProfileVault() {
 
   const saveToSupabase = async () => {
     try {
-      if (!user?.id) return;
-      
-      // Save basic profile
-      await supabase
-        .from('user_preferences')
+      if (!user?.id) {
+        throw new Error('User not authenticated');
+      }
+
+      const supabase = getSupabaseClient();
+      if (!supabase) {
+        throw new Error('Supabase client not initialized. Please check your configuration.');
+      }
+
+      // Save basic profile (excluding email - it's in auth.users)
+      const { error: profileError } = await supabase
+        .from('preferences')
         .upsert({
           user_id: user.id,
           first_name: firstName,
           last_name: lastName,
-          email: email,
           phone: phone,
           linkedin: linkedin,
-          portfolio: portfolio
+          portfolio: portfolio,
+          cover_letter: coverLetter,
+          qa_profile: qaProfile,
+          updated_at: new Date().toISOString()
         }, { onConflict: 'user_id' });
-      
+
+      if (profileError) {
+        console.error('Error saving profile to Supabase:', profileError);
+        throw profileError;
+      }
+
       // Save resume
       if (resume) {
-        await supabase
+        const { error: resumeError } = await supabase
           .from('resumes')
           .upsert({
             user_id: user.id,
-            content: resume
+            content: resume,
+            updated_at: new Date().toISOString()
           }, { onConflict: 'user_id' });
+
+        if (resumeError) {
+          console.error('Error saving resume to Supabase:', resumeError);
+          throw resumeError;
+        }
       }
     } catch (error) {
       console.error('Error saving to Supabase:', error);

@@ -1,7 +1,6 @@
 class SupabaseClient {
-  config;
-  authToken = null;
   constructor(config) {
+    this.authToken = null;
     this.config = config;
   }
   async signIn(email, password) {
@@ -107,6 +106,10 @@ class SupabaseClient {
       if (!session || !session.access_token)
         return null;
       this.authToken = session.access_token;
+      if (session.expires_at && session.expires_at < Date.now() + 6e4) {
+        console.log("🔄 Token expiring soon, refreshing proactively...");
+        await this.tryRefresh();
+      }
     }
     try {
       const res = await fetch(`${this.config.url}/auth/v1/user`, {
@@ -125,10 +128,10 @@ class SupabaseClient {
         } catch (e) {
         }
         if (res.status === 401 || res.status === 403 || /expired|bad_jwt|invalid token/i.test(txt)) {
-          console.log("Token expired, attempting refresh...");
+          console.log("🔐 Token expired, attempting automatic refresh...");
           const refreshed = await this.tryRefresh();
           if (refreshed) {
-            console.log("Token refreshed successfully, retrying getUser...");
+            console.log("✅ Token refreshed, retrying user fetch...");
             const retry = await fetch(`${this.config.url}/auth/v1/user`, {
               method: "GET",
               headers: {
@@ -139,15 +142,17 @@ class SupabaseClient {
             });
             if (retry.ok) {
               const userData = await retry.json();
-              console.log("getUser succeeded after token refresh");
+              console.log("✅ User authenticated successfully");
               return userData;
             }
             const rtxt = await retry.text().catch(() => "");
-            console.warn("getUser retry failed", retry.status, rtxt);
+            console.log("⚠️ Authentication failed after refresh:", retry.status);
+            if (retry.status === 401 || retry.status === 403) {
+              await this.clearSession();
+            }
             return null;
           } else {
-            console.warn("Token refresh failed, user needs to re-login");
-            await this.clearSession();
+            console.log("ℹ️ Session expired - please sign in again");
             return null;
           }
         }
@@ -165,11 +170,11 @@ class SupabaseClient {
     const session = await this.loadSession();
     const refreshToken = session?.refresh_token;
     if (!refreshToken) {
-      console.log("No refresh token available");
+      console.log("No refresh token available - session may have expired");
       return false;
     }
     try {
-      console.log("Attempting token refresh...");
+      console.log("🔄 Refreshing authentication token...");
       const res = await fetch(
         `${this.config.url}/auth/v1/token?grant_type=refresh_token`,
         {
@@ -194,17 +199,16 @@ class SupabaseClient {
         } catch {
         }
         await this.saveSession(data);
-        console.log("Token refresh successful");
+        console.log("✅ Token refreshed successfully");
         return true;
       } else {
-        console.warn("Token refresh failed:", data);
+        console.log("⚠️ Token refresh unsuccessful:", data?.error || "Unknown error");
+        return false;
       }
     } catch (e) {
-      console.error("Token refresh error:", e);
+      console.log("⚠️ Token refresh network error:", e);
+      return false;
     }
-    await this.clearSession();
-    this.authToken = null;
-    return false;
   }
   async signOut() {
     if (!this.authToken)
@@ -325,10 +329,128 @@ class SupabaseClient {
         const txt = await res.text().catch(() => "");
         throw new Error(`Supabase error ${res.status}: ${txt}`);
       }
-      return await res.json();
+      const contentLength = res.headers.get("content-length");
+      if (contentLength === "0" || res.status === 204) {
+        return null;
+      }
+      const text = await res.text();
+      if (!text || text.trim() === "") {
+        return null;
+      }
+      return JSON.parse(text);
     } catch (err) {
       throw new Error(err?.message || String(err));
     }
+  }
+  // Query builder API for Supabase-style queries
+  from(tableName) {
+    return new QueryBuilder(this, tableName);
+  }
+}
+class QueryBuilder {
+  constructor(client, tableName) {
+    this.selectFields = "*";
+    this.filters = [];
+    this.singleResult = false;
+    this.client = client;
+    this.tableName = tableName;
+  }
+  select(fields = "*") {
+    this.selectFields = fields;
+    return this;
+  }
+  eq(column, value) {
+    this.filters.push(`${column}=eq.${encodeURIComponent(value)}`);
+    return this;
+  }
+  limit(count) {
+    this.limitValue = count;
+    return this;
+  }
+  single() {
+    this.singleResult = true;
+    return this;
+  }
+  async upsert(data, options = {}) {
+    const headers = {
+      Prefer: "resolution=merge-duplicates"
+    };
+    if (options.onConflict) {
+      headers["Prefer"] = `resolution=merge-duplicates,on_conflict=${options.onConflict}`;
+    }
+    try {
+      const result = await this.client.makeRequest(this.tableName, {
+        method: "POST",
+        headers,
+        body: JSON.stringify(data)
+      });
+      return { data: result, error: null };
+    } catch (error) {
+      return { data: null, error };
+    }
+  }
+  async insert(data) {
+    try {
+      const result = await this.client.makeRequest(this.tableName, {
+        method: "POST",
+        body: JSON.stringify(data)
+      });
+      return { data: result, error: null };
+    } catch (error) {
+      return { data: null, error };
+    }
+  }
+  async update(data) {
+    let endpoint = this.tableName;
+    if (this.filters.length > 0) {
+      endpoint += "?" + this.filters.join("&");
+    }
+    try {
+      const result = await this.client.makeRequest(endpoint, {
+        method: "PATCH",
+        body: JSON.stringify(data)
+      });
+      return { data: result, error: null };
+    } catch (error) {
+      return { data: null, error };
+    }
+  }
+  async delete() {
+    let endpoint = this.tableName;
+    if (this.filters.length > 0) {
+      endpoint += "?" + this.filters.join("&");
+    }
+    try {
+      const result = await this.client.makeRequest(endpoint, {
+        method: "DELETE"
+      });
+      return { data: result, error: null };
+    } catch (error) {
+      return { data: null, error };
+    }
+  }
+  async executeQuery() {
+    let endpoint = `${this.tableName}?select=${this.selectFields}`;
+    if (this.filters.length > 0) {
+      endpoint += "&" + this.filters.join("&");
+    }
+    if (this.limitValue) {
+      endpoint += `&limit=${this.limitValue}`;
+    }
+    const headers = {};
+    if (this.singleResult) {
+      headers["Accept"] = "application/vnd.pgrst.object+json";
+    }
+    try {
+      const result = await this.client.makeRequest(endpoint, { headers });
+      return { data: result, error: null };
+    } catch (error) {
+      return { data: null, error };
+    }
+  }
+  // Make QueryBuilder thenable so it can be awaited
+  then(onfulfilled, onrejected) {
+    return this.executeQuery().then(onfulfilled, onrejected);
   }
 }
 let singleton = null;

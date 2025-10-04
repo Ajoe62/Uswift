@@ -1,73 +1,8 @@
 import { getSupabaseClient } from './supabaseClient.js';
 
-true&&(function polyfill() {
-    const relList = document.createElement('link').relList;
-    if (relList && relList.supports && relList.supports('modulepreload')) {
-        return;
-    }
-    for (const link of document.querySelectorAll('link[rel="modulepreload"]')) {
-        processPreload(link);
-    }
-    new MutationObserver((mutations) => {
-        for (const mutation of mutations) {
-            if (mutation.type !== 'childList') {
-                continue;
-            }
-            for (const node of mutation.addedNodes) {
-                if (node.tagName === 'LINK' && node.rel === 'modulepreload')
-                    processPreload(node);
-            }
-        }
-    }).observe(document, { childList: true, subtree: true });
-    function getFetchOpts(link) {
-        const fetchOpts = {};
-        if (link.integrity)
-            fetchOpts.integrity = link.integrity;
-        if (link.referrerPolicy)
-            fetchOpts.referrerPolicy = link.referrerPolicy;
-        if (link.crossOrigin === 'use-credentials')
-            fetchOpts.credentials = 'include';
-        else if (link.crossOrigin === 'anonymous')
-            fetchOpts.credentials = 'omit';
-        else
-            fetchOpts.credentials = 'same-origin';
-        return fetchOpts;
-    }
-    function processPreload(link) {
-        if (link.ep)
-            // ep marker = processed
-            return;
-        link.ep = true;
-        // prepopulate the load record
-        const fetchOpts = getFetchOpts(link);
-        fetch(link.href, fetchOpts);
-    }
-}());
-
 function getDefaultExportFromCjs (x) {
 	return x && x.__esModule && Object.prototype.hasOwnProperty.call(x, 'default') ? x['default'] : x;
 }
-
-var jsxDevRuntime = {exports: {}};
-
-var reactJsxDevRuntime_production_min = {};
-
-/**
- * @license React
- * react-jsx-dev-runtime.production.min.js
- *
- * Copyright (c) Facebook, Inc. and its affiliates.
- *
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
- */
-var a=Symbol.for("react.fragment");reactJsxDevRuntime_production_min.Fragment=a;reactJsxDevRuntime_production_min.jsxDEV=void 0;
-
-{
-  jsxDevRuntime.exports = reactJsxDevRuntime_production_min;
-}
-
-var jsxDevRuntimeExports = jsxDevRuntime.exports;
 
 var react = {exports: {}};
 
@@ -679,16 +614,29 @@ function ProfileVault() {
     try {
       if (!user?.id)
         return;
-      const { data: profileData } = await supabase.from("user_preferences").select("*").eq("user_id", user.id).single();
+      const supabase = getSupabaseClient();
+      if (!supabase) {
+        console.error("Supabase client not initialized");
+        return;
+      }
+      const { data: profileData, error: profileError } = await supabase.from("preferences").select("*").eq("user_id", user.id).single();
+      if (profileError && !profileError.message?.includes("0 rows")) {
+        console.error("Error loading profile from Supabase:", profileError);
+      }
       if (profileData) {
         setFirstName(profileData.first_name || "");
         setLastName(profileData.last_name || "");
-        setEmail(profileData.email || "");
+        setEmail(user.email || "");
         setPhone(profileData.phone || "");
         setLinkedin(profileData.linkedin || "");
         setPortfolio(profileData.portfolio || "");
+        setCoverLetter(profileData.cover_letter || "");
+        setQaProfile(profileData.qa_profile || "");
       }
-      const { data: resumeData } = await supabase.from("resumes").select("content").eq("user_id", user.id).single();
+      const { data: resumeData, error: resumeError } = await supabase.from("resumes").select("*").eq("user_id", user.id).single();
+      if (resumeError && !resumeError.message?.includes("0 rows")) {
+        console.error("Error loading resume from Supabase:", resumeError);
+      }
       if (resumeData) {
         setResume(resumeData.content || "");
       }
@@ -698,22 +646,38 @@ function ProfileVault() {
   };
   const saveToSupabase = async () => {
     try {
-      if (!user?.id)
-        return;
-      await supabase.from("user_preferences").upsert({
+      if (!user?.id) {
+        throw new Error("User not authenticated");
+      }
+      const supabase = getSupabaseClient();
+      if (!supabase) {
+        throw new Error("Supabase client not initialized. Please check your configuration.");
+      }
+      const { error: profileError } = await supabase.from("preferences").upsert({
         user_id: user.id,
         first_name: firstName,
         last_name: lastName,
-        email,
         phone,
         linkedin,
-        portfolio
+        portfolio,
+        cover_letter: coverLetter,
+        qa_profile: qaProfile,
+        updated_at: (/* @__PURE__ */ new Date()).toISOString()
       }, { onConflict: "user_id" });
+      if (profileError) {
+        console.error("Error saving profile to Supabase:", profileError);
+        throw profileError;
+      }
       if (resume) {
-        await supabase.from("resumes").upsert({
+        const { error: resumeError } = await supabase.from("resumes").upsert({
           user_id: user.id,
-          content: resume
+          content: resume,
+          updated_at: (/* @__PURE__ */ new Date()).toISOString()
         }, { onConflict: "user_id" });
+        if (resumeError) {
+          console.error("Error saving resume to Supabase:", resumeError);
+          throw resumeError;
+        }
       }
     } catch (error) {
       console.error("Error saving to Supabase:", error);
@@ -782,821 +746,224 @@ function ProfileVault() {
     }
   }, [isAuthenticated, user]);
   const TourGuide = () => {
-    return /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: {
+    return /* @__PURE__ */ React.createElement("div", { style: {
       background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
       color: "white",
       padding: "1.5rem",
       borderRadius: "1rem",
       marginBottom: "1.5rem",
       position: "relative"
-    }, children: [
-      /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: {
-        position: "absolute",
-        top: "10px",
-        right: "10px",
-        cursor: "pointer",
-        fontSize: "1.2rem"
-      }, onClick: () => setShowTour(false), children: "✕" }, void 0, false, {
-        fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
-        lineNumber: 211,
-        columnNumber: 9
-      }, this),
-      /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("h3", { style: { margin: "0 0 1rem 0", fontSize: "1.2rem" }, children: "🚀 Auto-Apply Setup Guide" }, void 0, false, {
-        fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
-        lineNumber: 221,
-        columnNumber: 9
-      }, this),
-      /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { fontSize: "0.9rem", lineHeight: "1.5" }, children: [
-        /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { marginBottom: "1rem" }, children: [
-          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("strong", { children: "📋 Required Information:" }, void 0, false, {
-            fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
-            lineNumber: 227,
-            columnNumber: 13
-          }, this),
-          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("ul", { style: { margin: "0.5rem 0", paddingLeft: "1.2rem" }, children: [
-            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("li", { children: [
-              /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("strong", { children: "Basic Info:" }, void 0, false, {
-                fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
-                lineNumber: 229,
-                columnNumber: 19
-              }, this),
-              " First Name, Last Name, Email, Phone"
-            ] }, void 0, true, {
-              fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
-              lineNumber: 229,
-              columnNumber: 15
-            }, this),
-            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("li", { children: [
-              /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("strong", { children: "Resume:" }, void 0, false, {
-                fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
-                lineNumber: 230,
-                columnNumber: 19
-              }, this),
-              " Upload your resume file (PDF/DOC)"
-            ] }, void 0, true, {
-              fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
-              lineNumber: 230,
-              columnNumber: 15
-            }, this)
-          ] }, void 0, true, {
-            fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
-            lineNumber: 228,
-            columnNumber: 13
-          }, this)
-        ] }, void 0, true, {
-          fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
-          lineNumber: 226,
-          columnNumber: 11
-        }, this),
-        /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { marginBottom: "1rem" }, children: [
-          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("strong", { children: "📝 Optional but Recommended:" }, void 0, false, {
-            fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
-            lineNumber: 235,
-            columnNumber: 13
-          }, this),
-          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("ul", { style: { margin: "0.5rem 0", paddingLeft: "1.2rem" }, children: [
-            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("li", { children: [
-              /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("strong", { children: "Cover Letter:" }, void 0, false, {
-                fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
-                lineNumber: 237,
-                columnNumber: 19
-              }, this),
-              " Template or custom content"
-            ] }, void 0, true, {
-              fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
-              lineNumber: 237,
-              columnNumber: 15
-            }, this),
-            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("li", { children: [
-              /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("strong", { children: "LinkedIn:" }, void 0, false, {
-                fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
-                lineNumber: 238,
-                columnNumber: 19
-              }, this),
-              " Your LinkedIn profile URL"
-            ] }, void 0, true, {
-              fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
-              lineNumber: 238,
-              columnNumber: 15
-            }, this),
-            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("li", { children: [
-              /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("strong", { children: "Portfolio:" }, void 0, false, {
-                fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
-                lineNumber: 239,
-                columnNumber: 19
-              }, this),
-              " Website or portfolio link"
-            ] }, void 0, true, {
-              fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
-              lineNumber: 239,
-              columnNumber: 15
-            }, this),
-            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("li", { children: [
-              /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("strong", { children: "Q&A Profile:" }, void 0, false, {
-                fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
-                lineNumber: 240,
-                columnNumber: 19
-              }, this),
-              " Interview answers and skills"
-            ] }, void 0, true, {
-              fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
-              lineNumber: 240,
-              columnNumber: 15
-            }, this)
-          ] }, void 0, true, {
-            fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
-            lineNumber: 236,
-            columnNumber: 13
-          }, this)
-        ] }, void 0, true, {
-          fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
-          lineNumber: 234,
-          columnNumber: 11
-        }, this),
-        /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { marginBottom: "1rem" }, children: [
-          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("strong", { children: "🎯 How Auto-Apply Works:" }, void 0, false, {
-            fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
-            lineNumber: 245,
-            columnNumber: 13
-          }, this),
-          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("ol", { style: { margin: "0.5rem 0", paddingLeft: "1.2rem" }, children: [
-            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("li", { children: "Opens job application page" }, void 0, false, {
-              fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
-              lineNumber: 247,
-              columnNumber: 15
-            }, this),
-            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("li", { children: "Detects form fields automatically" }, void 0, false, {
-              fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
-              lineNumber: 248,
-              columnNumber: 15
-            }, this),
-            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("li", { children: "Fills your information" }, void 0, false, {
-              fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
-              lineNumber: 249,
-              columnNumber: 15
-            }, this),
-            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("li", { children: "Uploads your resume" }, void 0, false, {
-              fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
-              lineNumber: 250,
-              columnNumber: 15
-            }, this),
-            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("li", { children: "Submits the application" }, void 0, false, {
-              fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
-              lineNumber: 251,
-              columnNumber: 15
-            }, this)
-          ] }, void 0, true, {
-            fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
-            lineNumber: 246,
-            columnNumber: 13
-          }, this)
-        ] }, void 0, true, {
-          fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
-          lineNumber: 244,
-          columnNumber: 11
-        }, this),
-        /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { marginTop: "1rem", padding: "0.8rem", background: "rgba(255,255,255,0.1)", borderRadius: "8px" }, children: [
-          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("strong", { children: "💡 Pro Tip:" }, void 0, false, {
-            fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
-            lineNumber: 256,
-            columnNumber: 13
-          }, this),
-          " Complete all required fields to ensure successful auto-application on all major job boards!"
-        ] }, void 0, true, {
-          fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
-          lineNumber: 255,
-          columnNumber: 11
-        }, this)
-      ] }, void 0, true, {
-        fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
-        lineNumber: 225,
-        columnNumber: 9
-      }, this)
-    ] }, void 0, true, {
-      fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
-      lineNumber: 203,
-      columnNumber: 7
-    }, this);
+    } }, /* @__PURE__ */ React.createElement("div", { style: {
+      position: "absolute",
+      top: "10px",
+      right: "10px",
+      cursor: "pointer",
+      fontSize: "1.2rem"
+    }, onClick: () => setShowTour(false) }, "✕"), /* @__PURE__ */ React.createElement("h3", { style: { margin: "0 0 1rem 0", fontSize: "1.2rem" } }, "🚀 Auto-Apply Setup Guide"), /* @__PURE__ */ React.createElement("div", { style: { fontSize: "0.9rem", lineHeight: "1.5" } }, /* @__PURE__ */ React.createElement("div", { style: { marginBottom: "1rem" } }, /* @__PURE__ */ React.createElement("strong", null, "📋 Required Information:"), /* @__PURE__ */ React.createElement("ul", { style: { margin: "0.5rem 0", paddingLeft: "1.2rem" } }, /* @__PURE__ */ React.createElement("li", null, /* @__PURE__ */ React.createElement("strong", null, "Basic Info:"), " First Name, Last Name, Email, Phone"), /* @__PURE__ */ React.createElement("li", null, /* @__PURE__ */ React.createElement("strong", null, "Resume:"), " Upload your resume file (PDF/DOC)"))), /* @__PURE__ */ React.createElement("div", { style: { marginBottom: "1rem" } }, /* @__PURE__ */ React.createElement("strong", null, "📝 Optional but Recommended:"), /* @__PURE__ */ React.createElement("ul", { style: { margin: "0.5rem 0", paddingLeft: "1.2rem" } }, /* @__PURE__ */ React.createElement("li", null, /* @__PURE__ */ React.createElement("strong", null, "Cover Letter:"), " Template or custom content"), /* @__PURE__ */ React.createElement("li", null, /* @__PURE__ */ React.createElement("strong", null, "LinkedIn:"), " Your LinkedIn profile URL"), /* @__PURE__ */ React.createElement("li", null, /* @__PURE__ */ React.createElement("strong", null, "Portfolio:"), " Website or portfolio link"), /* @__PURE__ */ React.createElement("li", null, /* @__PURE__ */ React.createElement("strong", null, "Q&A Profile:"), " Interview answers and skills"))), /* @__PURE__ */ React.createElement("div", { style: { marginBottom: "1rem" } }, /* @__PURE__ */ React.createElement("strong", null, "🎯 How Auto-Apply Works:"), /* @__PURE__ */ React.createElement("ol", { style: { margin: "0.5rem 0", paddingLeft: "1.2rem" } }, /* @__PURE__ */ React.createElement("li", null, "Opens job application page"), /* @__PURE__ */ React.createElement("li", null, "Detects form fields automatically"), /* @__PURE__ */ React.createElement("li", null, "Fills your information"), /* @__PURE__ */ React.createElement("li", null, "Uploads your resume"), /* @__PURE__ */ React.createElement("li", null, "Submits the application"))), /* @__PURE__ */ React.createElement("div", { style: { marginTop: "1rem", padding: "0.8rem", background: "rgba(255,255,255,0.1)", borderRadius: "8px" } }, /* @__PURE__ */ React.createElement("strong", null, "💡 Pro Tip:"), " Complete all required fields to ensure successful auto-application on all major job boards!")));
   };
-  return /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { background: "#FFFFFF", borderRadius: "1.5rem", padding: "2rem" }, children: [
-    /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { className: "uswift-gradient", style: { height: 8, borderRadius: 8, marginBottom: 24 } }, void 0, false, {
-      fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
-      lineNumber: 265,
-      columnNumber: 7
-    }, this),
-    /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: {
-      display: "flex",
-      justifyContent: "space-between",
-      alignItems: "center",
-      marginBottom: 16
-    }, children: [
-      /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { children: [
-        /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("h2", { className: "uswift-text-gradient", style: { fontSize: "1.5rem", margin: 0 }, children: "Profile Vault" }, void 0, false, {
-          fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
-          lineNumber: 274,
-          columnNumber: 11
-        }, this),
-        /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("p", { style: { color: "#6B7280", fontSize: "0.9rem", margin: "4px 0 0 0" }, children: "Manage your career documents and auto-apply settings" }, void 0, false, {
-          fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
-          lineNumber: 277,
-          columnNumber: 11
-        }, this)
-      ] }, void 0, true, {
-        fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
-        lineNumber: 273,
-        columnNumber: 9
-      }, this),
-      /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { display: "flex", alignItems: "center", gap: "12px" }, children: [
-        lastSaved && /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("span", { style: { fontSize: "0.8rem", color: "#10B981" }, children: [
-          "✓ Saved ",
-          lastSaved
-        ] }, void 0, true, {
-          fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
-          lineNumber: 283,
-          columnNumber: 13
-        }, this),
-        /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-          "button",
-          {
-            onClick: () => setShowTour(!showTour),
-            style: {
-              background: "#F3F4F6",
-              border: "1px solid #E5E7EB",
-              borderRadius: "8px",
-              padding: "8px 12px",
-              fontSize: "0.8rem",
-              cursor: "pointer",
-              color: "#374151"
-            },
-            children: "❓ Guide"
-          },
-          void 0,
-          false,
-          {
-            fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
-            lineNumber: 287,
-            columnNumber: 11
-          },
-          this
-        )
-      ] }, void 0, true, {
-        fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
-        lineNumber: 281,
-        columnNumber: 9
-      }, this)
-    ] }, void 0, true, {
-      fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
-      lineNumber: 267,
-      columnNumber: 7
-    }, this),
-    showTour && /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(TourGuide, {}, void 0, false, {
-      fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
-      lineNumber: 304,
-      columnNumber: 20
-    }, this),
-    /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { marginBottom: "1.5rem" }, children: [
-      /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("h3", { style: { fontSize: "1.1rem", fontWeight: 600, color: "#111827", marginBottom: "1rem", display: "flex", alignItems: "center", gap: "8px" }, children: [
-        /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("span", { style: { color: "#EF4444" }, children: "●" }, void 0, false, {
-          fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
-          lineNumber: 309,
-          columnNumber: 11
-        }, this),
-        "Required for Auto-Apply"
-      ] }, void 0, true, {
-        fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
-        lineNumber: 308,
-        columnNumber: 9
-      }, this),
-      /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem", marginBottom: "1rem" }, children: [
-        /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { className: "uswift-card", children: [
-          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("label", { style: { fontWeight: 600, display: "block", marginBottom: 8 }, children: "First Name *" }, void 0, false, {
-            fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
-            lineNumber: 316,
-            columnNumber: 13
-          }, this),
-          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-            "input",
-            {
-              type: "text",
-              value: firstName,
-              onChange: (e) => setFirstName(e.target.value),
-              style: {
-                width: "100%",
-                padding: "8px 12px",
-                borderRadius: 8,
-                border: "1px solid #E5E7EB",
-                fontSize: "0.9rem"
-              },
-              placeholder: "Your first name",
-              disabled: loading
-            },
-            void 0,
-            false,
-            {
-              fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
-              lineNumber: 319,
-              columnNumber: 13
-            },
-            this
-          )
-        ] }, void 0, true, {
-          fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
-          lineNumber: 315,
-          columnNumber: 11
-        }, this),
-        /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { className: "uswift-card", children: [
-          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("label", { style: { fontWeight: 600, display: "block", marginBottom: 8 }, children: "Last Name *" }, void 0, false, {
-            fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
-            lineNumber: 336,
-            columnNumber: 13
-          }, this),
-          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-            "input",
-            {
-              type: "text",
-              value: lastName,
-              onChange: (e) => setLastName(e.target.value),
-              style: {
-                width: "100%",
-                padding: "8px 12px",
-                borderRadius: 8,
-                border: "1px solid #E5E7EB",
-                fontSize: "0.9rem"
-              },
-              placeholder: "Your last name",
-              disabled: loading
-            },
-            void 0,
-            false,
-            {
-              fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
-              lineNumber: 339,
-              columnNumber: 13
-            },
-            this
-          )
-        ] }, void 0, true, {
-          fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
-          lineNumber: 335,
-          columnNumber: 11
-        }, this)
-      ] }, void 0, true, {
-        fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
-        lineNumber: 314,
-        columnNumber: 9
-      }, this),
-      /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { display: "grid", gridTemplateColumns: "2fr 1fr", gap: "1rem", marginBottom: "1rem" }, children: [
-        /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { className: "uswift-card", children: [
-          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("label", { style: { fontWeight: 600, display: "block", marginBottom: 8 }, children: "Email Address *" }, void 0, false, {
-            fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
-            lineNumber: 358,
-            columnNumber: 13
-          }, this),
-          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-            "input",
-            {
-              type: "email",
-              value: email,
-              onChange: (e) => setEmail(e.target.value),
-              style: {
-                width: "100%",
-                padding: "8px 12px",
-                borderRadius: 8,
-                border: "1px solid #E5E7EB",
-                fontSize: "0.9rem"
-              },
-              placeholder: "your.email@example.com",
-              disabled: loading
-            },
-            void 0,
-            false,
-            {
-              fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
-              lineNumber: 361,
-              columnNumber: 13
-            },
-            this
-          )
-        ] }, void 0, true, {
-          fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
-          lineNumber: 357,
-          columnNumber: 11
-        }, this),
-        /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { className: "uswift-card", children: [
-          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("label", { style: { fontWeight: 600, display: "block", marginBottom: 8 }, children: "Phone Number *" }, void 0, false, {
-            fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
-            lineNumber: 378,
-            columnNumber: 13
-          }, this),
-          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-            "input",
-            {
-              type: "tel",
-              value: phone,
-              onChange: (e) => setPhone(e.target.value),
-              style: {
-                width: "100%",
-                padding: "8px 12px",
-                borderRadius: 8,
-                border: "1px solid #E5E7EB",
-                fontSize: "0.9rem"
-              },
-              placeholder: "+1 (555) 123-4567",
-              disabled: loading
-            },
-            void 0,
-            false,
-            {
-              fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
-              lineNumber: 381,
-              columnNumber: 13
-            },
-            this
-          )
-        ] }, void 0, true, {
-          fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
-          lineNumber: 377,
-          columnNumber: 11
-        }, this)
-      ] }, void 0, true, {
-        fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
-        lineNumber: 356,
-        columnNumber: 9
-      }, this),
-      /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { className: "uswift-card", children: [
-        /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("label", { style: { fontWeight: 600, display: "block", marginBottom: 8 }, children: "Resume File *" }, void 0, false, {
-          fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
-          lineNumber: 400,
-          columnNumber: 11
-        }, this),
-        /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { display: "flex", alignItems: "center", gap: "12px" }, children: [
-          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-            "input",
-            {
-              type: "file",
-              accept: ".pdf,.doc,.docx",
-              onChange: handleResumeFileUpload,
-              style: {
-                flex: 1,
-                padding: "8px",
-                borderRadius: 8,
-                border: "1px solid #E5E7EB",
-                fontSize: "0.9rem"
-              },
-              disabled: loading
-            },
-            void 0,
-            false,
-            {
-              fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
-              lineNumber: 404,
-              columnNumber: 13
-            },
-            this
-          ),
-          resumeFile && /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("span", { style: { color: "#10B981", fontSize: "0.8rem", fontWeight: 500 }, children: [
-            "✓ ",
-            resumeFile.name
-          ] }, void 0, true, {
-            fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
-            lineNumber: 418,
-            columnNumber: 15
-          }, this)
-        ] }, void 0, true, {
-          fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
-          lineNumber: 403,
-          columnNumber: 11
-        }, this),
-        /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("small", { style: { color: "#6B7280", fontSize: "0.8rem", marginTop: "4px", display: "block" }, children: "Supported formats: PDF, DOC, DOCX (Max 10MB)" }, void 0, false, {
-          fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
-          lineNumber: 423,
-          columnNumber: 11
-        }, this)
-      ] }, void 0, true, {
-        fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
-        lineNumber: 399,
-        columnNumber: 9
-      }, this)
-    ] }, void 0, true, {
-      fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
-      lineNumber: 307,
-      columnNumber: 7
-    }, this),
-    /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { marginBottom: "1.5rem" }, children: [
-      /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("h3", { style: { fontSize: "1.1rem", fontWeight: 600, color: "#111827", marginBottom: "1rem", display: "flex", alignItems: "center", gap: "8px" }, children: [
-        /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("span", { style: { color: "#F59E0B" }, children: "●" }, void 0, false, {
-          fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
-          lineNumber: 432,
-          columnNumber: 11
-        }, this),
-        "Optional (Recommended)"
-      ] }, void 0, true, {
-        fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
-        lineNumber: 431,
-        columnNumber: 9
-      }, this),
-      /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem", marginBottom: "1rem" }, children: [
-        /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { className: "uswift-card", children: [
-          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("label", { style: { fontWeight: 600, display: "block", marginBottom: 8 }, children: "LinkedIn Profile" }, void 0, false, {
-            fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
-            lineNumber: 438,
-            columnNumber: 13
-          }, this),
-          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-            "input",
-            {
-              type: "url",
-              value: linkedin,
-              onChange: (e) => setLinkedin(e.target.value),
-              style: {
-                width: "100%",
-                padding: "8px 12px",
-                borderRadius: 8,
-                border: "1px solid #E5E7EB",
-                fontSize: "0.9rem"
-              },
-              placeholder: "https://linkedin.com/in/yourprofile",
-              disabled: loading
-            },
-            void 0,
-            false,
-            {
-              fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
-              lineNumber: 441,
-              columnNumber: 13
-            },
-            this
-          )
-        ] }, void 0, true, {
-          fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
-          lineNumber: 437,
-          columnNumber: 11
-        }, this),
-        /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { className: "uswift-card", children: [
-          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("label", { style: { fontWeight: 600, display: "block", marginBottom: 8 }, children: "Portfolio/Website" }, void 0, false, {
-            fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
-            lineNumber: 458,
-            columnNumber: 13
-          }, this),
-          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-            "input",
-            {
-              type: "url",
-              value: portfolio,
-              onChange: (e) => setPortfolio(e.target.value),
-              style: {
-                width: "100%",
-                padding: "8px 12px",
-                borderRadius: 8,
-                border: "1px solid #E5E7EB",
-                fontSize: "0.9rem"
-              },
-              placeholder: "https://yourportfolio.com",
-              disabled: loading
-            },
-            void 0,
-            false,
-            {
-              fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
-              lineNumber: 461,
-              columnNumber: 13
-            },
-            this
-          )
-        ] }, void 0, true, {
-          fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
-          lineNumber: 457,
-          columnNumber: 11
-        }, this)
-      ] }, void 0, true, {
-        fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
-        lineNumber: 436,
-        columnNumber: 9
-      }, this),
-      /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { className: "uswift-card", children: [
-        /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("label", { style: { fontWeight: 600, display: "block", marginBottom: 8 }, children: "Cover Letter Template" }, void 0, false, {
-          fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
-          lineNumber: 479,
-          columnNumber: 11
-        }, this),
-        /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-          "textarea",
-          {
-            value: coverLetter,
-            onChange: (e) => setCoverLetter(e.target.value),
-            rows: 4,
-            style: {
-              width: "100%",
-              padding: "8px 12px",
-              borderRadius: 8,
-              border: "1px solid #E5E7EB",
-              fontSize: "0.9rem",
-              resize: "vertical"
-            },
-            placeholder: "Write your cover letter template here. Use [COMPANY] and [POSITION] as placeholders...",
-            disabled: loading
-          },
-          void 0,
-          false,
-          {
-            fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
-            lineNumber: 482,
-            columnNumber: 11
-          },
-          this
-        ),
-        /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("small", { style: { color: "#6B7280", fontSize: "0.8rem", marginTop: "4px", display: "block" }, children: "Tip: Use placeholders like [COMPANY] and [POSITION] for auto-customization" }, void 0, false, {
-          fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
-          lineNumber: 497,
-          columnNumber: 11
-        }, this)
-      ] }, void 0, true, {
-        fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
-        lineNumber: 478,
-        columnNumber: 9
-      }, this),
-      /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { className: "uswift-card", children: [
-        /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("label", { style: { fontWeight: 600, display: "block", marginBottom: 8 }, children: "Interview Q&A Profile" }, void 0, false, {
-          fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
-          lineNumber: 503,
-          columnNumber: 11
-        }, this),
-        /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-          "textarea",
-          {
-            value: qaProfile,
-            onChange: (e) => setQaProfile(e.target.value),
-            rows: 4,
-            style: {
-              width: "100%",
-              padding: "8px 12px",
-              borderRadius: 8,
-              border: "1px solid #E5E7EB",
-              fontSize: "0.9rem",
-              resize: "vertical"
-            },
-            placeholder: "List your key skills, experience highlights, and common interview answers...",
-            disabled: loading
-          },
-          void 0,
-          false,
-          {
-            fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
-            lineNumber: 506,
-            columnNumber: 11
-          },
-          this
-        ),
-        /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("small", { style: { color: "#6B7280", fontSize: "0.8rem", marginTop: "4px", display: "block" }, children: "Used by AI interview preparation features" }, void 0, false, {
-          fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
-          lineNumber: 521,
-          columnNumber: 11
-        }, this)
-      ] }, void 0, true, {
-        fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
-        lineNumber: 502,
-        columnNumber: 9
-      }, this)
-    ] }, void 0, true, {
-      fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
-      lineNumber: 430,
-      columnNumber: 7
-    }, this),
-    /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: {
-      marginTop: "1.5rem",
-      padding: "1rem",
-      borderRadius: "8px",
-      background: isProfileCompleteForAutoApply() ? "linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(16, 185, 129, 0.05) 100%)" : "linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(245, 158, 11, 0.05) 100%)",
-      border: `1px solid ${isProfileCompleteForAutoApply() ? "#10B981" : "#F59E0B"}`
-    }, children: [
-      /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { display: "flex", alignItems: "center", gap: "8px", marginBottom: "0.5rem" }, children: [
-        isProfileCompleteForAutoApply() ? /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("span", { style: { color: "#10B981", fontSize: "1.2rem" }, children: "✅" }, void 0, false, {
-          fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
-          lineNumber: 539,
-          columnNumber: 13
-        }, this) : /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("span", { style: { color: "#F59E0B", fontSize: "1.2rem" }, children: "⚠️" }, void 0, false, {
-          fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
-          lineNumber: 541,
-          columnNumber: 13
-        }, this),
-        /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("span", { style: { fontWeight: 600, color: "#111827" }, children: [
-          "Auto-Apply Status: ",
-          isProfileCompleteForAutoApply() ? "Ready" : "Incomplete"
-        ] }, void 0, true, {
-          fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
-          lineNumber: 543,
-          columnNumber: 11
-        }, this)
-      ] }, void 0, true, {
-        fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
-        lineNumber: 537,
-        columnNumber: 9
-      }, this),
-      isProfileCompleteForAutoApply() ? /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("p", { style: { color: "#10B981", fontSize: "0.9rem", margin: 0 }, children: "🎉 Your profile is complete! You can now use auto-apply on supported job boards." }, void 0, false, {
-        fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
-        lineNumber: 549,
-        columnNumber: 11
-      }, this) : /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { fontSize: "0.9rem", color: "#92400E" }, children: [
-        /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("p", { style: { margin: "0 0 0.5rem 0", fontWeight: 500 }, children: "Complete these fields to enable auto-apply:" }, void 0, false, {
-          fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
-          lineNumber: 554,
-          columnNumber: 13
-        }, this),
-        /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("ul", { style: { margin: 0, paddingLeft: "1.2rem" }, children: [
-          !firstName.trim() && /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("li", { children: "First Name" }, void 0, false, {
-            fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
-            lineNumber: 558,
-            columnNumber: 37
-          }, this),
-          !lastName.trim() && /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("li", { children: "Last Name" }, void 0, false, {
-            fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
-            lineNumber: 559,
-            columnNumber: 36
-          }, this),
-          !email.trim() && /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("li", { children: "Email Address" }, void 0, false, {
-            fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
-            lineNumber: 560,
-            columnNumber: 33
-          }, this),
-          !phone.trim() && /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("li", { children: "Phone Number" }, void 0, false, {
-            fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
-            lineNumber: 561,
-            columnNumber: 33
-          }, this),
-          !resume.trim() && /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("li", { children: "Resume File" }, void 0, false, {
-            fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
-            lineNumber: 562,
-            columnNumber: 34
-          }, this)
-        ] }, void 0, true, {
-          fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
-          lineNumber: 557,
-          columnNumber: 13
-        }, this)
-      ] }, void 0, true, {
-        fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
-        lineNumber: 553,
-        columnNumber: 11
-      }, this)
-    ] }, void 0, true, {
-      fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
-      lineNumber: 528,
-      columnNumber: 7
-    }, this),
-    /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-      "button",
-      {
-        className: "uswift-btn",
-        style: { marginTop: 16, opacity: loading ? 0.6 : 1 },
-        onClick: saveProfile,
-        disabled: loading,
-        children: loading ? "Saving..." : isAuthenticated ? "Save to Cloud" : "Save Locally"
+  return /* @__PURE__ */ React.createElement("div", { style: { background: "#FFFFFF", borderRadius: "1.5rem", padding: "2rem" } }, /* @__PURE__ */ React.createElement("div", { className: "uswift-gradient", style: { height: 8, borderRadius: 8, marginBottom: 24 } }), /* @__PURE__ */ React.createElement("div", { style: {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 16
+  } }, /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("h2", { className: "uswift-text-gradient", style: { fontSize: "1.5rem", margin: 0 } }, "Profile Vault"), /* @__PURE__ */ React.createElement("p", { style: { color: "#6B7280", fontSize: "0.9rem", margin: "4px 0 0 0" } }, "Manage your career documents and auto-apply settings")), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", gap: "12px" } }, lastSaved && /* @__PURE__ */ React.createElement("span", { style: { fontSize: "0.8rem", color: "#10B981" } }, "✓ Saved ", lastSaved), /* @__PURE__ */ React.createElement(
+    "button",
+    {
+      onClick: () => setShowTour(!showTour),
+      style: {
+        background: "#F3F4F6",
+        border: "1px solid #E5E7EB",
+        borderRadius: "8px",
+        padding: "8px 12px",
+        fontSize: "0.8rem",
+        cursor: "pointer",
+        color: "#374151"
+      }
+    },
+    "❓ Guide"
+  ))), showTour && /* @__PURE__ */ React.createElement(TourGuide, null), /* @__PURE__ */ React.createElement("div", { style: { marginBottom: "1.5rem" } }, /* @__PURE__ */ React.createElement("h3", { style: { fontSize: "1.1rem", fontWeight: 600, color: "#111827", marginBottom: "1rem", display: "flex", alignItems: "center", gap: "8px" } }, /* @__PURE__ */ React.createElement("span", { style: { color: "#EF4444" } }, "●"), "Required for Auto-Apply"), /* @__PURE__ */ React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem", marginBottom: "1rem" } }, /* @__PURE__ */ React.createElement("div", { className: "uswift-card" }, /* @__PURE__ */ React.createElement("label", { style: { fontWeight: 600, display: "block", marginBottom: 8 } }, "First Name *"), /* @__PURE__ */ React.createElement(
+    "input",
+    {
+      type: "text",
+      value: firstName,
+      onChange: (e) => setFirstName(e.target.value),
+      style: {
+        width: "100%",
+        padding: "8px 12px",
+        borderRadius: 8,
+        border: "1px solid #E5E7EB",
+        fontSize: "0.9rem"
       },
-      void 0,
-      false,
-      {
-        fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
-        lineNumber: 568,
-        columnNumber: 7
+      placeholder: "Your first name",
+      disabled: loading
+    }
+  )), /* @__PURE__ */ React.createElement("div", { className: "uswift-card" }, /* @__PURE__ */ React.createElement("label", { style: { fontWeight: 600, display: "block", marginBottom: 8 } }, "Last Name *"), /* @__PURE__ */ React.createElement(
+    "input",
+    {
+      type: "text",
+      value: lastName,
+      onChange: (e) => setLastName(e.target.value),
+      style: {
+        width: "100%",
+        padding: "8px 12px",
+        borderRadius: 8,
+        border: "1px solid #E5E7EB",
+        fontSize: "0.9rem"
       },
-      this
-    ),
-    isProfileCompleteForAutoApply() && /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-      "button",
-      {
-        onClick: () => {
-          const profile = createProfileForAutoApply();
-          console.log("📋 Profile for Auto-Apply:", profile);
-          navigator.clipboard.writeText(JSON.stringify(profile, null, 2));
-          alert("Profile copied to clipboard for debugging!");
-        },
-        style: {
-          marginTop: "8px",
-          marginLeft: "8px",
-          padding: "8px 16px",
-          background: "#F3F4F6",
-          color: "#6B7280",
-          border: "none",
-          borderRadius: "6px",
-          fontSize: "0.8rem",
-          cursor: "pointer"
-        },
-        children: "📋 Export Profile"
+      placeholder: "Your last name",
+      disabled: loading
+    }
+  ))), /* @__PURE__ */ React.createElement("div", { style: { display: "grid", gridTemplateColumns: "2fr 1fr", gap: "1rem", marginBottom: "1rem" } }, /* @__PURE__ */ React.createElement("div", { className: "uswift-card" }, /* @__PURE__ */ React.createElement("label", { style: { fontWeight: 600, display: "block", marginBottom: 8 } }, "Email Address *"), /* @__PURE__ */ React.createElement(
+    "input",
+    {
+      type: "email",
+      value: email,
+      onChange: (e) => setEmail(e.target.value),
+      style: {
+        width: "100%",
+        padding: "8px 12px",
+        borderRadius: 8,
+        border: "1px solid #E5E7EB",
+        fontSize: "0.9rem"
       },
-      void 0,
-      false,
-      {
-        fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
-        lineNumber: 582,
-        columnNumber: 9
+      placeholder: "your.email@example.com",
+      disabled: loading
+    }
+  )), /* @__PURE__ */ React.createElement("div", { className: "uswift-card" }, /* @__PURE__ */ React.createElement("label", { style: { fontWeight: 600, display: "block", marginBottom: 8 } }, "Phone Number *"), /* @__PURE__ */ React.createElement(
+    "input",
+    {
+      type: "tel",
+      value: phone,
+      onChange: (e) => setPhone(e.target.value),
+      style: {
+        width: "100%",
+        padding: "8px 12px",
+        borderRadius: 8,
+        border: "1px solid #E5E7EB",
+        fontSize: "0.9rem"
       },
-      this
-    )
-  ] }, void 0, true, {
-    fileName: "C:/Users/DELL/Uswift/extension/src/ProfileVault.tsx",
-    lineNumber: 264,
-    columnNumber: 5
-  }, this);
+      placeholder: "+1 (555) 123-4567",
+      disabled: loading
+    }
+  ))), /* @__PURE__ */ React.createElement("div", { className: "uswift-card" }, /* @__PURE__ */ React.createElement("label", { style: { fontWeight: 600, display: "block", marginBottom: 8 } }, "Resume File *"), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", gap: "12px" } }, /* @__PURE__ */ React.createElement(
+    "input",
+    {
+      type: "file",
+      accept: ".pdf,.doc,.docx",
+      onChange: handleResumeFileUpload,
+      style: {
+        flex: 1,
+        padding: "8px",
+        borderRadius: 8,
+        border: "1px solid #E5E7EB",
+        fontSize: "0.9rem"
+      },
+      disabled: loading
+    }
+  ), resumeFile && /* @__PURE__ */ React.createElement("span", { style: { color: "#10B981", fontSize: "0.8rem", fontWeight: 500 } }, "✓ ", resumeFile.name)), /* @__PURE__ */ React.createElement("small", { style: { color: "#6B7280", fontSize: "0.8rem", marginTop: "4px", display: "block" } }, "Supported formats: PDF, DOC, DOCX (Max 10MB)"))), /* @__PURE__ */ React.createElement("div", { style: { marginBottom: "1.5rem" } }, /* @__PURE__ */ React.createElement("h3", { style: { fontSize: "1.1rem", fontWeight: 600, color: "#111827", marginBottom: "1rem", display: "flex", alignItems: "center", gap: "8px" } }, /* @__PURE__ */ React.createElement("span", { style: { color: "#F59E0B" } }, "●"), "Optional (Recommended)"), /* @__PURE__ */ React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem", marginBottom: "1rem" } }, /* @__PURE__ */ React.createElement("div", { className: "uswift-card" }, /* @__PURE__ */ React.createElement("label", { style: { fontWeight: 600, display: "block", marginBottom: 8 } }, "LinkedIn Profile"), /* @__PURE__ */ React.createElement(
+    "input",
+    {
+      type: "url",
+      value: linkedin,
+      onChange: (e) => setLinkedin(e.target.value),
+      style: {
+        width: "100%",
+        padding: "8px 12px",
+        borderRadius: 8,
+        border: "1px solid #E5E7EB",
+        fontSize: "0.9rem"
+      },
+      placeholder: "https://linkedin.com/in/yourprofile",
+      disabled: loading
+    }
+  )), /* @__PURE__ */ React.createElement("div", { className: "uswift-card" }, /* @__PURE__ */ React.createElement("label", { style: { fontWeight: 600, display: "block", marginBottom: 8 } }, "Portfolio/Website"), /* @__PURE__ */ React.createElement(
+    "input",
+    {
+      type: "url",
+      value: portfolio,
+      onChange: (e) => setPortfolio(e.target.value),
+      style: {
+        width: "100%",
+        padding: "8px 12px",
+        borderRadius: 8,
+        border: "1px solid #E5E7EB",
+        fontSize: "0.9rem"
+      },
+      placeholder: "https://yourportfolio.com",
+      disabled: loading
+    }
+  ))), /* @__PURE__ */ React.createElement("div", { className: "uswift-card" }, /* @__PURE__ */ React.createElement("label", { style: { fontWeight: 600, display: "block", marginBottom: 8 } }, "Cover Letter Template"), /* @__PURE__ */ React.createElement(
+    "textarea",
+    {
+      value: coverLetter,
+      onChange: (e) => setCoverLetter(e.target.value),
+      rows: 4,
+      style: {
+        width: "100%",
+        padding: "8px 12px",
+        borderRadius: 8,
+        border: "1px solid #E5E7EB",
+        fontSize: "0.9rem",
+        resize: "vertical"
+      },
+      placeholder: "Write your cover letter template here. Use [COMPANY] and [POSITION] as placeholders...",
+      disabled: loading
+    }
+  ), /* @__PURE__ */ React.createElement("small", { style: { color: "#6B7280", fontSize: "0.8rem", marginTop: "4px", display: "block" } }, "Tip: Use placeholders like [COMPANY] and [POSITION] for auto-customization")), /* @__PURE__ */ React.createElement("div", { className: "uswift-card" }, /* @__PURE__ */ React.createElement("label", { style: { fontWeight: 600, display: "block", marginBottom: 8 } }, "Interview Q&A Profile"), /* @__PURE__ */ React.createElement(
+    "textarea",
+    {
+      value: qaProfile,
+      onChange: (e) => setQaProfile(e.target.value),
+      rows: 4,
+      style: {
+        width: "100%",
+        padding: "8px 12px",
+        borderRadius: 8,
+        border: "1px solid #E5E7EB",
+        fontSize: "0.9rem",
+        resize: "vertical"
+      },
+      placeholder: "List your key skills, experience highlights, and common interview answers...",
+      disabled: loading
+    }
+  ), /* @__PURE__ */ React.createElement("small", { style: { color: "#6B7280", fontSize: "0.8rem", marginTop: "4px", display: "block" } }, "Used by AI interview preparation features"))), /* @__PURE__ */ React.createElement("div", { style: {
+    marginTop: "1.5rem",
+    padding: "1rem",
+    borderRadius: "8px",
+    background: isProfileCompleteForAutoApply() ? "linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(16, 185, 129, 0.05) 100%)" : "linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(245, 158, 11, 0.05) 100%)",
+    border: `1px solid ${isProfileCompleteForAutoApply() ? "#10B981" : "#F59E0B"}`
+  } }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", gap: "8px", marginBottom: "0.5rem" } }, isProfileCompleteForAutoApply() ? /* @__PURE__ */ React.createElement("span", { style: { color: "#10B981", fontSize: "1.2rem" } }, "✅") : /* @__PURE__ */ React.createElement("span", { style: { color: "#F59E0B", fontSize: "1.2rem" } }, "⚠️"), /* @__PURE__ */ React.createElement("span", { style: { fontWeight: 600, color: "#111827" } }, "Auto-Apply Status: ", isProfileCompleteForAutoApply() ? "Ready" : "Incomplete")), isProfileCompleteForAutoApply() ? /* @__PURE__ */ React.createElement("p", { style: { color: "#10B981", fontSize: "0.9rem", margin: 0 } }, "🎉 Your profile is complete! You can now use auto-apply on supported job boards.") : /* @__PURE__ */ React.createElement("div", { style: { fontSize: "0.9rem", color: "#92400E" } }, /* @__PURE__ */ React.createElement("p", { style: { margin: "0 0 0.5rem 0", fontWeight: 500 } }, "Complete these fields to enable auto-apply:"), /* @__PURE__ */ React.createElement("ul", { style: { margin: 0, paddingLeft: "1.2rem" } }, !firstName.trim() && /* @__PURE__ */ React.createElement("li", null, "First Name"), !lastName.trim() && /* @__PURE__ */ React.createElement("li", null, "Last Name"), !email.trim() && /* @__PURE__ */ React.createElement("li", null, "Email Address"), !phone.trim() && /* @__PURE__ */ React.createElement("li", null, "Phone Number"), !resume.trim() && /* @__PURE__ */ React.createElement("li", null, "Resume File")))), /* @__PURE__ */ React.createElement(
+    "button",
+    {
+      className: "uswift-btn",
+      style: { marginTop: 16, opacity: loading ? 0.6 : 1 },
+      onClick: saveProfile,
+      disabled: loading
+    },
+    loading ? "Saving..." : isAuthenticated ? "Save to Cloud" : "Save Locally"
+  ), isProfileCompleteForAutoApply() && /* @__PURE__ */ React.createElement(
+    "button",
+    {
+      onClick: () => {
+        const profile = createProfileForAutoApply();
+        console.log("📋 Profile for Auto-Apply:", profile);
+        navigator.clipboard.writeText(JSON.stringify(profile, null, 2));
+        alert("Profile copied to clipboard for debugging!");
+      },
+      style: {
+        marginTop: "8px",
+        marginLeft: "8px",
+        padding: "8px 16px",
+        background: "#F3F4F6",
+        color: "#6B7280",
+        border: "none",
+        borderRadius: "6px",
+        fontSize: "0.8rem",
+        cursor: "pointer"
+      }
+    },
+    "📋 Export Profile"
+  ));
 }
 
 const JobTracker = () => {
@@ -1705,23 +1072,33 @@ const JobTracker = () => {
         status: application.status,
         applied_at: application.dateApplied,
         job_url: application.jobUrl,
+        job_board: "manual",
         notes: application.notes,
-        tags: application.tags,
+        tags: application.tags || [],
         updated_at: (/* @__PURE__ */ new Date()).toISOString()
       };
       if (client) {
         if (application.id) {
           await client.makeRequest(`applications?id=eq.${application.id}`, {
             method: "PATCH",
-            body: JSON.stringify(appData)
+            body: JSON.stringify(appData),
+            headers: {
+              "Prefer": "return=representation"
+            }
           });
-          return true;
+          return application.id;
         } else {
           const inserted = await client.makeRequest("applications", {
             method: "POST",
-            body: JSON.stringify([appData])
+            body: JSON.stringify([appData]),
+            headers: {
+              "Prefer": "return=representation"
+            }
           });
-          return inserted?.[0]?.id || true;
+          if (inserted && Array.isArray(inserted) && inserted.length > 0 && inserted[0].id) {
+            return inserted[0].id;
+          }
+          throw new Error("Failed to get ID from inserted application");
         }
       }
       if (typeof window.supabase !== "undefined") {
@@ -1754,33 +1131,51 @@ const JobTracker = () => {
       return;
     }
     setLoading(true);
-    if (isAuthenticated && user) {
-      const id = await saveToSupabase(newApplication);
-      if (id) {
-        const appWithId = {
-          ...newApplication,
-          id: typeof id === "string" ? id : String(id)
-        };
+    try {
+      if (isAuthenticated && user) {
+        const id = await saveToSupabase(newApplication);
+        if (id && typeof id === "string") {
+          const appWithId = {
+            ...newApplication,
+            id
+          };
+          const updatedApps = [appWithId, ...applications];
+          setApplications(updatedApps);
+          setNewApplication({
+            company: "",
+            position: "",
+            status: "applied",
+            dateApplied: (/* @__PURE__ */ new Date()).toISOString().split("T")[0],
+            jobUrl: "",
+            notes: "",
+            tags: []
+          });
+          setShowAddForm(false);
+        } else {
+          alert("Failed to save application. Please try again.");
+        }
+      } else {
+        const appWithId = { ...newApplication, id: Date.now().toString() };
         const updatedApps = [appWithId, ...applications];
         setApplications(updatedApps);
+        saveToChrome(updatedApps);
+        setNewApplication({
+          company: "",
+          position: "",
+          status: "applied",
+          dateApplied: (/* @__PURE__ */ new Date()).toISOString().split("T")[0],
+          jobUrl: "",
+          notes: "",
+          tags: []
+        });
+        setShowAddForm(false);
       }
-    } else {
-      const appWithId = { ...newApplication, id: Date.now().toString() };
-      const updatedApps = [appWithId, ...applications];
-      setApplications(updatedApps);
-      saveToChrome(updatedApps);
+    } catch (error) {
+      console.error("Error adding application:", error);
+      alert("Failed to add application. Please check the console for details.");
+    } finally {
+      setLoading(false);
     }
-    setNewApplication({
-      company: "",
-      position: "",
-      status: "applied",
-      dateApplied: (/* @__PURE__ */ new Date()).toISOString().split("T")[0],
-      jobUrl: "",
-      notes: "",
-      tags: []
-    });
-    setShowAddForm(false);
-    setLoading(false);
   };
   const updateStatus = async (id, status) => {
     const updatedApps = applications.map(
@@ -1868,7 +1263,7 @@ const JobTracker = () => {
     a.click();
     URL.revokeObjectURL(url);
   };
-  return /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
+  return /* @__PURE__ */ React.createElement(
     "div",
     {
       style: {
@@ -1877,949 +1272,476 @@ const JobTracker = () => {
         padding: "2rem",
         maxWidth: "100%",
         overflow: "hidden"
+      }
+    },
+    /* @__PURE__ */ React.createElement(
+      "div",
+      {
+        className: "uswift-gradient",
+        style: { height: 8, borderRadius: 8, marginBottom: 24 }
+      }
+    ),
+    /* @__PURE__ */ React.createElement(
+      "div",
+      {
+        style: {
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          marginBottom: 16
+        }
       },
-      children: [
-        /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
+      /* @__PURE__ */ React.createElement("h2", { style: { fontSize: "1.4rem", fontWeight: 700, color: "#111827" } }, "Job Tracker"),
+      isAuthenticated && /* @__PURE__ */ React.createElement(
+        "span",
+        {
+          style: { color: "#10B981", fontSize: "0.8rem", fontWeight: 600 }
+        },
+        "☁️ Cloud Sync"
+      )
+    ),
+    /* @__PURE__ */ React.createElement(
+      "div",
+      {
+        style: {
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit, minmax(120px, 1fr))",
+          gap: 12,
+          marginBottom: 20
+        }
+      },
+      /* @__PURE__ */ React.createElement(
+        "div",
+        {
+          style: {
+            background: "#F3F4F6",
+            padding: 12,
+            borderRadius: 8,
+            textAlign: "center"
+          }
+        },
+        /* @__PURE__ */ React.createElement(
           "div",
           {
-            className: "uswift-gradient",
-            style: { height: 8, borderRadius: 8, marginBottom: 24 }
+            style: { fontSize: "1.5rem", fontWeight: 700, color: "#3B82F6" }
           },
-          void 0,
-          false,
-          {
-            fileName: "C:/Users/DELL/Uswift/extension/src/JobTracker.tsx",
-            lineNumber: 350,
-            columnNumber: 7
-          },
-          globalThis
+          getStatusCount("applied")
         ),
-        /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
+        /* @__PURE__ */ React.createElement("div", { style: { fontSize: "0.8rem", color: "#6B7280" } }, "Applied")
+      ),
+      /* @__PURE__ */ React.createElement(
+        "div",
+        {
+          style: {
+            background: "#F3F4F6",
+            padding: 12,
+            borderRadius: 8,
+            textAlign: "center"
+          }
+        },
+        /* @__PURE__ */ React.createElement(
           "div",
           {
+            style: { fontSize: "1.5rem", fontWeight: 700, color: "#F59E0B" }
+          },
+          getStatusCount("interviewing")
+        ),
+        /* @__PURE__ */ React.createElement("div", { style: { fontSize: "0.8rem", color: "#6B7280" } }, "Interviewing")
+      ),
+      /* @__PURE__ */ React.createElement(
+        "div",
+        {
+          style: {
+            background: "#F3F4F6",
+            padding: 12,
+            borderRadius: 8,
+            textAlign: "center"
+          }
+        },
+        /* @__PURE__ */ React.createElement(
+          "div",
+          {
+            style: { fontSize: "1.5rem", fontWeight: 700, color: "#10B981" }
+          },
+          getStatusCount("offer")
+        ),
+        /* @__PURE__ */ React.createElement("div", { style: { fontSize: "0.8rem", color: "#6B7280" } }, "Offers")
+      ),
+      /* @__PURE__ */ React.createElement(
+        "div",
+        {
+          style: {
+            background: "#F3F4F6",
+            padding: 12,
+            borderRadius: 8,
+            textAlign: "center"
+          }
+        },
+        /* @__PURE__ */ React.createElement(
+          "div",
+          {
+            style: { fontSize: "1.5rem", fontWeight: 700, color: "#EF4444" }
+          },
+          getStatusCount("rejected")
+        ),
+        /* @__PURE__ */ React.createElement("div", { style: { fontSize: "0.8rem", color: "#6B7280" } }, "Rejected")
+      )
+    ),
+    /* @__PURE__ */ React.createElement(
+      "div",
+      {
+        style: { display: "flex", gap: 8, marginBottom: 16, flexWrap: "wrap" }
+      },
+      /* @__PURE__ */ React.createElement(
+        "input",
+        {
+          type: "text",
+          placeholder: "Search companies or positions...",
+          value: searchTerm,
+          onChange: (e) => setSearchTerm(e.target.value),
+          style: {
+            flex: 1,
+            minWidth: 200,
+            padding: 8,
+            borderRadius: 6,
+            border: "1px solid #E5E7EB",
+            fontSize: "0.9rem"
+          }
+        }
+      ),
+      /* @__PURE__ */ React.createElement(
+        "select",
+        {
+          value: statusFilter,
+          onChange: (e) => setStatusFilter(e.target.value),
+          style: {
+            padding: 8,
+            borderRadius: 6,
+            border: "1px solid #E5E7EB",
+            fontSize: "0.9rem"
+          }
+        },
+        /* @__PURE__ */ React.createElement("option", { value: "all" }, "All Status"),
+        /* @__PURE__ */ React.createElement("option", { value: "applied" }, "Applied"),
+        /* @__PURE__ */ React.createElement("option", { value: "interviewing" }, "Interviewing"),
+        /* @__PURE__ */ React.createElement("option", { value: "offer" }, "Offer"),
+        /* @__PURE__ */ React.createElement("option", { value: "rejected" }, "Rejected"),
+        /* @__PURE__ */ React.createElement("option", { value: "archived" }, "Archived")
+      ),
+      /* @__PURE__ */ React.createElement(
+        "select",
+        {
+          value: sortBy,
+          onChange: (e) => setSortBy(e.target.value),
+          style: {
+            padding: 8,
+            borderRadius: 6,
+            border: "1px solid #E5E7EB",
+            fontSize: "0.9rem"
+          }
+        },
+        /* @__PURE__ */ React.createElement("option", { value: "date" }, "Sort by Date"),
+        /* @__PURE__ */ React.createElement("option", { value: "company" }, "Sort by Company"),
+        /* @__PURE__ */ React.createElement("option", { value: "status" }, "Sort by Status")
+      ),
+      /* @__PURE__ */ React.createElement(
+        "button",
+        {
+          className: "uswift-btn",
+          style: { fontSize: "0.9rem", padding: "8px 12px" },
+          onClick: () => setShowAddForm(true)
+        },
+        "+ Add Job"
+      ),
+      /* @__PURE__ */ React.createElement(
+        "button",
+        {
+          onClick: exportToCSV,
+          style: {
+            background: "#EDE9FE",
+            color: "#6D28D9",
+            border: "none",
+            borderRadius: 6,
+            padding: "8px 12px",
+            cursor: "pointer",
+            fontSize: "0.9rem"
+          }
+        },
+        "Export CSV"
+      )
+    ),
+    showAddForm && /* @__PURE__ */ React.createElement(
+      "div",
+      {
+        style: {
+          background: "#F9FAFB",
+          padding: 16,
+          borderRadius: 8,
+          marginBottom: 16
+        }
+      },
+      /* @__PURE__ */ React.createElement("h3", { style: { marginBottom: 12, fontSize: "1rem", fontWeight: 600 } }, "Add New Application"),
+      /* @__PURE__ */ React.createElement(
+        "div",
+        {
+          style: {
+            display: "grid",
+            gridTemplateColumns: "1fr 1fr",
+            gap: 12,
+            marginBottom: 12
+          }
+        },
+        /* @__PURE__ */ React.createElement(
+          "input",
+          {
+            type: "text",
+            placeholder: "Company",
+            value: newApplication.company,
+            onChange: (e) => setNewApplication({
+              ...newApplication,
+              company: e.target.value
+            }),
             style: {
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              marginBottom: 16
-            },
-            children: [
-              /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("h2", { style: { fontSize: "1.4rem", fontWeight: 700, color: "#111827" }, children: "Job Tracker" }, void 0, false, {
-                fileName: "C:/Users/DELL/Uswift/extension/src/JobTracker.tsx",
-                lineNumber: 362,
-                columnNumber: 9
-              }, globalThis),
-              isAuthenticated && /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                "span",
-                {
-                  style: { color: "#10B981", fontSize: "0.8rem", fontWeight: 600 },
-                  children: "☁️ Cloud Sync"
-                },
-                void 0,
-                false,
-                {
-                  fileName: "C:/Users/DELL/Uswift/extension/src/JobTracker.tsx",
-                  lineNumber: 366,
-                  columnNumber: 11
-                },
-                globalThis
-              )
-            ]
-          },
-          void 0,
-          true,
-          {
-            fileName: "C:/Users/DELL/Uswift/extension/src/JobTracker.tsx",
-            lineNumber: 354,
-            columnNumber: 7
-          },
-          globalThis
-        ),
-        /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-          "div",
-          {
-            style: {
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fit, minmax(120px, 1fr))",
-              gap: 12,
-              marginBottom: 20
-            },
-            children: [
-              /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                "div",
-                {
-                  style: {
-                    background: "#F3F4F6",
-                    padding: 12,
-                    borderRadius: 8,
-                    textAlign: "center"
-                  },
-                  children: [
-                    /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                      "div",
-                      {
-                        style: { fontSize: "1.5rem", fontWeight: 700, color: "#3B82F6" },
-                        children: getStatusCount("applied")
-                      },
-                      void 0,
-                      false,
-                      {
-                        fileName: "C:/Users/DELL/Uswift/extension/src/JobTracker.tsx",
-                        lineNumber: 390,
-                        columnNumber: 11
-                      },
-                      globalThis
-                    ),
-                    /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { fontSize: "0.8rem", color: "#6B7280" }, children: "Applied" }, void 0, false, {
-                      fileName: "C:/Users/DELL/Uswift/extension/src/JobTracker.tsx",
-                      lineNumber: 395,
-                      columnNumber: 11
-                    }, globalThis)
-                  ]
-                },
-                void 0,
-                true,
-                {
-                  fileName: "C:/Users/DELL/Uswift/extension/src/JobTracker.tsx",
-                  lineNumber: 382,
-                  columnNumber: 9
-                },
-                globalThis
-              ),
-              /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                "div",
-                {
-                  style: {
-                    background: "#F3F4F6",
-                    padding: 12,
-                    borderRadius: 8,
-                    textAlign: "center"
-                  },
-                  children: [
-                    /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                      "div",
-                      {
-                        style: { fontSize: "1.5rem", fontWeight: 700, color: "#F59E0B" },
-                        children: getStatusCount("interviewing")
-                      },
-                      void 0,
-                      false,
-                      {
-                        fileName: "C:/Users/DELL/Uswift/extension/src/JobTracker.tsx",
-                        lineNumber: 405,
-                        columnNumber: 11
-                      },
-                      globalThis
-                    ),
-                    /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { fontSize: "0.8rem", color: "#6B7280" }, children: "Interviewing" }, void 0, false, {
-                      fileName: "C:/Users/DELL/Uswift/extension/src/JobTracker.tsx",
-                      lineNumber: 410,
-                      columnNumber: 11
-                    }, globalThis)
-                  ]
-                },
-                void 0,
-                true,
-                {
-                  fileName: "C:/Users/DELL/Uswift/extension/src/JobTracker.tsx",
-                  lineNumber: 397,
-                  columnNumber: 9
-                },
-                globalThis
-              ),
-              /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                "div",
-                {
-                  style: {
-                    background: "#F3F4F6",
-                    padding: 12,
-                    borderRadius: 8,
-                    textAlign: "center"
-                  },
-                  children: [
-                    /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                      "div",
-                      {
-                        style: { fontSize: "1.5rem", fontWeight: 700, color: "#10B981" },
-                        children: getStatusCount("offer")
-                      },
-                      void 0,
-                      false,
-                      {
-                        fileName: "C:/Users/DELL/Uswift/extension/src/JobTracker.tsx",
-                        lineNumber: 422,
-                        columnNumber: 11
-                      },
-                      globalThis
-                    ),
-                    /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { fontSize: "0.8rem", color: "#6B7280" }, children: "Offers" }, void 0, false, {
-                      fileName: "C:/Users/DELL/Uswift/extension/src/JobTracker.tsx",
-                      lineNumber: 427,
-                      columnNumber: 11
-                    }, globalThis)
-                  ]
-                },
-                void 0,
-                true,
-                {
-                  fileName: "C:/Users/DELL/Uswift/extension/src/JobTracker.tsx",
-                  lineNumber: 414,
-                  columnNumber: 9
-                },
-                globalThis
-              ),
-              /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                "div",
-                {
-                  style: {
-                    background: "#F3F4F6",
-                    padding: 12,
-                    borderRadius: 8,
-                    textAlign: "center"
-                  },
-                  children: [
-                    /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                      "div",
-                      {
-                        style: { fontSize: "1.5rem", fontWeight: 700, color: "#EF4444" },
-                        children: getStatusCount("rejected")
-                      },
-                      void 0,
-                      false,
-                      {
-                        fileName: "C:/Users/DELL/Uswift/extension/src/JobTracker.tsx",
-                        lineNumber: 437,
-                        columnNumber: 11
-                      },
-                      globalThis
-                    ),
-                    /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { fontSize: "0.8rem", color: "#6B7280" }, children: "Rejected" }, void 0, false, {
-                      fileName: "C:/Users/DELL/Uswift/extension/src/JobTracker.tsx",
-                      lineNumber: 442,
-                      columnNumber: 11
-                    }, globalThis)
-                  ]
-                },
-                void 0,
-                true,
-                {
-                  fileName: "C:/Users/DELL/Uswift/extension/src/JobTracker.tsx",
-                  lineNumber: 429,
-                  columnNumber: 9
-                },
-                globalThis
-              )
-            ]
-          },
-          void 0,
-          true,
-          {
-            fileName: "C:/Users/DELL/Uswift/extension/src/JobTracker.tsx",
-            lineNumber: 374,
-            columnNumber: 7
-          },
-          globalThis
-        ),
-        /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-          "div",
-          {
-            style: { display: "flex", gap: 8, marginBottom: 16, flexWrap: "wrap" },
-            children: [
-              /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                "input",
-                {
-                  type: "text",
-                  placeholder: "Search companies or positions...",
-                  value: searchTerm,
-                  onChange: (e) => setSearchTerm(e.target.value),
-                  style: {
-                    flex: 1,
-                    minWidth: 200,
-                    padding: 8,
-                    borderRadius: 6,
-                    border: "1px solid #E5E7EB",
-                    fontSize: "0.9rem"
-                  }
-                },
-                void 0,
-                false,
-                {
-                  fileName: "C:/Users/DELL/Uswift/extension/src/JobTracker.tsx",
-                  lineNumber: 449,
-                  columnNumber: 9
-                },
-                globalThis
-              ),
-              /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                "select",
-                {
-                  value: statusFilter,
-                  onChange: (e) => setStatusFilter(e.target.value),
-                  style: {
-                    padding: 8,
-                    borderRadius: 6,
-                    border: "1px solid #E5E7EB",
-                    fontSize: "0.9rem"
-                  },
-                  children: [
-                    /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("option", { value: "all", children: "All Status" }, void 0, false, {
-                      fileName: "C:/Users/DELL/Uswift/extension/src/JobTracker.tsx",
-                      lineNumber: 473,
-                      columnNumber: 11
-                    }, globalThis),
-                    /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("option", { value: "applied", children: "Applied" }, void 0, false, {
-                      fileName: "C:/Users/DELL/Uswift/extension/src/JobTracker.tsx",
-                      lineNumber: 474,
-                      columnNumber: 11
-                    }, globalThis),
-                    /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("option", { value: "interviewing", children: "Interviewing" }, void 0, false, {
-                      fileName: "C:/Users/DELL/Uswift/extension/src/JobTracker.tsx",
-                      lineNumber: 475,
-                      columnNumber: 11
-                    }, globalThis),
-                    /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("option", { value: "offer", children: "Offer" }, void 0, false, {
-                      fileName: "C:/Users/DELL/Uswift/extension/src/JobTracker.tsx",
-                      lineNumber: 476,
-                      columnNumber: 11
-                    }, globalThis),
-                    /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("option", { value: "rejected", children: "Rejected" }, void 0, false, {
-                      fileName: "C:/Users/DELL/Uswift/extension/src/JobTracker.tsx",
-                      lineNumber: 477,
-                      columnNumber: 11
-                    }, globalThis),
-                    /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("option", { value: "archived", children: "Archived" }, void 0, false, {
-                      fileName: "C:/Users/DELL/Uswift/extension/src/JobTracker.tsx",
-                      lineNumber: 478,
-                      columnNumber: 11
-                    }, globalThis)
-                  ]
-                },
-                void 0,
-                true,
-                {
-                  fileName: "C:/Users/DELL/Uswift/extension/src/JobTracker.tsx",
-                  lineNumber: 463,
-                  columnNumber: 9
-                },
-                globalThis
-              ),
-              /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                "select",
-                {
-                  value: sortBy,
-                  onChange: (e) => setSortBy(e.target.value),
-                  style: {
-                    padding: 8,
-                    borderRadius: 6,
-                    border: "1px solid #E5E7EB",
-                    fontSize: "0.9rem"
-                  },
-                  children: [
-                    /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("option", { value: "date", children: "Sort by Date" }, void 0, false, {
-                      fileName: "C:/Users/DELL/Uswift/extension/src/JobTracker.tsx",
-                      lineNumber: 492,
-                      columnNumber: 11
-                    }, globalThis),
-                    /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("option", { value: "company", children: "Sort by Company" }, void 0, false, {
-                      fileName: "C:/Users/DELL/Uswift/extension/src/JobTracker.tsx",
-                      lineNumber: 493,
-                      columnNumber: 11
-                    }, globalThis),
-                    /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("option", { value: "status", children: "Sort by Status" }, void 0, false, {
-                      fileName: "C:/Users/DELL/Uswift/extension/src/JobTracker.tsx",
-                      lineNumber: 494,
-                      columnNumber: 11
-                    }, globalThis)
-                  ]
-                },
-                void 0,
-                true,
-                {
-                  fileName: "C:/Users/DELL/Uswift/extension/src/JobTracker.tsx",
-                  lineNumber: 480,
-                  columnNumber: 9
-                },
-                globalThis
-              ),
-              /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                "button",
-                {
-                  className: "uswift-btn",
-                  style: { fontSize: "0.9rem", padding: "8px 12px" },
-                  onClick: () => setShowAddForm(true),
-                  children: "+ Add Job"
-                },
-                void 0,
-                false,
-                {
-                  fileName: "C:/Users/DELL/Uswift/extension/src/JobTracker.tsx",
-                  lineNumber: 496,
-                  columnNumber: 9
-                },
-                globalThis
-              ),
-              /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                "button",
-                {
-                  onClick: exportToCSV,
-                  style: {
-                    background: "#EDE9FE",
-                    color: "#6D28D9",
-                    border: "none",
-                    borderRadius: 6,
-                    padding: "8px 12px",
-                    cursor: "pointer",
-                    fontSize: "0.9rem"
-                  },
-                  children: "Export CSV"
-                },
-                void 0,
-                false,
-                {
-                  fileName: "C:/Users/DELL/Uswift/extension/src/JobTracker.tsx",
-                  lineNumber: 503,
-                  columnNumber: 9
-                },
-                globalThis
-              )
-            ]
-          },
-          void 0,
-          true,
-          {
-            fileName: "C:/Users/DELL/Uswift/extension/src/JobTracker.tsx",
-            lineNumber: 446,
-            columnNumber: 7
-          },
-          globalThis
-        ),
-        showAddForm && /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-          "div",
-          {
-            style: {
-              background: "#F9FAFB",
-              padding: 16,
-              borderRadius: 8,
-              marginBottom: 16
-            },
-            children: [
-              /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("h3", { style: { marginBottom: 12, fontSize: "1rem", fontWeight: 600 }, children: "Add New Application" }, void 0, false, {
-                fileName: "C:/Users/DELL/Uswift/extension/src/JobTracker.tsx",
-                lineNumber: 528,
-                columnNumber: 11
-              }, globalThis),
-              /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                "div",
-                {
-                  style: {
-                    display: "grid",
-                    gridTemplateColumns: "1fr 1fr",
-                    gap: 12,
-                    marginBottom: 12
-                  },
-                  children: [
-                    /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                      "input",
-                      {
-                        type: "text",
-                        placeholder: "Company",
-                        value: newApplication.company,
-                        onChange: (e) => setNewApplication({
-                          ...newApplication,
-                          company: e.target.value
-                        }),
-                        style: {
-                          padding: 8,
-                          borderRadius: 6,
-                          border: "1px solid #E5E7EB"
-                        }
-                      },
-                      void 0,
-                      false,
-                      {
-                        fileName: "C:/Users/DELL/Uswift/extension/src/JobTracker.tsx",
-                        lineNumber: 539,
-                        columnNumber: 13
-                      },
-                      globalThis
-                    ),
-                    /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                      "input",
-                      {
-                        type: "text",
-                        placeholder: "Position",
-                        value: newApplication.position,
-                        onChange: (e) => setNewApplication({
-                          ...newApplication,
-                          position: e.target.value
-                        }),
-                        style: {
-                          padding: 8,
-                          borderRadius: 6,
-                          border: "1px solid #E5E7EB"
-                        }
-                      },
-                      void 0,
-                      false,
-                      {
-                        fileName: "C:/Users/DELL/Uswift/extension/src/JobTracker.tsx",
-                        lineNumber: 555,
-                        columnNumber: 13
-                      },
-                      globalThis
-                    )
-                  ]
-                },
-                void 0,
-                true,
-                {
-                  fileName: "C:/Users/DELL/Uswift/extension/src/JobTracker.tsx",
-                  lineNumber: 531,
-                  columnNumber: 11
-                },
-                globalThis
-              ),
-              /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                "div",
-                {
-                  style: {
-                    display: "grid",
-                    gridTemplateColumns: "1fr 1fr",
-                    gap: 12,
-                    marginBottom: 12
-                  },
-                  children: [
-                    /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                      "select",
-                      {
-                        value: newApplication.status,
-                        onChange: (e) => setNewApplication({
-                          ...newApplication,
-                          status: e.target.value
-                        }),
-                        style: {
-                          padding: 8,
-                          borderRadius: 6,
-                          border: "1px solid #E5E7EB"
-                        },
-                        children: [
-                          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("option", { value: "applied", children: "Applied" }, void 0, false, {
-                            fileName: "C:/Users/DELL/Uswift/extension/src/JobTracker.tsx",
-                            lineNumber: 594,
-                            columnNumber: 15
-                          }, globalThis),
-                          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("option", { value: "interviewing", children: "Interviewing" }, void 0, false, {
-                            fileName: "C:/Users/DELL/Uswift/extension/src/JobTracker.tsx",
-                            lineNumber: 595,
-                            columnNumber: 15
-                          }, globalThis),
-                          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("option", { value: "offer", children: "Offer" }, void 0, false, {
-                            fileName: "C:/Users/DELL/Uswift/extension/src/JobTracker.tsx",
-                            lineNumber: 596,
-                            columnNumber: 15
-                          }, globalThis),
-                          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("option", { value: "rejected", children: "Rejected" }, void 0, false, {
-                            fileName: "C:/Users/DELL/Uswift/extension/src/JobTracker.tsx",
-                            lineNumber: 597,
-                            columnNumber: 15
-                          }, globalThis),
-                          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("option", { value: "archived", children: "Archived" }, void 0, false, {
-                            fileName: "C:/Users/DELL/Uswift/extension/src/JobTracker.tsx",
-                            lineNumber: 598,
-                            columnNumber: 15
-                          }, globalThis)
-                        ]
-                      },
-                      void 0,
-                      true,
-                      {
-                        fileName: "C:/Users/DELL/Uswift/extension/src/JobTracker.tsx",
-                        lineNumber: 580,
-                        columnNumber: 13
-                      },
-                      globalThis
-                    ),
-                    /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                      "input",
-                      {
-                        type: "date",
-                        value: newApplication.dateApplied,
-                        onChange: (e) => setNewApplication({
-                          ...newApplication,
-                          dateApplied: e.target.value
-                        }),
-                        style: {
-                          padding: 8,
-                          borderRadius: 6,
-                          border: "1px solid #E5E7EB"
-                        }
-                      },
-                      void 0,
-                      false,
-                      {
-                        fileName: "C:/Users/DELL/Uswift/extension/src/JobTracker.tsx",
-                        lineNumber: 600,
-                        columnNumber: 13
-                      },
-                      globalThis
-                    )
-                  ]
-                },
-                void 0,
-                true,
-                {
-                  fileName: "C:/Users/DELL/Uswift/extension/src/JobTracker.tsx",
-                  lineNumber: 572,
-                  columnNumber: 11
-                },
-                globalThis
-              ),
-              /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                "input",
-                {
-                  type: "url",
-                  placeholder: "Job URL (optional)",
-                  value: newApplication.jobUrl,
-                  onChange: (e) => setNewApplication({ ...newApplication, jobUrl: e.target.value }),
-                  style: {
-                    width: "100%",
-                    padding: 8,
-                    borderRadius: 6,
-                    border: "1px solid #E5E7EB",
-                    marginBottom: 12
-                  }
-                },
-                void 0,
-                false,
-                {
-                  fileName: "C:/Users/DELL/Uswift/extension/src/JobTracker.tsx",
-                  lineNumber: 616,
-                  columnNumber: 11
-                },
-                globalThis
-              ),
-              /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                "textarea",
-                {
-                  placeholder: "Notes (optional)",
-                  value: newApplication.notes,
-                  onChange: (e) => setNewApplication({ ...newApplication, notes: e.target.value }),
-                  rows: 2,
-                  style: {
-                    width: "100%",
-                    padding: 8,
-                    borderRadius: 6,
-                    border: "1px solid #E5E7EB",
-                    marginBottom: 12,
-                    resize: "vertical"
-                  }
-                },
-                void 0,
-                false,
-                {
-                  fileName: "C:/Users/DELL/Uswift/extension/src/JobTracker.tsx",
-                  lineNumber: 631,
-                  columnNumber: 11
-                },
-                globalThis
-              ),
-              /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { display: "flex", gap: 8 }, children: [
-                /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                  "button",
-                  {
-                    className: "uswift-btn",
-                    onClick: addApplication,
-                    disabled: loading,
-                    style: { opacity: loading ? 0.6 : 1 },
-                    children: loading ? "Adding..." : "Add Application"
-                  },
-                  void 0,
-                  false,
-                  {
-                    fileName: "C:/Users/DELL/Uswift/extension/src/JobTracker.tsx",
-                    lineNumber: 648,
-                    columnNumber: 13
-                  },
-                  globalThis
-                ),
-                /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                  "button",
-                  {
-                    onClick: () => setShowAddForm(false),
-                    style: {
-                      background: "#F3F4F6",
-                      color: "#6B7280",
-                      border: "none",
-                      borderRadius: 6,
-                      padding: "8px 16px",
-                      cursor: "pointer"
-                    },
-                    children: "Cancel"
-                  },
-                  void 0,
-                  false,
-                  {
-                    fileName: "C:/Users/DELL/Uswift/extension/src/JobTracker.tsx",
-                    lineNumber: 656,
-                    columnNumber: 13
-                  },
-                  globalThis
-                )
-              ] }, void 0, true, {
-                fileName: "C:/Users/DELL/Uswift/extension/src/JobTracker.tsx",
-                lineNumber: 647,
-                columnNumber: 11
-              }, globalThis)
-            ]
-          },
-          void 0,
-          true,
-          {
-            fileName: "C:/Users/DELL/Uswift/extension/src/JobTracker.tsx",
-            lineNumber: 520,
-            columnNumber: 9
-          },
-          globalThis
-        ),
-        /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { maxHeight: 400, overflowY: "auto" }, children: loading && applications.length === 0 ? /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { textAlign: "center", padding: 40, color: "#6B7280" }, children: "Loading applications..." }, void 0, false, {
-          fileName: "C:/Users/DELL/Uswift/extension/src/JobTracker.tsx",
-          lineNumber: 675,
-          columnNumber: 11
-        }, globalThis) : filteredApplications.length === 0 ? /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { textAlign: "center", padding: 40, color: "#6B7280" }, children: applications.length === 0 ? 'No applications yet. Click "Add Job" to get started!' : "No applications match your search." }, void 0, false, {
-          fileName: "C:/Users/DELL/Uswift/extension/src/JobTracker.tsx",
-          lineNumber: 679,
-          columnNumber: 11
-        }, globalThis) : filteredApplications.map((app) => /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-          "div",
-          {
-            style: {
-              background: "#F9FAFB",
-              padding: 16,
-              borderRadius: 8,
-              marginBottom: 12,
+              padding: 8,
+              borderRadius: 6,
               border: "1px solid #E5E7EB"
-            },
-            children: /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-              "div",
-              {
-                style: {
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "flex-start",
-                  marginBottom: 8
-                },
-                children: [
-                  /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { flex: 1 }, children: [
-                    /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                      "h3",
-                      {
-                        style: {
-                          fontSize: "1.1rem",
-                          fontWeight: 600,
-                          marginBottom: 4,
-                          color: "#111827"
-                        },
-                        children: app.position
-                      },
-                      void 0,
-                      false,
-                      {
-                        fileName: "C:/Users/DELL/Uswift/extension/src/JobTracker.tsx",
-                        lineNumber: 705,
-                        columnNumber: 19
-                      },
-                      globalThis
-                    ),
-                    /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                      "p",
-                      {
-                        style: {
-                          color: "#6B7280",
-                          fontSize: "0.9rem",
-                          marginBottom: 4
-                        },
-                        children: [
-                          app.company,
-                          " • Applied",
-                          " ",
-                          new Date(app.dateApplied).toLocaleDateString()
-                        ]
-                      },
-                      void 0,
-                      true,
-                      {
-                        fileName: "C:/Users/DELL/Uswift/extension/src/JobTracker.tsx",
-                        lineNumber: 715,
-                        columnNumber: 19
-                      },
-                      globalThis
-                    ),
-                    app.jobUrl && /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                      "a",
-                      {
-                        href: app.jobUrl,
-                        target: "_blank",
-                        rel: "noopener noreferrer",
-                        style: {
-                          color: "#6D28D9",
-                          fontSize: "0.85rem",
-                          textDecoration: "none"
-                        },
-                        children: "View Job Posting →"
-                      },
-                      void 0,
-                      false,
-                      {
-                        fileName: "C:/Users/DELL/Uswift/extension/src/JobTracker.tsx",
-                        lineNumber: 726,
-                        columnNumber: 21
-                      },
-                      globalThis
-                    ),
-                    app.notes && /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                      "p",
-                      {
-                        style: {
-                          color: "#4B5563",
-                          fontSize: "0.85rem",
-                          marginTop: 8
-                        },
-                        children: app.notes
-                      },
-                      void 0,
-                      false,
-                      {
-                        fileName: "C:/Users/DELL/Uswift/extension/src/JobTracker.tsx",
-                        lineNumber: 740,
-                        columnNumber: 21
-                      },
-                      globalThis
-                    )
-                  ] }, void 0, true, {
-                    fileName: "C:/Users/DELL/Uswift/extension/src/JobTracker.tsx",
-                    lineNumber: 704,
-                    columnNumber: 17
-                  }, globalThis),
-                  /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { display: "flex", alignItems: "center", gap: 8 }, children: [
-                    /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                      "select",
-                      {
-                        value: app.status,
-                        onChange: (e) => updateStatus(app.id, e.target.value),
-                        style: {
-                          padding: "4px 8px",
-                          borderRadius: 6,
-                          border: "1px solid #E5E7EB",
-                          fontSize: "0.8rem",
-                          color: getStatusColor(app.status),
-                          fontWeight: 600
-                        },
-                        children: [
-                          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("option", { value: "applied", children: "Applied" }, void 0, false, {
-                            fileName: "C:/Users/DELL/Uswift/extension/src/JobTracker.tsx",
-                            lineNumber: 766,
-                            columnNumber: 21
-                          }, globalThis),
-                          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("option", { value: "interviewing", children: "Interviewing" }, void 0, false, {
-                            fileName: "C:/Users/DELL/Uswift/extension/src/JobTracker.tsx",
-                            lineNumber: 767,
-                            columnNumber: 21
-                          }, globalThis),
-                          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("option", { value: "offer", children: "Offer" }, void 0, false, {
-                            fileName: "C:/Users/DELL/Uswift/extension/src/JobTracker.tsx",
-                            lineNumber: 768,
-                            columnNumber: 21
-                          }, globalThis),
-                          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("option", { value: "rejected", children: "Rejected" }, void 0, false, {
-                            fileName: "C:/Users/DELL/Uswift/extension/src/JobTracker.tsx",
-                            lineNumber: 769,
-                            columnNumber: 21
-                          }, globalThis),
-                          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("option", { value: "archived", children: "Archived" }, void 0, false, {
-                            fileName: "C:/Users/DELL/Uswift/extension/src/JobTracker.tsx",
-                            lineNumber: 770,
-                            columnNumber: 21
-                          }, globalThis)
-                        ]
-                      },
-                      void 0,
-                      true,
-                      {
-                        fileName: "C:/Users/DELL/Uswift/extension/src/JobTracker.tsx",
-                        lineNumber: 752,
-                        columnNumber: 19
-                      },
-                      globalThis
-                    ),
-                    /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                      "button",
-                      {
-                        onClick: () => deleteApplication(app.id),
-                        style: {
-                          background: "#EF4444",
-                          color: "white",
-                          border: "none",
-                          borderRadius: 6,
-                          padding: "4px 8px",
-                          cursor: "pointer",
-                          fontSize: "0.8rem"
-                        },
-                        children: "Delete"
-                      },
-                      void 0,
-                      false,
-                      {
-                        fileName: "C:/Users/DELL/Uswift/extension/src/JobTracker.tsx",
-                        lineNumber: 772,
-                        columnNumber: 19
-                      },
-                      globalThis
-                    )
-                  ] }, void 0, true, {
-                    fileName: "C:/Users/DELL/Uswift/extension/src/JobTracker.tsx",
-                    lineNumber: 751,
-                    columnNumber: 17
-                  }, globalThis)
-                ]
-              },
-              void 0,
-              true,
-              {
-                fileName: "C:/Users/DELL/Uswift/extension/src/JobTracker.tsx",
-                lineNumber: 696,
-                columnNumber: 15
-              },
-              globalThis
-            )
-          },
-          app.id,
-          false,
+            }
+          }
+        ),
+        /* @__PURE__ */ React.createElement(
+          "input",
           {
-            fileName: "C:/Users/DELL/Uswift/extension/src/JobTracker.tsx",
-            lineNumber: 686,
-            columnNumber: 13
+            type: "text",
+            placeholder: "Position",
+            value: newApplication.position,
+            onChange: (e) => setNewApplication({
+              ...newApplication,
+              position: e.target.value
+            }),
+            style: {
+              padding: 8,
+              borderRadius: 6,
+              border: "1px solid #E5E7EB"
+            }
+          }
+        )
+      ),
+      /* @__PURE__ */ React.createElement(
+        "div",
+        {
+          style: {
+            display: "grid",
+            gridTemplateColumns: "1fr 1fr",
+            gap: 12,
+            marginBottom: 12
+          }
+        },
+        /* @__PURE__ */ React.createElement(
+          "select",
+          {
+            value: newApplication.status,
+            onChange: (e) => setNewApplication({
+              ...newApplication,
+              status: e.target.value
+            }),
+            style: {
+              padding: 8,
+              borderRadius: 6,
+              border: "1px solid #E5E7EB"
+            }
           },
-          globalThis
-        )) }, void 0, false, {
-          fileName: "C:/Users/DELL/Uswift/extension/src/JobTracker.tsx",
-          lineNumber: 673,
-          columnNumber: 7
-        }, globalThis)
-      ]
-    },
-    void 0,
-    true,
-    {
-      fileName: "C:/Users/DELL/Uswift/extension/src/JobTracker.tsx",
-      lineNumber: 341,
-      columnNumber: 5
-    },
-    globalThis
+          /* @__PURE__ */ React.createElement("option", { value: "applied" }, "Applied"),
+          /* @__PURE__ */ React.createElement("option", { value: "interviewing" }, "Interviewing"),
+          /* @__PURE__ */ React.createElement("option", { value: "offer" }, "Offer"),
+          /* @__PURE__ */ React.createElement("option", { value: "rejected" }, "Rejected"),
+          /* @__PURE__ */ React.createElement("option", { value: "archived" }, "Archived")
+        ),
+        /* @__PURE__ */ React.createElement(
+          "input",
+          {
+            type: "date",
+            value: newApplication.dateApplied,
+            onChange: (e) => setNewApplication({
+              ...newApplication,
+              dateApplied: e.target.value
+            }),
+            style: {
+              padding: 8,
+              borderRadius: 6,
+              border: "1px solid #E5E7EB"
+            }
+          }
+        )
+      ),
+      /* @__PURE__ */ React.createElement(
+        "input",
+        {
+          type: "url",
+          placeholder: "Job URL (optional)",
+          value: newApplication.jobUrl,
+          onChange: (e) => setNewApplication({ ...newApplication, jobUrl: e.target.value }),
+          style: {
+            width: "100%",
+            padding: 8,
+            borderRadius: 6,
+            border: "1px solid #E5E7EB",
+            marginBottom: 12
+          }
+        }
+      ),
+      /* @__PURE__ */ React.createElement(
+        "textarea",
+        {
+          placeholder: "Notes (optional)",
+          value: newApplication.notes,
+          onChange: (e) => setNewApplication({ ...newApplication, notes: e.target.value }),
+          rows: 2,
+          style: {
+            width: "100%",
+            padding: 8,
+            borderRadius: 6,
+            border: "1px solid #E5E7EB",
+            marginBottom: 12,
+            resize: "vertical"
+          }
+        }
+      ),
+      /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 8 } }, /* @__PURE__ */ React.createElement(
+        "button",
+        {
+          className: "uswift-btn",
+          onClick: addApplication,
+          disabled: loading,
+          style: { opacity: loading ? 0.6 : 1 }
+        },
+        loading ? "Adding..." : "Add Application"
+      ), /* @__PURE__ */ React.createElement(
+        "button",
+        {
+          onClick: () => setShowAddForm(false),
+          style: {
+            background: "#F3F4F6",
+            color: "#6B7280",
+            border: "none",
+            borderRadius: 6,
+            padding: "8px 16px",
+            cursor: "pointer"
+          }
+        },
+        "Cancel"
+      ))
+    ),
+    /* @__PURE__ */ React.createElement("div", { style: { maxHeight: 400, overflowY: "auto" } }, loading && applications.length === 0 ? /* @__PURE__ */ React.createElement("div", { style: { textAlign: "center", padding: 40, color: "#6B7280" } }, "Loading applications...") : filteredApplications.length === 0 ? /* @__PURE__ */ React.createElement("div", { style: { textAlign: "center", padding: 40, color: "#6B7280" } }, applications.length === 0 ? 'No applications yet. Click "Add Job" to get started!' : "No applications match your search.") : filteredApplications.map((app) => /* @__PURE__ */ React.createElement(
+      "div",
+      {
+        key: app.id,
+        style: {
+          background: "#F9FAFB",
+          padding: 16,
+          borderRadius: 8,
+          marginBottom: 12,
+          border: "1px solid #E5E7EB"
+        }
+      },
+      /* @__PURE__ */ React.createElement(
+        "div",
+        {
+          style: {
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "flex-start",
+            marginBottom: 8
+          }
+        },
+        /* @__PURE__ */ React.createElement("div", { style: { flex: 1 } }, /* @__PURE__ */ React.createElement(
+          "h3",
+          {
+            style: {
+              fontSize: "1.1rem",
+              fontWeight: 600,
+              marginBottom: 4,
+              color: "#111827"
+            }
+          },
+          app.position
+        ), /* @__PURE__ */ React.createElement(
+          "p",
+          {
+            style: {
+              color: "#6B7280",
+              fontSize: "0.9rem",
+              marginBottom: 4
+            }
+          },
+          app.company,
+          " • Applied",
+          " ",
+          new Date(app.dateApplied).toLocaleDateString()
+        ), app.jobUrl && /* @__PURE__ */ React.createElement(
+          "a",
+          {
+            href: app.jobUrl,
+            target: "_blank",
+            rel: "noopener noreferrer",
+            style: {
+              color: "#6D28D9",
+              fontSize: "0.85rem",
+              textDecoration: "none"
+            }
+          },
+          "View Job Posting →"
+        ), app.notes && /* @__PURE__ */ React.createElement(
+          "p",
+          {
+            style: {
+              color: "#4B5563",
+              fontSize: "0.85rem",
+              marginTop: 8
+            }
+          },
+          app.notes
+        )),
+        /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 8 } }, /* @__PURE__ */ React.createElement(
+          "select",
+          {
+            value: app.status,
+            onChange: (e) => updateStatus(app.id, e.target.value),
+            style: {
+              padding: "4px 8px",
+              borderRadius: 6,
+              border: "1px solid #E5E7EB",
+              fontSize: "0.8rem",
+              color: getStatusColor(app.status),
+              fontWeight: 600
+            }
+          },
+          /* @__PURE__ */ React.createElement("option", { value: "applied" }, "Applied"),
+          /* @__PURE__ */ React.createElement("option", { value: "interviewing" }, "Interviewing"),
+          /* @__PURE__ */ React.createElement("option", { value: "offer" }, "Offer"),
+          /* @__PURE__ */ React.createElement("option", { value: "rejected" }, "Rejected"),
+          /* @__PURE__ */ React.createElement("option", { value: "archived" }, "Archived")
+        ), /* @__PURE__ */ React.createElement(
+          "button",
+          {
+            onClick: () => deleteApplication(app.id),
+            style: {
+              background: "#EF4444",
+              color: "white",
+              border: "none",
+              borderRadius: 6,
+              padding: "4px 8px",
+              cursor: "pointer",
+              fontSize: "0.8rem"
+            }
+          },
+          "Delete"
+        ))
+      )
+    )))
   );
 };
 
 class MistralClient {
-  config;
   constructor(config) {
     this.config = config;
   }
@@ -3197,20 +2119,9 @@ function ChatInterface() {
     ]);
   };
   const formatMessage = (content) => {
-    return content.split("\n").map((line, index) => /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("span", { children: [
-      line,
-      index < content.split("\n").length - 1 && /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("br", {}, void 0, false, {
-        fileName: "C:/Users/DELL/Uswift/extension/src/ChatInterface.tsx",
-        lineNumber: 205,
-        columnNumber: 52
-      }, this)
-    ] }, index, true, {
-      fileName: "C:/Users/DELL/Uswift/extension/src/ChatInterface.tsx",
-      lineNumber: 203,
-      columnNumber: 7
-    }, this));
+    return content.split("\n").map((line, index) => /* @__PURE__ */ React.createElement("span", { key: index }, line, index < content.split("\n").length - 1 && /* @__PURE__ */ React.createElement("br", null)));
   };
-  return /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
+  return /* @__PURE__ */ React.createElement(
     "div",
     {
       style: {
@@ -3221,423 +2132,253 @@ function ChatInterface() {
         minHeight: 520,
         display: "flex",
         flexDirection: "column"
+      }
+    },
+    /* @__PURE__ */ React.createElement(
+      "div",
+      {
+        className: "uswift-gradient",
+        style: {
+          height: 8,
+          borderRadius: 8,
+          marginBottom: 16
+        }
+      }
+    ),
+    /* @__PURE__ */ React.createElement(
+      "div",
+      {
+        style: {
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          marginBottom: 16
+        }
       },
-      children: [
-        /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-          "div",
-          {
-            className: "uswift-gradient",
-            style: {
-              height: 8,
-              borderRadius: 8,
-              marginBottom: 16
+      /* @__PURE__ */ React.createElement(
+        "h2",
+        {
+          style: {
+            fontSize: "1.4rem",
+            fontWeight: 700,
+            color: "#111827",
+            margin: 0
+          }
+        },
+        "AI Assistant"
+      ),
+      /* @__PURE__ */ React.createElement(
+        "button",
+        {
+          onClick: clearChat,
+          style: {
+            background: "#EDE9FE",
+            color: "#6D28D9",
+            border: "none",
+            borderRadius: 8,
+            padding: "6px 12px",
+            cursor: "pointer",
+            fontSize: "0.8rem"
+          }
+        },
+        "Clear Chat"
+      )
+    ),
+    /* @__PURE__ */ React.createElement("div", { style: { marginBottom: 16 } }, /* @__PURE__ */ React.createElement(
+      "div",
+      {
+        style: {
+          display: "flex",
+          gap: 8,
+          marginBottom: 12,
+          flexWrap: "wrap"
+        }
+      },
+      categories.map((category) => /* @__PURE__ */ React.createElement(
+        "button",
+        {
+          key: category,
+          onClick: () => setSelectedCategory(category),
+          style: {
+            background: selectedCategory === category ? "#6D28D9" : "#F3F4F6",
+            color: selectedCategory === category ? "#FFFFFF" : "#6B7280",
+            border: "none",
+            borderRadius: 6,
+            padding: "4px 12px",
+            cursor: "pointer",
+            fontSize: "0.8rem",
+            fontWeight: 500
+          }
+        },
+        category
+      ))
+    ), /* @__PURE__ */ React.createElement(
+      "div",
+      {
+        style: {
+          display: "flex",
+          gap: 8,
+          flexWrap: "wrap",
+          maxHeight: 120,
+          overflowY: "auto"
+        }
+      },
+      filteredPrompts.slice(0, 6).map((prompt) => /* @__PURE__ */ React.createElement(
+        "button",
+        {
+          key: prompt.id,
+          onClick: () => handleQuickPrompt(prompt),
+          disabled: isLoading,
+          style: {
+            background: "#F8F9FA",
+            border: "1px solid #E5E7EB",
+            borderRadius: 8,
+            padding: "8px 12px",
+            cursor: isLoading ? "not-allowed" : "pointer",
+            fontSize: "0.8rem",
+            color: "#4B5563",
+            opacity: isLoading ? 0.6 : 1,
+            transition: "all 0.2s ease",
+            flex: "1 1 auto",
+            minWidth: 120,
+            textAlign: "left",
+            whiteSpace: "nowrap",
+            overflow: "hidden",
+            textOverflow: "ellipsis"
+          },
+          onMouseEnter: (e) => {
+            if (!isLoading) {
+              e.currentTarget.style.background = "#EDE9FE";
+              e.currentTarget.style.borderColor = "#6D28D9";
             }
           },
-          void 0,
-          false,
-          {
-            fileName: "C:/Users/DELL/Uswift/extension/src/ChatInterface.tsx",
-            lineNumber: 223,
-            columnNumber: 7
-          },
-          this
-        ),
-        /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
+          onMouseLeave: (e) => {
+            if (!isLoading) {
+              e.currentTarget.style.background = "#F8F9FA";
+              e.currentTarget.style.borderColor = "#E5E7EB";
+            }
+          }
+        },
+        prompt.label
+      ))
+    )),
+    /* @__PURE__ */ React.createElement(
+      "div",
+      {
+        style: {
+          flex: 1,
+          overflowY: "auto",
+          marginBottom: 16,
+          maxHeight: 300
+        }
+      },
+      messages.map((message) => /* @__PURE__ */ React.createElement(
+        "div",
+        {
+          key: message.id,
+          style: {
+            marginBottom: 16,
+            display: "flex",
+            flexDirection: message.role === "user" ? "row-reverse" : "row"
+          }
+        },
+        /* @__PURE__ */ React.createElement(
           "div",
           {
             style: {
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              marginBottom: 16
-            },
-            children: [
-              /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                "h2",
-                {
-                  style: {
-                    fontSize: "1.4rem",
-                    fontWeight: 700,
-                    color: "#111827",
-                    margin: 0
-                  },
-                  children: "AI Assistant"
-                },
-                void 0,
-                false,
-                {
-                  fileName: "C:/Users/DELL/Uswift/extension/src/ChatInterface.tsx",
-                  lineNumber: 240,
-                  columnNumber: 9
-                },
-                this
-              ),
-              /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                "button",
-                {
-                  onClick: clearChat,
-                  style: {
-                    background: "#EDE9FE",
-                    color: "#6D28D9",
-                    border: "none",
-                    borderRadius: 8,
-                    padding: "6px 12px",
-                    cursor: "pointer",
-                    fontSize: "0.8rem"
-                  },
-                  children: "Clear Chat"
-                },
-                void 0,
-                false,
-                {
-                  fileName: "C:/Users/DELL/Uswift/extension/src/ChatInterface.tsx",
-                  lineNumber: 250,
-                  columnNumber: 9
-                },
-                this
-              )
-            ]
+              maxWidth: "80%",
+              padding: "12px 16px",
+              borderRadius: 12,
+              background: message.role === "user" ? "#6D28D9" : "#F3F4F6",
+              color: message.role === "user" ? "#FFFFFF" : "#111827",
+              fontSize: "0.9rem",
+              lineHeight: 1.4,
+              position: "relative"
+            }
           },
-          void 0,
-          true,
-          {
-            fileName: "C:/Users/DELL/Uswift/extension/src/ChatInterface.tsx",
-            lineNumber: 232,
-            columnNumber: 7
-          },
-          this
-        ),
-        /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { marginBottom: 16 }, children: [
-          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
+          message.isLoading ? /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 8 } }, /* @__PURE__ */ React.createElement(
             "div",
             {
               style: {
-                display: "flex",
-                gap: 8,
-                marginBottom: 12,
-                flexWrap: "wrap"
-              },
-              children: categories.map((category) => /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                "button",
-                {
-                  onClick: () => setSelectedCategory(category),
-                  style: {
-                    background: selectedCategory === category ? "#6D28D9" : "#F3F4F6",
-                    color: selectedCategory === category ? "#FFFFFF" : "#6B7280",
-                    border: "none",
-                    borderRadius: 6,
-                    padding: "4px 12px",
-                    cursor: "pointer",
-                    fontSize: "0.8rem",
-                    fontWeight: 500
-                  },
-                  children: category
-                },
-                category,
-                false,
-                {
-                  fileName: "C:/Users/DELL/Uswift/extension/src/ChatInterface.tsx",
-                  lineNumber: 277,
-                  columnNumber: 13
-                },
-                this
-              ))
-            },
-            void 0,
-            false,
-            {
-              fileName: "C:/Users/DELL/Uswift/extension/src/ChatInterface.tsx",
-              lineNumber: 268,
-              columnNumber: 9
-            },
-            this
-          ),
-          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
+                width: 16,
+                height: 16,
+                border: "2px solid #6D28D9",
+                borderTop: "2px solid transparent",
+                borderRadius: "50%",
+                animation: "spin 1s linear infinite"
+              }
+            }
+          ), /* @__PURE__ */ React.createElement("span", { style: { color: "#6B7280" } }, "Thinking...")) : formatMessage(message.content),
+          /* @__PURE__ */ React.createElement(
             "div",
             {
               style: {
-                display: "flex",
-                gap: 8,
-                flexWrap: "wrap",
-                maxHeight: 120,
-                overflowY: "auto"
-              },
-              children: filteredPrompts.slice(0, 6).map((prompt) => /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                "button",
-                {
-                  onClick: () => handleQuickPrompt(prompt),
-                  disabled: isLoading,
-                  style: {
-                    background: "#F8F9FA",
-                    border: "1px solid #E5E7EB",
-                    borderRadius: 8,
-                    padding: "8px 12px",
-                    cursor: isLoading ? "not-allowed" : "pointer",
-                    fontSize: "0.8rem",
-                    color: "#4B5563",
-                    opacity: isLoading ? 0.6 : 1,
-                    transition: "all 0.2s ease",
-                    flex: "1 1 auto",
-                    minWidth: 120,
-                    textAlign: "left",
-                    whiteSpace: "nowrap",
-                    overflow: "hidden",
-                    textOverflow: "ellipsis"
-                  },
-                  onMouseEnter: (e) => {
-                    if (!isLoading) {
-                      e.currentTarget.style.background = "#EDE9FE";
-                      e.currentTarget.style.borderColor = "#6D28D9";
-                    }
-                  },
-                  onMouseLeave: (e) => {
-                    if (!isLoading) {
-                      e.currentTarget.style.background = "#F8F9FA";
-                      e.currentTarget.style.borderColor = "#E5E7EB";
-                    }
-                  },
-                  children: prompt.label
-                },
-                prompt.id,
-                false,
-                {
-                  fileName: "C:/Users/DELL/Uswift/extension/src/ChatInterface.tsx",
-                  lineNumber: 307,
-                  columnNumber: 13
-                },
-                this
-              ))
-            },
-            void 0,
-            false,
-            {
-              fileName: "C:/Users/DELL/Uswift/extension/src/ChatInterface.tsx",
-              lineNumber: 297,
-              columnNumber: 9
-            },
-            this
-          )
-        ] }, void 0, true, {
-          fileName: "C:/Users/DELL/Uswift/extension/src/ChatInterface.tsx",
-          lineNumber: 267,
-          columnNumber: 7
-        }, this),
-        /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-          "div",
-          {
-            style: {
-              flex: 1,
-              overflowY: "auto",
-              marginBottom: 16,
-              maxHeight: 300
-            },
-            children: [
-              messages.map((message) => /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                "div",
-                {
-                  style: {
-                    marginBottom: 16,
-                    display: "flex",
-                    flexDirection: message.role === "user" ? "row-reverse" : "row"
-                  },
-                  children: /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                    "div",
-                    {
-                      style: {
-                        maxWidth: "80%",
-                        padding: "12px 16px",
-                        borderRadius: 12,
-                        background: message.role === "user" ? "#6D28D9" : "#F3F4F6",
-                        color: message.role === "user" ? "#FFFFFF" : "#111827",
-                        fontSize: "0.9rem",
-                        lineHeight: 1.4,
-                        position: "relative"
-                      },
-                      children: [
-                        message.isLoading ? /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { display: "flex", alignItems: "center", gap: 8 }, children: [
-                          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                            "div",
-                            {
-                              style: {
-                                width: 16,
-                                height: 16,
-                                border: "2px solid #6D28D9",
-                                borderTop: "2px solid transparent",
-                                borderRadius: "50%",
-                                animation: "spin 1s linear infinite"
-                              }
-                            },
-                            void 0,
-                            false,
-                            {
-                              fileName: "C:/Users/DELL/Uswift/extension/src/ChatInterface.tsx",
-                              lineNumber: 379,
-                              columnNumber: 19
-                            },
-                            this
-                          ),
-                          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("span", { style: { color: "#6B7280" }, children: "Thinking..." }, void 0, false, {
-                            fileName: "C:/Users/DELL/Uswift/extension/src/ChatInterface.tsx",
-                            lineNumber: 389,
-                            columnNumber: 19
-                          }, this)
-                        ] }, void 0, true, {
-                          fileName: "C:/Users/DELL/Uswift/extension/src/ChatInterface.tsx",
-                          lineNumber: 378,
-                          columnNumber: 17
-                        }, this) : formatMessage(message.content),
-                        /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                          "div",
-                          {
-                            style: {
-                              fontSize: "0.7rem",
-                              opacity: 0.7,
-                              marginTop: 4,
-                              textAlign: message.role === "user" ? "right" : "left"
-                            },
-                            children: message.timestamp.toLocaleTimeString([], {
-                              hour: "2-digit",
-                              minute: "2-digit"
-                            })
-                          },
-                          void 0,
-                          false,
-                          {
-                            fileName: "C:/Users/DELL/Uswift/extension/src/ChatInterface.tsx",
-                            lineNumber: 395,
-                            columnNumber: 15
-                          },
-                          this
-                        )
-                      ]
-                    },
-                    void 0,
-                    true,
-                    {
-                      fileName: "C:/Users/DELL/Uswift/extension/src/ChatInterface.tsx",
-                      lineNumber: 365,
-                      columnNumber: 13
-                    },
-                    this
-                  )
-                },
-                message.id,
-                false,
-                {
-                  fileName: "C:/Users/DELL/Uswift/extension/src/ChatInterface.tsx",
-                  lineNumber: 357,
-                  columnNumber: 11
-                },
-                this
-              )),
-              /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { ref: messagesEndRef }, void 0, false, {
-                fileName: "C:/Users/DELL/Uswift/extension/src/ChatInterface.tsx",
-                lineNumber: 411,
-                columnNumber: 9
-              }, this)
-            ]
-          },
-          void 0,
-          true,
-          {
-            fileName: "C:/Users/DELL/Uswift/extension/src/ChatInterface.tsx",
-            lineNumber: 348,
-            columnNumber: 7
-          },
-          this
-        ),
-        /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { display: "flex", gap: 8 }, children: [
-          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-            "input",
-            {
-              type: "text",
-              value: inputMessage,
-              onChange: (e) => setInputMessage(e.target.value),
-              onKeyPress: (e) => {
-                if (e.key === "Enter" && !e.shiftKey) {
-                  e.preventDefault();
-                  sendMessage(inputMessage);
-                }
-              },
-              placeholder: "Ask me anything about your career...",
-              disabled: isLoading,
-              style: {
-                flex: 1,
-                padding: "12px 16px",
-                borderRadius: 8,
-                border: "1px solid #E5E7EB",
-                fontSize: "0.9rem",
-                outline: "none",
-                opacity: isLoading ? 0.6 : 1
+                fontSize: "0.7rem",
+                opacity: 0.7,
+                marginTop: 4,
+                textAlign: message.role === "user" ? "right" : "left"
               }
             },
-            void 0,
-            false,
-            {
-              fileName: "C:/Users/DELL/Uswift/extension/src/ChatInterface.tsx",
-              lineNumber: 416,
-              columnNumber: 9
-            },
-            this
-          ),
-          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-            "button",
-            {
-              onClick: () => sendMessage(inputMessage),
-              disabled: isLoading || !inputMessage.trim(),
-              className: "uswift-btn",
-              style: {
-                padding: "12px 16px",
-                opacity: isLoading || !inputMessage.trim() ? 0.6 : 1,
-                cursor: isLoading || !inputMessage.trim() ? "not-allowed" : "pointer",
-                minWidth: 60
-              },
-              children: isLoading ? "..." : "Send"
-            },
-            void 0,
-            false,
-            {
-              fileName: "C:/Users/DELL/Uswift/extension/src/ChatInterface.tsx",
-              lineNumber: 438,
-              columnNumber: 9
-            },
-            this
+            message.timestamp.toLocaleTimeString([], {
+              hour: "2-digit",
+              minute: "2-digit"
+            })
           )
-        ] }, void 0, true, {
-          fileName: "C:/Users/DELL/Uswift/extension/src/ChatInterface.tsx",
-          lineNumber: 415,
-          columnNumber: 7
-        }, this),
-        /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-          "div",
-          {
-            style: {
-              marginTop: 12,
-              textAlign: "center",
-              fontSize: "0.8rem",
-              color: "#6B7280"
-            },
-            children: "Powered by Mistral AI • Ask me about career advice, resume help, or interview tips!"
-          },
-          void 0,
-          false,
-          {
-            fileName: "C:/Users/DELL/Uswift/extension/src/ChatInterface.tsx",
-            lineNumber: 455,
-            columnNumber: 7
-          },
-          this
         )
-      ]
-    },
-    void 0,
-    true,
-    {
-      fileName: "C:/Users/DELL/Uswift/extension/src/ChatInterface.tsx",
-      lineNumber: 211,
-      columnNumber: 5
-    },
-    this
+      )),
+      /* @__PURE__ */ React.createElement("div", { ref: messagesEndRef })
+    ),
+    /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 8 } }, /* @__PURE__ */ React.createElement(
+      "input",
+      {
+        type: "text",
+        value: inputMessage,
+        onChange: (e) => setInputMessage(e.target.value),
+        onKeyPress: (e) => {
+          if (e.key === "Enter" && !e.shiftKey) {
+            e.preventDefault();
+            sendMessage(inputMessage);
+          }
+        },
+        placeholder: "Ask me anything about your career...",
+        disabled: isLoading,
+        style: {
+          flex: 1,
+          padding: "12px 16px",
+          borderRadius: 8,
+          border: "1px solid #E5E7EB",
+          fontSize: "0.9rem",
+          outline: "none",
+          opacity: isLoading ? 0.6 : 1
+        }
+      }
+    ), /* @__PURE__ */ React.createElement(
+      "button",
+      {
+        onClick: () => sendMessage(inputMessage),
+        disabled: isLoading || !inputMessage.trim(),
+        className: "uswift-btn",
+        style: {
+          padding: "12px 16px",
+          opacity: isLoading || !inputMessage.trim() ? 0.6 : 1,
+          cursor: isLoading || !inputMessage.trim() ? "not-allowed" : "pointer",
+          minWidth: 60
+        }
+      },
+      isLoading ? "..." : "Send"
+    )),
+    /* @__PURE__ */ React.createElement(
+      "div",
+      {
+        style: {
+          marginTop: 12,
+          textAlign: "center",
+          fontSize: "0.8rem",
+          color: "#6B7280"
+        }
+      },
+      "Powered by Mistral AI • Ask me about career advice, resume help, or interview tips!"
+    )
   );
 }
 
@@ -3738,7 +2479,7 @@ function ResumeEnhancement() {
       alert("Copied to clipboard!");
     });
   };
-  return /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
+  return /* @__PURE__ */ React.createElement(
     "div",
     {
       style: {
@@ -3747,845 +2488,431 @@ function ResumeEnhancement() {
         padding: "2rem",
         minWidth: 350,
         minHeight: 520
+      }
+    },
+    /* @__PURE__ */ React.createElement(
+      "div",
+      {
+        className: "uswift-gradient",
+        style: {
+          height: 8,
+          borderRadius: 8,
+          marginBottom: 16
+        }
+      }
+    ),
+    /* @__PURE__ */ React.createElement(
+      "div",
+      {
+        style: {
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          marginBottom: 16
+        }
       },
-      children: [
-        /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
+      /* @__PURE__ */ React.createElement(
+        "h2",
+        {
+          style: {
+            fontSize: "1.4rem",
+            fontWeight: 700,
+            color: "#111827",
+            margin: 0
+          }
+        },
+        "Resume Enhancement"
+      ),
+      activeTab === "result" && /* @__PURE__ */ React.createElement(
+        "button",
+        {
+          onClick: () => setActiveTab("input"),
+          style: {
+            background: "#EDE9FE",
+            color: "#6D28D9",
+            border: "none",
+            borderRadius: 8,
+            padding: "6px 12px",
+            cursor: "pointer",
+            fontSize: "0.8rem"
+          }
+        },
+        "← Back to Edit"
+      )
+    ),
+    /* @__PURE__ */ React.createElement(
+      "div",
+      {
+        style: {
+          display: "flex",
+          marginBottom: 16,
+          borderBottom: "1px solid #E5E7EB"
+        }
+      },
+      /* @__PURE__ */ React.createElement(
+        "button",
+        {
+          onClick: () => setActiveTab("input"),
+          style: {
+            background: "none",
+            border: "none",
+            padding: "12px 16px",
+            cursor: "pointer",
+            fontSize: "0.9rem",
+            fontWeight: activeTab === "input" ? 600 : 400,
+            color: activeTab === "input" ? "#6D28D9" : "#6B7280",
+            borderBottom: activeTab === "input" ? "2px solid #6D28D9" : "none"
+          }
+        },
+        "Input"
+      ),
+      /* @__PURE__ */ React.createElement(
+        "button",
+        {
+          onClick: () => setActiveTab("result"),
+          disabled: !result,
+          style: {
+            background: "none",
+            border: "none",
+            padding: "12px 16px",
+            cursor: result ? "pointer" : "not-allowed",
+            fontSize: "0.9rem",
+            fontWeight: activeTab === "result" ? 600 : 400,
+            color: activeTab === "result" ? "#6D28D9" : "#6B7280",
+            borderBottom: activeTab === "result" ? "2px solid #6D28D9" : "none",
+            opacity: result ? 1 : 0.5
+          }
+        },
+        "Enhanced Resume"
+      )
+    ),
+    activeTab === "input" && /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { style: { marginBottom: 16 } }, /* @__PURE__ */ React.createElement(
+      "label",
+      {
+        style: {
+          display: "block",
+          fontSize: "0.9rem",
+          fontWeight: 600,
+          color: "#374151",
+          marginBottom: 8
+        }
+      },
+      "Enhancement Type:"
+    ), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 8 } }, /* @__PURE__ */ React.createElement(
+      "button",
+      {
+        onClick: () => setEnhancementType("general"),
+        style: {
+          background: enhancementType === "general" ? "#6D28D9" : "#F3F4F6",
+          color: enhancementType === "general" ? "#FFFFFF" : "#6B7280",
+          border: "none",
+          borderRadius: 6,
+          padding: "8px 16px",
+          cursor: "pointer",
+          fontSize: "0.8rem",
+          fontWeight: 500
+        }
+      },
+      "General Enhancement"
+    ), /* @__PURE__ */ React.createElement(
+      "button",
+      {
+        onClick: () => setEnhancementType("job-specific"),
+        style: {
+          background: enhancementType === "job-specific" ? "#6D28D9" : "#F3F4F6",
+          color: enhancementType === "job-specific" ? "#FFFFFF" : "#6B7280",
+          border: "none",
+          borderRadius: 6,
+          padding: "8px 16px",
+          cursor: "pointer",
+          fontSize: "0.8rem",
+          fontWeight: 500
+        }
+      },
+      "Job-Specific Tailoring"
+    ))), /* @__PURE__ */ React.createElement("div", { className: "uswift-card", style: { marginBottom: 16 } }, /* @__PURE__ */ React.createElement(
+      "label",
+      {
+        style: {
+          fontWeight: 600,
+          display: "block",
+          marginBottom: 8,
+          color: "#374151"
+        }
+      },
+      "Your Resume Content:"
+    ), /* @__PURE__ */ React.createElement(
+      "textarea",
+      {
+        value: resumeContent,
+        onChange: (e) => setResumeContent(e.target.value),
+        placeholder: "Paste your current resume content here...",
+        rows: 8,
+        style: {
+          width: "100%",
+          padding: 12,
+          borderRadius: 8,
+          border: "1px solid #E5E7EB",
+          fontSize: "0.9rem",
+          resize: "vertical",
+          fontFamily: "monospace"
+        }
+      }
+    )), enhancementType === "job-specific" && /* @__PURE__ */ React.createElement("div", { className: "uswift-card", style: { marginBottom: 16 } }, /* @__PURE__ */ React.createElement(
+      "label",
+      {
+        style: {
+          fontWeight: 600,
+          display: "block",
+          marginBottom: 8,
+          color: "#374151"
+        }
+      },
+      "Job Description (Optional):"
+    ), /* @__PURE__ */ React.createElement(
+      "textarea",
+      {
+        value: jobDescription,
+        onChange: (e) => setJobDescription(e.target.value),
+        placeholder: "Paste the job description to tailor your resume specifically for this role...",
+        rows: 6,
+        style: {
+          width: "100%",
+          padding: 12,
+          borderRadius: 8,
+          border: "1px solid #E5E7EB",
+          fontSize: "0.9rem",
+          resize: "vertical"
+        }
+      }
+    )), /* @__PURE__ */ React.createElement(
+      "button",
+      {
+        onClick: handleEnhance,
+        disabled: isLoading || !resumeContent.trim(),
+        className: "uswift-btn",
+        style: {
+          width: "100%",
+          opacity: isLoading || !resumeContent.trim() ? 0.6 : 1,
+          cursor: isLoading || !resumeContent.trim() ? "not-allowed" : "pointer"
+        }
+      },
+      isLoading ? /* @__PURE__ */ React.createElement(
+        "div",
+        {
+          style: {
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 8
+          }
+        },
+        /* @__PURE__ */ React.createElement(
           "div",
           {
-            className: "uswift-gradient",
             style: {
-              height: 8,
-              borderRadius: 8,
-              marginBottom: 16
+              width: 16,
+              height: 16,
+              border: "2px solid #ffffff",
+              borderTop: "2px solid transparent",
+              borderRadius: "50%",
+              animation: "spin 1s linear infinite"
             }
-          },
-          void 0,
-          false,
-          {
-            fileName: "C:/Users/DELL/Uswift/extension/src/ResumeEnhancement.tsx",
-            lineNumber: 158,
-            columnNumber: 7
-          },
-          this
+          }
         ),
-        /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-          "div",
-          {
-            style: {
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              marginBottom: 16
-            },
-            children: [
-              /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                "h2",
-                {
-                  style: {
-                    fontSize: "1.4rem",
-                    fontWeight: 700,
-                    color: "#111827",
-                    margin: 0
-                  },
-                  children: "Resume Enhancement"
-                },
-                void 0,
-                false,
-                {
-                  fileName: "C:/Users/DELL/Uswift/extension/src/ResumeEnhancement.tsx",
-                  lineNumber: 175,
-                  columnNumber: 9
-                },
-                this
-              ),
-              activeTab === "result" && /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                "button",
-                {
-                  onClick: () => setActiveTab("input"),
-                  style: {
-                    background: "#EDE9FE",
-                    color: "#6D28D9",
-                    border: "none",
-                    borderRadius: 8,
-                    padding: "6px 12px",
-                    cursor: "pointer",
-                    fontSize: "0.8rem"
-                  },
-                  children: "← Back to Edit"
-                },
-                void 0,
-                false,
-                {
-                  fileName: "C:/Users/DELL/Uswift/extension/src/ResumeEnhancement.tsx",
-                  lineNumber: 186,
-                  columnNumber: 11
-                },
-                this
-              )
-            ]
-          },
-          void 0,
-          true,
-          {
-            fileName: "C:/Users/DELL/Uswift/extension/src/ResumeEnhancement.tsx",
-            lineNumber: 167,
-            columnNumber: 7
-          },
-          this
-        ),
-        /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-          "div",
-          {
-            style: {
-              display: "flex",
-              marginBottom: 16,
-              borderBottom: "1px solid #E5E7EB"
-            },
-            children: [
-              /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                "button",
-                {
-                  onClick: () => setActiveTab("input"),
-                  style: {
-                    background: "none",
-                    border: "none",
-                    padding: "12px 16px",
-                    cursor: "pointer",
-                    fontSize: "0.9rem",
-                    fontWeight: activeTab === "input" ? 600 : 400,
-                    color: activeTab === "input" ? "#6D28D9" : "#6B7280",
-                    borderBottom: activeTab === "input" ? "2px solid #6D28D9" : "none"
-                  },
-                  children: "Input"
-                },
-                void 0,
-                false,
-                {
-                  fileName: "C:/Users/DELL/Uswift/extension/src/ResumeEnhancement.tsx",
-                  lineNumber: 211,
-                  columnNumber: 9
-                },
-                this
-              ),
-              /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                "button",
-                {
-                  onClick: () => setActiveTab("result"),
-                  disabled: !result,
-                  style: {
-                    background: "none",
-                    border: "none",
-                    padding: "12px 16px",
-                    cursor: result ? "pointer" : "not-allowed",
-                    fontSize: "0.9rem",
-                    fontWeight: activeTab === "result" ? 600 : 400,
-                    color: activeTab === "result" ? "#6D28D9" : "#6B7280",
-                    borderBottom: activeTab === "result" ? "2px solid #6D28D9" : "none",
-                    opacity: result ? 1 : 0.5
-                  },
-                  children: "Enhanced Resume"
-                },
-                void 0,
-                false,
-                {
-                  fileName: "C:/Users/DELL/Uswift/extension/src/ResumeEnhancement.tsx",
-                  lineNumber: 226,
-                  columnNumber: 9
-                },
-                this
-              )
-            ]
-          },
-          void 0,
-          true,
-          {
-            fileName: "C:/Users/DELL/Uswift/extension/src/ResumeEnhancement.tsx",
-            lineNumber: 204,
-            columnNumber: 7
-          },
-          this
-        ),
-        activeTab === "input" && /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { children: [
-          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { marginBottom: 16 }, children: [
-            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-              "label",
-              {
-                style: {
-                  display: "block",
-                  fontSize: "0.9rem",
-                  fontWeight: 600,
-                  color: "#374151",
-                  marginBottom: 8
-                },
-                children: "Enhancement Type:"
-              },
-              void 0,
-              false,
-              {
-                fileName: "C:/Users/DELL/Uswift/extension/src/ResumeEnhancement.tsx",
-                lineNumber: 249,
-                columnNumber: 13
-              },
-              this
-            ),
-            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { display: "flex", gap: 8 }, children: [
-              /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                "button",
-                {
-                  onClick: () => setEnhancementType("general"),
-                  style: {
-                    background: enhancementType === "general" ? "#6D28D9" : "#F3F4F6",
-                    color: enhancementType === "general" ? "#FFFFFF" : "#6B7280",
-                    border: "none",
-                    borderRadius: 6,
-                    padding: "8px 16px",
-                    cursor: "pointer",
-                    fontSize: "0.8rem",
-                    fontWeight: 500
-                  },
-                  children: "General Enhancement"
-                },
-                void 0,
-                false,
-                {
-                  fileName: "C:/Users/DELL/Uswift/extension/src/ResumeEnhancement.tsx",
-                  lineNumber: 261,
-                  columnNumber: 15
-                },
-                this
-              ),
-              /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                "button",
-                {
-                  onClick: () => setEnhancementType("job-specific"),
-                  style: {
-                    background: enhancementType === "job-specific" ? "#6D28D9" : "#F3F4F6",
-                    color: enhancementType === "job-specific" ? "#FFFFFF" : "#6B7280",
-                    border: "none",
-                    borderRadius: 6,
-                    padding: "8px 16px",
-                    cursor: "pointer",
-                    fontSize: "0.8rem",
-                    fontWeight: 500
-                  },
-                  children: "Job-Specific Tailoring"
-                },
-                void 0,
-                false,
-                {
-                  fileName: "C:/Users/DELL/Uswift/extension/src/ResumeEnhancement.tsx",
-                  lineNumber: 277,
-                  columnNumber: 15
-                },
-                this
-              )
-            ] }, void 0, true, {
-              fileName: "C:/Users/DELL/Uswift/extension/src/ResumeEnhancement.tsx",
-              lineNumber: 260,
-              columnNumber: 13
-            }, this)
-          ] }, void 0, true, {
-            fileName: "C:/Users/DELL/Uswift/extension/src/ResumeEnhancement.tsx",
-            lineNumber: 248,
-            columnNumber: 11
-          }, this),
-          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { className: "uswift-card", style: { marginBottom: 16 }, children: [
-            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-              "label",
-              {
-                style: {
-                  fontWeight: 600,
-                  display: "block",
-                  marginBottom: 8,
-                  color: "#374151"
-                },
-                children: "Your Resume Content:"
-              },
-              void 0,
-              false,
-              {
-                fileName: "C:/Users/DELL/Uswift/extension/src/ResumeEnhancement.tsx",
-                lineNumber: 299,
-                columnNumber: 13
-              },
-              this
-            ),
-            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-              "textarea",
-              {
-                value: resumeContent,
-                onChange: (e) => setResumeContent(e.target.value),
-                placeholder: "Paste your current resume content here...",
-                rows: 8,
-                style: {
-                  width: "100%",
-                  padding: 12,
-                  borderRadius: 8,
-                  border: "1px solid #E5E7EB",
-                  fontSize: "0.9rem",
-                  resize: "vertical",
-                  fontFamily: "monospace"
-                }
-              },
-              void 0,
-              false,
-              {
-                fileName: "C:/Users/DELL/Uswift/extension/src/ResumeEnhancement.tsx",
-                lineNumber: 309,
-                columnNumber: 13
-              },
-              this
-            )
-          ] }, void 0, true, {
-            fileName: "C:/Users/DELL/Uswift/extension/src/ResumeEnhancement.tsx",
-            lineNumber: 298,
-            columnNumber: 11
-          }, this),
-          enhancementType === "job-specific" && /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { className: "uswift-card", style: { marginBottom: 16 }, children: [
-            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-              "label",
-              {
-                style: {
-                  fontWeight: 600,
-                  display: "block",
-                  marginBottom: 8,
-                  color: "#374151"
-                },
-                children: "Job Description (Optional):"
-              },
-              void 0,
-              false,
-              {
-                fileName: "C:/Users/DELL/Uswift/extension/src/ResumeEnhancement.tsx",
-                lineNumber: 329,
-                columnNumber: 15
-              },
-              this
-            ),
-            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-              "textarea",
-              {
-                value: jobDescription,
-                onChange: (e) => setJobDescription(e.target.value),
-                placeholder: "Paste the job description to tailor your resume specifically for this role...",
-                rows: 6,
-                style: {
-                  width: "100%",
-                  padding: 12,
-                  borderRadius: 8,
-                  border: "1px solid #E5E7EB",
-                  fontSize: "0.9rem",
-                  resize: "vertical"
-                }
-              },
-              void 0,
-              false,
-              {
-                fileName: "C:/Users/DELL/Uswift/extension/src/ResumeEnhancement.tsx",
-                lineNumber: 339,
-                columnNumber: 15
-              },
-              this
-            )
-          ] }, void 0, true, {
-            fileName: "C:/Users/DELL/Uswift/extension/src/ResumeEnhancement.tsx",
-            lineNumber: 328,
-            columnNumber: 13
-          }, this),
-          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-            "button",
-            {
-              onClick: handleEnhance,
-              disabled: isLoading || !resumeContent.trim(),
-              className: "uswift-btn",
-              style: {
-                width: "100%",
-                opacity: isLoading || !resumeContent.trim() ? 0.6 : 1,
-                cursor: isLoading || !resumeContent.trim() ? "not-allowed" : "pointer"
-              },
-              children: isLoading ? /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                "div",
-                {
-                  style: {
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    gap: 8
-                  },
-                  children: [
-                    /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                      "div",
-                      {
-                        style: {
-                          width: 16,
-                          height: 16,
-                          border: "2px solid #ffffff",
-                          borderTop: "2px solid transparent",
-                          borderRadius: "50%",
-                          animation: "spin 1s linear infinite"
-                        }
-                      },
-                      void 0,
-                      false,
-                      {
-                        fileName: "C:/Users/DELL/Uswift/extension/src/ResumeEnhancement.tsx",
-                        lineNumber: 377,
-                        columnNumber: 17
-                      },
-                      this
-                    ),
-                    "Enhancing Resume..."
-                  ]
-                },
-                void 0,
-                true,
-                {
-                  fileName: "C:/Users/DELL/Uswift/extension/src/ResumeEnhancement.tsx",
-                  lineNumber: 369,
-                  columnNumber: 15
-                },
-                this
-              ) : "Enhance My Resume"
-            },
-            void 0,
-            false,
-            {
-              fileName: "C:/Users/DELL/Uswift/extension/src/ResumeEnhancement.tsx",
-              lineNumber: 357,
-              columnNumber: 11
-            },
-            this
-          ),
-          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-            "div",
-            {
-              style: {
-                marginTop: 16,
-                padding: 12,
-                background: "#F8F9FA",
-                borderRadius: 8,
-                fontSize: "0.8rem",
-                color: "#6B7280"
-              },
-              children: [
-                /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("strong", { children: "Tips:" }, void 0, false, {
-                  fileName: "C:/Users/DELL/Uswift/extension/src/ResumeEnhancement.tsx",
-                  lineNumber: 405,
-                  columnNumber: 13
-                }, this),
-                /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("ul", { style: { margin: "8px 0 0 16px", padding: 0 }, children: [
-                  /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("li", { children: "Include your full work history and key achievements" }, void 0, false, {
-                    fileName: "C:/Users/DELL/Uswift/extension/src/ResumeEnhancement.tsx",
-                    lineNumber: 407,
-                    columnNumber: 15
-                  }, this),
-                  /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("li", { children: "Use quantifiable metrics where possible" }, void 0, false, {
-                    fileName: "C:/Users/DELL/Uswift/extension/src/ResumeEnhancement.tsx",
-                    lineNumber: 408,
-                    columnNumber: 15
-                  }, this),
-                  /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("li", { children: "Keep it concise but comprehensive" }, void 0, false, {
-                    fileName: "C:/Users/DELL/Uswift/extension/src/ResumeEnhancement.tsx",
-                    lineNumber: 409,
-                    columnNumber: 15
-                  }, this),
-                  /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("li", { children: "For job-specific enhancement, include relevant keywords from the job posting" }, void 0, false, {
-                    fileName: "C:/Users/DELL/Uswift/extension/src/ResumeEnhancement.tsx",
-                    lineNumber: 410,
-                    columnNumber: 15
-                  }, this)
-                ] }, void 0, true, {
-                  fileName: "C:/Users/DELL/Uswift/extension/src/ResumeEnhancement.tsx",
-                  lineNumber: 406,
-                  columnNumber: 13
-                }, this)
-              ]
-            },
-            void 0,
-            true,
-            {
-              fileName: "C:/Users/DELL/Uswift/extension/src/ResumeEnhancement.tsx",
-              lineNumber: 395,
-              columnNumber: 11
-            },
-            this
-          )
-        ] }, void 0, true, {
-          fileName: "C:/Users/DELL/Uswift/extension/src/ResumeEnhancement.tsx",
-          lineNumber: 246,
-          columnNumber: 9
-        }, this),
-        activeTab === "result" && result && /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { children: [
-          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-            "div",
-            {
-              style: {
-                display: "flex",
-                alignItems: "center",
-                gap: 16,
-                marginBottom: 20,
-                padding: 16,
-                background: "#F8F9FA",
-                borderRadius: 8
-              },
-              children: [
-                /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { textAlign: "center" }, children: [
-                  /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                    "div",
-                    {
-                      style: {
-                        fontSize: "2rem",
-                        fontWeight: 700,
-                        color: getScoreColor(result.score),
-                        marginBottom: 4
-                      },
-                      children: [
-                        result.score,
-                        "/100"
-                      ]
-                    },
-                    void 0,
-                    true,
-                    {
-                      fileName: "C:/Users/DELL/Uswift/extension/src/ResumeEnhancement.tsx",
-                      lineNumber: 434,
-                      columnNumber: 15
-                    },
-                    this
-                  ),
-                  /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                    "div",
-                    {
-                      style: {
-                        fontSize: "0.8rem",
-                        color: "#6B7280",
-                        fontWeight: 500
-                      },
-                      children: getScoreLabel(result.score)
-                    },
-                    void 0,
-                    false,
-                    {
-                      fileName: "C:/Users/DELL/Uswift/extension/src/ResumeEnhancement.tsx",
-                      lineNumber: 444,
-                      columnNumber: 15
-                    },
-                    this
-                  )
-                ] }, void 0, true, {
-                  fileName: "C:/Users/DELL/Uswift/extension/src/ResumeEnhancement.tsx",
-                  lineNumber: 433,
-                  columnNumber: 13
-                }, this),
-                /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { flex: 1 }, children: [
-                  /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                    "h3",
-                    {
-                      style: {
-                        margin: "0 0 8px 0",
-                        fontSize: "1rem",
-                        color: "#111827"
-                      },
-                      children: "Resume Quality Score"
-                    },
-                    void 0,
-                    false,
-                    {
-                      fileName: "C:/Users/DELL/Uswift/extension/src/ResumeEnhancement.tsx",
-                      lineNumber: 455,
-                      columnNumber: 15
-                    },
-                    this
-                  ),
-                  /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("p", { style: { margin: 0, fontSize: "0.8rem", color: "#6B7280" }, children: "Based on content relevance, formatting, and impact statements" }, void 0, false, {
-                    fileName: "C:/Users/DELL/Uswift/extension/src/ResumeEnhancement.tsx",
-                    lineNumber: 464,
-                    columnNumber: 15
-                  }, this)
-                ] }, void 0, true, {
-                  fileName: "C:/Users/DELL/Uswift/extension/src/ResumeEnhancement.tsx",
-                  lineNumber: 454,
-                  columnNumber: 13
-                }, this)
-              ]
-            },
-            void 0,
-            true,
-            {
-              fileName: "C:/Users/DELL/Uswift/extension/src/ResumeEnhancement.tsx",
-              lineNumber: 422,
-              columnNumber: 11
-            },
-            this
-          ),
-          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { className: "uswift-card", style: { marginBottom: 16 }, children: [
-            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-              "h3",
-              {
-                style: {
-                  fontSize: "1.1rem",
-                  fontWeight: 600,
-                  color: "#111827",
-                  marginBottom: 12
-                },
-                children: "Key Suggestions"
-              },
-              void 0,
-              false,
-              {
-                fileName: "C:/Users/DELL/Uswift/extension/src/ResumeEnhancement.tsx",
-                lineNumber: 472,
-                columnNumber: 13
-              },
-              this
-            ),
-            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-              "div",
-              {
-                style: { fontSize: "0.9rem", lineHeight: 1.6, color: "#4B5563" },
-                children: result.suggestions
-              },
-              void 0,
-              false,
-              {
-                fileName: "C:/Users/DELL/Uswift/extension/src/ResumeEnhancement.tsx",
-                lineNumber: 482,
-                columnNumber: 13
-              },
-              this
-            )
-          ] }, void 0, true, {
-            fileName: "C:/Users/DELL/Uswift/extension/src/ResumeEnhancement.tsx",
-            lineNumber: 471,
-            columnNumber: 11
-          }, this),
-          result.improvements.length > 0 && /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { className: "uswift-card", style: { marginBottom: 16 }, children: [
-            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-              "h3",
-              {
-                style: {
-                  fontSize: "1.1rem",
-                  fontWeight: 600,
-                  color: "#111827",
-                  marginBottom: 12
-                },
-                children: "Top Improvements Made"
-              },
-              void 0,
-              false,
-              {
-                fileName: "C:/Users/DELL/Uswift/extension/src/ResumeEnhancement.tsx",
-                lineNumber: 492,
-                columnNumber: 15
-              },
-              this
-            ),
-            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("ul", { style: { margin: 0, paddingLeft: 20 }, children: result.improvements.map((improvement, index) => /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-              "li",
-              {
-                style: {
-                  fontSize: "0.9rem",
-                  color: "#4B5563",
-                  marginBottom: 8
-                },
-                children: improvement
-              },
-              index,
-              false,
-              {
-                fileName: "C:/Users/DELL/Uswift/extension/src/ResumeEnhancement.tsx",
-                lineNumber: 504,
-                columnNumber: 19
-              },
-              this
-            )) }, void 0, false, {
-              fileName: "C:/Users/DELL/Uswift/extension/src/ResumeEnhancement.tsx",
-              lineNumber: 502,
-              columnNumber: 15
-            }, this)
-          ] }, void 0, true, {
-            fileName: "C:/Users/DELL/Uswift/extension/src/ResumeEnhancement.tsx",
-            lineNumber: 491,
-            columnNumber: 13
-          }, this),
-          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { className: "uswift-card", style: { marginBottom: 16 }, children: [
-            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-              "div",
-              {
-                style: {
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  marginBottom: 12
-                },
-                children: [
-                  /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                    "h3",
-                    {
-                      style: {
-                        fontSize: "1.1rem",
-                        fontWeight: 600,
-                        color: "#111827",
-                        margin: 0
-                      },
-                      children: "Enhanced Resume"
-                    },
-                    void 0,
-                    false,
-                    {
-                      fileName: "C:/Users/DELL/Uswift/extension/src/ResumeEnhancement.tsx",
-                      lineNumber: 529,
-                      columnNumber: 15
-                    },
-                    this
-                  ),
-                  /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                    "button",
-                    {
-                      onClick: () => copyToClipboard(result.enhancedResume),
-                      style: {
-                        background: "#EDE9FE",
-                        color: "#6D28D9",
-                        border: "none",
-                        borderRadius: 6,
-                        padding: "6px 12px",
-                        cursor: "pointer",
-                        fontSize: "0.8rem"
-                      },
-                      children: "Copy"
-                    },
-                    void 0,
-                    false,
-                    {
-                      fileName: "C:/Users/DELL/Uswift/extension/src/ResumeEnhancement.tsx",
-                      lineNumber: 539,
-                      columnNumber: 15
-                    },
-                    this
-                  )
-                ]
-              },
-              void 0,
-              true,
-              {
-                fileName: "C:/Users/DELL/Uswift/extension/src/ResumeEnhancement.tsx",
-                lineNumber: 521,
-                columnNumber: 13
-              },
-              this
-            ),
-            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-              "div",
-              {
-                style: {
-                  background: "#F8F9FA",
-                  padding: 16,
-                  borderRadius: 8,
-                  fontSize: "0.85rem",
-                  fontFamily: "monospace",
-                  whiteSpace: "pre-wrap",
-                  maxHeight: 300,
-                  overflowY: "auto",
-                  border: "1px solid #E5E7EB"
-                },
-                children: result.enhancedResume
-              },
-              void 0,
-              false,
-              {
-                fileName: "C:/Users/DELL/Uswift/extension/src/ResumeEnhancement.tsx",
-                lineNumber: 554,
-                columnNumber: 13
-              },
-              this
-            )
-          ] }, void 0, true, {
-            fileName: "C:/Users/DELL/Uswift/extension/src/ResumeEnhancement.tsx",
-            lineNumber: 520,
-            columnNumber: 11
-          }, this),
-          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { display: "flex", gap: 8 }, children: [
-            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-              "button",
-              {
-                onClick: () => copyToClipboard(result.enhancedResume),
-                className: "uswift-btn",
-                style: { flex: 1 },
-                children: "Copy Enhanced Resume"
-              },
-              void 0,
-              false,
-              {
-                fileName: "C:/Users/DELL/Uswift/extension/src/ResumeEnhancement.tsx",
-                lineNumber: 573,
-                columnNumber: 13
-              },
-              this
-            ),
-            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-              "button",
-              {
-                onClick: () => setActiveTab("input"),
-                style: {
-                  flex: 1,
-                  background: "#F3F4F6",
-                  color: "#6B7280",
-                  border: "1px solid #E5E7EB",
-                  borderRadius: 8,
-                  padding: "12px",
-                  cursor: "pointer"
-                },
-                children: "Make Another Edit"
-              },
-              void 0,
-              false,
-              {
-                fileName: "C:/Users/DELL/Uswift/extension/src/ResumeEnhancement.tsx",
-                lineNumber: 580,
-                columnNumber: 13
-              },
-              this
-            )
-          ] }, void 0, true, {
-            fileName: "C:/Users/DELL/Uswift/extension/src/ResumeEnhancement.tsx",
-            lineNumber: 572,
-            columnNumber: 11
-          }, this)
-        ] }, void 0, true, {
-          fileName: "C:/Users/DELL/Uswift/extension/src/ResumeEnhancement.tsx",
-          lineNumber: 420,
-          columnNumber: 9
-        }, this),
-        /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-          "div",
-          {
-            style: {
-              marginTop: 16,
-              textAlign: "center",
-              fontSize: "0.8rem",
-              color: "#6B7280"
-            },
-            children: "Powered by Mistral AI • Get professional resume enhancement suggestions"
-          },
-          void 0,
-          false,
-          {
-            fileName: "C:/Users/DELL/Uswift/extension/src/ResumeEnhancement.tsx",
-            lineNumber: 599,
-            columnNumber: 7
-          },
-          this
-        )
-      ]
-    },
-    void 0,
-    true,
-    {
-      fileName: "C:/Users/DELL/Uswift/extension/src/ResumeEnhancement.tsx",
-      lineNumber: 148,
-      columnNumber: 5
-    },
-    this
+        "Enhancing Resume..."
+      ) : "Enhance My Resume"
+    ), /* @__PURE__ */ React.createElement(
+      "div",
+      {
+        style: {
+          marginTop: 16,
+          padding: 12,
+          background: "#F8F9FA",
+          borderRadius: 8,
+          fontSize: "0.8rem",
+          color: "#6B7280"
+        }
+      },
+      /* @__PURE__ */ React.createElement("strong", null, "Tips:"),
+      /* @__PURE__ */ React.createElement("ul", { style: { margin: "8px 0 0 16px", padding: 0 } }, /* @__PURE__ */ React.createElement("li", null, "Include your full work history and key achievements"), /* @__PURE__ */ React.createElement("li", null, "Use quantifiable metrics where possible"), /* @__PURE__ */ React.createElement("li", null, "Keep it concise but comprehensive"), /* @__PURE__ */ React.createElement("li", null, "For job-specific enhancement, include relevant keywords from the job posting"))
+    )),
+    activeTab === "result" && result && /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement(
+      "div",
+      {
+        style: {
+          display: "flex",
+          alignItems: "center",
+          gap: 16,
+          marginBottom: 20,
+          padding: 16,
+          background: "#F8F9FA",
+          borderRadius: 8
+        }
+      },
+      /* @__PURE__ */ React.createElement("div", { style: { textAlign: "center" } }, /* @__PURE__ */ React.createElement(
+        "div",
+        {
+          style: {
+            fontSize: "2rem",
+            fontWeight: 700,
+            color: getScoreColor(result.score),
+            marginBottom: 4
+          }
+        },
+        result.score,
+        "/100"
+      ), /* @__PURE__ */ React.createElement(
+        "div",
+        {
+          style: {
+            fontSize: "0.8rem",
+            color: "#6B7280",
+            fontWeight: 500
+          }
+        },
+        getScoreLabel(result.score)
+      )),
+      /* @__PURE__ */ React.createElement("div", { style: { flex: 1 } }, /* @__PURE__ */ React.createElement(
+        "h3",
+        {
+          style: {
+            margin: "0 0 8px 0",
+            fontSize: "1rem",
+            color: "#111827"
+          }
+        },
+        "Resume Quality Score"
+      ), /* @__PURE__ */ React.createElement("p", { style: { margin: 0, fontSize: "0.8rem", color: "#6B7280" } }, "Based on content relevance, formatting, and impact statements"))
+    ), /* @__PURE__ */ React.createElement("div", { className: "uswift-card", style: { marginBottom: 16 } }, /* @__PURE__ */ React.createElement(
+      "h3",
+      {
+        style: {
+          fontSize: "1.1rem",
+          fontWeight: 600,
+          color: "#111827",
+          marginBottom: 12
+        }
+      },
+      "Key Suggestions"
+    ), /* @__PURE__ */ React.createElement(
+      "div",
+      {
+        style: { fontSize: "0.9rem", lineHeight: 1.6, color: "#4B5563" }
+      },
+      result.suggestions
+    )), result.improvements.length > 0 && /* @__PURE__ */ React.createElement("div", { className: "uswift-card", style: { marginBottom: 16 } }, /* @__PURE__ */ React.createElement(
+      "h3",
+      {
+        style: {
+          fontSize: "1.1rem",
+          fontWeight: 600,
+          color: "#111827",
+          marginBottom: 12
+        }
+      },
+      "Top Improvements Made"
+    ), /* @__PURE__ */ React.createElement("ul", { style: { margin: 0, paddingLeft: 20 } }, result.improvements.map((improvement, index) => /* @__PURE__ */ React.createElement(
+      "li",
+      {
+        key: index,
+        style: {
+          fontSize: "0.9rem",
+          color: "#4B5563",
+          marginBottom: 8
+        }
+      },
+      improvement
+    )))), /* @__PURE__ */ React.createElement("div", { className: "uswift-card", style: { marginBottom: 16 } }, /* @__PURE__ */ React.createElement(
+      "div",
+      {
+        style: {
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          marginBottom: 12
+        }
+      },
+      /* @__PURE__ */ React.createElement(
+        "h3",
+        {
+          style: {
+            fontSize: "1.1rem",
+            fontWeight: 600,
+            color: "#111827",
+            margin: 0
+          }
+        },
+        "Enhanced Resume"
+      ),
+      /* @__PURE__ */ React.createElement(
+        "button",
+        {
+          onClick: () => copyToClipboard(result.enhancedResume),
+          style: {
+            background: "#EDE9FE",
+            color: "#6D28D9",
+            border: "none",
+            borderRadius: 6,
+            padding: "6px 12px",
+            cursor: "pointer",
+            fontSize: "0.8rem"
+          }
+        },
+        "Copy"
+      )
+    ), /* @__PURE__ */ React.createElement(
+      "div",
+      {
+        style: {
+          background: "#F8F9FA",
+          padding: 16,
+          borderRadius: 8,
+          fontSize: "0.85rem",
+          fontFamily: "monospace",
+          whiteSpace: "pre-wrap",
+          maxHeight: 300,
+          overflowY: "auto",
+          border: "1px solid #E5E7EB"
+        }
+      },
+      result.enhancedResume
+    )), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 8 } }, /* @__PURE__ */ React.createElement(
+      "button",
+      {
+        onClick: () => copyToClipboard(result.enhancedResume),
+        className: "uswift-btn",
+        style: { flex: 1 }
+      },
+      "Copy Enhanced Resume"
+    ), /* @__PURE__ */ React.createElement(
+      "button",
+      {
+        onClick: () => setActiveTab("input"),
+        style: {
+          flex: 1,
+          background: "#F3F4F6",
+          color: "#6B7280",
+          border: "1px solid #E5E7EB",
+          borderRadius: 8,
+          padding: "12px",
+          cursor: "pointer"
+        }
+      },
+      "Make Another Edit"
+    ))),
+    /* @__PURE__ */ React.createElement(
+      "div",
+      {
+        style: {
+          marginTop: 16,
+          textAlign: "center",
+          fontSize: "0.8rem",
+          color: "#6B7280"
+        }
+      },
+      "Powered by Mistral AI • Get professional resume enhancement suggestions"
+    )
   );
 }
 
@@ -4689,7 +3016,7 @@ function CoverLetterGenerator() {
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
   };
-  return /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
+  return /* @__PURE__ */ React.createElement(
     "div",
     {
       style: {
@@ -4698,939 +3025,480 @@ function CoverLetterGenerator() {
         padding: "2rem",
         minWidth: 350,
         minHeight: 520
+      }
+    },
+    /* @__PURE__ */ React.createElement(
+      "div",
+      {
+        className: "uswift-gradient",
+        style: {
+          height: 8,
+          borderRadius: 8,
+          marginBottom: 16
+        }
+      }
+    ),
+    /* @__PURE__ */ React.createElement(
+      "div",
+      {
+        style: {
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          marginBottom: 16
+        }
       },
-      children: [
-        /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
+      /* @__PURE__ */ React.createElement(
+        "h2",
+        {
+          style: {
+            fontSize: "1.4rem",
+            fontWeight: 700,
+            color: "#111827",
+            margin: 0
+          }
+        },
+        "Cover Letter Generator"
+      ),
+      activeTab === "result" && /* @__PURE__ */ React.createElement(
+        "button",
+        {
+          onClick: () => setActiveTab("input"),
+          style: {
+            background: "#EDE9FE",
+            color: "#6D28D9",
+            border: "none",
+            borderRadius: 8,
+            padding: "6px 12px",
+            cursor: "pointer",
+            fontSize: "0.8rem"
+          }
+        },
+        "← Back to Edit"
+      )
+    ),
+    /* @__PURE__ */ React.createElement(
+      "div",
+      {
+        style: {
+          display: "flex",
+          marginBottom: 16,
+          borderBottom: "1px solid #E5E7EB"
+        }
+      },
+      /* @__PURE__ */ React.createElement(
+        "button",
+        {
+          onClick: () => setActiveTab("input"),
+          style: {
+            background: "none",
+            border: "none",
+            padding: "12px 16px",
+            cursor: "pointer",
+            fontSize: "0.9rem",
+            fontWeight: activeTab === "input" ? 600 : 400,
+            color: activeTab === "input" ? "#6D28D9" : "#6B7280",
+            borderBottom: activeTab === "input" ? "2px solid #6D28D9" : "none"
+          }
+        },
+        "Input"
+      ),
+      /* @__PURE__ */ React.createElement(
+        "button",
+        {
+          onClick: () => setActiveTab("result"),
+          disabled: !result,
+          style: {
+            background: "none",
+            border: "none",
+            padding: "12px 16px",
+            cursor: result ? "pointer" : "not-allowed",
+            fontSize: "0.9rem",
+            fontWeight: activeTab === "result" ? 600 : 400,
+            color: activeTab === "result" ? "#6D28D9" : "#6B7280",
+            borderBottom: activeTab === "result" ? "2px solid #6D28D9" : "none",
+            opacity: result ? 1 : 0.5
+          }
+        },
+        "Generated Letter"
+      )
+    ),
+    activeTab === "input" && /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 12, marginBottom: 16 } }, /* @__PURE__ */ React.createElement("div", { style: { flex: 1 } }, /* @__PURE__ */ React.createElement(
+      "label",
+      {
+        style: {
+          display: "block",
+          fontSize: "0.9rem",
+          fontWeight: 600,
+          color: "#374151",
+          marginBottom: 4
+        }
+      },
+      "Job Title"
+    ), /* @__PURE__ */ React.createElement(
+      "input",
+      {
+        type: "text",
+        value: jobTitle,
+        onChange: (e) => setJobTitle(e.target.value),
+        placeholder: "e.g., Senior Software Engineer",
+        style: {
+          width: "100%",
+          padding: "8px 12px",
+          borderRadius: 6,
+          border: "1px solid #E5E7EB",
+          fontSize: "0.9rem"
+        }
+      }
+    )), /* @__PURE__ */ React.createElement("div", { style: { flex: 1 } }, /* @__PURE__ */ React.createElement(
+      "label",
+      {
+        style: {
+          display: "block",
+          fontSize: "0.9rem",
+          fontWeight: 600,
+          color: "#374151",
+          marginBottom: 4
+        }
+      },
+      "Company Name"
+    ), /* @__PURE__ */ React.createElement(
+      "input",
+      {
+        type: "text",
+        value: companyName,
+        onChange: (e) => setCompanyName(e.target.value),
+        placeholder: "e.g., Google",
+        style: {
+          width: "100%",
+          padding: "8px 12px",
+          borderRadius: 6,
+          border: "1px solid #E5E7EB",
+          fontSize: "0.9rem"
+        }
+      }
+    ))), /* @__PURE__ */ React.createElement("div", { style: { marginBottom: 16 } }, /* @__PURE__ */ React.createElement(
+      "label",
+      {
+        style: {
+          display: "block",
+          fontSize: "0.9rem",
+          fontWeight: 600,
+          color: "#374151",
+          marginBottom: 8
+        }
+      },
+      "Cover Letter Tone:"
+    ), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 8, flexWrap: "wrap" } }, toneOptions.map((option) => /* @__PURE__ */ React.createElement(
+      "button",
+      {
+        key: option.value,
+        onClick: () => setTone(option.value),
+        style: {
+          background: tone === option.value ? "#6D28D9" : "#F3F4F6",
+          color: tone === option.value ? "#FFFFFF" : "#6B7280",
+          border: "none",
+          borderRadius: 6,
+          padding: "8px 16px",
+          cursor: "pointer",
+          fontSize: "0.8rem",
+          fontWeight: 500,
+          minWidth: 120,
+          textAlign: "left"
+        },
+        title: option.description
+      },
+      /* @__PURE__ */ React.createElement("div", { style: { fontWeight: 600 } }, option.label),
+      /* @__PURE__ */ React.createElement("div", { style: { fontSize: "0.7rem", opacity: 0.8 } }, option.description)
+    )))), /* @__PURE__ */ React.createElement("div", { className: "uswift-card", style: { marginBottom: 16 } }, /* @__PURE__ */ React.createElement(
+      "label",
+      {
+        style: {
+          fontWeight: 600,
+          display: "block",
+          marginBottom: 8,
+          color: "#374151"
+        }
+      },
+      "Your Resume Content:"
+    ), /* @__PURE__ */ React.createElement(
+      "textarea",
+      {
+        value: resumeContent,
+        onChange: (e) => setResumeContent(e.target.value),
+        placeholder: "Paste your resume content here to help tailor the cover letter...",
+        rows: 6,
+        style: {
+          width: "100%",
+          padding: 12,
+          borderRadius: 8,
+          border: "1px solid #E5E7EB",
+          fontSize: "0.9rem",
+          resize: "vertical"
+        }
+      }
+    )), /* @__PURE__ */ React.createElement("div", { className: "uswift-card", style: { marginBottom: 16 } }, /* @__PURE__ */ React.createElement(
+      "label",
+      {
+        style: {
+          fontWeight: 600,
+          display: "block",
+          marginBottom: 8,
+          color: "#374151"
+        }
+      },
+      "Job Description:"
+    ), /* @__PURE__ */ React.createElement(
+      "textarea",
+      {
+        value: jobDescription,
+        onChange: (e) => setJobDescription(e.target.value),
+        placeholder: "Paste the complete job description here...",
+        rows: 8,
+        style: {
+          width: "100%",
+          padding: 12,
+          borderRadius: 8,
+          border: "1px solid #E5E7EB",
+          fontSize: "0.9rem",
+          resize: "vertical"
+        }
+      }
+    )), /* @__PURE__ */ React.createElement(
+      "button",
+      {
+        onClick: handleGenerate,
+        disabled: isLoading || !resumeContent.trim() || !jobDescription.trim(),
+        className: "uswift-btn",
+        style: {
+          width: "100%",
+          opacity: isLoading || !resumeContent.trim() || !jobDescription.trim() ? 0.6 : 1,
+          cursor: isLoading || !resumeContent.trim() || !jobDescription.trim() ? "not-allowed" : "pointer"
+        }
+      },
+      isLoading ? /* @__PURE__ */ React.createElement(
+        "div",
+        {
+          style: {
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 8
+          }
+        },
+        /* @__PURE__ */ React.createElement(
           "div",
           {
-            className: "uswift-gradient",
             style: {
-              height: 8,
-              borderRadius: 8,
-              marginBottom: 16
+              width: 16,
+              height: 16,
+              border: "2px solid #ffffff",
+              borderTop: "2px solid transparent",
+              borderRadius: "50%",
+              animation: "spin 1s linear infinite"
             }
-          },
-          void 0,
-          false,
-          {
-            fileName: "C:/Users/DELL/Uswift/extension/src/CoverLetterGenerator.tsx",
-            lineNumber: 156,
-            columnNumber: 7
-          },
-          this
+          }
         ),
-        /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-          "div",
-          {
-            style: {
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              marginBottom: 16
-            },
-            children: [
-              /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                "h2",
-                {
-                  style: {
-                    fontSize: "1.4rem",
-                    fontWeight: 700,
-                    color: "#111827",
-                    margin: 0
-                  },
-                  children: "Cover Letter Generator"
-                },
-                void 0,
-                false,
-                {
-                  fileName: "C:/Users/DELL/Uswift/extension/src/CoverLetterGenerator.tsx",
-                  lineNumber: 173,
-                  columnNumber: 9
-                },
-                this
-              ),
-              activeTab === "result" && /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                "button",
-                {
-                  onClick: () => setActiveTab("input"),
-                  style: {
-                    background: "#EDE9FE",
-                    color: "#6D28D9",
-                    border: "none",
-                    borderRadius: 8,
-                    padding: "6px 12px",
-                    cursor: "pointer",
-                    fontSize: "0.8rem"
-                  },
-                  children: "← Back to Edit"
-                },
-                void 0,
-                false,
-                {
-                  fileName: "C:/Users/DELL/Uswift/extension/src/CoverLetterGenerator.tsx",
-                  lineNumber: 184,
-                  columnNumber: 11
-                },
-                this
-              )
-            ]
-          },
-          void 0,
-          true,
-          {
-            fileName: "C:/Users/DELL/Uswift/extension/src/CoverLetterGenerator.tsx",
-            lineNumber: 165,
-            columnNumber: 7
-          },
-          this
-        ),
-        /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-          "div",
-          {
-            style: {
-              display: "flex",
-              marginBottom: 16,
-              borderBottom: "1px solid #E5E7EB"
-            },
-            children: [
-              /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                "button",
-                {
-                  onClick: () => setActiveTab("input"),
-                  style: {
-                    background: "none",
-                    border: "none",
-                    padding: "12px 16px",
-                    cursor: "pointer",
-                    fontSize: "0.9rem",
-                    fontWeight: activeTab === "input" ? 600 : 400,
-                    color: activeTab === "input" ? "#6D28D9" : "#6B7280",
-                    borderBottom: activeTab === "input" ? "2px solid #6D28D9" : "none"
-                  },
-                  children: "Input"
-                },
-                void 0,
-                false,
-                {
-                  fileName: "C:/Users/DELL/Uswift/extension/src/CoverLetterGenerator.tsx",
-                  lineNumber: 209,
-                  columnNumber: 9
-                },
-                this
-              ),
-              /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                "button",
-                {
-                  onClick: () => setActiveTab("result"),
-                  disabled: !result,
-                  style: {
-                    background: "none",
-                    border: "none",
-                    padding: "12px 16px",
-                    cursor: result ? "pointer" : "not-allowed",
-                    fontSize: "0.9rem",
-                    fontWeight: activeTab === "result" ? 600 : 400,
-                    color: activeTab === "result" ? "#6D28D9" : "#6B7280",
-                    borderBottom: activeTab === "result" ? "2px solid #6D28D9" : "none",
-                    opacity: result ? 1 : 0.5
-                  },
-                  children: "Generated Letter"
-                },
-                void 0,
-                false,
-                {
-                  fileName: "C:/Users/DELL/Uswift/extension/src/CoverLetterGenerator.tsx",
-                  lineNumber: 224,
-                  columnNumber: 9
-                },
-                this
-              )
-            ]
-          },
-          void 0,
-          true,
-          {
-            fileName: "C:/Users/DELL/Uswift/extension/src/CoverLetterGenerator.tsx",
-            lineNumber: 202,
-            columnNumber: 7
-          },
-          this
-        ),
-        activeTab === "input" && /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { children: [
-          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { display: "flex", gap: 12, marginBottom: 16 }, children: [
-            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { flex: 1 }, children: [
-              /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                "label",
-                {
-                  style: {
-                    display: "block",
-                    fontSize: "0.9rem",
-                    fontWeight: 600,
-                    color: "#374151",
-                    marginBottom: 4
-                  },
-                  children: "Job Title"
-                },
-                void 0,
-                false,
-                {
-                  fileName: "C:/Users/DELL/Uswift/extension/src/CoverLetterGenerator.tsx",
-                  lineNumber: 248,
-                  columnNumber: 15
-                },
-                this
-              ),
-              /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                "input",
-                {
-                  type: "text",
-                  value: jobTitle,
-                  onChange: (e) => setJobTitle(e.target.value),
-                  placeholder: "e.g., Senior Software Engineer",
-                  style: {
-                    width: "100%",
-                    padding: "8px 12px",
-                    borderRadius: 6,
-                    border: "1px solid #E5E7EB",
-                    fontSize: "0.9rem"
-                  }
-                },
-                void 0,
-                false,
-                {
-                  fileName: "C:/Users/DELL/Uswift/extension/src/CoverLetterGenerator.tsx",
-                  lineNumber: 259,
-                  columnNumber: 15
-                },
-                this
-              )
-            ] }, void 0, true, {
-              fileName: "C:/Users/DELL/Uswift/extension/src/CoverLetterGenerator.tsx",
-              lineNumber: 247,
-              columnNumber: 13
-            }, this),
-            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { flex: 1 }, children: [
-              /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                "label",
-                {
-                  style: {
-                    display: "block",
-                    fontSize: "0.9rem",
-                    fontWeight: 600,
-                    color: "#374151",
-                    marginBottom: 4
-                  },
-                  children: "Company Name"
-                },
-                void 0,
-                false,
-                {
-                  fileName: "C:/Users/DELL/Uswift/extension/src/CoverLetterGenerator.tsx",
-                  lineNumber: 274,
-                  columnNumber: 15
-                },
-                this
-              ),
-              /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                "input",
-                {
-                  type: "text",
-                  value: companyName,
-                  onChange: (e) => setCompanyName(e.target.value),
-                  placeholder: "e.g., Google",
-                  style: {
-                    width: "100%",
-                    padding: "8px 12px",
-                    borderRadius: 6,
-                    border: "1px solid #E5E7EB",
-                    fontSize: "0.9rem"
-                  }
-                },
-                void 0,
-                false,
-                {
-                  fileName: "C:/Users/DELL/Uswift/extension/src/CoverLetterGenerator.tsx",
-                  lineNumber: 285,
-                  columnNumber: 15
-                },
-                this
-              )
-            ] }, void 0, true, {
-              fileName: "C:/Users/DELL/Uswift/extension/src/CoverLetterGenerator.tsx",
-              lineNumber: 273,
-              columnNumber: 13
-            }, this)
-          ] }, void 0, true, {
-            fileName: "C:/Users/DELL/Uswift/extension/src/CoverLetterGenerator.tsx",
-            lineNumber: 246,
-            columnNumber: 11
-          }, this),
-          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { marginBottom: 16 }, children: [
-            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-              "label",
-              {
-                style: {
-                  display: "block",
-                  fontSize: "0.9rem",
-                  fontWeight: 600,
-                  color: "#374151",
-                  marginBottom: 8
-                },
-                children: "Cover Letter Tone:"
-              },
-              void 0,
-              false,
-              {
-                fileName: "C:/Users/DELL/Uswift/extension/src/CoverLetterGenerator.tsx",
-                lineNumber: 303,
-                columnNumber: 13
-              },
-              this
-            ),
-            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { display: "flex", gap: 8, flexWrap: "wrap" }, children: toneOptions.map((option) => /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-              "button",
-              {
-                onClick: () => setTone(option.value),
-                style: {
-                  background: tone === option.value ? "#6D28D9" : "#F3F4F6",
-                  color: tone === option.value ? "#FFFFFF" : "#6B7280",
-                  border: "none",
-                  borderRadius: 6,
-                  padding: "8px 16px",
-                  cursor: "pointer",
-                  fontSize: "0.8rem",
-                  fontWeight: 500,
-                  minWidth: 120,
-                  textAlign: "left"
-                },
-                title: option.description,
-                children: [
-                  /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { fontWeight: 600 }, children: option.label }, void 0, false, {
-                    fileName: "C:/Users/DELL/Uswift/extension/src/CoverLetterGenerator.tsx",
-                    lineNumber: 333,
-                    columnNumber: 19
-                  }, this),
-                  /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { fontSize: "0.7rem", opacity: 0.8 }, children: option.description }, void 0, false, {
-                    fileName: "C:/Users/DELL/Uswift/extension/src/CoverLetterGenerator.tsx",
-                    lineNumber: 334,
-                    columnNumber: 19
-                  }, this)
-                ]
-              },
-              option.value,
-              true,
-              {
-                fileName: "C:/Users/DELL/Uswift/extension/src/CoverLetterGenerator.tsx",
-                lineNumber: 316,
-                columnNumber: 17
-              },
-              this
-            )) }, void 0, false, {
-              fileName: "C:/Users/DELL/Uswift/extension/src/CoverLetterGenerator.tsx",
-              lineNumber: 314,
-              columnNumber: 13
-            }, this)
-          ] }, void 0, true, {
-            fileName: "C:/Users/DELL/Uswift/extension/src/CoverLetterGenerator.tsx",
-            lineNumber: 302,
-            columnNumber: 11
-          }, this),
-          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { className: "uswift-card", style: { marginBottom: 16 }, children: [
-            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-              "label",
-              {
-                style: {
-                  fontWeight: 600,
-                  display: "block",
-                  marginBottom: 8,
-                  color: "#374151"
-                },
-                children: "Your Resume Content:"
-              },
-              void 0,
-              false,
-              {
-                fileName: "C:/Users/DELL/Uswift/extension/src/CoverLetterGenerator.tsx",
-                lineNumber: 344,
-                columnNumber: 13
-              },
-              this
-            ),
-            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-              "textarea",
-              {
-                value: resumeContent,
-                onChange: (e) => setResumeContent(e.target.value),
-                placeholder: "Paste your resume content here to help tailor the cover letter...",
-                rows: 6,
-                style: {
-                  width: "100%",
-                  padding: 12,
-                  borderRadius: 8,
-                  border: "1px solid #E5E7EB",
-                  fontSize: "0.9rem",
-                  resize: "vertical"
-                }
-              },
-              void 0,
-              false,
-              {
-                fileName: "C:/Users/DELL/Uswift/extension/src/CoverLetterGenerator.tsx",
-                lineNumber: 354,
-                columnNumber: 13
-              },
-              this
-            )
-          ] }, void 0, true, {
-            fileName: "C:/Users/DELL/Uswift/extension/src/CoverLetterGenerator.tsx",
-            lineNumber: 343,
-            columnNumber: 11
-          }, this),
-          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { className: "uswift-card", style: { marginBottom: 16 }, children: [
-            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-              "label",
-              {
-                style: {
-                  fontWeight: 600,
-                  display: "block",
-                  marginBottom: 8,
-                  color: "#374151"
-                },
-                children: "Job Description:"
-              },
-              void 0,
-              false,
-              {
-                fileName: "C:/Users/DELL/Uswift/extension/src/CoverLetterGenerator.tsx",
-                lineNumber: 372,
-                columnNumber: 13
-              },
-              this
-            ),
-            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-              "textarea",
-              {
-                value: jobDescription,
-                onChange: (e) => setJobDescription(e.target.value),
-                placeholder: "Paste the complete job description here...",
-                rows: 8,
-                style: {
-                  width: "100%",
-                  padding: 12,
-                  borderRadius: 8,
-                  border: "1px solid #E5E7EB",
-                  fontSize: "0.9rem",
-                  resize: "vertical"
-                }
-              },
-              void 0,
-              false,
-              {
-                fileName: "C:/Users/DELL/Uswift/extension/src/CoverLetterGenerator.tsx",
-                lineNumber: 382,
-                columnNumber: 13
-              },
-              this
-            )
-          ] }, void 0, true, {
-            fileName: "C:/Users/DELL/Uswift/extension/src/CoverLetterGenerator.tsx",
-            lineNumber: 371,
-            columnNumber: 11
-          }, this),
-          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-            "button",
-            {
-              onClick: handleGenerate,
-              disabled: isLoading || !resumeContent.trim() || !jobDescription.trim(),
-              className: "uswift-btn",
-              style: {
-                width: "100%",
-                opacity: isLoading || !resumeContent.trim() || !jobDescription.trim() ? 0.6 : 1,
-                cursor: isLoading || !resumeContent.trim() || !jobDescription.trim() ? "not-allowed" : "pointer"
-              },
-              children: isLoading ? /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                "div",
-                {
-                  style: {
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    gap: 8
-                  },
-                  children: [
-                    /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                      "div",
-                      {
-                        style: {
-                          width: 16,
-                          height: 16,
-                          border: "2px solid #ffffff",
-                          borderTop: "2px solid transparent",
-                          borderRadius: "50%",
-                          animation: "spin 1s linear infinite"
-                        }
-                      },
-                      void 0,
-                      false,
-                      {
-                        fileName: "C:/Users/DELL/Uswift/extension/src/CoverLetterGenerator.tsx",
-                        lineNumber: 426,
-                        columnNumber: 17
-                      },
-                      this
-                    ),
-                    "Generating Cover Letter..."
-                  ]
-                },
-                void 0,
-                true,
-                {
-                  fileName: "C:/Users/DELL/Uswift/extension/src/CoverLetterGenerator.tsx",
-                  lineNumber: 418,
-                  columnNumber: 15
-                },
-                this
-              ) : "Generate Cover Letter"
-            },
-            void 0,
-            false,
-            {
-              fileName: "C:/Users/DELL/Uswift/extension/src/CoverLetterGenerator.tsx",
-              lineNumber: 399,
-              columnNumber: 11
-            },
-            this
-          ),
-          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-            "div",
-            {
-              style: {
-                marginTop: 16,
-                padding: 12,
-                background: "#F8F9FA",
-                borderRadius: 8,
-                fontSize: "0.8rem",
-                color: "#6B7280"
-              },
-              children: [
-                /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("strong", { children: "Tips for Better Results:" }, void 0, false, {
-                  fileName: "C:/Users/DELL/Uswift/extension/src/CoverLetterGenerator.tsx",
-                  lineNumber: 454,
-                  columnNumber: 13
-                }, this),
-                /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("ul", { style: { margin: "8px 0 0 16px", padding: 0 }, children: [
-                  /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("li", { children: "Include specific achievements and metrics from your resume" }, void 0, false, {
-                    fileName: "C:/Users/DELL/Uswift/extension/src/CoverLetterGenerator.tsx",
-                    lineNumber: 456,
-                    columnNumber: 15
-                  }, this),
-                  /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("li", { children: "Highlight relevant skills that match the job requirements" }, void 0, false, {
-                    fileName: "C:/Users/DELL/Uswift/extension/src/CoverLetterGenerator.tsx",
-                    lineNumber: 459,
-                    columnNumber: 15
-                  }, this),
-                  /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("li", { children: "Keep the job description comprehensive for better tailoring" }, void 0, false, {
-                    fileName: "C:/Users/DELL/Uswift/extension/src/CoverLetterGenerator.tsx",
-                    lineNumber: 460,
-                    columnNumber: 15
-                  }, this),
-                  /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("li", { children: "Choose a tone that matches the company culture" }, void 0, false, {
-                    fileName: "C:/Users/DELL/Uswift/extension/src/CoverLetterGenerator.tsx",
-                    lineNumber: 463,
-                    columnNumber: 15
-                  }, this)
-                ] }, void 0, true, {
-                  fileName: "C:/Users/DELL/Uswift/extension/src/CoverLetterGenerator.tsx",
-                  lineNumber: 455,
-                  columnNumber: 13
-                }, this)
-              ]
-            },
-            void 0,
-            true,
-            {
-              fileName: "C:/Users/DELL/Uswift/extension/src/CoverLetterGenerator.tsx",
-              lineNumber: 444,
-              columnNumber: 11
-            },
-            this
-          )
-        ] }, void 0, true, {
-          fileName: "C:/Users/DELL/Uswift/extension/src/CoverLetterGenerator.tsx",
-          lineNumber: 244,
-          columnNumber: 9
-        }, this),
-        activeTab === "result" && result && /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { children: [
-          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-            "div",
-            {
-              style: {
-                display: "flex",
-                gap: 16,
-                marginBottom: 20,
-                padding: 16,
-                background: "#F8F9FA",
-                borderRadius: 8
-              },
-              children: [
-                /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { textAlign: "center", flex: 1 }, children: [
-                  /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                    "div",
-                    {
-                      style: {
-                        fontSize: "1.5rem",
-                        fontWeight: 700,
-                        color: "#6D28D9",
-                        marginBottom: 4
-                      },
-                      children: result.wordCount
-                    },
-                    void 0,
-                    false,
-                    {
-                      fileName: "C:/Users/DELL/Uswift/extension/src/CoverLetterGenerator.tsx",
-                      lineNumber: 483,
-                      columnNumber: 15
-                    },
-                    this
-                  ),
-                  /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                    "div",
-                    {
-                      style: {
-                        fontSize: "0.8rem",
-                        color: "#6B7280",
-                        fontWeight: 500
-                      },
-                      children: "Words"
-                    },
-                    void 0,
-                    false,
-                    {
-                      fileName: "C:/Users/DELL/Uswift/extension/src/CoverLetterGenerator.tsx",
-                      lineNumber: 493,
-                      columnNumber: 15
-                    },
-                    this
-                  )
-                ] }, void 0, true, {
-                  fileName: "C:/Users/DELL/Uswift/extension/src/CoverLetterGenerator.tsx",
-                  lineNumber: 482,
-                  columnNumber: 13
-                }, this),
-                /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { textAlign: "center", flex: 1 }, children: [
-                  /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                    "div",
-                    {
-                      style: {
-                        fontSize: "1.2rem",
-                        fontWeight: 600,
-                        color: "#10B981",
-                        marginBottom: 4
-                      },
-                      children: result.tone
-                    },
-                    void 0,
-                    false,
-                    {
-                      fileName: "C:/Users/DELL/Uswift/extension/src/CoverLetterGenerator.tsx",
-                      lineNumber: 504,
-                      columnNumber: 15
-                    },
-                    this
-                  ),
-                  /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                    "div",
-                    {
-                      style: {
-                        fontSize: "0.8rem",
-                        color: "#6B7280",
-                        fontWeight: 500
-                      },
-                      children: "Tone"
-                    },
-                    void 0,
-                    false,
-                    {
-                      fileName: "C:/Users/DELL/Uswift/extension/src/CoverLetterGenerator.tsx",
-                      lineNumber: 514,
-                      columnNumber: 15
-                    },
-                    this
-                  )
-                ] }, void 0, true, {
-                  fileName: "C:/Users/DELL/Uswift/extension/src/CoverLetterGenerator.tsx",
-                  lineNumber: 503,
-                  columnNumber: 13
-                }, this)
-              ]
-            },
-            void 0,
-            true,
-            {
-              fileName: "C:/Users/DELL/Uswift/extension/src/CoverLetterGenerator.tsx",
-              lineNumber: 472,
-              columnNumber: 11
-            },
-            this
-          ),
-          result.keyPoints.length > 0 && /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { className: "uswift-card", style: { marginBottom: 16 }, children: [
-            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-              "h3",
-              {
-                style: {
-                  fontSize: "1.1rem",
-                  fontWeight: 600,
-                  color: "#111827",
-                  marginBottom: 12
-                },
-                children: "Key Highlights"
-              },
-              void 0,
-              false,
-              {
-                fileName: "C:/Users/DELL/Uswift/extension/src/CoverLetterGenerator.tsx",
-                lineNumber: 529,
-                columnNumber: 15
-              },
-              this
-            ),
-            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("ul", { style: { margin: 0, paddingLeft: 20 }, children: result.keyPoints.map((point, index) => /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-              "li",
-              {
-                style: {
-                  fontSize: "0.9rem",
-                  color: "#4B5563",
-                  marginBottom: 8
-                },
-                children: point
-              },
-              index,
-              false,
-              {
-                fileName: "C:/Users/DELL/Uswift/extension/src/CoverLetterGenerator.tsx",
-                lineNumber: 541,
-                columnNumber: 19
-              },
-              this
-            )) }, void 0, false, {
-              fileName: "C:/Users/DELL/Uswift/extension/src/CoverLetterGenerator.tsx",
-              lineNumber: 539,
-              columnNumber: 15
-            }, this)
-          ] }, void 0, true, {
-            fileName: "C:/Users/DELL/Uswift/extension/src/CoverLetterGenerator.tsx",
-            lineNumber: 528,
-            columnNumber: 13
-          }, this),
-          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { className: "uswift-card", style: { marginBottom: 16 }, children: [
-            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-              "div",
-              {
-                style: {
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  marginBottom: 12
-                },
-                children: [
-                  /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                    "h3",
-                    {
-                      style: {
-                        fontSize: "1.1rem",
-                        fontWeight: 600,
-                        color: "#111827",
-                        margin: 0
-                      },
-                      children: "Your Cover Letter"
-                    },
-                    void 0,
-                    false,
-                    {
-                      fileName: "C:/Users/DELL/Uswift/extension/src/CoverLetterGenerator.tsx",
-                      lineNumber: 566,
-                      columnNumber: 15
-                    },
-                    this
-                  ),
-                  /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { display: "flex", gap: 8 }, children: [
-                    /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                      "button",
-                      {
-                        onClick: () => copyToClipboard(result.content),
-                        style: {
-                          background: "#EDE9FE",
-                          color: "#6D28D9",
-                          border: "none",
-                          borderRadius: 6,
-                          padding: "6px 12px",
-                          cursor: "pointer",
-                          fontSize: "0.8rem"
-                        },
-                        children: "Copy"
-                      },
-                      void 0,
-                      false,
-                      {
-                        fileName: "C:/Users/DELL/Uswift/extension/src/CoverLetterGenerator.tsx",
-                        lineNumber: 577,
-                        columnNumber: 17
-                      },
-                      this
-                    ),
-                    /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                      "button",
-                      {
-                        onClick: () => downloadAsText(result.content, "cover-letter.txt"),
-                        style: {
-                          background: "#EDE9FE",
-                          color: "#6D28D9",
-                          border: "none",
-                          borderRadius: 6,
-                          padding: "6px 12px",
-                          cursor: "pointer",
-                          fontSize: "0.8rem"
-                        },
-                        children: "Download"
-                      },
-                      void 0,
-                      false,
-                      {
-                        fileName: "C:/Users/DELL/Uswift/extension/src/CoverLetterGenerator.tsx",
-                        lineNumber: 591,
-                        columnNumber: 17
-                      },
-                      this
-                    )
-                  ] }, void 0, true, {
-                    fileName: "C:/Users/DELL/Uswift/extension/src/CoverLetterGenerator.tsx",
-                    lineNumber: 576,
-                    columnNumber: 15
-                  }, this)
-                ]
-              },
-              void 0,
-              true,
-              {
-                fileName: "C:/Users/DELL/Uswift/extension/src/CoverLetterGenerator.tsx",
-                lineNumber: 558,
-                columnNumber: 13
-              },
-              this
-            ),
-            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-              "div",
-              {
-                style: {
-                  background: "#F8F9FA",
-                  padding: 16,
-                  borderRadius: 8,
-                  fontSize: "0.9rem",
-                  lineHeight: 1.6,
-                  whiteSpace: "pre-wrap",
-                  maxHeight: 400,
-                  overflowY: "auto",
-                  border: "1px solid #E5E7EB"
-                },
-                children: result.content
-              },
-              void 0,
-              false,
-              {
-                fileName: "C:/Users/DELL/Uswift/extension/src/CoverLetterGenerator.tsx",
-                lineNumber: 609,
-                columnNumber: 13
-              },
-              this
-            )
-          ] }, void 0, true, {
-            fileName: "C:/Users/DELL/Uswift/extension/src/CoverLetterGenerator.tsx",
-            lineNumber: 557,
-            columnNumber: 11
-          }, this),
-          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { display: "flex", gap: 8 }, children: [
-            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-              "button",
-              {
-                onClick: () => copyToClipboard(result.content),
-                className: "uswift-btn",
-                style: { flex: 1 },
-                children: "Copy to Clipboard"
-              },
-              void 0,
-              false,
-              {
-                fileName: "C:/Users/DELL/Uswift/extension/src/CoverLetterGenerator.tsx",
-                lineNumber: 628,
-                columnNumber: 13
-              },
-              this
-            ),
-            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-              "button",
-              {
-                onClick: () => setActiveTab("input"),
-                style: {
-                  flex: 1,
-                  background: "#F3F4F6",
-                  color: "#6B7280",
-                  border: "1px solid #E5E7EB",
-                  borderRadius: 8,
-                  padding: "12px",
-                  cursor: "pointer"
-                },
-                children: "Generate Another"
-              },
-              void 0,
-              false,
-              {
-                fileName: "C:/Users/DELL/Uswift/extension/src/CoverLetterGenerator.tsx",
-                lineNumber: 635,
-                columnNumber: 13
-              },
-              this
-            )
-          ] }, void 0, true, {
-            fileName: "C:/Users/DELL/Uswift/extension/src/CoverLetterGenerator.tsx",
-            lineNumber: 627,
-            columnNumber: 11
-          }, this)
-        ] }, void 0, true, {
-          fileName: "C:/Users/DELL/Uswift/extension/src/CoverLetterGenerator.tsx",
-          lineNumber: 470,
-          columnNumber: 9
-        }, this),
-        /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-          "div",
-          {
-            style: {
-              marginTop: 16,
-              textAlign: "center",
-              fontSize: "0.8rem",
-              color: "#6B7280"
-            },
-            children: "Powered by Mistral AI • Create professional cover letters tailored to each job"
-          },
-          void 0,
-          false,
-          {
-            fileName: "C:/Users/DELL/Uswift/extension/src/CoverLetterGenerator.tsx",
-            lineNumber: 654,
-            columnNumber: 7
-          },
-          this
-        )
-      ]
-    },
-    void 0,
-    true,
-    {
-      fileName: "C:/Users/DELL/Uswift/extension/src/CoverLetterGenerator.tsx",
-      lineNumber: 146,
-      columnNumber: 5
-    },
-    this
+        "Generating Cover Letter..."
+      ) : "Generate Cover Letter"
+    ), /* @__PURE__ */ React.createElement(
+      "div",
+      {
+        style: {
+          marginTop: 16,
+          padding: 12,
+          background: "#F8F9FA",
+          borderRadius: 8,
+          fontSize: "0.8rem",
+          color: "#6B7280"
+        }
+      },
+      /* @__PURE__ */ React.createElement("strong", null, "Tips for Better Results:"),
+      /* @__PURE__ */ React.createElement("ul", { style: { margin: "8px 0 0 16px", padding: 0 } }, /* @__PURE__ */ React.createElement("li", null, "Include specific achievements and metrics from your resume"), /* @__PURE__ */ React.createElement("li", null, "Highlight relevant skills that match the job requirements"), /* @__PURE__ */ React.createElement("li", null, "Keep the job description comprehensive for better tailoring"), /* @__PURE__ */ React.createElement("li", null, "Choose a tone that matches the company culture"))
+    )),
+    activeTab === "result" && result && /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement(
+      "div",
+      {
+        style: {
+          display: "flex",
+          gap: 16,
+          marginBottom: 20,
+          padding: 16,
+          background: "#F8F9FA",
+          borderRadius: 8
+        }
+      },
+      /* @__PURE__ */ React.createElement("div", { style: { textAlign: "center", flex: 1 } }, /* @__PURE__ */ React.createElement(
+        "div",
+        {
+          style: {
+            fontSize: "1.5rem",
+            fontWeight: 700,
+            color: "#6D28D9",
+            marginBottom: 4
+          }
+        },
+        result.wordCount
+      ), /* @__PURE__ */ React.createElement(
+        "div",
+        {
+          style: {
+            fontSize: "0.8rem",
+            color: "#6B7280",
+            fontWeight: 500
+          }
+        },
+        "Words"
+      )),
+      /* @__PURE__ */ React.createElement("div", { style: { textAlign: "center", flex: 1 } }, /* @__PURE__ */ React.createElement(
+        "div",
+        {
+          style: {
+            fontSize: "1.2rem",
+            fontWeight: 600,
+            color: "#10B981",
+            marginBottom: 4
+          }
+        },
+        result.tone
+      ), /* @__PURE__ */ React.createElement(
+        "div",
+        {
+          style: {
+            fontSize: "0.8rem",
+            color: "#6B7280",
+            fontWeight: 500
+          }
+        },
+        "Tone"
+      ))
+    ), result.keyPoints.length > 0 && /* @__PURE__ */ React.createElement("div", { className: "uswift-card", style: { marginBottom: 16 } }, /* @__PURE__ */ React.createElement(
+      "h3",
+      {
+        style: {
+          fontSize: "1.1rem",
+          fontWeight: 600,
+          color: "#111827",
+          marginBottom: 12
+        }
+      },
+      "Key Highlights"
+    ), /* @__PURE__ */ React.createElement("ul", { style: { margin: 0, paddingLeft: 20 } }, result.keyPoints.map((point, index) => /* @__PURE__ */ React.createElement(
+      "li",
+      {
+        key: index,
+        style: {
+          fontSize: "0.9rem",
+          color: "#4B5563",
+          marginBottom: 8
+        }
+      },
+      point
+    )))), /* @__PURE__ */ React.createElement("div", { className: "uswift-card", style: { marginBottom: 16 } }, /* @__PURE__ */ React.createElement(
+      "div",
+      {
+        style: {
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          marginBottom: 12
+        }
+      },
+      /* @__PURE__ */ React.createElement(
+        "h3",
+        {
+          style: {
+            fontSize: "1.1rem",
+            fontWeight: 600,
+            color: "#111827",
+            margin: 0
+          }
+        },
+        "Your Cover Letter"
+      ),
+      /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 8 } }, /* @__PURE__ */ React.createElement(
+        "button",
+        {
+          onClick: () => copyToClipboard(result.content),
+          style: {
+            background: "#EDE9FE",
+            color: "#6D28D9",
+            border: "none",
+            borderRadius: 6,
+            padding: "6px 12px",
+            cursor: "pointer",
+            fontSize: "0.8rem"
+          }
+        },
+        "Copy"
+      ), /* @__PURE__ */ React.createElement(
+        "button",
+        {
+          onClick: () => downloadAsText(result.content, "cover-letter.txt"),
+          style: {
+            background: "#EDE9FE",
+            color: "#6D28D9",
+            border: "none",
+            borderRadius: 6,
+            padding: "6px 12px",
+            cursor: "pointer",
+            fontSize: "0.8rem"
+          }
+        },
+        "Download"
+      ))
+    ), /* @__PURE__ */ React.createElement(
+      "div",
+      {
+        style: {
+          background: "#F8F9FA",
+          padding: 16,
+          borderRadius: 8,
+          fontSize: "0.9rem",
+          lineHeight: 1.6,
+          whiteSpace: "pre-wrap",
+          maxHeight: 400,
+          overflowY: "auto",
+          border: "1px solid #E5E7EB"
+        }
+      },
+      result.content
+    )), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 8 } }, /* @__PURE__ */ React.createElement(
+      "button",
+      {
+        onClick: () => copyToClipboard(result.content),
+        className: "uswift-btn",
+        style: { flex: 1 }
+      },
+      "Copy to Clipboard"
+    ), /* @__PURE__ */ React.createElement(
+      "button",
+      {
+        onClick: () => setActiveTab("input"),
+        style: {
+          flex: 1,
+          background: "#F3F4F6",
+          color: "#6B7280",
+          border: "1px solid #E5E7EB",
+          borderRadius: 8,
+          padding: "12px",
+          cursor: "pointer"
+        }
+      },
+      "Generate Another"
+    ))),
+    /* @__PURE__ */ React.createElement(
+      "div",
+      {
+        style: {
+          marginTop: 16,
+          textAlign: "center",
+          fontSize: "0.8rem",
+          color: "#6B7280"
+        }
+      },
+      "Powered by Mistral AI • Create professional cover letters tailored to each job"
+    )
   );
 }
 
@@ -5855,7 +3723,7 @@ ${file.content}`;
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
   };
-  return /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
+  return /* @__PURE__ */ React.createElement(
     "div",
     {
       style: {
@@ -5864,1042 +3732,528 @@ ${file.content}`;
         padding: "2rem",
         minWidth: 350,
         minHeight: 520
+      }
+    },
+    /* @__PURE__ */ React.createElement(
+      "div",
+      {
+        className: "uswift-gradient",
+        style: {
+          height: 8,
+          borderRadius: 8,
+          marginBottom: 16
+        }
+      }
+    ),
+    /* @__PURE__ */ React.createElement(
+      "div",
+      {
+        style: {
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          marginBottom: 16
+        }
       },
-      children: [
-        /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-          "div",
+      /* @__PURE__ */ React.createElement(
+        "h2",
+        {
+          style: {
+            fontSize: "1.4rem",
+            fontWeight: 700,
+            color: "#111827",
+            margin: 0
+          }
+        },
+        "File Manager"
+      ),
+      /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 8 } }, /* @__PURE__ */ React.createElement(
+        "span",
+        {
+          style: {
+            color: "#6B7280",
+            fontSize: "0.8rem",
+            alignSelf: "center"
+          }
+        },
+        files.length,
+        " files"
+      ))
+    ),
+    /* @__PURE__ */ React.createElement(
+      "div",
+      {
+        style: {
+          display: "flex",
+          marginBottom: 16,
+          borderBottom: "1px solid #E5E7EB"
+        }
+      },
+      /* @__PURE__ */ React.createElement(
+        "button",
+        {
+          onClick: () => setActiveTab("upload"),
+          style: {
+            background: "none",
+            border: "none",
+            padding: "12px 16px",
+            cursor: "pointer",
+            fontSize: "0.9rem",
+            fontWeight: activeTab === "upload" ? 600 : 400,
+            color: activeTab === "upload" ? "#6D28D9" : "#6B7280",
+            borderBottom: activeTab === "upload" ? "2px solid #6D28D9" : "none"
+          }
+        },
+        "Upload"
+      ),
+      /* @__PURE__ */ React.createElement(
+        "button",
+        {
+          onClick: () => setActiveTab("manage"),
+          style: {
+            background: "none",
+            border: "none",
+            padding: "12px 16px",
+            cursor: "pointer",
+            fontSize: "0.9rem",
+            fontWeight: activeTab === "manage" ? 600 : 400,
+            color: activeTab === "manage" ? "#6D28D9" : "#6B7280",
+            borderBottom: activeTab === "manage" ? "2px solid #6D28D9" : "none"
+          }
+        },
+        "Manage (",
+        files.length,
+        ")"
+      ),
+      /* @__PURE__ */ React.createElement(
+        "button",
+        {
+          onClick: () => setActiveTab("analyze"),
+          disabled: !selectedFile,
+          style: {
+            background: "none",
+            border: "none",
+            padding: "12px 16px",
+            cursor: selectedFile ? "pointer" : "not-allowed",
+            fontSize: "0.9rem",
+            fontWeight: activeTab === "analyze" ? 600 : 400,
+            color: activeTab === "analyze" ? "#6D28D9" : "#6B7280",
+            borderBottom: activeTab === "analyze" ? "2px solid #6D28D9" : "none",
+            opacity: selectedFile ? 1 : 0.5
+          }
+        },
+        "Analyze"
+      )
+    ),
+    activeTab === "upload" && /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { style: { marginBottom: 16 } }, /* @__PURE__ */ React.createElement(
+      "label",
+      {
+        style: {
+          display: "block",
+          fontSize: "0.9rem",
+          fontWeight: 600,
+          color: "#374151",
+          marginBottom: 8
+        }
+      },
+      "Document Type:"
+    ), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 8, flexWrap: "wrap" } }, [
+      { value: "resume", label: "Resume", icon: "📄" },
+      { value: "cover_letter", label: "Cover Letter", icon: "✉️" },
+      { value: "portfolio", label: "Portfolio", icon: "💼" },
+      { value: "certificate", label: "Certificate", icon: "🏆" },
+      { value: "other", label: "Other", icon: "📎" }
+    ].map((option) => /* @__PURE__ */ React.createElement(
+      "button",
+      {
+        key: option.value,
+        onClick: () => setFileType(option.value),
+        style: {
+          background: fileType === option.value ? "#6D28D9" : "#F3F4F6",
+          color: fileType === option.value ? "#FFFFFF" : "#6B7280",
+          border: "none",
+          borderRadius: 6,
+          padding: "8px 16px",
+          cursor: "pointer",
+          fontSize: "0.8rem",
+          fontWeight: 500,
+          display: "flex",
+          alignItems: "center",
+          gap: 4
+        }
+      },
+      /* @__PURE__ */ React.createElement("span", null, option.icon),
+      option.label
+    )))), /* @__PURE__ */ React.createElement(
+      "div",
+      {
+        className: "uswift-card",
+        onDragOver: handleDragOver,
+        onDragLeave: handleDragLeave,
+        onDrop: handleDrop,
+        style: {
+          border: dragActive ? "2px dashed #6D28D9" : "2px dashed #E5E7EB",
+          background: dragActive ? "#F8F9FA" : "#FFFFFF",
+          cursor: "pointer",
+          transition: "all 0.2s ease",
+          textAlign: "center",
+          padding: "2rem",
+          marginBottom: 16
+        }
+      },
+      /* @__PURE__ */ React.createElement("div", { style: { marginBottom: 16 } }, /* @__PURE__ */ React.createElement(
+        "div",
+        {
+          style: {
+            fontSize: "2rem",
+            marginBottom: 8,
+            color: dragActive ? "#6D28D9" : "#6B7280"
+          }
+        },
+        "📁"
+      ), /* @__PURE__ */ React.createElement(
+        "h3",
+        {
+          style: {
+            fontSize: "1.1rem",
+            fontWeight: 600,
+            color: "#111827",
+            marginBottom: 8
+          }
+        },
+        "Drop your file here"
+      ), /* @__PURE__ */ React.createElement(
+        "p",
+        {
+          style: {
+            color: "#6B7280",
+            fontSize: "0.9rem",
+            marginBottom: 16
+          }
+        },
+        "or click to browse"
+      )),
+      /* @__PURE__ */ React.createElement(
+        "input",
+        {
+          type: "file",
+          accept: ".txt,.pdf,.doc,.docx",
+          onChange: handleFileSelect,
+          style: { display: "none" },
+          id: "file-input"
+        }
+      ),
+      /* @__PURE__ */ React.createElement(
+        "label",
+        {
+          htmlFor: "file-input",
+          style: {
+            background: "#6D28D9",
+            color: "#FFFFFF",
+            border: "none",
+            borderRadius: 8,
+            padding: "12px 24px",
+            cursor: "pointer",
+            fontSize: "0.9rem",
+            fontWeight: 500
+          }
+        },
+        "Choose File"
+      )
+    ), /* @__PURE__ */ React.createElement(
+      "div",
+      {
+        style: {
+          padding: 12,
+          background: "#F8F9FA",
+          borderRadius: 8,
+          fontSize: "0.8rem",
+          color: "#6B7280"
+        }
+      },
+      /* @__PURE__ */ React.createElement("strong", null, "Supported formats:"),
+      " .txt, .pdf, .doc, .docx",
+      /* @__PURE__ */ React.createElement("br", null),
+      /* @__PURE__ */ React.createElement("strong", null, "Max file size:"),
+      " 5MB",
+      /* @__PURE__ */ React.createElement("br", null),
+      /* @__PURE__ */ React.createElement("strong", null, "Recommended:"),
+      " Plain text files work best for AI analysis"
+    )),
+    activeTab === "manage" && /* @__PURE__ */ React.createElement("div", null, files.length === 0 ? /* @__PURE__ */ React.createElement(
+      "div",
+      {
+        style: {
+          textAlign: "center",
+          padding: "3rem",
+          color: "#6B7280"
+        }
+      },
+      /* @__PURE__ */ React.createElement("div", { style: { fontSize: "3rem", marginBottom: 16 } }, "📂"),
+      /* @__PURE__ */ React.createElement("h3", { style: { fontSize: "1.1rem", marginBottom: 8 } }, "No files uploaded yet"),
+      /* @__PURE__ */ React.createElement("p", { style: { fontSize: "0.9rem" } }, "Upload your first document to get started")
+    ) : /* @__PURE__ */ React.createElement("div", { style: { maxHeight: 400, overflowY: "auto" } }, files.map((file) => /* @__PURE__ */ React.createElement(
+      "div",
+      {
+        key: file.id,
+        className: "uswift-card",
+        style: {
+          marginBottom: 12,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between"
+        }
+      },
+      /* @__PURE__ */ React.createElement("div", { style: { flex: 1 } }, /* @__PURE__ */ React.createElement(
+        "div",
+        {
+          style: {
+            display: "flex",
+            alignItems: "center",
+            gap: 8,
+            marginBottom: 4
+          }
+        },
+        /* @__PURE__ */ React.createElement("span", { style: { fontSize: "1.2rem" } }, getFileTypeIcon(file.type)),
+        /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement(
+          "h4",
           {
-            className: "uswift-gradient",
             style: {
-              height: 8,
-              borderRadius: 8,
-              marginBottom: 16
+              fontSize: "0.9rem",
+              fontWeight: 600,
+              color: "#111827",
+              margin: 0
             }
           },
-          void 0,
-          false,
-          {
-            fileName: "C:/Users/DELL/Uswift/extension/src/FileManager.tsx",
-            lineNumber: 319,
-            columnNumber: 7
-          },
-          this
-        ),
-        /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-          "div",
+          file.name
+        ), /* @__PURE__ */ React.createElement(
+          "p",
           {
             style: {
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              marginBottom: 16
-            },
-            children: [
-              /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                "h2",
-                {
-                  style: {
-                    fontSize: "1.4rem",
-                    fontWeight: 700,
-                    color: "#111827",
-                    margin: 0
-                  },
-                  children: "File Manager"
-                },
-                void 0,
-                false,
-                {
-                  fileName: "C:/Users/DELL/Uswift/extension/src/FileManager.tsx",
-                  lineNumber: 336,
-                  columnNumber: 9
-                },
-                this
-              ),
-              /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { display: "flex", gap: 8 }, children: /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                "span",
-                {
-                  style: {
-                    color: "#6B7280",
-                    fontSize: "0.8rem",
-                    alignSelf: "center"
-                  },
-                  children: [
-                    files.length,
-                    " files"
-                  ]
-                },
-                void 0,
-                true,
-                {
-                  fileName: "C:/Users/DELL/Uswift/extension/src/FileManager.tsx",
-                  lineNumber: 347,
-                  columnNumber: 11
-                },
-                this
-              ) }, void 0, false, {
-                fileName: "C:/Users/DELL/Uswift/extension/src/FileManager.tsx",
-                lineNumber: 346,
-                columnNumber: 9
-              }, this)
-            ]
+              fontSize: "0.7rem",
+              color: "#6B7280",
+              margin: 0
+            }
           },
-          void 0,
-          true,
-          {
-            fileName: "C:/Users/DELL/Uswift/extension/src/FileManager.tsx",
-            lineNumber: 328,
-            columnNumber: 7
-          },
-          this
-        ),
-        /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-          "div",
-          {
-            style: {
-              display: "flex",
-              marginBottom: 16,
-              borderBottom: "1px solid #E5E7EB"
-            },
-            children: [
-              /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                "button",
-                {
-                  onClick: () => setActiveTab("upload"),
-                  style: {
-                    background: "none",
-                    border: "none",
-                    padding: "12px 16px",
-                    cursor: "pointer",
-                    fontSize: "0.9rem",
-                    fontWeight: activeTab === "upload" ? 600 : 400,
-                    color: activeTab === "upload" ? "#6D28D9" : "#6B7280",
-                    borderBottom: activeTab === "upload" ? "2px solid #6D28D9" : "none"
-                  },
-                  children: "Upload"
-                },
-                void 0,
-                false,
-                {
-                  fileName: "C:/Users/DELL/Uswift/extension/src/FileManager.tsx",
-                  lineNumber: 367,
-                  columnNumber: 9
-                },
-                this
-              ),
-              /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                "button",
-                {
-                  onClick: () => setActiveTab("manage"),
-                  style: {
-                    background: "none",
-                    border: "none",
-                    padding: "12px 16px",
-                    cursor: "pointer",
-                    fontSize: "0.9rem",
-                    fontWeight: activeTab === "manage" ? 600 : 400,
-                    color: activeTab === "manage" ? "#6D28D9" : "#6B7280",
-                    borderBottom: activeTab === "manage" ? "2px solid #6D28D9" : "none"
-                  },
-                  children: [
-                    "Manage (",
-                    files.length,
-                    ")"
-                  ]
-                },
-                void 0,
-                true,
-                {
-                  fileName: "C:/Users/DELL/Uswift/extension/src/FileManager.tsx",
-                  lineNumber: 382,
-                  columnNumber: 9
-                },
-                this
-              ),
-              /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                "button",
-                {
-                  onClick: () => setActiveTab("analyze"),
-                  disabled: !selectedFile,
-                  style: {
-                    background: "none",
-                    border: "none",
-                    padding: "12px 16px",
-                    cursor: selectedFile ? "pointer" : "not-allowed",
-                    fontSize: "0.9rem",
-                    fontWeight: activeTab === "analyze" ? 600 : 400,
-                    color: activeTab === "analyze" ? "#6D28D9" : "#6B7280",
-                    borderBottom: activeTab === "analyze" ? "2px solid #6D28D9" : "none",
-                    opacity: selectedFile ? 1 : 0.5
-                  },
-                  children: "Analyze"
-                },
-                void 0,
-                false,
-                {
-                  fileName: "C:/Users/DELL/Uswift/extension/src/FileManager.tsx",
-                  lineNumber: 397,
-                  columnNumber: 9
-                },
-                this
-              )
-            ]
-          },
-          void 0,
-          true,
-          {
-            fileName: "C:/Users/DELL/Uswift/extension/src/FileManager.tsx",
-            lineNumber: 360,
-            columnNumber: 7
-          },
-          this
-        ),
-        activeTab === "upload" && /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { children: [
-          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { marginBottom: 16 }, children: [
-            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-              "label",
-              {
-                style: {
-                  display: "block",
-                  fontSize: "0.9rem",
-                  fontWeight: 600,
-                  color: "#374151",
-                  marginBottom: 8
-                },
-                children: "Document Type:"
-              },
-              void 0,
-              false,
-              {
-                fileName: "C:/Users/DELL/Uswift/extension/src/FileManager.tsx",
-                lineNumber: 421,
-                columnNumber: 13
-              },
-              this
-            ),
-            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { display: "flex", gap: 8, flexWrap: "wrap" }, children: [
-              { value: "resume", label: "Resume", icon: "📄" },
-              { value: "cover_letter", label: "Cover Letter", icon: "✉️" },
-              { value: "portfolio", label: "Portfolio", icon: "💼" },
-              { value: "certificate", label: "Certificate", icon: "🏆" },
-              { value: "other", label: "Other", icon: "📎" }
-            ].map((option) => /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-              "button",
-              {
-                onClick: () => setFileType(option.value),
-                style: {
-                  background: fileType === option.value ? "#6D28D9" : "#F3F4F6",
-                  color: fileType === option.value ? "#FFFFFF" : "#6B7280",
-                  border: "none",
-                  borderRadius: 6,
-                  padding: "8px 16px",
-                  cursor: "pointer",
-                  fontSize: "0.8rem",
-                  fontWeight: 500,
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 4
-                },
-                children: [
-                  /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("span", { children: option.icon }, void 0, false, {
-                    fileName: "C:/Users/DELL/Uswift/extension/src/FileManager.tsx",
-                    lineNumber: 458,
-                    columnNumber: 19
-                  }, this),
-                  option.label
-                ]
-              },
-              option.value,
-              true,
-              {
-                fileName: "C:/Users/DELL/Uswift/extension/src/FileManager.tsx",
-                lineNumber: 440,
-                columnNumber: 17
-              },
-              this
-            )) }, void 0, false, {
-              fileName: "C:/Users/DELL/Uswift/extension/src/FileManager.tsx",
-              lineNumber: 432,
-              columnNumber: 13
-            }, this)
-          ] }, void 0, true, {
-            fileName: "C:/Users/DELL/Uswift/extension/src/FileManager.tsx",
-            lineNumber: 420,
-            columnNumber: 11
-          }, this),
-          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-            "div",
-            {
-              className: "uswift-card",
-              onDragOver: handleDragOver,
-              onDragLeave: handleDragLeave,
-              onDrop: handleDrop,
-              style: {
-                border: dragActive ? "2px dashed #6D28D9" : "2px dashed #E5E7EB",
-                background: dragActive ? "#F8F9FA" : "#FFFFFF",
-                cursor: "pointer",
-                transition: "all 0.2s ease",
-                textAlign: "center",
-                padding: "2rem",
-                marginBottom: 16
-              },
-              children: [
-                /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { marginBottom: 16 }, children: [
-                  /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                    "div",
-                    {
-                      style: {
-                        fontSize: "2rem",
-                        marginBottom: 8,
-                        color: dragActive ? "#6D28D9" : "#6B7280"
-                      },
-                      children: "📁"
-                    },
-                    void 0,
-                    false,
-                    {
-                      fileName: "C:/Users/DELL/Uswift/extension/src/FileManager.tsx",
-                      lineNumber: 482,
-                      columnNumber: 15
-                    },
-                    this
-                  ),
-                  /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                    "h3",
-                    {
-                      style: {
-                        fontSize: "1.1rem",
-                        fontWeight: 600,
-                        color: "#111827",
-                        marginBottom: 8
-                      },
-                      children: "Drop your file here"
-                    },
-                    void 0,
-                    false,
-                    {
-                      fileName: "C:/Users/DELL/Uswift/extension/src/FileManager.tsx",
-                      lineNumber: 491,
-                      columnNumber: 15
-                    },
-                    this
-                  ),
-                  /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                    "p",
-                    {
-                      style: {
-                        color: "#6B7280",
-                        fontSize: "0.9rem",
-                        marginBottom: 16
-                      },
-                      children: "or click to browse"
-                    },
-                    void 0,
-                    false,
-                    {
-                      fileName: "C:/Users/DELL/Uswift/extension/src/FileManager.tsx",
-                      lineNumber: 501,
-                      columnNumber: 15
-                    },
-                    this
-                  )
-                ] }, void 0, true, {
-                  fileName: "C:/Users/DELL/Uswift/extension/src/FileManager.tsx",
-                  lineNumber: 481,
-                  columnNumber: 13
-                }, this),
-                /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                  "input",
-                  {
-                    type: "file",
-                    accept: ".txt,.pdf,.doc,.docx",
-                    onChange: handleFileSelect,
-                    style: { display: "none" },
-                    id: "file-input"
-                  },
-                  void 0,
-                  false,
-                  {
-                    fileName: "C:/Users/DELL/Uswift/extension/src/FileManager.tsx",
-                    lineNumber: 512,
-                    columnNumber: 13
-                  },
-                  this
-                ),
-                /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                  "label",
-                  {
-                    htmlFor: "file-input",
-                    style: {
-                      background: "#6D28D9",
-                      color: "#FFFFFF",
-                      border: "none",
-                      borderRadius: 8,
-                      padding: "12px 24px",
-                      cursor: "pointer",
-                      fontSize: "0.9rem",
-                      fontWeight: 500
-                    },
-                    children: "Choose File"
-                  },
-                  void 0,
-                  false,
-                  {
-                    fileName: "C:/Users/DELL/Uswift/extension/src/FileManager.tsx",
-                    lineNumber: 519,
-                    columnNumber: 13
-                  },
-                  this
-                )
-              ]
-            },
-            void 0,
-            true,
-            {
-              fileName: "C:/Users/DELL/Uswift/extension/src/FileManager.tsx",
-              lineNumber: 466,
-              columnNumber: 11
-            },
-            this
-          ),
-          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-            "div",
-            {
-              style: {
-                padding: 12,
-                background: "#F8F9FA",
-                borderRadius: 8,
-                fontSize: "0.8rem",
-                color: "#6B7280"
-              },
-              children: [
-                /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("strong", { children: "Supported formats:" }, void 0, false, {
-                  fileName: "C:/Users/DELL/Uswift/extension/src/FileManager.tsx",
-                  lineNumber: 546,
-                  columnNumber: 13
-                }, this),
-                " .txt, .pdf, .doc, .docx",
-                /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("br", {}, void 0, false, {
-                  fileName: "C:/Users/DELL/Uswift/extension/src/FileManager.tsx",
-                  lineNumber: 547,
-                  columnNumber: 13
-                }, this),
-                /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("strong", { children: "Max file size:" }, void 0, false, {
-                  fileName: "C:/Users/DELL/Uswift/extension/src/FileManager.tsx",
-                  lineNumber: 548,
-                  columnNumber: 13
-                }, this),
-                " 5MB",
-                /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("br", {}, void 0, false, {
-                  fileName: "C:/Users/DELL/Uswift/extension/src/FileManager.tsx",
-                  lineNumber: 549,
-                  columnNumber: 13
-                }, this),
-                /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("strong", { children: "Recommended:" }, void 0, false, {
-                  fileName: "C:/Users/DELL/Uswift/extension/src/FileManager.tsx",
-                  lineNumber: 550,
-                  columnNumber: 13
-                }, this),
-                " Plain text files work best for AI analysis"
-              ]
-            },
-            void 0,
-            true,
-            {
-              fileName: "C:/Users/DELL/Uswift/extension/src/FileManager.tsx",
-              lineNumber: 537,
-              columnNumber: 11
-            },
-            this
-          )
-        ] }, void 0, true, {
-          fileName: "C:/Users/DELL/Uswift/extension/src/FileManager.tsx",
-          lineNumber: 418,
-          columnNumber: 9
-        }, this),
-        activeTab === "manage" && /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { children: files.length === 0 ? /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-          "div",
-          {
-            style: {
-              textAlign: "center",
-              padding: "3rem",
-              color: "#6B7280"
-            },
-            children: [
-              /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { fontSize: "3rem", marginBottom: 16 }, children: "📂" }, void 0, false, {
-                fileName: "C:/Users/DELL/Uswift/extension/src/FileManager.tsx",
-                lineNumber: 566,
-                columnNumber: 15
-              }, this),
-              /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("h3", { style: { fontSize: "1.1rem", marginBottom: 8 }, children: "No files uploaded yet" }, void 0, false, {
-                fileName: "C:/Users/DELL/Uswift/extension/src/FileManager.tsx",
-                lineNumber: 567,
-                columnNumber: 15
-              }, this),
-              /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("p", { style: { fontSize: "0.9rem" }, children: "Upload your first document to get started" }, void 0, false, {
-                fileName: "C:/Users/DELL/Uswift/extension/src/FileManager.tsx",
-                lineNumber: 570,
-                columnNumber: 15
-              }, this)
-            ]
-          },
-          void 0,
-          true,
-          {
-            fileName: "C:/Users/DELL/Uswift/extension/src/FileManager.tsx",
-            lineNumber: 559,
-            columnNumber: 13
-          },
-          this
-        ) : /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { maxHeight: 400, overflowY: "auto" }, children: files.map((file) => /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-          "div",
-          {
-            className: "uswift-card",
-            style: {
-              marginBottom: 12,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between"
-            },
-            children: [
-              /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { flex: 1 }, children: /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                "div",
-                {
-                  style: {
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 8,
-                    marginBottom: 4
-                  },
-                  children: [
-                    /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("span", { style: { fontSize: "1.2rem" }, children: getFileTypeIcon(file.type) }, void 0, false, {
-                      fileName: "C:/Users/DELL/Uswift/extension/src/FileManager.tsx",
-                      lineNumber: 596,
-                      columnNumber: 23
-                    }, this),
-                    /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { children: [
-                      /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                        "h4",
-                        {
-                          style: {
-                            fontSize: "0.9rem",
-                            fontWeight: 600,
-                            color: "#111827",
-                            margin: 0
-                          },
-                          children: file.name
-                        },
-                        void 0,
-                        false,
-                        {
-                          fileName: "C:/Users/DELL/Uswift/extension/src/FileManager.tsx",
-                          lineNumber: 600,
-                          columnNumber: 25
-                        },
-                        this
-                      ),
-                      /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                        "p",
-                        {
-                          style: {
-                            fontSize: "0.7rem",
-                            color: "#6B7280",
-                            margin: 0
-                          },
-                          children: [
-                            file.type.replace("_", " "),
-                            " •",
-                            " ",
-                            formatFileSize(file.size),
-                            " •",
-                            " ",
-                            file.uploadedAt.toLocaleDateString()
-                          ]
-                        },
-                        void 0,
-                        true,
-                        {
-                          fileName: "C:/Users/DELL/Uswift/extension/src/FileManager.tsx",
-                          lineNumber: 610,
-                          columnNumber: 25
-                        },
-                        this
-                      )
-                    ] }, void 0, true, {
-                      fileName: "C:/Users/DELL/Uswift/extension/src/FileManager.tsx",
-                      lineNumber: 599,
-                      columnNumber: 23
-                    }, this)
-                  ]
-                },
-                void 0,
-                true,
-                {
-                  fileName: "C:/Users/DELL/Uswift/extension/src/FileManager.tsx",
-                  lineNumber: 588,
-                  columnNumber: 21
-                },
-                this
-              ) }, void 0, false, {
-                fileName: "C:/Users/DELL/Uswift/extension/src/FileManager.tsx",
-                lineNumber: 587,
-                columnNumber: 19
-              }, this),
-              /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { display: "flex", gap: 4 }, children: [
-                /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                  "button",
-                  {
-                    onClick: () => analyzeFile(file),
-                    disabled: isLoading,
-                    style: {
-                      background: "#10B981",
-                      color: "#FFFFFF",
-                      border: "none",
-                      borderRadius: 4,
-                      padding: "4px 8px",
-                      cursor: "pointer",
-                      fontSize: "0.7rem"
-                    },
-                    children: "Analyze"
-                  },
-                  void 0,
-                  false,
-                  {
-                    fileName: "C:/Users/DELL/Uswift/extension/src/FileManager.tsx",
-                    lineNumber: 626,
-                    columnNumber: 21
-                  },
-                  this
-                ),
-                /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                  "button",
-                  {
-                    onClick: () => deleteFile(file.id),
-                    style: {
-                      background: "#EF4444",
-                      color: "#FFFFFF",
-                      border: "none",
-                      borderRadius: 4,
-                      padding: "4px 8px",
-                      cursor: "pointer",
-                      fontSize: "0.7rem"
-                    },
-                    children: "Delete"
-                  },
-                  void 0,
-                  false,
-                  {
-                    fileName: "C:/Users/DELL/Uswift/extension/src/FileManager.tsx",
-                    lineNumber: 641,
-                    columnNumber: 21
-                  },
-                  this
-                )
-              ] }, void 0, true, {
-                fileName: "C:/Users/DELL/Uswift/extension/src/FileManager.tsx",
-                lineNumber: 625,
-                columnNumber: 19
-              }, this)
-            ]
-          },
-          file.id,
-          true,
-          {
-            fileName: "C:/Users/DELL/Uswift/extension/src/FileManager.tsx",
-            lineNumber: 577,
-            columnNumber: 17
-          },
-          this
-        )) }, void 0, false, {
-          fileName: "C:/Users/DELL/Uswift/extension/src/FileManager.tsx",
-          lineNumber: 575,
-          columnNumber: 13
-        }, this) }, void 0, false, {
-          fileName: "C:/Users/DELL/Uswift/extension/src/FileManager.tsx",
-          lineNumber: 557,
-          columnNumber: 9
-        }, this),
-        activeTab === "analyze" && selectedFile && analysis && /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { children: [
-          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { className: "uswift-card", style: { marginBottom: 16 }, children: [
-            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-              "div",
-              {
-                style: {
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 8,
-                  marginBottom: 12
-                },
-                children: [
-                  /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("span", { style: { fontSize: "1.5rem" }, children: getFileTypeIcon(selectedFile.type) }, void 0, false, {
-                    fileName: "C:/Users/DELL/Uswift/extension/src/FileManager.tsx",
-                    lineNumber: 675,
-                    columnNumber: 15
-                  }, this),
-                  /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { children: [
-                    /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                      "h3",
-                      {
-                        style: {
-                          fontSize: "1.1rem",
-                          fontWeight: 600,
-                          color: "#111827",
-                          margin: 0
-                        },
-                        children: selectedFile.name
-                      },
-                      void 0,
-                      false,
-                      {
-                        fileName: "C:/Users/DELL/Uswift/extension/src/FileManager.tsx",
-                        lineNumber: 679,
-                        columnNumber: 17
-                      },
-                      this
-                    ),
-                    /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                      "p",
-                      {
-                        style: {
-                          fontSize: "0.8rem",
-                          color: "#6B7280",
-                          margin: 0
-                        },
-                        children: [
-                          selectedFile.type.replace("_", " "),
-                          " •",
-                          " ",
-                          formatFileSize(selectedFile.size)
-                        ]
-                      },
-                      void 0,
-                      true,
-                      {
-                        fileName: "C:/Users/DELL/Uswift/extension/src/FileManager.tsx",
-                        lineNumber: 689,
-                        columnNumber: 17
-                      },
-                      this
-                    )
-                  ] }, void 0, true, {
-                    fileName: "C:/Users/DELL/Uswift/extension/src/FileManager.tsx",
-                    lineNumber: 678,
-                    columnNumber: 15
-                  }, this)
-                ]
-              },
-              void 0,
-              true,
-              {
-                fileName: "C:/Users/DELL/Uswift/extension/src/FileManager.tsx",
-                lineNumber: 667,
-                columnNumber: 13
-              },
-              this
-            ),
-            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-              "div",
-              {
-                style: {
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 12,
-                  padding: 12,
-                  background: "#F8F9FA",
-                  borderRadius: 8,
-                  marginBottom: 12
-                },
-                children: /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { textAlign: "center" }, children: [
-                  /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                    "div",
-                    {
-                      style: {
-                        fontSize: "1.8rem",
-                        fontWeight: 700,
-                        color: analysis.score >= 80 ? "#10B981" : analysis.score >= 60 ? "#F59E0B" : "#EF4444",
-                        marginBottom: 4
-                      },
-                      children: [
-                        analysis.score,
-                        "/100"
-                      ]
-                    },
-                    void 0,
-                    true,
-                    {
-                      fileName: "C:/Users/DELL/Uswift/extension/src/FileManager.tsx",
-                      lineNumber: 715,
-                      columnNumber: 17
-                    },
-                    this
-                  ),
-                  /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                    "div",
-                    {
-                      style: {
-                        fontSize: "0.8rem",
-                        color: "#6B7280",
-                        fontWeight: 500
-                      },
-                      children: "Quality Score"
-                    },
-                    void 0,
-                    false,
-                    {
-                      fileName: "C:/Users/DELL/Uswift/extension/src/FileManager.tsx",
-                      lineNumber: 730,
-                      columnNumber: 17
-                    },
-                    this
-                  )
-                ] }, void 0, true, {
-                  fileName: "C:/Users/DELL/Uswift/extension/src/FileManager.tsx",
-                  lineNumber: 714,
-                  columnNumber: 15
-                }, this)
-              },
-              void 0,
-              false,
-              {
-                fileName: "C:/Users/DELL/Uswift/extension/src/FileManager.tsx",
-                lineNumber: 703,
-                columnNumber: 13
-              },
-              this
-            )
-          ] }, void 0, true, {
-            fileName: "C:/Users/DELL/Uswift/extension/src/FileManager.tsx",
-            lineNumber: 666,
-            columnNumber: 11
-          }, this),
-          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { className: "uswift-card", style: { marginBottom: 16 }, children: [
-            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-              "h3",
-              {
-                style: {
-                  fontSize: "1.1rem",
-                  fontWeight: 600,
-                  color: "#111827",
-                  marginBottom: 12
-                },
-                children: "Analysis Summary"
-              },
-              void 0,
-              false,
-              {
-                fileName: "C:/Users/DELL/Uswift/extension/src/FileManager.tsx",
-                lineNumber: 745,
-                columnNumber: 13
-              },
-              this
-            ),
-            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-              "p",
-              {
-                style: {
-                  fontSize: "0.9rem",
-                  lineHeight: 1.6,
-                  color: "#4B5563",
-                  margin: 0
-                },
-                children: analysis.summary
-              },
-              void 0,
-              false,
-              {
-                fileName: "C:/Users/DELL/Uswift/extension/src/FileManager.tsx",
-                lineNumber: 755,
-                columnNumber: 13
-              },
-              this
-            )
-          ] }, void 0, true, {
-            fileName: "C:/Users/DELL/Uswift/extension/src/FileManager.tsx",
-            lineNumber: 744,
-            columnNumber: 11
-          }, this),
-          analysis.keywords.length > 0 && /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { className: "uswift-card", style: { marginBottom: 16 }, children: [
-            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-              "h3",
-              {
-                style: {
-                  fontSize: "1.1rem",
-                  fontWeight: 600,
-                  color: "#111827",
-                  marginBottom: 12
-                },
-                children: "Key Keywords"
-              },
-              void 0,
-              false,
-              {
-                fileName: "C:/Users/DELL/Uswift/extension/src/FileManager.tsx",
-                lineNumber: 770,
-                columnNumber: 15
-              },
-              this
-            ),
-            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { display: "flex", gap: 4, flexWrap: "wrap" }, children: analysis.keywords.map((keyword, index) => /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-              "span",
-              {
-                style: {
-                  background: "#EDE9FE",
-                  color: "#6D28D9",
-                  padding: "4px 8px",
-                  borderRadius: 4,
-                  fontSize: "0.8rem",
-                  fontWeight: 500
-                },
-                children: keyword
-              },
-              index,
-              false,
-              {
-                fileName: "C:/Users/DELL/Uswift/extension/src/FileManager.tsx",
-                lineNumber: 782,
-                columnNumber: 19
-              },
-              this
-            )) }, void 0, false, {
-              fileName: "C:/Users/DELL/Uswift/extension/src/FileManager.tsx",
-              lineNumber: 780,
-              columnNumber: 15
-            }, this)
-          ] }, void 0, true, {
-            fileName: "C:/Users/DELL/Uswift/extension/src/FileManager.tsx",
-            lineNumber: 769,
-            columnNumber: 13
-          }, this),
-          analysis.suggestions.length > 0 && /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { className: "uswift-card", style: { marginBottom: 16 }, children: [
-            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-              "h3",
-              {
-                style: {
-                  fontSize: "1.1rem",
-                  fontWeight: 600,
-                  color: "#111827",
-                  marginBottom: 12
-                },
-                children: "Improvement Suggestions"
-              },
-              void 0,
-              false,
-              {
-                fileName: "C:/Users/DELL/Uswift/extension/src/FileManager.tsx",
-                lineNumber: 803,
-                columnNumber: 15
-              },
-              this
-            ),
-            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("ul", { style: { margin: 0, paddingLeft: 20 }, children: analysis.suggestions.map((suggestion, index) => /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-              "li",
-              {
-                style: {
-                  fontSize: "0.9rem",
-                  color: "#4B5563",
-                  marginBottom: 8
-                },
-                children: suggestion
-              },
-              index,
-              false,
-              {
-                fileName: "C:/Users/DELL/Uswift/extension/src/FileManager.tsx",
-                lineNumber: 815,
-                columnNumber: 19
-              },
-              this
-            )) }, void 0, false, {
-              fileName: "C:/Users/DELL/Uswift/extension/src/FileManager.tsx",
-              lineNumber: 813,
-              columnNumber: 15
-            }, this)
-          ] }, void 0, true, {
-            fileName: "C:/Users/DELL/Uswift/extension/src/FileManager.tsx",
-            lineNumber: 802,
-            columnNumber: 13
-          }, this),
-          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { display: "flex", gap: 8 }, children: [
-            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-              "button",
-              {
-                onClick: () => setActiveTab("upload"),
-                className: "uswift-btn",
-                style: { flex: 1 },
-                children: "Upload Another File"
-              },
-              void 0,
-              false,
-              {
-                fileName: "C:/Users/DELL/Uswift/extension/src/FileManager.tsx",
-                lineNumber: 832,
-                columnNumber: 13
-              },
-              this
-            ),
-            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-              "button",
-              {
-                onClick: () => setActiveTab("manage"),
-                style: {
-                  flex: 1,
-                  background: "#F3F4F6",
-                  color: "#6B7280",
-                  border: "1px solid #E5E7EB",
-                  borderRadius: 8,
-                  padding: "12px",
-                  cursor: "pointer"
-                },
-                children: "Back to Files"
-              },
-              void 0,
-              false,
-              {
-                fileName: "C:/Users/DELL/Uswift/extension/src/FileManager.tsx",
-                lineNumber: 839,
-                columnNumber: 13
-              },
-              this
-            )
-          ] }, void 0, true, {
-            fileName: "C:/Users/DELL/Uswift/extension/src/FileManager.tsx",
-            lineNumber: 831,
-            columnNumber: 11
-          }, this)
-        ] }, void 0, true, {
-          fileName: "C:/Users/DELL/Uswift/extension/src/FileManager.tsx",
-          lineNumber: 664,
-          columnNumber: 9
-        }, this),
-        /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-          "div",
-          {
-            style: {
-              marginTop: 16,
-              textAlign: "center",
-              fontSize: "0.8rem",
-              color: "#6B7280"
-            },
-            children: "Powered by Mistral AI • Secure file storage and AI-powered analysis"
-          },
-          void 0,
-          false,
-          {
-            fileName: "C:/Users/DELL/Uswift/extension/src/FileManager.tsx",
-            lineNumber: 858,
-            columnNumber: 7
-          },
-          this
-        )
-      ]
-    },
-    void 0,
-    true,
-    {
-      fileName: "C:/Users/DELL/Uswift/extension/src/FileManager.tsx",
-      lineNumber: 309,
-      columnNumber: 5
-    },
-    this
+          file.type.replace("_", " "),
+          " •",
+          " ",
+          formatFileSize(file.size),
+          " •",
+          " ",
+          file.uploadedAt.toLocaleDateString()
+        ))
+      )),
+      /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 4 } }, /* @__PURE__ */ React.createElement(
+        "button",
+        {
+          onClick: () => analyzeFile(file),
+          disabled: isLoading,
+          style: {
+            background: "#10B981",
+            color: "#FFFFFF",
+            border: "none",
+            borderRadius: 4,
+            padding: "4px 8px",
+            cursor: "pointer",
+            fontSize: "0.7rem"
+          }
+        },
+        "Analyze"
+      ), /* @__PURE__ */ React.createElement(
+        "button",
+        {
+          onClick: () => deleteFile(file.id),
+          style: {
+            background: "#EF4444",
+            color: "#FFFFFF",
+            border: "none",
+            borderRadius: 4,
+            padding: "4px 8px",
+            cursor: "pointer",
+            fontSize: "0.7rem"
+          }
+        },
+        "Delete"
+      ))
+    )))),
+    activeTab === "analyze" && selectedFile && analysis && /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { className: "uswift-card", style: { marginBottom: 16 } }, /* @__PURE__ */ React.createElement(
+      "div",
+      {
+        style: {
+          display: "flex",
+          alignItems: "center",
+          gap: 8,
+          marginBottom: 12
+        }
+      },
+      /* @__PURE__ */ React.createElement("span", { style: { fontSize: "1.5rem" } }, getFileTypeIcon(selectedFile.type)),
+      /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement(
+        "h3",
+        {
+          style: {
+            fontSize: "1.1rem",
+            fontWeight: 600,
+            color: "#111827",
+            margin: 0
+          }
+        },
+        selectedFile.name
+      ), /* @__PURE__ */ React.createElement(
+        "p",
+        {
+          style: {
+            fontSize: "0.8rem",
+            color: "#6B7280",
+            margin: 0
+          }
+        },
+        selectedFile.type.replace("_", " "),
+        " •",
+        " ",
+        formatFileSize(selectedFile.size)
+      ))
+    ), /* @__PURE__ */ React.createElement(
+      "div",
+      {
+        style: {
+          display: "flex",
+          alignItems: "center",
+          gap: 12,
+          padding: 12,
+          background: "#F8F9FA",
+          borderRadius: 8,
+          marginBottom: 12
+        }
+      },
+      /* @__PURE__ */ React.createElement("div", { style: { textAlign: "center" } }, /* @__PURE__ */ React.createElement(
+        "div",
+        {
+          style: {
+            fontSize: "1.8rem",
+            fontWeight: 700,
+            color: analysis.score >= 80 ? "#10B981" : analysis.score >= 60 ? "#F59E0B" : "#EF4444",
+            marginBottom: 4
+          }
+        },
+        analysis.score,
+        "/100"
+      ), /* @__PURE__ */ React.createElement(
+        "div",
+        {
+          style: {
+            fontSize: "0.8rem",
+            color: "#6B7280",
+            fontWeight: 500
+          }
+        },
+        "Quality Score"
+      ))
+    )), /* @__PURE__ */ React.createElement("div", { className: "uswift-card", style: { marginBottom: 16 } }, /* @__PURE__ */ React.createElement(
+      "h3",
+      {
+        style: {
+          fontSize: "1.1rem",
+          fontWeight: 600,
+          color: "#111827",
+          marginBottom: 12
+        }
+      },
+      "Analysis Summary"
+    ), /* @__PURE__ */ React.createElement(
+      "p",
+      {
+        style: {
+          fontSize: "0.9rem",
+          lineHeight: 1.6,
+          color: "#4B5563",
+          margin: 0
+        }
+      },
+      analysis.summary
+    )), analysis.keywords.length > 0 && /* @__PURE__ */ React.createElement("div", { className: "uswift-card", style: { marginBottom: 16 } }, /* @__PURE__ */ React.createElement(
+      "h3",
+      {
+        style: {
+          fontSize: "1.1rem",
+          fontWeight: 600,
+          color: "#111827",
+          marginBottom: 12
+        }
+      },
+      "Key Keywords"
+    ), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 4, flexWrap: "wrap" } }, analysis.keywords.map((keyword, index) => /* @__PURE__ */ React.createElement(
+      "span",
+      {
+        key: index,
+        style: {
+          background: "#EDE9FE",
+          color: "#6D28D9",
+          padding: "4px 8px",
+          borderRadius: 4,
+          fontSize: "0.8rem",
+          fontWeight: 500
+        }
+      },
+      keyword
+    )))), analysis.suggestions.length > 0 && /* @__PURE__ */ React.createElement("div", { className: "uswift-card", style: { marginBottom: 16 } }, /* @__PURE__ */ React.createElement(
+      "h3",
+      {
+        style: {
+          fontSize: "1.1rem",
+          fontWeight: 600,
+          color: "#111827",
+          marginBottom: 12
+        }
+      },
+      "Improvement Suggestions"
+    ), /* @__PURE__ */ React.createElement("ul", { style: { margin: 0, paddingLeft: 20 } }, analysis.suggestions.map((suggestion, index) => /* @__PURE__ */ React.createElement(
+      "li",
+      {
+        key: index,
+        style: {
+          fontSize: "0.9rem",
+          color: "#4B5563",
+          marginBottom: 8
+        }
+      },
+      suggestion
+    )))), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 8 } }, /* @__PURE__ */ React.createElement(
+      "button",
+      {
+        onClick: () => setActiveTab("upload"),
+        className: "uswift-btn",
+        style: { flex: 1 }
+      },
+      "Upload Another File"
+    ), /* @__PURE__ */ React.createElement(
+      "button",
+      {
+        onClick: () => setActiveTab("manage"),
+        style: {
+          flex: 1,
+          background: "#F3F4F6",
+          color: "#6B7280",
+          border: "1px solid #E5E7EB",
+          borderRadius: 8,
+          padding: "12px",
+          cursor: "pointer"
+        }
+      },
+      "Back to Files"
+    ))),
+    /* @__PURE__ */ React.createElement(
+      "div",
+      {
+        style: {
+          marginTop: 16,
+          textAlign: "center",
+          fontSize: "0.8rem",
+          color: "#6B7280"
+        }
+      },
+      "Powered by Mistral AI • Secure file storage and AI-powered analysis"
+    )
   );
 }
 
@@ -7065,7 +4419,7 @@ Format your response clearly with sections and bullet points.`;
       alert("Analysis copied to clipboard!");
     });
   };
-  return /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
+  return /* @__PURE__ */ React.createElement(
     "div",
     {
       style: {
@@ -7074,1149 +4428,574 @@ Format your response clearly with sections and bullet points.`;
         padding: "2rem",
         minWidth: 350,
         minHeight: 520
+      }
+    },
+    /* @__PURE__ */ React.createElement(
+      "div",
+      {
+        className: "uswift-gradient",
+        style: {
+          height: 8,
+          borderRadius: 8,
+          marginBottom: 16
+        }
+      }
+    ),
+    /* @__PURE__ */ React.createElement(
+      "div",
+      {
+        style: {
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          marginBottom: 16
+        }
       },
-      children: [
-        /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
+      /* @__PURE__ */ React.createElement(
+        "h2",
+        {
+          style: {
+            fontSize: "1.4rem",
+            fontWeight: 700,
+            color: "#111827",
+            margin: 0
+          }
+        },
+        "Job Analysis"
+      ),
+      activeTab === "analysis" && /* @__PURE__ */ React.createElement(
+        "button",
+        {
+          onClick: () => setActiveTab("input"),
+          style: {
+            background: "#EDE9FE",
+            color: "#6D28D9",
+            border: "none",
+            borderRadius: 8,
+            padding: "6px 12px",
+            cursor: "pointer",
+            fontSize: "0.8rem"
+          }
+        },
+        "← Back to Input"
+      )
+    ),
+    /* @__PURE__ */ React.createElement(
+      "div",
+      {
+        style: {
+          display: "flex",
+          marginBottom: 16,
+          borderBottom: "1px solid #E5E7EB"
+        }
+      },
+      /* @__PURE__ */ React.createElement(
+        "button",
+        {
+          onClick: () => setActiveTab("input"),
+          style: {
+            background: "none",
+            border: "none",
+            padding: "12px 16px",
+            cursor: "pointer",
+            fontSize: "0.9rem",
+            fontWeight: activeTab === "input" ? 600 : 400,
+            color: activeTab === "input" ? "#6D28D9" : "#6B7280",
+            borderBottom: activeTab === "input" ? "2px solid #6D28D9" : "none"
+          }
+        },
+        "Input"
+      ),
+      /* @__PURE__ */ React.createElement(
+        "button",
+        {
+          onClick: () => setActiveTab("analysis"),
+          disabled: !result,
+          style: {
+            background: "none",
+            border: "none",
+            padding: "12px 16px",
+            cursor: result ? "pointer" : "not-allowed",
+            fontSize: "0.9rem",
+            fontWeight: activeTab === "analysis" ? 600 : 400,
+            color: activeTab === "analysis" ? "#6D28D9" : "#6B7280",
+            borderBottom: activeTab === "analysis" ? "2px solid #6D28D9" : "none",
+            opacity: result ? 1 : 0.5
+          }
+        },
+        "Analysis"
+      )
+    ),
+    activeTab === "input" && /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { className: "uswift-card", style: { marginBottom: 16 } }, /* @__PURE__ */ React.createElement(
+      "h3",
+      {
+        style: {
+          fontSize: "1.1rem",
+          fontWeight: 600,
+          color: "#111827",
+          marginBottom: 12
+        }
+      },
+      "Job Details"
+    ), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 12, marginBottom: 12 } }, /* @__PURE__ */ React.createElement("div", { style: { flex: 1 } }, /* @__PURE__ */ React.createElement(
+      "label",
+      {
+        style: {
+          display: "block",
+          fontSize: "0.9rem",
+          fontWeight: 600,
+          color: "#374151",
+          marginBottom: 4
+        }
+      },
+      "Job Title"
+    ), /* @__PURE__ */ React.createElement(
+      "input",
+      {
+        type: "text",
+        value: jobDetails.title,
+        onChange: (e) => setJobDetails({ ...jobDetails, title: e.target.value }),
+        placeholder: "e.g., Senior Software Engineer",
+        style: {
+          width: "100%",
+          padding: "8px 12px",
+          borderRadius: 6,
+          border: "1px solid #E5E7EB",
+          fontSize: "0.9rem"
+        }
+      }
+    )), /* @__PURE__ */ React.createElement("div", { style: { flex: 1 } }, /* @__PURE__ */ React.createElement(
+      "label",
+      {
+        style: {
+          display: "block",
+          fontSize: "0.9rem",
+          fontWeight: 600,
+          color: "#374151",
+          marginBottom: 4
+        }
+      },
+      "Company"
+    ), /* @__PURE__ */ React.createElement(
+      "input",
+      {
+        type: "text",
+        value: jobDetails.company,
+        onChange: (e) => setJobDetails({ ...jobDetails, company: e.target.value }),
+        placeholder: "e.g., Google",
+        style: {
+          width: "100%",
+          padding: "8px 12px",
+          borderRadius: 6,
+          border: "1px solid #E5E7EB",
+          fontSize: "0.9rem"
+        }
+      }
+    ))), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 12, marginBottom: 12 } }, /* @__PURE__ */ React.createElement("div", { style: { flex: 1 } }, /* @__PURE__ */ React.createElement(
+      "label",
+      {
+        style: {
+          display: "block",
+          fontSize: "0.9rem",
+          fontWeight: 600,
+          color: "#374151",
+          marginBottom: 4
+        }
+      },
+      "Location"
+    ), /* @__PURE__ */ React.createElement(
+      "input",
+      {
+        type: "text",
+        value: jobDetails.location,
+        onChange: (e) => setJobDetails({ ...jobDetails, location: e.target.value }),
+        placeholder: "e.g., San Francisco, CA",
+        style: {
+          width: "100%",
+          padding: "8px 12px",
+          borderRadius: 6,
+          border: "1px solid #E5E7EB",
+          fontSize: "0.9rem"
+        }
+      }
+    )), /* @__PURE__ */ React.createElement("div", { style: { flex: 1 } }, /* @__PURE__ */ React.createElement(
+      "label",
+      {
+        style: {
+          display: "block",
+          fontSize: "0.9rem",
+          fontWeight: 600,
+          color: "#374151",
+          marginBottom: 4
+        }
+      },
+      "Job Type"
+    ), /* @__PURE__ */ React.createElement(
+      "select",
+      {
+        value: jobDetails.type,
+        onChange: (e) => setJobDetails({ ...jobDetails, type: e.target.value }),
+        style: {
+          width: "100%",
+          padding: "8px 12px",
+          borderRadius: 6,
+          border: "1px solid #E5E7EB",
+          fontSize: "0.9rem",
+          background: "#FFFFFF"
+        }
+      },
+      jobTypes.map((type) => /* @__PURE__ */ React.createElement("option", { key: type, value: type }, type.charAt(0).toUpperCase() + type.slice(1)))
+    ))), /* @__PURE__ */ React.createElement("div", { style: { marginBottom: 12 } }, /* @__PURE__ */ React.createElement(
+      "label",
+      {
+        style: {
+          display: "block",
+          fontSize: "0.9rem",
+          fontWeight: 600,
+          color: "#374151",
+          marginBottom: 4
+        }
+      },
+      "Salary Range (Optional)"
+    ), /* @__PURE__ */ React.createElement(
+      "input",
+      {
+        type: "text",
+        value: jobDetails.salary,
+        onChange: (e) => setJobDetails({ ...jobDetails, salary: e.target.value }),
+        placeholder: "e.g., $120K - $150K",
+        style: {
+          width: "100%",
+          padding: "8px 12px",
+          borderRadius: 6,
+          border: "1px solid #E5E7EB",
+          fontSize: "0.9rem"
+        }
+      }
+    ))), /* @__PURE__ */ React.createElement("div", { className: "uswift-card", style: { marginBottom: 16 } }, /* @__PURE__ */ React.createElement(
+      "label",
+      {
+        style: {
+          fontWeight: 600,
+          display: "block",
+          marginBottom: 8,
+          color: "#374151"
+        }
+      },
+      "Job Description:"
+    ), /* @__PURE__ */ React.createElement(
+      "textarea",
+      {
+        value: jobDescription,
+        onChange: (e) => setJobDescription(e.target.value),
+        placeholder: "Paste the complete job description here...",
+        rows: 8,
+        style: {
+          width: "100%",
+          padding: 12,
+          borderRadius: 8,
+          border: "1px solid #E5E7EB",
+          fontSize: "0.9rem",
+          resize: "vertical"
+        }
+      }
+    )), /* @__PURE__ */ React.createElement("div", { className: "uswift-card", style: { marginBottom: 16 } }, /* @__PURE__ */ React.createElement(
+      "label",
+      {
+        style: {
+          fontWeight: 600,
+          display: "block",
+          marginBottom: 8,
+          color: "#374151"
+        }
+      },
+      "Your Profile/Skills (Optional):"
+    ), /* @__PURE__ */ React.createElement(
+      "textarea",
+      {
+        value: userProfile,
+        onChange: (e) => setUserProfile(e.target.value),
+        placeholder: "Describe your skills, experience, and qualifications to get personalized analysis...",
+        rows: 4,
+        style: {
+          width: "100%",
+          padding: 12,
+          borderRadius: 8,
+          border: "1px solid #E5E7EB",
+          fontSize: "0.9rem",
+          resize: "vertical"
+        }
+      }
+    )), /* @__PURE__ */ React.createElement(
+      "button",
+      {
+        onClick: handleAnalyze,
+        disabled: isLoading || !jobDescription.trim(),
+        className: "uswift-btn",
+        style: {
+          width: "100%",
+          opacity: isLoading || !jobDescription.trim() ? 0.6 : 1,
+          cursor: isLoading || !jobDescription.trim() ? "not-allowed" : "pointer"
+        }
+      },
+      isLoading ? /* @__PURE__ */ React.createElement(
+        "div",
+        {
+          style: {
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 8
+          }
+        },
+        /* @__PURE__ */ React.createElement(
           "div",
           {
-            className: "uswift-gradient",
             style: {
-              height: 8,
-              borderRadius: 8,
-              marginBottom: 16
+              width: 16,
+              height: 16,
+              border: "2px solid #ffffff",
+              borderTop: "2px solid transparent",
+              borderRadius: "50%",
+              animation: "spin 1s linear infinite"
             }
-          },
-          void 0,
-          false,
-          {
-            fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
-            lineNumber: 242,
-            columnNumber: 7
-          },
-          this
+          }
         ),
-        /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-          "div",
-          {
-            style: {
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              marginBottom: 16
-            },
-            children: [
-              /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                "h2",
-                {
-                  style: {
-                    fontSize: "1.4rem",
-                    fontWeight: 700,
-                    color: "#111827",
-                    margin: 0
-                  },
-                  children: "Job Analysis"
-                },
-                void 0,
-                false,
-                {
-                  fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
-                  lineNumber: 259,
-                  columnNumber: 9
-                },
-                this
-              ),
-              activeTab === "analysis" && /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                "button",
-                {
-                  onClick: () => setActiveTab("input"),
-                  style: {
-                    background: "#EDE9FE",
-                    color: "#6D28D9",
-                    border: "none",
-                    borderRadius: 8,
-                    padding: "6px 12px",
-                    cursor: "pointer",
-                    fontSize: "0.8rem"
-                  },
-                  children: "← Back to Input"
-                },
-                void 0,
-                false,
-                {
-                  fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
-                  lineNumber: 270,
-                  columnNumber: 11
-                },
-                this
-              )
-            ]
-          },
-          void 0,
-          true,
-          {
-            fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
-            lineNumber: 251,
-            columnNumber: 7
-          },
-          this
-        ),
-        /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-          "div",
-          {
-            style: {
-              display: "flex",
-              marginBottom: 16,
-              borderBottom: "1px solid #E5E7EB"
-            },
-            children: [
-              /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                "button",
-                {
-                  onClick: () => setActiveTab("input"),
-                  style: {
-                    background: "none",
-                    border: "none",
-                    padding: "12px 16px",
-                    cursor: "pointer",
-                    fontSize: "0.9rem",
-                    fontWeight: activeTab === "input" ? 600 : 400,
-                    color: activeTab === "input" ? "#6D28D9" : "#6B7280",
-                    borderBottom: activeTab === "input" ? "2px solid #6D28D9" : "none"
-                  },
-                  children: "Input"
-                },
-                void 0,
-                false,
-                {
-                  fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
-                  lineNumber: 295,
-                  columnNumber: 9
-                },
-                this
-              ),
-              /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                "button",
-                {
-                  onClick: () => setActiveTab("analysis"),
-                  disabled: !result,
-                  style: {
-                    background: "none",
-                    border: "none",
-                    padding: "12px 16px",
-                    cursor: result ? "pointer" : "not-allowed",
-                    fontSize: "0.9rem",
-                    fontWeight: activeTab === "analysis" ? 600 : 400,
-                    color: activeTab === "analysis" ? "#6D28D9" : "#6B7280",
-                    borderBottom: activeTab === "analysis" ? "2px solid #6D28D9" : "none",
-                    opacity: result ? 1 : 0.5
-                  },
-                  children: "Analysis"
-                },
-                void 0,
-                false,
-                {
-                  fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
-                  lineNumber: 310,
-                  columnNumber: 9
-                },
-                this
-              )
-            ]
-          },
-          void 0,
-          true,
-          {
-            fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
-            lineNumber: 288,
-            columnNumber: 7
-          },
-          this
-        ),
-        activeTab === "input" && /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { children: [
-          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { className: "uswift-card", style: { marginBottom: 16 }, children: [
-            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-              "h3",
-              {
-                style: {
-                  fontSize: "1.1rem",
-                  fontWeight: 600,
-                  color: "#111827",
-                  marginBottom: 12
-                },
-                children: "Job Details"
-              },
-              void 0,
-              false,
-              {
-                fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
-                lineNumber: 334,
-                columnNumber: 13
-              },
-              this
-            ),
-            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { display: "flex", gap: 12, marginBottom: 12 }, children: [
-              /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { flex: 1 }, children: [
-                /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                  "label",
-                  {
-                    style: {
-                      display: "block",
-                      fontSize: "0.9rem",
-                      fontWeight: 600,
-                      color: "#374151",
-                      marginBottom: 4
-                    },
-                    children: "Job Title"
-                  },
-                  void 0,
-                  false,
-                  {
-                    fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
-                    lineNumber: 347,
-                    columnNumber: 17
-                  },
-                  this
-                ),
-                /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                  "input",
-                  {
-                    type: "text",
-                    value: jobDetails.title,
-                    onChange: (e) => setJobDetails({ ...jobDetails, title: e.target.value }),
-                    placeholder: "e.g., Senior Software Engineer",
-                    style: {
-                      width: "100%",
-                      padding: "8px 12px",
-                      borderRadius: 6,
-                      border: "1px solid #E5E7EB",
-                      fontSize: "0.9rem"
-                    }
-                  },
-                  void 0,
-                  false,
-                  {
-                    fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
-                    lineNumber: 358,
-                    columnNumber: 17
-                  },
-                  this
-                )
-              ] }, void 0, true, {
-                fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
-                lineNumber: 346,
-                columnNumber: 15
-              }, this),
-              /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { flex: 1 }, children: [
-                /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                  "label",
-                  {
-                    style: {
-                      display: "block",
-                      fontSize: "0.9rem",
-                      fontWeight: 600,
-                      color: "#374151",
-                      marginBottom: 4
-                    },
-                    children: "Company"
-                  },
-                  void 0,
-                  false,
-                  {
-                    fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
-                    lineNumber: 375,
-                    columnNumber: 17
-                  },
-                  this
-                ),
-                /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                  "input",
-                  {
-                    type: "text",
-                    value: jobDetails.company,
-                    onChange: (e) => setJobDetails({ ...jobDetails, company: e.target.value }),
-                    placeholder: "e.g., Google",
-                    style: {
-                      width: "100%",
-                      padding: "8px 12px",
-                      borderRadius: 6,
-                      border: "1px solid #E5E7EB",
-                      fontSize: "0.9rem"
-                    }
-                  },
-                  void 0,
-                  false,
-                  {
-                    fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
-                    lineNumber: 386,
-                    columnNumber: 17
-                  },
-                  this
-                )
-              ] }, void 0, true, {
-                fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
-                lineNumber: 374,
-                columnNumber: 15
-              }, this)
-            ] }, void 0, true, {
-              fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
-              lineNumber: 345,
-              columnNumber: 13
-            }, this),
-            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { display: "flex", gap: 12, marginBottom: 12 }, children: [
-              /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { flex: 1 }, children: [
-                /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                  "label",
-                  {
-                    style: {
-                      display: "block",
-                      fontSize: "0.9rem",
-                      fontWeight: 600,
-                      color: "#374151",
-                      marginBottom: 4
-                    },
-                    children: "Location"
-                  },
-                  void 0,
-                  false,
-                  {
-                    fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
-                    lineNumber: 406,
-                    columnNumber: 17
-                  },
-                  this
-                ),
-                /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                  "input",
-                  {
-                    type: "text",
-                    value: jobDetails.location,
-                    onChange: (e) => setJobDetails({ ...jobDetails, location: e.target.value }),
-                    placeholder: "e.g., San Francisco, CA",
-                    style: {
-                      width: "100%",
-                      padding: "8px 12px",
-                      borderRadius: 6,
-                      border: "1px solid #E5E7EB",
-                      fontSize: "0.9rem"
-                    }
-                  },
-                  void 0,
-                  false,
-                  {
-                    fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
-                    lineNumber: 417,
-                    columnNumber: 17
-                  },
-                  this
-                )
-              ] }, void 0, true, {
-                fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
-                lineNumber: 405,
-                columnNumber: 15
-              }, this),
-              /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { flex: 1 }, children: [
-                /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                  "label",
-                  {
-                    style: {
-                      display: "block",
-                      fontSize: "0.9rem",
-                      fontWeight: 600,
-                      color: "#374151",
-                      marginBottom: 4
-                    },
-                    children: "Job Type"
-                  },
-                  void 0,
-                  false,
-                  {
-                    fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
-                    lineNumber: 434,
-                    columnNumber: 17
-                  },
-                  this
-                ),
-                /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                  "select",
-                  {
-                    value: jobDetails.type,
-                    onChange: (e) => setJobDetails({ ...jobDetails, type: e.target.value }),
-                    style: {
-                      width: "100%",
-                      padding: "8px 12px",
-                      borderRadius: 6,
-                      border: "1px solid #E5E7EB",
-                      fontSize: "0.9rem",
-                      background: "#FFFFFF"
-                    },
-                    children: jobTypes.map((type) => /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("option", { value: type, children: type.charAt(0).toUpperCase() + type.slice(1) }, type, false, {
-                      fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
-                      lineNumber: 460,
-                      columnNumber: 21
-                    }, this))
-                  },
-                  void 0,
-                  false,
-                  {
-                    fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
-                    lineNumber: 445,
-                    columnNumber: 17
-                  },
-                  this
-                )
-              ] }, void 0, true, {
-                fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
-                lineNumber: 433,
-                columnNumber: 15
-              }, this)
-            ] }, void 0, true, {
-              fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
-              lineNumber: 404,
-              columnNumber: 13
-            }, this),
-            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { marginBottom: 12 }, children: [
-              /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                "label",
-                {
-                  style: {
-                    display: "block",
-                    fontSize: "0.9rem",
-                    fontWeight: 600,
-                    color: "#374151",
-                    marginBottom: 4
-                  },
-                  children: "Salary Range (Optional)"
-                },
-                void 0,
-                false,
-                {
-                  fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
-                  lineNumber: 469,
-                  columnNumber: 15
-                },
-                this
-              ),
-              /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                "input",
-                {
-                  type: "text",
-                  value: jobDetails.salary,
-                  onChange: (e) => setJobDetails({ ...jobDetails, salary: e.target.value }),
-                  placeholder: "e.g., $120K - $150K",
-                  style: {
-                    width: "100%",
-                    padding: "8px 12px",
-                    borderRadius: 6,
-                    border: "1px solid #E5E7EB",
-                    fontSize: "0.9rem"
-                  }
-                },
-                void 0,
-                false,
-                {
-                  fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
-                  lineNumber: 480,
-                  columnNumber: 15
-                },
-                this
-              )
-            ] }, void 0, true, {
-              fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
-              lineNumber: 468,
-              columnNumber: 13
-            }, this)
-          ] }, void 0, true, {
-            fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
-            lineNumber: 333,
-            columnNumber: 11
-          }, this),
-          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { className: "uswift-card", style: { marginBottom: 16 }, children: [
-            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-              "label",
-              {
-                style: {
-                  fontWeight: 600,
-                  display: "block",
-                  marginBottom: 8,
-                  color: "#374151"
-                },
-                children: "Job Description:"
-              },
-              void 0,
-              false,
-              {
-                fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
-                lineNumber: 500,
-                columnNumber: 13
-              },
-              this
-            ),
-            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-              "textarea",
-              {
-                value: jobDescription,
-                onChange: (e) => setJobDescription(e.target.value),
-                placeholder: "Paste the complete job description here...",
-                rows: 8,
-                style: {
-                  width: "100%",
-                  padding: 12,
-                  borderRadius: 8,
-                  border: "1px solid #E5E7EB",
-                  fontSize: "0.9rem",
-                  resize: "vertical"
-                }
-              },
-              void 0,
-              false,
-              {
-                fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
-                lineNumber: 510,
-                columnNumber: 13
-              },
-              this
-            )
-          ] }, void 0, true, {
-            fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
-            lineNumber: 499,
-            columnNumber: 11
-          }, this),
-          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { className: "uswift-card", style: { marginBottom: 16 }, children: [
-            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-              "label",
-              {
-                style: {
-                  fontWeight: 600,
-                  display: "block",
-                  marginBottom: 8,
-                  color: "#374151"
-                },
-                children: "Your Profile/Skills (Optional):"
-              },
-              void 0,
-              false,
-              {
-                fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
-                lineNumber: 528,
-                columnNumber: 13
-              },
-              this
-            ),
-            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-              "textarea",
-              {
-                value: userProfile,
-                onChange: (e) => setUserProfile(e.target.value),
-                placeholder: "Describe your skills, experience, and qualifications to get personalized analysis...",
-                rows: 4,
-                style: {
-                  width: "100%",
-                  padding: 12,
-                  borderRadius: 8,
-                  border: "1px solid #E5E7EB",
-                  fontSize: "0.9rem",
-                  resize: "vertical"
-                }
-              },
-              void 0,
-              false,
-              {
-                fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
-                lineNumber: 538,
-                columnNumber: 13
-              },
-              this
-            )
-          ] }, void 0, true, {
-            fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
-            lineNumber: 527,
-            columnNumber: 11
-          }, this),
-          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-            "button",
-            {
-              onClick: handleAnalyze,
-              disabled: isLoading || !jobDescription.trim(),
-              className: "uswift-btn",
-              style: {
-                width: "100%",
-                opacity: isLoading || !jobDescription.trim() ? 0.6 : 1,
-                cursor: isLoading || !jobDescription.trim() ? "not-allowed" : "pointer"
-              },
-              children: isLoading ? /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                "div",
-                {
-                  style: {
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    gap: 8
-                  },
-                  children: [
-                    /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                      "div",
-                      {
-                        style: {
-                          width: 16,
-                          height: 16,
-                          border: "2px solid #ffffff",
-                          borderTop: "2px solid transparent",
-                          borderRadius: "50%",
-                          animation: "spin 1s linear infinite"
-                        }
-                      },
-                      void 0,
-                      false,
-                      {
-                        fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
-                        lineNumber: 575,
-                        columnNumber: 17
-                      },
-                      this
-                    ),
-                    "Analyzing Job..."
-                  ]
-                },
-                void 0,
-                true,
-                {
-                  fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
-                  lineNumber: 567,
-                  columnNumber: 15
-                },
-                this
-              ) : "Analyze Job"
-            },
-            void 0,
-            false,
-            {
-              fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
-              lineNumber: 555,
-              columnNumber: 11
-            },
-            this
-          ),
-          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-            "div",
-            {
-              style: {
-                marginTop: 16,
-                padding: 12,
-                background: "#F8F9FA",
-                borderRadius: 8,
-                fontSize: "0.8rem",
-                color: "#6B7280"
-              },
-              children: [
-                /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("strong", { children: "Pro Tips:" }, void 0, false, {
-                  fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
-                  lineNumber: 603,
-                  columnNumber: 13
-                }, this),
-                /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("ul", { style: { margin: "8px 0 0 16px", padding: 0 }, children: [
-                  /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("li", { children: "Include your skills section for personalized matching analysis" }, void 0, false, {
-                    fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
-                    lineNumber: 605,
-                    columnNumber: 15
-                  }, this),
-                  /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("li", { children: "The more detailed the job description, the better the analysis" }, void 0, false, {
-                    fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
-                    lineNumber: 608,
-                    columnNumber: 15
-                  }, this),
-                  /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("li", { children: "Look for key requirements, responsibilities, and qualifications" }, void 0, false, {
-                    fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
-                    lineNumber: 611,
-                    columnNumber: 15
-                  }, this),
-                  /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("li", { children: "Consider both technical skills and soft skills mentioned" }, void 0, false, {
-                    fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
-                    lineNumber: 614,
-                    columnNumber: 15
-                  }, this)
-                ] }, void 0, true, {
-                  fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
-                  lineNumber: 604,
-                  columnNumber: 13
-                }, this)
-              ]
-            },
-            void 0,
-            true,
-            {
-              fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
-              lineNumber: 593,
-              columnNumber: 11
-            },
-            this
-          )
-        ] }, void 0, true, {
-          fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
-          lineNumber: 331,
-          columnNumber: 9
-        }, this),
-        activeTab === "analysis" && result && /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { children: [
-          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-            "div",
-            {
-              style: {
-                display: "flex",
-                alignItems: "center",
-                gap: 16,
-                marginBottom: 20,
-                padding: 20,
-                background: "#F8F9FA",
-                borderRadius: 8
-              },
-              children: [
-                /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { textAlign: "center" }, children: [
-                  /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                    "div",
-                    {
-                      style: {
-                        fontSize: "2.5rem",
-                        fontWeight: 700,
-                        color: getMatchColor(result.overallMatch),
-                        marginBottom: 8
-                      },
-                      children: [
-                        result.overallMatch,
-                        "/100"
-                      ]
-                    },
-                    void 0,
-                    true,
-                    {
-                      fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
-                      lineNumber: 635,
-                      columnNumber: 15
-                    },
-                    this
-                  ),
-                  /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                    "div",
-                    {
-                      style: {
-                        fontSize: "1rem",
-                        color: "#6B7280",
-                        fontWeight: 600
-                      },
-                      children: getMatchLabel(result.overallMatch)
-                    },
-                    void 0,
-                    false,
-                    {
-                      fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
-                      lineNumber: 645,
-                      columnNumber: 15
-                    },
-                    this
-                  )
-                ] }, void 0, true, {
-                  fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
-                  lineNumber: 634,
-                  columnNumber: 13
-                }, this),
-                /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { flex: 1 }, children: [
-                  /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                    "h3",
-                    {
-                      style: {
-                        margin: "0 0 8px 0",
-                        fontSize: "1.2rem",
-                        color: "#111827"
-                      },
-                      children: "Job Match Analysis"
-                    },
-                    void 0,
-                    false,
-                    {
-                      fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
-                      lineNumber: 656,
-                      columnNumber: 15
-                    },
-                    this
-                  ),
-                  /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("p", { style: { margin: 0, fontSize: "0.9rem", color: "#6B7280" }, children: "Based on requirements analysis and market standards" }, void 0, false, {
-                    fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
-                    lineNumber: 665,
-                    columnNumber: 15
-                  }, this)
-                ] }, void 0, true, {
-                  fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
-                  lineNumber: 655,
-                  columnNumber: 13
-                }, this)
-              ]
-            },
-            void 0,
-            true,
-            {
-              fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
-              lineNumber: 623,
-              columnNumber: 11
-            },
-            this
-          ),
-          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { className: "uswift-card", style: { marginBottom: 16 }, children: [
-            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-              "h3",
-              {
-                style: {
-                  fontSize: "1.1rem",
-                  fontWeight: 600,
-                  color: "#111827",
-                  marginBottom: 12
-                },
-                children: "Key Requirements"
-              },
-              void 0,
-              false,
-              {
-                fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
-                lineNumber: 673,
-                columnNumber: 13
-              },
-              this
-            ),
-            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { display: "flex", gap: 4, flexWrap: "wrap" }, children: result.keyRequirements.map((req, index) => /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-              "span",
-              {
-                style: {
-                  background: "#DBEAFE",
-                  color: "#1E40AF",
-                  padding: "6px 12px",
-                  borderRadius: 6,
-                  fontSize: "0.8rem",
-                  fontWeight: 500,
-                  display: "inline-block",
-                  marginBottom: 4
-                },
-                children: req
-              },
-              index,
-              false,
-              {
-                fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
-                lineNumber: 685,
-                columnNumber: 17
-              },
-              this
-            )) }, void 0, false, {
-              fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
-              lineNumber: 683,
-              columnNumber: 13
-            }, this)
-          ] }, void 0, true, {
-            fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
-            lineNumber: 672,
-            columnNumber: 11
-          }, this),
-          result.matchingSkills.length > 0 && /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { className: "uswift-card", style: { marginBottom: 16 }, children: [
-            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-              "h3",
-              {
-                style: {
-                  fontSize: "1.1rem",
-                  fontWeight: 600,
-                  color: "#111827",
-                  marginBottom: 12
-                },
-                children: "Matching Skills"
-              },
-              void 0,
-              false,
-              {
-                fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
-                lineNumber: 707,
-                columnNumber: 15
-              },
-              this
-            ),
-            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { display: "flex", gap: 4, flexWrap: "wrap" }, children: result.matchingSkills.map((skill, index) => /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-              "span",
-              {
-                style: {
-                  background: "#D1FAE5",
-                  color: "#065F46",
-                  padding: "4px 8px",
-                  borderRadius: 4,
-                  fontSize: "0.8rem",
-                  fontWeight: 500
-                },
-                children: [
-                  "✓ ",
-                  skill
-                ]
-              },
-              index,
-              true,
-              {
-                fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
-                lineNumber: 719,
-                columnNumber: 19
-              },
-              this
-            )) }, void 0, false, {
-              fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
-              lineNumber: 717,
-              columnNumber: 15
-            }, this)
-          ] }, void 0, true, {
-            fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
-            lineNumber: 706,
-            columnNumber: 13
-          }, this),
-          result.missingSkills.length > 0 && /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { className: "uswift-card", style: { marginBottom: 16 }, children: [
-            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-              "h3",
-              {
-                style: {
-                  fontSize: "1.1rem",
-                  fontWeight: 600,
-                  color: "#111827",
-                  marginBottom: 12
-                },
-                children: "Beneficial Skills (Not Required)"
-              },
-              void 0,
-              false,
-              {
-                fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
-                lineNumber: 739,
-                columnNumber: 15
-              },
-              this
-            ),
-            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { display: "flex", gap: 4, flexWrap: "wrap" }, children: result.missingSkills.map((skill, index) => /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-              "span",
-              {
-                style: {
-                  background: "#FEF3C7",
-                  color: "#92400E",
-                  padding: "4px 8px",
-                  borderRadius: 4,
-                  fontSize: "0.8rem",
-                  fontWeight: 500
-                },
-                children: [
-                  "+ ",
-                  skill
-                ]
-              },
-              index,
-              true,
-              {
-                fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
-                lineNumber: 751,
-                columnNumber: 19
-              },
-              this
-            )) }, void 0, false, {
-              fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
-              lineNumber: 749,
-              columnNumber: 15
-            }, this)
-          ] }, void 0, true, {
-            fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
-            lineNumber: 738,
-            columnNumber: 13
-          }, this),
-          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { className: "uswift-card", style: { marginBottom: 16 }, children: [
-            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-              "h3",
-              {
-                style: {
-                  fontSize: "1.1rem",
-                  fontWeight: 600,
-                  color: "#111827",
-                  marginBottom: 12
-                },
-                children: "💰 Salary Insights"
-              },
-              void 0,
-              false,
-              {
-                fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
-                lineNumber: 771,
-                columnNumber: 13
-              },
-              this
-            ),
-            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-              "p",
-              {
-                style: {
-                  fontSize: "0.9rem",
-                  lineHeight: 1.6,
-                  color: "#4B5563",
-                  margin: 0
-                },
-                children: result.salaryInsights
-              },
-              void 0,
-              false,
-              {
-                fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
-                lineNumber: 781,
-                columnNumber: 13
-              },
-              this
-            )
-          ] }, void 0, true, {
-            fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
-            lineNumber: 770,
-            columnNumber: 11
-          }, this),
-          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { className: "uswift-card", style: { marginBottom: 16 }, children: [
-            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-              "h3",
-              {
-                style: {
-                  fontSize: "1.1rem",
-                  fontWeight: 600,
-                  color: "#111827",
-                  marginBottom: 12
-                },
-                children: "🏢 Company Culture Indicators"
-              },
-              void 0,
-              false,
-              {
-                fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
-                lineNumber: 795,
-                columnNumber: 13
-              },
-              this
-            ),
-            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-              "p",
-              {
-                style: {
-                  fontSize: "0.9rem",
-                  lineHeight: 1.6,
-                  color: "#4B5563",
-                  margin: 0
-                },
-                children: result.companyCulture
-              },
-              void 0,
-              false,
-              {
-                fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
-                lineNumber: 805,
-                columnNumber: 13
-              },
-              this
-            )
-          ] }, void 0, true, {
-            fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
-            lineNumber: 794,
-            columnNumber: 11
-          }, this),
-          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { className: "uswift-card", style: { marginBottom: 16 }, children: [
-            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-              "h3",
-              {
-                style: {
-                  fontSize: "1.1rem",
-                  fontWeight: 600,
-                  color: "#111827",
-                  marginBottom: 12
-                },
-                children: "🎯 Application Tips"
-              },
-              void 0,
-              false,
-              {
-                fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
-                lineNumber: 819,
-                columnNumber: 13
-              },
-              this
-            ),
-            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("ul", { style: { margin: 0, paddingLeft: 20 }, children: result.applicationTips.map((tip, index) => /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-              "li",
-              {
-                style: {
-                  fontSize: "0.9rem",
-                  color: "#4B5563",
-                  marginBottom: 8
-                },
-                children: tip
-              },
-              index,
-              false,
-              {
-                fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
-                lineNumber: 831,
-                columnNumber: 17
-              },
-              this
-            )) }, void 0, false, {
-              fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
-              lineNumber: 829,
-              columnNumber: 13
-            }, this)
-          ] }, void 0, true, {
-            fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
-            lineNumber: 818,
-            columnNumber: 11
-          }, this),
-          result.recommendations.length > 0 && /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { className: "uswift-card", style: { marginBottom: 16 }, children: [
-            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-              "h3",
-              {
-                style: {
-                  fontSize: "1.1rem",
-                  fontWeight: 600,
-                  color: "#111827",
-                  marginBottom: 12
-                },
-                children: "💡 Recommendations"
-              },
-              void 0,
-              false,
-              {
-                fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
-                lineNumber: 848,
-                columnNumber: 15
-              },
-              this
-            ),
-            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("ul", { style: { margin: 0, paddingLeft: 20 }, children: result.recommendations.map((rec, index) => /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-              "li",
-              {
-                style: {
-                  fontSize: "0.9rem",
-                  color: "#4B5563",
-                  marginBottom: 8
-                },
-                children: rec
-              },
-              index,
-              false,
-              {
-                fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
-                lineNumber: 860,
-                columnNumber: 19
-              },
-              this
-            )) }, void 0, false, {
-              fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
-              lineNumber: 858,
-              columnNumber: 15
-            }, this)
-          ] }, void 0, true, {
-            fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
-            lineNumber: 847,
-            columnNumber: 13
-          }, this),
-          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { display: "flex", gap: 8 }, children: [
-            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-              "button",
-              {
-                onClick: () => copyToClipboard(`
+        "Analyzing Job..."
+      ) : "Analyze Job"
+    ), /* @__PURE__ */ React.createElement(
+      "div",
+      {
+        style: {
+          marginTop: 16,
+          padding: 12,
+          background: "#F8F9FA",
+          borderRadius: 8,
+          fontSize: "0.8rem",
+          color: "#6B7280"
+        }
+      },
+      /* @__PURE__ */ React.createElement("strong", null, "Pro Tips:"),
+      /* @__PURE__ */ React.createElement("ul", { style: { margin: "8px 0 0 16px", padding: 0 } }, /* @__PURE__ */ React.createElement("li", null, "Include your skills section for personalized matching analysis"), /* @__PURE__ */ React.createElement("li", null, "The more detailed the job description, the better the analysis"), /* @__PURE__ */ React.createElement("li", null, "Look for key requirements, responsibilities, and qualifications"), /* @__PURE__ */ React.createElement("li", null, "Consider both technical skills and soft skills mentioned"))
+    )),
+    activeTab === "analysis" && result && /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement(
+      "div",
+      {
+        style: {
+          display: "flex",
+          alignItems: "center",
+          gap: 16,
+          marginBottom: 20,
+          padding: 20,
+          background: "#F8F9FA",
+          borderRadius: 8
+        }
+      },
+      /* @__PURE__ */ React.createElement("div", { style: { textAlign: "center" } }, /* @__PURE__ */ React.createElement(
+        "div",
+        {
+          style: {
+            fontSize: "2.5rem",
+            fontWeight: 700,
+            color: getMatchColor(result.overallMatch),
+            marginBottom: 8
+          }
+        },
+        result.overallMatch,
+        "/100"
+      ), /* @__PURE__ */ React.createElement(
+        "div",
+        {
+          style: {
+            fontSize: "1rem",
+            color: "#6B7280",
+            fontWeight: 600
+          }
+        },
+        getMatchLabel(result.overallMatch)
+      )),
+      /* @__PURE__ */ React.createElement("div", { style: { flex: 1 } }, /* @__PURE__ */ React.createElement(
+        "h3",
+        {
+          style: {
+            margin: "0 0 8px 0",
+            fontSize: "1.2rem",
+            color: "#111827"
+          }
+        },
+        "Job Match Analysis"
+      ), /* @__PURE__ */ React.createElement("p", { style: { margin: 0, fontSize: "0.9rem", color: "#6B7280" } }, "Based on requirements analysis and market standards"))
+    ), /* @__PURE__ */ React.createElement("div", { className: "uswift-card", style: { marginBottom: 16 } }, /* @__PURE__ */ React.createElement(
+      "h3",
+      {
+        style: {
+          fontSize: "1.1rem",
+          fontWeight: 600,
+          color: "#111827",
+          marginBottom: 12
+        }
+      },
+      "Key Requirements"
+    ), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 4, flexWrap: "wrap" } }, result.keyRequirements.map((req, index) => /* @__PURE__ */ React.createElement(
+      "span",
+      {
+        key: index,
+        style: {
+          background: "#DBEAFE",
+          color: "#1E40AF",
+          padding: "6px 12px",
+          borderRadius: 6,
+          fontSize: "0.8rem",
+          fontWeight: 500,
+          display: "inline-block",
+          marginBottom: 4
+        }
+      },
+      req
+    )))), result.matchingSkills.length > 0 && /* @__PURE__ */ React.createElement("div", { className: "uswift-card", style: { marginBottom: 16 } }, /* @__PURE__ */ React.createElement(
+      "h3",
+      {
+        style: {
+          fontSize: "1.1rem",
+          fontWeight: 600,
+          color: "#111827",
+          marginBottom: 12
+        }
+      },
+      "Matching Skills"
+    ), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 4, flexWrap: "wrap" } }, result.matchingSkills.map((skill, index) => /* @__PURE__ */ React.createElement(
+      "span",
+      {
+        key: index,
+        style: {
+          background: "#D1FAE5",
+          color: "#065F46",
+          padding: "4px 8px",
+          borderRadius: 4,
+          fontSize: "0.8rem",
+          fontWeight: 500
+        }
+      },
+      "✓ ",
+      skill
+    )))), result.missingSkills.length > 0 && /* @__PURE__ */ React.createElement("div", { className: "uswift-card", style: { marginBottom: 16 } }, /* @__PURE__ */ React.createElement(
+      "h3",
+      {
+        style: {
+          fontSize: "1.1rem",
+          fontWeight: 600,
+          color: "#111827",
+          marginBottom: 12
+        }
+      },
+      "Beneficial Skills (Not Required)"
+    ), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 4, flexWrap: "wrap" } }, result.missingSkills.map((skill, index) => /* @__PURE__ */ React.createElement(
+      "span",
+      {
+        key: index,
+        style: {
+          background: "#FEF3C7",
+          color: "#92400E",
+          padding: "4px 8px",
+          borderRadius: 4,
+          fontSize: "0.8rem",
+          fontWeight: 500
+        }
+      },
+      "+ ",
+      skill
+    )))), /* @__PURE__ */ React.createElement("div", { className: "uswift-card", style: { marginBottom: 16 } }, /* @__PURE__ */ React.createElement(
+      "h3",
+      {
+        style: {
+          fontSize: "1.1rem",
+          fontWeight: 600,
+          color: "#111827",
+          marginBottom: 12
+        }
+      },
+      "💰 Salary Insights"
+    ), /* @__PURE__ */ React.createElement(
+      "p",
+      {
+        style: {
+          fontSize: "0.9rem",
+          lineHeight: 1.6,
+          color: "#4B5563",
+          margin: 0
+        }
+      },
+      result.salaryInsights
+    )), /* @__PURE__ */ React.createElement("div", { className: "uswift-card", style: { marginBottom: 16 } }, /* @__PURE__ */ React.createElement(
+      "h3",
+      {
+        style: {
+          fontSize: "1.1rem",
+          fontWeight: 600,
+          color: "#111827",
+          marginBottom: 12
+        }
+      },
+      "🏢 Company Culture Indicators"
+    ), /* @__PURE__ */ React.createElement(
+      "p",
+      {
+        style: {
+          fontSize: "0.9rem",
+          lineHeight: 1.6,
+          color: "#4B5563",
+          margin: 0
+        }
+      },
+      result.companyCulture
+    )), /* @__PURE__ */ React.createElement("div", { className: "uswift-card", style: { marginBottom: 16 } }, /* @__PURE__ */ React.createElement(
+      "h3",
+      {
+        style: {
+          fontSize: "1.1rem",
+          fontWeight: 600,
+          color: "#111827",
+          marginBottom: 12
+        }
+      },
+      "🎯 Application Tips"
+    ), /* @__PURE__ */ React.createElement("ul", { style: { margin: 0, paddingLeft: 20 } }, result.applicationTips.map((tip, index) => /* @__PURE__ */ React.createElement(
+      "li",
+      {
+        key: index,
+        style: {
+          fontSize: "0.9rem",
+          color: "#4B5563",
+          marginBottom: 8
+        }
+      },
+      tip
+    )))), result.recommendations.length > 0 && /* @__PURE__ */ React.createElement("div", { className: "uswift-card", style: { marginBottom: 16 } }, /* @__PURE__ */ React.createElement(
+      "h3",
+      {
+        style: {
+          fontSize: "1.1rem",
+          fontWeight: 600,
+          color: "#111827",
+          marginBottom: 12
+        }
+      },
+      "💡 Recommendations"
+    ), /* @__PURE__ */ React.createElement("ul", { style: { margin: 0, paddingLeft: 20 } }, result.recommendations.map((rec, index) => /* @__PURE__ */ React.createElement(
+      "li",
+      {
+        key: index,
+        style: {
+          fontSize: "0.9rem",
+          color: "#4B5563",
+          marginBottom: 8
+        }
+      },
+      rec
+    )))), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 8 } }, /* @__PURE__ */ React.createElement(
+      "button",
+      {
+        onClick: () => copyToClipboard(`
 Job Analysis Report
 ==================
 
@@ -8243,83 +5022,38 @@ ${result.applicationTips.map((tip) => `• ${tip}`).join("\n")}
 Recommendations:
 ${result.recommendations.map((rec) => `• ${rec}`).join("\n")}
               `),
-                className: "uswift-btn",
-                style: { flex: 1 },
-                children: "Copy Full Report"
-              },
-              void 0,
-              false,
-              {
-                fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
-                lineNumber: 877,
-                columnNumber: 13
-              },
-              this
-            ),
-            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-              "button",
-              {
-                onClick: () => setActiveTab("input"),
-                style: {
-                  flex: 1,
-                  background: "#F3F4F6",
-                  color: "#6B7280",
-                  border: "1px solid #E5E7EB",
-                  borderRadius: 8,
-                  padding: "12px",
-                  cursor: "pointer"
-                },
-                children: "Analyze Another Job"
-              },
-              void 0,
-              false,
-              {
-                fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
-                lineNumber: 920,
-                columnNumber: 13
-              },
-              this
-            )
-          ] }, void 0, true, {
-            fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
-            lineNumber: 876,
-            columnNumber: 11
-          }, this)
-        ] }, void 0, true, {
-          fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
-          lineNumber: 621,
-          columnNumber: 9
-        }, this),
-        /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-          "div",
-          {
-            style: {
-              marginTop: 16,
-              textAlign: "center",
-              fontSize: "0.8rem",
-              color: "#6B7280"
-            },
-            children: "Powered by Mistral AI • Smart job analysis and career insights"
-          },
-          void 0,
-          false,
-          {
-            fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
-            lineNumber: 939,
-            columnNumber: 7
-          },
-          this
-        )
-      ]
-    },
-    void 0,
-    true,
-    {
-      fileName: "C:/Users/DELL/Uswift/extension/src/JobAnalysis.tsx",
-      lineNumber: 232,
-      columnNumber: 5
-    },
-    this
+        className: "uswift-btn",
+        style: { flex: 1 }
+      },
+      "Copy Full Report"
+    ), /* @__PURE__ */ React.createElement(
+      "button",
+      {
+        onClick: () => setActiveTab("input"),
+        style: {
+          flex: 1,
+          background: "#F3F4F6",
+          color: "#6B7280",
+          border: "1px solid #E5E7EB",
+          borderRadius: 8,
+          padding: "12px",
+          cursor: "pointer"
+        }
+      },
+      "Analyze Another Job"
+    ))),
+    /* @__PURE__ */ React.createElement(
+      "div",
+      {
+        style: {
+          marginTop: 16,
+          textAlign: "center",
+          fontSize: "0.8rem",
+          color: "#6B7280"
+        }
+      },
+      "Powered by Mistral AI • Smart job analysis and career insights"
+    )
   );
 }
 
@@ -8543,7 +5277,7 @@ Format the response clearly with proper sections and structure.`;
   const getDifficultyLabel = (difficulty) => {
     return difficulty.charAt(0).toUpperCase() + difficulty.slice(1);
   };
-  return /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
+  return /* @__PURE__ */ React.createElement(
     "div",
     {
       style: {
@@ -8552,913 +5286,467 @@ Format the response clearly with proper sections and structure.`;
         padding: "2rem",
         minWidth: 350,
         minHeight: 520
+      }
+    },
+    /* @__PURE__ */ React.createElement(
+      "div",
+      {
+        className: "uswift-gradient",
+        style: {
+          height: 8,
+          borderRadius: 8,
+          marginBottom: 16
+        }
+      }
+    ),
+    /* @__PURE__ */ React.createElement(
+      "div",
+      {
+        style: {
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          marginBottom: 16
+        }
       },
-      children: [
-        /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
+      /* @__PURE__ */ React.createElement(
+        "h2",
+        {
+          style: {
+            fontSize: "1.4rem",
+            fontWeight: 700,
+            color: "#111827",
+            margin: 0
+          }
+        },
+        "Interview Preparation"
+      ),
+      activeTab !== "input" && /* @__PURE__ */ React.createElement(
+        "button",
+        {
+          onClick: () => setActiveTab("input"),
+          style: {
+            background: "#EDE9FE",
+            color: "#6D28D9",
+            border: "none",
+            borderRadius: 8,
+            padding: "6px 12px",
+            cursor: "pointer",
+            fontSize: "0.8rem"
+          }
+        },
+        "← Back to Input"
+      )
+    ),
+    /* @__PURE__ */ React.createElement(
+      "div",
+      {
+        style: {
+          display: "flex",
+          marginBottom: 16,
+          borderBottom: "1px solid #E5E7EB"
+        }
+      },
+      /* @__PURE__ */ React.createElement(
+        "button",
+        {
+          onClick: () => setActiveTab("input"),
+          style: {
+            background: "none",
+            border: "none",
+            padding: "12px 16px",
+            cursor: "pointer",
+            fontSize: "0.9rem",
+            fontWeight: activeTab === "input" ? 600 : 400,
+            color: activeTab === "input" ? "#6D28D9" : "#6B7280",
+            borderBottom: activeTab === "input" ? "2px solid #6D28D9" : "none"
+          }
+        },
+        "Input"
+      ),
+      /* @__PURE__ */ React.createElement(
+        "button",
+        {
+          onClick: () => setActiveTab("questions"),
+          disabled: !result,
+          style: {
+            background: "none",
+            border: "none",
+            padding: "12px 16px",
+            cursor: result ? "pointer" : "not-allowed",
+            fontSize: "0.9rem",
+            fontWeight: activeTab === "questions" ? 600 : 400,
+            color: activeTab === "questions" ? "#6D28D9" : "#6B7280",
+            borderBottom: activeTab === "questions" ? "2px solid #6D28D9" : "none",
+            opacity: result ? 1 : 0.5
+          }
+        },
+        "Questions"
+      ),
+      /* @__PURE__ */ React.createElement(
+        "button",
+        {
+          onClick: () => setActiveTab("tips"),
+          disabled: !result,
+          style: {
+            background: "none",
+            border: "none",
+            padding: "12px 16px",
+            cursor: result ? "pointer" : "not-allowed",
+            fontSize: "0.9rem",
+            fontWeight: activeTab === "tips" ? 600 : 400,
+            color: activeTab === "tips" ? "#6D28D9" : "#6B7280",
+            borderBottom: activeTab === "tips" ? "2px solid #6D28D9" : "none",
+            opacity: result ? 1 : 0.5
+          }
+        },
+        "Tips & Plan"
+      )
+    ),
+    activeTab === "input" && /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { className: "uswift-card", style: { marginBottom: 16 } }, /* @__PURE__ */ React.createElement(
+      "label",
+      {
+        style: {
+          fontWeight: 600,
+          display: "block",
+          marginBottom: 8,
+          color: "#374151"
+        }
+      },
+      "Job Description:"
+    ), /* @__PURE__ */ React.createElement(
+      "textarea",
+      {
+        value: jobDescription,
+        onChange: (e) => setJobDescription(e.target.value),
+        placeholder: "Paste the job description to generate relevant interview questions...",
+        rows: 6,
+        style: {
+          width: "100%",
+          padding: 12,
+          borderRadius: 8,
+          border: "1px solid #E5E7EB",
+          fontSize: "0.9rem",
+          resize: "vertical"
+        }
+      }
+    )), /* @__PURE__ */ React.createElement("div", { className: "uswift-card", style: { marginBottom: 16 } }, /* @__PURE__ */ React.createElement(
+      "label",
+      {
+        style: {
+          fontWeight: 600,
+          display: "block",
+          marginBottom: 8,
+          color: "#374151"
+        }
+      },
+      "Your Experience Level:"
+    ), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 8, flexWrap: "wrap" } }, experienceLevels.map((level) => /* @__PURE__ */ React.createElement(
+      "button",
+      {
+        key: level.value,
+        onClick: () => setExperienceLevel(level.value),
+        style: {
+          background: experienceLevel === level.value ? "#6D28D9" : "#F3F4F6",
+          color: experienceLevel === level.value ? "#FFFFFF" : "#6B7280",
+          border: "none",
+          borderRadius: 6,
+          padding: "8px 16px",
+          cursor: "pointer",
+          fontSize: "0.8rem",
+          fontWeight: 500,
+          minWidth: 120,
+          textAlign: "left"
+        },
+        title: level.description
+      },
+      /* @__PURE__ */ React.createElement("div", { style: { fontWeight: 600 } }, level.label),
+      /* @__PURE__ */ React.createElement("div", { style: { fontSize: "0.7rem", opacity: 0.8 } }, level.description)
+    )))), /* @__PURE__ */ React.createElement("div", { className: "uswift-card", style: { marginBottom: 16 } }, /* @__PURE__ */ React.createElement(
+      "label",
+      {
+        style: {
+          fontWeight: 600,
+          display: "block",
+          marginBottom: 8,
+          color: "#374151"
+        }
+      },
+      "Focus Areas (Optional):"
+    ), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 4, flexWrap: "wrap" } }, commonFocusAreas.map((area) => /* @__PURE__ */ React.createElement(
+      "button",
+      {
+        key: area,
+        onClick: () => toggleFocusArea(area),
+        style: {
+          background: focusAreas.includes(area) ? "#6D28D9" : "#F3F4F6",
+          color: focusAreas.includes(area) ? "#FFFFFF" : "#6B7280",
+          border: "none",
+          borderRadius: 6,
+          padding: "6px 12px",
+          cursor: "pointer",
+          fontSize: "0.8rem",
+          fontWeight: 500
+        }
+      },
+      focusAreas.includes(area) ? "✓" : "+",
+      " ",
+      area
+    )))), /* @__PURE__ */ React.createElement(
+      "button",
+      {
+        onClick: handleGenerate,
+        disabled: isLoading || !jobDescription.trim(),
+        className: "uswift-btn",
+        style: {
+          width: "100%",
+          opacity: isLoading || !jobDescription.trim() ? 0.6 : 1,
+          cursor: isLoading || !jobDescription.trim() ? "not-allowed" : "pointer"
+        }
+      },
+      isLoading ? /* @__PURE__ */ React.createElement(
+        "div",
+        {
+          style: {
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 8
+          }
+        },
+        /* @__PURE__ */ React.createElement(
           "div",
           {
-            className: "uswift-gradient",
             style: {
-              height: 8,
-              borderRadius: 8,
-              marginBottom: 16
+              width: 16,
+              height: 16,
+              border: "2px solid #ffffff",
+              borderTop: "2px solid transparent",
+              borderRadius: "50%",
+              animation: "spin 1s linear infinite"
+            }
+          }
+        ),
+        "Generating Interview Prep..."
+      ) : "Generate Interview Preparation"
+    ), /* @__PURE__ */ React.createElement(
+      "div",
+      {
+        style: {
+          marginTop: 16,
+          padding: 12,
+          background: "#F8F9FA",
+          borderRadius: 8,
+          fontSize: "0.8rem",
+          color: "#6B7280"
+        }
+      },
+      /* @__PURE__ */ React.createElement("strong", null, "Interview Preparation Tips:"),
+      /* @__PURE__ */ React.createElement("ul", { style: { margin: "8px 0 0 16px", padding: 0 } }, /* @__PURE__ */ React.createElement("li", null, "Use the STAR method (Situation, Task, Action, Result) for behavioral questions"), /* @__PURE__ */ React.createElement("li", null, "Practice coding problems on platforms like LeetCode"), /* @__PURE__ */ React.createElement("li", null, "Research the company and prepare thoughtful questions"), /* @__PURE__ */ React.createElement("li", null, "Review your resume and be ready to discuss any experience"))
+    )),
+    activeTab === "questions" && result && /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { style: { maxHeight: 400, overflowY: "auto" } }, result.questions.map((question) => /* @__PURE__ */ React.createElement(
+      "div",
+      {
+        key: question.id,
+        className: "uswift-card",
+        style: { marginBottom: 12 }
+      },
+      /* @__PURE__ */ React.createElement(
+        "div",
+        {
+          style: {
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "flex-start",
+            marginBottom: 8
+          }
+        },
+        /* @__PURE__ */ React.createElement(
+          "h4",
+          {
+            style: {
+              fontSize: "0.9rem",
+              fontWeight: 600,
+              color: "#111827",
+              margin: 0,
+              flex: 1,
+              marginRight: 12
             }
           },
-          void 0,
-          false,
-          {
-            fileName: "C:/Users/DELL/Uswift/extension/src/InterviewPrep.tsx",
-            lineNumber: 326,
-            columnNumber: 7
-          },
-          this
+          question.question
         ),
-        /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
+        /* @__PURE__ */ React.createElement(
           "div",
           {
-            style: {
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              marginBottom: 16
-            },
-            children: [
-              /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                "h2",
-                {
-                  style: {
-                    fontSize: "1.4rem",
-                    fontWeight: 700,
-                    color: "#111827",
-                    margin: 0
-                  },
-                  children: "Interview Preparation"
-                },
-                void 0,
-                false,
-                {
-                  fileName: "C:/Users/DELL/Uswift/extension/src/InterviewPrep.tsx",
-                  lineNumber: 343,
-                  columnNumber: 9
-                },
-                this
-              ),
-              activeTab !== "input" && /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                "button",
-                {
-                  onClick: () => setActiveTab("input"),
-                  style: {
-                    background: "#EDE9FE",
-                    color: "#6D28D9",
-                    border: "none",
-                    borderRadius: 8,
-                    padding: "6px 12px",
-                    cursor: "pointer",
-                    fontSize: "0.8rem"
-                  },
-                  children: "← Back to Input"
-                },
-                void 0,
-                false,
-                {
-                  fileName: "C:/Users/DELL/Uswift/extension/src/InterviewPrep.tsx",
-                  lineNumber: 354,
-                  columnNumber: 11
-                },
-                this
-              )
-            ]
+            style: { display: "flex", gap: 4, alignItems: "center" }
           },
-          void 0,
-          true,
-          {
-            fileName: "C:/Users/DELL/Uswift/extension/src/InterviewPrep.tsx",
-            lineNumber: 335,
-            columnNumber: 7
-          },
-          this
-        ),
-        /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-          "div",
-          {
-            style: {
-              display: "flex",
-              marginBottom: 16,
-              borderBottom: "1px solid #E5E7EB"
-            },
-            children: [
-              /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                "button",
-                {
-                  onClick: () => setActiveTab("input"),
-                  style: {
-                    background: "none",
-                    border: "none",
-                    padding: "12px 16px",
-                    cursor: "pointer",
-                    fontSize: "0.9rem",
-                    fontWeight: activeTab === "input" ? 600 : 400,
-                    color: activeTab === "input" ? "#6D28D9" : "#6B7280",
-                    borderBottom: activeTab === "input" ? "2px solid #6D28D9" : "none"
-                  },
-                  children: "Input"
-                },
-                void 0,
-                false,
-                {
-                  fileName: "C:/Users/DELL/Uswift/extension/src/InterviewPrep.tsx",
-                  lineNumber: 379,
-                  columnNumber: 9
-                },
-                this
-              ),
-              /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                "button",
-                {
-                  onClick: () => setActiveTab("questions"),
-                  disabled: !result,
-                  style: {
-                    background: "none",
-                    border: "none",
-                    padding: "12px 16px",
-                    cursor: result ? "pointer" : "not-allowed",
-                    fontSize: "0.9rem",
-                    fontWeight: activeTab === "questions" ? 600 : 400,
-                    color: activeTab === "questions" ? "#6D28D9" : "#6B7280",
-                    borderBottom: activeTab === "questions" ? "2px solid #6D28D9" : "none",
-                    opacity: result ? 1 : 0.5
-                  },
-                  children: "Questions"
-                },
-                void 0,
-                false,
-                {
-                  fileName: "C:/Users/DELL/Uswift/extension/src/InterviewPrep.tsx",
-                  lineNumber: 394,
-                  columnNumber: 9
-                },
-                this
-              ),
-              /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                "button",
-                {
-                  onClick: () => setActiveTab("tips"),
-                  disabled: !result,
-                  style: {
-                    background: "none",
-                    border: "none",
-                    padding: "12px 16px",
-                    cursor: result ? "pointer" : "not-allowed",
-                    fontSize: "0.9rem",
-                    fontWeight: activeTab === "tips" ? 600 : 400,
-                    color: activeTab === "tips" ? "#6D28D9" : "#6B7280",
-                    borderBottom: activeTab === "tips" ? "2px solid #6D28D9" : "none",
-                    opacity: result ? 1 : 0.5
-                  },
-                  children: "Tips & Plan"
-                },
-                void 0,
-                false,
-                {
-                  fileName: "C:/Users/DELL/Uswift/extension/src/InterviewPrep.tsx",
-                  lineNumber: 412,
-                  columnNumber: 9
-                },
-                this
-              )
-            ]
-          },
-          void 0,
-          true,
-          {
-            fileName: "C:/Users/DELL/Uswift/extension/src/InterviewPrep.tsx",
-            lineNumber: 372,
-            columnNumber: 7
-          },
-          this
-        ),
-        activeTab === "input" && /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { children: [
-          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { className: "uswift-card", style: { marginBottom: 16 }, children: [
-            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-              "label",
-              {
-                style: {
-                  fontWeight: 600,
-                  display: "block",
-                  marginBottom: 8,
-                  color: "#374151"
-                },
-                children: "Job Description:"
-              },
-              void 0,
-              false,
-              {
-                fileName: "C:/Users/DELL/Uswift/extension/src/InterviewPrep.tsx",
-                lineNumber: 435,
-                columnNumber: 13
-              },
-              this
-            ),
-            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-              "textarea",
-              {
-                value: jobDescription,
-                onChange: (e) => setJobDescription(e.target.value),
-                placeholder: "Paste the job description to generate relevant interview questions...",
-                rows: 6,
-                style: {
-                  width: "100%",
-                  padding: 12,
-                  borderRadius: 8,
-                  border: "1px solid #E5E7EB",
-                  fontSize: "0.9rem",
-                  resize: "vertical"
-                }
-              },
-              void 0,
-              false,
-              {
-                fileName: "C:/Users/DELL/Uswift/extension/src/InterviewPrep.tsx",
-                lineNumber: 445,
-                columnNumber: 13
-              },
-              this
-            )
-          ] }, void 0, true, {
-            fileName: "C:/Users/DELL/Uswift/extension/src/InterviewPrep.tsx",
-            lineNumber: 434,
-            columnNumber: 11
-          }, this),
-          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { className: "uswift-card", style: { marginBottom: 16 }, children: [
-            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-              "label",
-              {
-                style: {
-                  fontWeight: 600,
-                  display: "block",
-                  marginBottom: 8,
-                  color: "#374151"
-                },
-                children: "Your Experience Level:"
-              },
-              void 0,
-              false,
-              {
-                fileName: "C:/Users/DELL/Uswift/extension/src/InterviewPrep.tsx",
-                lineNumber: 463,
-                columnNumber: 13
-              },
-              this
-            ),
-            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { display: "flex", gap: 8, flexWrap: "wrap" }, children: experienceLevels.map((level) => /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-              "button",
-              {
-                onClick: () => setExperienceLevel(level.value),
-                style: {
-                  background: experienceLevel === level.value ? "#6D28D9" : "#F3F4F6",
-                  color: experienceLevel === level.value ? "#FFFFFF" : "#6B7280",
-                  border: "none",
-                  borderRadius: 6,
-                  padding: "8px 16px",
-                  cursor: "pointer",
-                  fontSize: "0.8rem",
-                  fontWeight: 500,
-                  minWidth: 120,
-                  textAlign: "left"
-                },
-                title: level.description,
-                children: [
-                  /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { fontWeight: 600 }, children: level.label }, void 0, false, {
-                    fileName: "C:/Users/DELL/Uswift/extension/src/InterviewPrep.tsx",
-                    lineNumber: 494,
-                    columnNumber: 19
-                  }, this),
-                  /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { fontSize: "0.7rem", opacity: 0.8 }, children: level.description }, void 0, false, {
-                    fileName: "C:/Users/DELL/Uswift/extension/src/InterviewPrep.tsx",
-                    lineNumber: 495,
-                    columnNumber: 19
-                  }, this)
-                ]
-              },
-              level.value,
-              true,
-              {
-                fileName: "C:/Users/DELL/Uswift/extension/src/InterviewPrep.tsx",
-                lineNumber: 475,
-                columnNumber: 17
-              },
-              this
-            )) }, void 0, false, {
-              fileName: "C:/Users/DELL/Uswift/extension/src/InterviewPrep.tsx",
-              lineNumber: 473,
-              columnNumber: 13
-            }, this)
-          ] }, void 0, true, {
-            fileName: "C:/Users/DELL/Uswift/extension/src/InterviewPrep.tsx",
-            lineNumber: 462,
-            columnNumber: 11
-          }, this),
-          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { className: "uswift-card", style: { marginBottom: 16 }, children: [
-            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-              "label",
-              {
-                style: {
-                  fontWeight: 600,
-                  display: "block",
-                  marginBottom: 8,
-                  color: "#374151"
-                },
-                children: "Focus Areas (Optional):"
-              },
-              void 0,
-              false,
-              {
-                fileName: "C:/Users/DELL/Uswift/extension/src/InterviewPrep.tsx",
-                lineNumber: 505,
-                columnNumber: 13
-              },
-              this
-            ),
-            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { display: "flex", gap: 4, flexWrap: "wrap" }, children: commonFocusAreas.map((area) => /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-              "button",
-              {
-                onClick: () => toggleFocusArea(area),
-                style: {
-                  background: focusAreas.includes(area) ? "#6D28D9" : "#F3F4F6",
-                  color: focusAreas.includes(area) ? "#FFFFFF" : "#6B7280",
-                  border: "none",
-                  borderRadius: 6,
-                  padding: "6px 12px",
-                  cursor: "pointer",
-                  fontSize: "0.8rem",
-                  fontWeight: 500
-                },
-                children: [
-                  focusAreas.includes(area) ? "✓" : "+",
-                  " ",
-                  area
-                ]
-              },
-              area,
-              true,
-              {
-                fileName: "C:/Users/DELL/Uswift/extension/src/InterviewPrep.tsx",
-                lineNumber: 517,
-                columnNumber: 17
-              },
-              this
-            )) }, void 0, false, {
-              fileName: "C:/Users/DELL/Uswift/extension/src/InterviewPrep.tsx",
-              lineNumber: 515,
-              columnNumber: 13
-            }, this)
-          ] }, void 0, true, {
-            fileName: "C:/Users/DELL/Uswift/extension/src/InterviewPrep.tsx",
-            lineNumber: 504,
-            columnNumber: 11
-          }, this),
-          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-            "button",
+          /* @__PURE__ */ React.createElement(
+            "span",
             {
-              onClick: handleGenerate,
-              disabled: isLoading || !jobDescription.trim(),
-              className: "uswift-btn",
               style: {
-                width: "100%",
-                opacity: isLoading || !jobDescription.trim() ? 0.6 : 1,
-                cursor: isLoading || !jobDescription.trim() ? "not-allowed" : "pointer"
-              },
-              children: isLoading ? /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                "div",
-                {
-                  style: {
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    gap: 8
-                  },
-                  children: [
-                    /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                      "div",
-                      {
-                        style: {
-                          width: 16,
-                          height: 16,
-                          border: "2px solid #ffffff",
-                          borderTop: "2px solid transparent",
-                          borderRadius: "50%",
-                          animation: "spin 1s linear infinite"
-                        }
-                      },
-                      void 0,
-                      false,
-                      {
-                        fileName: "C:/Users/DELL/Uswift/extension/src/InterviewPrep.tsx",
-                        lineNumber: 560,
-                        columnNumber: 17
-                      },
-                      this
-                    ),
-                    "Generating Interview Prep..."
-                  ]
-                },
-                void 0,
-                true,
-                {
-                  fileName: "C:/Users/DELL/Uswift/extension/src/InterviewPrep.tsx",
-                  lineNumber: 552,
-                  columnNumber: 15
-                },
-                this
-              ) : "Generate Interview Preparation"
+                background: "#EDE9FE",
+                color: "#6D28D9",
+                padding: "2px 6px",
+                borderRadius: 4,
+                fontSize: "0.7rem",
+                fontWeight: 500
+              }
             },
-            void 0,
-            false,
-            {
-              fileName: "C:/Users/DELL/Uswift/extension/src/InterviewPrep.tsx",
-              lineNumber: 540,
-              columnNumber: 11
-            },
-            this
+            question.category
           ),
-          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-            "div",
+          /* @__PURE__ */ React.createElement(
+            "span",
             {
               style: {
-                marginTop: 16,
-                padding: 12,
-                background: "#F8F9FA",
-                borderRadius: 8,
-                fontSize: "0.8rem",
-                color: "#6B7280"
-              },
-              children: [
-                /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("strong", { children: "Interview Preparation Tips:" }, void 0, false, {
-                  fileName: "C:/Users/DELL/Uswift/extension/src/InterviewPrep.tsx",
-                  lineNumber: 588,
-                  columnNumber: 13
-                }, this),
-                /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("ul", { style: { margin: "8px 0 0 16px", padding: 0 }, children: [
-                  /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("li", { children: "Use the STAR method (Situation, Task, Action, Result) for behavioral questions" }, void 0, false, {
-                    fileName: "C:/Users/DELL/Uswift/extension/src/InterviewPrep.tsx",
-                    lineNumber: 590,
-                    columnNumber: 15
-                  }, this),
-                  /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("li", { children: "Practice coding problems on platforms like LeetCode" }, void 0, false, {
-                    fileName: "C:/Users/DELL/Uswift/extension/src/InterviewPrep.tsx",
-                    lineNumber: 594,
-                    columnNumber: 15
-                  }, this),
-                  /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("li", { children: "Research the company and prepare thoughtful questions" }, void 0, false, {
-                    fileName: "C:/Users/DELL/Uswift/extension/src/InterviewPrep.tsx",
-                    lineNumber: 595,
-                    columnNumber: 15
-                  }, this),
-                  /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("li", { children: "Review your resume and be ready to discuss any experience" }, void 0, false, {
-                    fileName: "C:/Users/DELL/Uswift/extension/src/InterviewPrep.tsx",
-                    lineNumber: 596,
-                    columnNumber: 15
-                  }, this)
-                ] }, void 0, true, {
-                  fileName: "C:/Users/DELL/Uswift/extension/src/InterviewPrep.tsx",
-                  lineNumber: 589,
-                  columnNumber: 13
-                }, this)
-              ]
+                background: getDifficultyColor(question.difficulty),
+                color: "#FFFFFF",
+                padding: "2px 6px",
+                borderRadius: 4,
+                fontSize: "0.7rem",
+                fontWeight: 500
+              }
             },
-            void 0,
-            true,
-            {
-              fileName: "C:/Users/DELL/Uswift/extension/src/InterviewPrep.tsx",
-              lineNumber: 578,
-              columnNumber: 11
-            },
-            this
+            getDifficultyLabel(question.difficulty)
           )
-        ] }, void 0, true, {
-          fileName: "C:/Users/DELL/Uswift/extension/src/InterviewPrep.tsx",
-          lineNumber: 432,
-          columnNumber: 9
-        }, this),
-        activeTab === "questions" && result && /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { children: /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { maxHeight: 400, overflowY: "auto" }, children: result.questions.map((question) => /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-          "div",
-          {
-            className: "uswift-card",
-            style: { marginBottom: 12 },
-            children: [
-              /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                "div",
-                {
-                  style: {
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "flex-start",
-                    marginBottom: 8
-                  },
-                  children: [
-                    /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                      "h4",
-                      {
-                        style: {
-                          fontSize: "0.9rem",
-                          fontWeight: 600,
-                          color: "#111827",
-                          margin: 0,
-                          flex: 1,
-                          marginRight: 12
-                        },
-                        children: question.question
-                      },
-                      void 0,
-                      false,
-                      {
-                        fileName: "C:/Users/DELL/Uswift/extension/src/InterviewPrep.tsx",
-                        lineNumber: 620,
-                        columnNumber: 19
-                      },
-                      this
-                    ),
-                    /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                      "div",
-                      {
-                        style: { display: "flex", gap: 4, alignItems: "center" },
-                        children: [
-                          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                            "span",
-                            {
-                              style: {
-                                background: "#EDE9FE",
-                                color: "#6D28D9",
-                                padding: "2px 6px",
-                                borderRadius: 4,
-                                fontSize: "0.7rem",
-                                fontWeight: 500
-                              },
-                              children: question.category
-                            },
-                            void 0,
-                            false,
-                            {
-                              fileName: "C:/Users/DELL/Uswift/extension/src/InterviewPrep.tsx",
-                              lineNumber: 635,
-                              columnNumber: 21
-                            },
-                            this
-                          ),
-                          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                            "span",
-                            {
-                              style: {
-                                background: getDifficultyColor(question.difficulty),
-                                color: "#FFFFFF",
-                                padding: "2px 6px",
-                                borderRadius: 4,
-                                fontSize: "0.7rem",
-                                fontWeight: 500
-                              },
-                              children: getDifficultyLabel(question.difficulty)
-                            },
-                            void 0,
-                            false,
-                            {
-                              fileName: "C:/Users/DELL/Uswift/extension/src/InterviewPrep.tsx",
-                              lineNumber: 647,
-                              columnNumber: 21
-                            },
-                            this
-                          )
-                        ]
-                      },
-                      void 0,
-                      true,
-                      {
-                        fileName: "C:/Users/DELL/Uswift/extension/src/InterviewPrep.tsx",
-                        lineNumber: 632,
-                        columnNumber: 19
-                      },
-                      this
-                    )
-                  ]
-                },
-                void 0,
-                true,
-                {
-                  fileName: "C:/Users/DELL/Uswift/extension/src/InterviewPrep.tsx",
-                  lineNumber: 612,
-                  columnNumber: 17
-                },
-                this
-              ),
-              /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                "div",
-                {
-                  style: {
-                    fontSize: "0.85rem",
-                    color: "#4B5563",
-                    lineHeight: 1.5,
-                    marginBottom: 8
-                  },
-                  children: [
-                    /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("strong", { children: "Suggested Answer:" }, void 0, false, {
-                      fileName: "C:/Users/DELL/Uswift/extension/src/InterviewPrep.tsx",
-                      lineNumber: 670,
-                      columnNumber: 19
-                    }, this),
-                    " ",
-                    question.suggestedAnswer
-                  ]
-                },
-                void 0,
-                true,
-                {
-                  fileName: "C:/Users/DELL/Uswift/extension/src/InterviewPrep.tsx",
-                  lineNumber: 662,
-                  columnNumber: 17
-                },
-                this
-              ),
-              question.keyPoints.length > 0 && /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { children: [
-                /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("strong", { style: { fontSize: "0.8rem", color: "#374151" }, children: "Key Points:" }, void 0, false, {
-                  fileName: "C:/Users/DELL/Uswift/extension/src/InterviewPrep.tsx",
-                  lineNumber: 675,
-                  columnNumber: 21
-                }, this),
-                /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("ul", { style: { margin: "4px 0 0 16px", padding: 0 }, children: question.keyPoints.map((point, index) => /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                  "li",
-                  {
-                    style: {
-                      fontSize: "0.8rem",
-                      color: "#6B7280",
-                      marginBottom: 4
-                    },
-                    children: point
-                  },
-                  index,
-                  false,
-                  {
-                    fileName: "C:/Users/DELL/Uswift/extension/src/InterviewPrep.tsx",
-                    lineNumber: 680,
-                    columnNumber: 25
-                  },
-                  this
-                )) }, void 0, false, {
-                  fileName: "C:/Users/DELL/Uswift/extension/src/InterviewPrep.tsx",
-                  lineNumber: 678,
-                  columnNumber: 21
-                }, this)
-              ] }, void 0, true, {
-                fileName: "C:/Users/DELL/Uswift/extension/src/InterviewPrep.tsx",
-                lineNumber: 674,
-                columnNumber: 19
-              }, this)
-            ]
-          },
-          question.id,
-          true,
-          {
-            fileName: "C:/Users/DELL/Uswift/extension/src/InterviewPrep.tsx",
-            lineNumber: 607,
-            columnNumber: 15
-          },
-          this
-        )) }, void 0, false, {
-          fileName: "C:/Users/DELL/Uswift/extension/src/InterviewPrep.tsx",
-          lineNumber: 605,
-          columnNumber: 11
-        }, this) }, void 0, false, {
-          fileName: "C:/Users/DELL/Uswift/extension/src/InterviewPrep.tsx",
-          lineNumber: 603,
-          columnNumber: 9
-        }, this),
-        activeTab === "tips" && result && /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { children: [
-          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { className: "uswift-card", style: { marginBottom: 16 }, children: [
-            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-              "h3",
-              {
-                style: {
-                  fontSize: "1.1rem",
-                  fontWeight: 600,
-                  color: "#111827",
-                  marginBottom: 12
-                },
-                children: "💡 Overall Preparation Tips"
-              },
-              void 0,
-              false,
-              {
-                fileName: "C:/Users/DELL/Uswift/extension/src/InterviewPrep.tsx",
-                lineNumber: 704,
-                columnNumber: 13
-              },
-              this
-            ),
-            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("ul", { style: { margin: 0, paddingLeft: 20 }, children: result.overallTips.map((tip, index) => /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-              "li",
-              {
-                style: {
-                  fontSize: "0.9rem",
-                  color: "#4B5563",
-                  marginBottom: 8
-                },
-                children: tip
-              },
-              index,
-              false,
-              {
-                fileName: "C:/Users/DELL/Uswift/extension/src/InterviewPrep.tsx",
-                lineNumber: 716,
-                columnNumber: 17
-              },
-              this
-            )) }, void 0, false, {
-              fileName: "C:/Users/DELL/Uswift/extension/src/InterviewPrep.tsx",
-              lineNumber: 714,
-              columnNumber: 13
-            }, this)
-          ] }, void 0, true, {
-            fileName: "C:/Users/DELL/Uswift/extension/src/InterviewPrep.tsx",
-            lineNumber: 703,
-            columnNumber: 11
-          }, this),
-          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { className: "uswift-card", style: { marginBottom: 16 }, children: [
-            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-              "h3",
-              {
-                style: {
-                  fontSize: "1.1rem",
-                  fontWeight: 600,
-                  color: "#111827",
-                  marginBottom: 12
-                },
-                children: "🏢 Company-Specific Advice"
-              },
-              void 0,
-              false,
-              {
-                fileName: "C:/Users/DELL/Uswift/extension/src/InterviewPrep.tsx",
-                lineNumber: 732,
-                columnNumber: 13
-              },
-              this
-            ),
-            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-              "p",
-              {
-                style: {
-                  fontSize: "0.9rem",
-                  lineHeight: 1.6,
-                  color: "#4B5563",
-                  margin: 0
-                },
-                children: result.companySpecificAdvice
-              },
-              void 0,
-              false,
-              {
-                fileName: "C:/Users/DELL/Uswift/extension/src/InterviewPrep.tsx",
-                lineNumber: 742,
-                columnNumber: 13
-              },
-              this
-            )
-          ] }, void 0, true, {
-            fileName: "C:/Users/DELL/Uswift/extension/src/InterviewPrep.tsx",
-            lineNumber: 731,
-            columnNumber: 11
-          }, this),
-          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { className: "uswift-card", style: { marginBottom: 16 }, children: [
-            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-              "h3",
-              {
-                style: {
-                  fontSize: "1.1rem",
-                  fontWeight: 600,
-                  color: "#111827",
-                  marginBottom: 12
-                },
-                children: "📅 7-Day Preparation Plan"
-              },
-              void 0,
-              false,
-              {
-                fileName: "C:/Users/DELL/Uswift/extension/src/InterviewPrep.tsx",
-                lineNumber: 756,
-                columnNumber: 13
-              },
-              this
-            ),
-            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { display: "flex", flexDirection: "column", gap: 8 }, children: result.preparationPlan.map((day, index) => /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-              "div",
-              {
-                style: {
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 8,
-                  padding: 8,
-                  background: "#F8F9FA",
-                  borderRadius: 6
-                },
-                children: [
-                  /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                    "span",
-                    {
-                      style: {
-                        background: "#6D28D9",
-                        color: "#FFFFFF",
-                        width: 24,
-                        height: 24,
-                        borderRadius: "50%",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        fontSize: "0.8rem",
-                        fontWeight: 600
-                      },
-                      children: index + 1
-                    },
-                    void 0,
-                    false,
-                    {
-                      fileName: "C:/Users/DELL/Uswift/extension/src/InterviewPrep.tsx",
-                      lineNumber: 779,
-                      columnNumber: 19
-                    },
-                    this
-                  ),
-                  /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                    "span",
-                    {
-                      style: {
-                        fontSize: "0.9rem",
-                        color: "#4B5563",
-                        flex: 1
-                      },
-                      children: day
-                    },
-                    void 0,
-                    false,
-                    {
-                      fileName: "C:/Users/DELL/Uswift/extension/src/InterviewPrep.tsx",
-                      lineNumber: 795,
-                      columnNumber: 19
-                    },
-                    this
-                  )
-                ]
-              },
-              index,
-              true,
-              {
-                fileName: "C:/Users/DELL/Uswift/extension/src/InterviewPrep.tsx",
-                lineNumber: 768,
-                columnNumber: 17
-              },
-              this
-            )) }, void 0, false, {
-              fileName: "C:/Users/DELL/Uswift/extension/src/InterviewPrep.tsx",
-              lineNumber: 766,
-              columnNumber: 13
-            }, this)
-          ] }, void 0, true, {
-            fileName: "C:/Users/DELL/Uswift/extension/src/InterviewPrep.tsx",
-            lineNumber: 755,
-            columnNumber: 11
-          }, this)
-        ] }, void 0, true, {
-          fileName: "C:/Users/DELL/Uswift/extension/src/InterviewPrep.tsx",
-          lineNumber: 701,
-          columnNumber: 9
-        }, this),
-        /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-          "div",
-          {
-            style: {
-              marginTop: 16,
-              textAlign: "center",
-              fontSize: "0.8rem",
-              color: "#6B7280"
-            },
-            children: "Powered by Mistral AI • Comprehensive interview preparation and practice questions"
-          },
-          void 0,
-          false,
-          {
-            fileName: "C:/Users/DELL/Uswift/extension/src/InterviewPrep.tsx",
-            lineNumber: 812,
-            columnNumber: 7
-          },
-          this
         )
-      ]
-    },
-    void 0,
-    true,
-    {
-      fileName: "C:/Users/DELL/Uswift/extension/src/InterviewPrep.tsx",
-      lineNumber: 316,
-      columnNumber: 5
-    },
-    this
+      ),
+      /* @__PURE__ */ React.createElement(
+        "div",
+        {
+          style: {
+            fontSize: "0.85rem",
+            color: "#4B5563",
+            lineHeight: 1.5,
+            marginBottom: 8
+          }
+        },
+        /* @__PURE__ */ React.createElement("strong", null, "Suggested Answer:"),
+        " ",
+        question.suggestedAnswer
+      ),
+      question.keyPoints.length > 0 && /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("strong", { style: { fontSize: "0.8rem", color: "#374151" } }, "Key Points:"), /* @__PURE__ */ React.createElement("ul", { style: { margin: "4px 0 0 16px", padding: 0 } }, question.keyPoints.map((point, index) => /* @__PURE__ */ React.createElement(
+        "li",
+        {
+          key: index,
+          style: {
+            fontSize: "0.8rem",
+            color: "#6B7280",
+            marginBottom: 4
+          }
+        },
+        point
+      ))))
+    )))),
+    activeTab === "tips" && result && /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { className: "uswift-card", style: { marginBottom: 16 } }, /* @__PURE__ */ React.createElement(
+      "h3",
+      {
+        style: {
+          fontSize: "1.1rem",
+          fontWeight: 600,
+          color: "#111827",
+          marginBottom: 12
+        }
+      },
+      "💡 Overall Preparation Tips"
+    ), /* @__PURE__ */ React.createElement("ul", { style: { margin: 0, paddingLeft: 20 } }, result.overallTips.map((tip, index) => /* @__PURE__ */ React.createElement(
+      "li",
+      {
+        key: index,
+        style: {
+          fontSize: "0.9rem",
+          color: "#4B5563",
+          marginBottom: 8
+        }
+      },
+      tip
+    )))), /* @__PURE__ */ React.createElement("div", { className: "uswift-card", style: { marginBottom: 16 } }, /* @__PURE__ */ React.createElement(
+      "h3",
+      {
+        style: {
+          fontSize: "1.1rem",
+          fontWeight: 600,
+          color: "#111827",
+          marginBottom: 12
+        }
+      },
+      "🏢 Company-Specific Advice"
+    ), /* @__PURE__ */ React.createElement(
+      "p",
+      {
+        style: {
+          fontSize: "0.9rem",
+          lineHeight: 1.6,
+          color: "#4B5563",
+          margin: 0
+        }
+      },
+      result.companySpecificAdvice
+    )), /* @__PURE__ */ React.createElement("div", { className: "uswift-card", style: { marginBottom: 16 } }, /* @__PURE__ */ React.createElement(
+      "h3",
+      {
+        style: {
+          fontSize: "1.1rem",
+          fontWeight: 600,
+          color: "#111827",
+          marginBottom: 12
+        }
+      },
+      "📅 7-Day Preparation Plan"
+    ), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", flexDirection: "column", gap: 8 } }, result.preparationPlan.map((day, index) => /* @__PURE__ */ React.createElement(
+      "div",
+      {
+        key: index,
+        style: {
+          display: "flex",
+          alignItems: "center",
+          gap: 8,
+          padding: 8,
+          background: "#F8F9FA",
+          borderRadius: 6
+        }
+      },
+      /* @__PURE__ */ React.createElement(
+        "span",
+        {
+          style: {
+            background: "#6D28D9",
+            color: "#FFFFFF",
+            width: 24,
+            height: 24,
+            borderRadius: "50%",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            fontSize: "0.8rem",
+            fontWeight: 600
+          }
+        },
+        index + 1
+      ),
+      /* @__PURE__ */ React.createElement(
+        "span",
+        {
+          style: {
+            fontSize: "0.9rem",
+            color: "#4B5563",
+            flex: 1
+          }
+        },
+        day
+      )
+    ))))),
+    /* @__PURE__ */ React.createElement(
+      "div",
+      {
+        style: {
+          marginTop: 16,
+          textAlign: "center",
+          fontSize: "0.8rem",
+          color: "#6B7280"
+        }
+      },
+      "Powered by Mistral AI • Comprehensive interview preparation and practice questions"
+    )
   );
 }
 
@@ -9531,7 +5819,7 @@ function Auth({ onAuthSuccess }) {
     }
   };
   if (authLoading) {
-    return /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { padding: "2rem", textAlign: "center" }, children: /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
+    return /* @__PURE__ */ React.createElement("div", { style: { padding: "2rem", textAlign: "center" } }, /* @__PURE__ */ React.createElement(
       "div",
       {
         style: {
@@ -9539,87 +5827,43 @@ function Auth({ onAuthSuccess }) {
           borderRadius: "1.5rem",
           padding: "2rem",
           minWidth: 350
+        }
+      },
+      /* @__PURE__ */ React.createElement(
+        "div",
+        {
+          className: "uswift-gradient",
+          style: { height: 8, borderRadius: 8, marginBottom: 24 }
+        }
+      ),
+      /* @__PURE__ */ React.createElement(
+        "div",
+        {
+          style: {
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 12
+          }
         },
-        children: [
-          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-            "div",
-            {
-              className: "uswift-gradient",
-              style: { height: 8, borderRadius: 8, marginBottom: 24 }
-            },
-            void 0,
-            false,
-            {
-              fileName: "C:/Users/DELL/Uswift/extension/src/Auth.tsx",
-              lineNumber: 96,
-              columnNumber: 11
-            },
-            this
-          ),
-          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-            "div",
-            {
-              style: {
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                gap: 12
-              },
-              children: [
-                /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                  "div",
-                  {
-                    style: {
-                      width: 20,
-                      height: 20,
-                      border: "2px solid #6D28D9",
-                      borderTop: "2px solid transparent",
-                      borderRadius: "50%",
-                      animation: "spin 1s linear infinite"
-                    }
-                  },
-                  void 0,
-                  false,
-                  {
-                    fileName: "C:/Users/DELL/Uswift/extension/src/Auth.tsx",
-                    lineNumber: 108,
-                    columnNumber: 13
-                  },
-                  this
-                ),
-                /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("p", { style: { margin: 0, color: "#6D28D9", fontWeight: 600 }, children: "Initializing..." }, void 0, false, {
-                  fileName: "C:/Users/DELL/Uswift/extension/src/Auth.tsx",
-                  lineNumber: 118,
-                  columnNumber: 13
-                }, this)
-              ]
-            },
-            void 0,
-            true,
-            {
-              fileName: "C:/Users/DELL/Uswift/extension/src/Auth.tsx",
-              lineNumber: 100,
-              columnNumber: 11
-            },
-            this
-          )
-        ]
-      },
-      void 0,
-      true,
-      {
-        fileName: "C:/Users/DELL/Uswift/extension/src/Auth.tsx",
-        lineNumber: 88,
-        columnNumber: 9
-      },
-      this
-    ) }, void 0, false, {
-      fileName: "C:/Users/DELL/Uswift/extension/src/Auth.tsx",
-      lineNumber: 87,
-      columnNumber: 7
-    }, this);
+        /* @__PURE__ */ React.createElement(
+          "div",
+          {
+            style: {
+              width: 20,
+              height: 20,
+              border: "2px solid #6D28D9",
+              borderTop: "2px solid transparent",
+              borderRadius: "50%",
+              animation: "spin 1s linear infinite"
+            }
+          }
+        ),
+        /* @__PURE__ */ React.createElement("p", { style: { margin: 0, color: "#6D28D9", fontWeight: 600 } }, "Initializing...")
+      )
+    ));
   }
-  return /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
+  return /* @__PURE__ */ React.createElement(
     "div",
     {
       style: {
@@ -9627,385 +5871,226 @@ function Auth({ onAuthSuccess }) {
         borderRadius: "1.5rem",
         padding: "2rem",
         minWidth: 350
+      }
+    },
+    /* @__PURE__ */ React.createElement(
+      "div",
+      {
+        className: "uswift-gradient",
+        style: { height: 8, borderRadius: 8, marginBottom: 24 }
+      }
+    ),
+    /* @__PURE__ */ React.createElement(
+      "h2",
+      {
+        style: {
+          fontSize: "1.4rem",
+          fontWeight: 700,
+          color: "#111827",
+          marginBottom: 16,
+          textAlign: "center"
+        }
       },
-      children: [
-        /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-          "div",
-          {
-            className: "uswift-gradient",
-            style: { height: 8, borderRadius: 8, marginBottom: 24 }
-          },
-          void 0,
-          false,
-          {
-            fileName: "C:/Users/DELL/Uswift/extension/src/Auth.tsx",
-            lineNumber: 136,
-            columnNumber: 7
-          },
-          this
-        ),
-        /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-          "h2",
-          {
-            style: {
-              fontSize: "1.4rem",
-              fontWeight: 700,
-              color: "#111827",
-              marginBottom: 16,
-              textAlign: "center"
-            },
-            children: isSignUp ? "Sign Up for Uswift" : "Sign In to Uswift"
-          },
-          void 0,
-          false,
-          {
-            fileName: "C:/Users/DELL/Uswift/extension/src/Auth.tsx",
-            lineNumber: 141,
-            columnNumber: 7
-          },
-          this
-        ),
-        /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("form", { onSubmit: handleSubmit, children: [
-          isSignUp && /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-            "input",
-            {
-              type: "text",
-              placeholder: "Full Name",
-              value: fullName,
-              onChange: (e) => setFullName(e.target.value),
-              style: {
-                width: "100%",
-                marginBottom: 12,
-                borderRadius: 8,
-                border: "1px solid #E5E7EB",
-                padding: 12,
-                fontSize: "1rem",
-                transition: "all 0.2s ease"
-              },
-              required: true
-            },
-            void 0,
-            false,
-            {
-              fileName: "C:/Users/DELL/Uswift/extension/src/Auth.tsx",
-              lineNumber: 155,
-              columnNumber: 11
-            },
-            this
-          ),
-          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-            "input",
-            {
-              type: "email",
-              placeholder: "Email",
-              value: email,
-              onChange: (e) => setEmail(e.target.value),
-              style: {
-                width: "100%",
-                marginBottom: 12,
-                borderRadius: 8,
-                border: "1px solid #E5E7EB",
-                padding: 12,
-                fontSize: "1rem",
-                transition: "all 0.2s ease"
-              },
-              required: true
-            },
-            void 0,
-            false,
-            {
-              fileName: "C:/Users/DELL/Uswift/extension/src/Auth.tsx",
-              lineNumber: 173,
-              columnNumber: 9
-            },
-            this
-          ),
-          !isForgot && /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-            "input",
-            {
-              type: "password",
-              placeholder: "Password",
-              value: password,
-              onChange: (e) => setPassword(e.target.value),
-              style: {
-                width: "100%",
-                marginBottom: 16,
-                borderRadius: 8,
-                border: "1px solid #E5E7EB",
-                padding: 12,
-                fontSize: "1rem",
-                transition: "all 0.2s ease"
-              },
-              required: true
-            },
-            void 0,
-            false,
-            {
-              fileName: "C:/Users/DELL/Uswift/extension/src/Auth.tsx",
-              lineNumber: 191,
-              columnNumber: 11
-            },
-            this
-          ),
-          isForgot && /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-            "div",
-            {
-              style: { fontSize: "0.9rem", color: "#6B7280", marginBottom: 12 },
-              children: "Enter your email and we'll send a password reset link if an account exists."
-            },
-            void 0,
-            false,
-            {
-              fileName: "C:/Users/DELL/Uswift/extension/src/Auth.tsx",
-              lineNumber: 210,
-              columnNumber: 11
-            },
-            this
-          ),
-          error && /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-            "div",
-            {
-              style: {
-                color: "#DC2626",
-                fontSize: "0.9rem",
-                marginBottom: 12,
-                padding: "8px 12px",
-                background: "#FEF2F2",
-                border: "1px solid #FECACA",
-                borderRadius: 6
-              },
-              children: error
-            },
-            void 0,
-            false,
-            {
-              fileName: "C:/Users/DELL/Uswift/extension/src/Auth.tsx",
-              lineNumber: 219,
-              columnNumber: 11
-            },
-            this
-          ),
-          success && /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-            "div",
-            {
-              style: {
-                color: "#059669",
-                fontSize: "0.9rem",
-                marginBottom: 12,
-                padding: "8px 12px",
-                background: "#ECFDF5",
-                border: "1px solid #A7F3D0",
-                borderRadius: 6,
-                animation: "fadeIn 0.3s ease-in"
-              },
-              children: [
-                success,
-                pending && /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                  "div",
-                  {
-                    style: { fontSize: "0.85rem", color: "#065F46", marginTop: 8 },
-                    children: "Verifying account... this may take a few seconds."
-                  },
-                  void 0,
-                  false,
-                  {
-                    fileName: "C:/Users/DELL/Uswift/extension/src/Auth.tsx",
-                    lineNumber: 249,
-                    columnNumber: 15
-                  },
-                  this
-                ),
-                !pending && success.includes("successfully") && /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                  "div",
-                  {
-                    style: { fontSize: "0.85rem", color: "#065F46", marginTop: 8 },
-                    children: "Redirecting to dashboard..."
-                  },
-                  void 0,
-                  false,
-                  {
-                    fileName: "C:/Users/DELL/Uswift/extension/src/Auth.tsx",
-                    lineNumber: 256,
-                    columnNumber: 15
-                  },
-                  this
-                )
-              ]
-            },
-            void 0,
-            true,
-            {
-              fileName: "C:/Users/DELL/Uswift/extension/src/Auth.tsx",
-              lineNumber: 235,
-              columnNumber: 11
-            },
-            this
-          ),
-          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-            "button",
-            {
-              type: "submit",
-              className: "uswift-btn",
-              disabled: submitting,
-              style: {
-                width: "100%",
-                marginBottom: 16,
-                opacity: submitting ? 0.7 : 1,
-                cursor: submitting ? "not-allowed" : "pointer",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                gap: 8,
-                transition: "all 0.2s ease"
-              },
-              children: [
-                submitting && /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                  "div",
-                  {
-                    style: {
-                      width: 16,
-                      height: 16,
-                      border: "2px solid #ffffff",
-                      borderTop: "2px solid transparent",
-                      borderRadius: "50%",
-                      animation: "spin 1s linear infinite"
-                    }
-                  },
-                  void 0,
-                  false,
-                  {
-                    fileName: "C:/Users/DELL/Uswift/extension/src/Auth.tsx",
-                    lineNumber: 282,
-                    columnNumber: 13
-                  },
-                  this
-                ),
-                submitting ? isSignUp ? "Creating Account..." : "Signing In..." : isSignUp ? "Sign Up" : "Sign In"
-              ]
-            },
-            void 0,
-            true,
-            {
-              fileName: "C:/Users/DELL/Uswift/extension/src/Auth.tsx",
-              lineNumber: 265,
-              columnNumber: 9
-            },
-            this
-          ),
-          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { textAlign: "center", marginTop: 8 }, children: !isForgot ? /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-            "button",
-            {
-              type: "button",
-              onClick: () => {
-                setIsForgot(true);
-                setError("");
-                setSuccess("");
-              },
-              style: {
-                background: "none",
-                border: "none",
-                color: "#6D28D9",
-                cursor: "pointer",
-                textDecoration: "underline"
-              },
-              children: "Forgot password?"
-            },
-            void 0,
-            false,
-            {
-              fileName: "C:/Users/DELL/Uswift/extension/src/Auth.tsx",
-              lineNumber: 304,
-              columnNumber: 13
-            },
-            this
-          ) : /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-            "button",
-            {
-              type: "button",
-              onClick: () => {
-                setIsForgot(false);
-                setError("");
-                setSuccess("");
-              },
-              style: {
-                background: "none",
-                border: "none",
-                color: "#6D28D9",
-                cursor: "pointer",
-                textDecoration: "underline"
-              },
-              children: "Back to sign in"
-            },
-            void 0,
-            false,
-            {
-              fileName: "C:/Users/DELL/Uswift/extension/src/Auth.tsx",
-              lineNumber: 322,
-              columnNumber: 13
-            },
-            this
-          ) }, void 0, false, {
-            fileName: "C:/Users/DELL/Uswift/extension/src/Auth.tsx",
-            lineNumber: 302,
-            columnNumber: 9
-          }, this)
-        ] }, void 0, true, {
-          fileName: "C:/Users/DELL/Uswift/extension/src/Auth.tsx",
-          lineNumber: 153,
-          columnNumber: 7
-        }, this),
-        /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("p", { style: { textAlign: "center", color: "#4B5563" }, children: [
-          isSignUp ? "Already have an account?" : "Don't have an account?",
-          " ",
-          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-            "button",
-            {
-              onClick: () => {
-                setIsSignUp(!isSignUp);
-                setError("");
-                setSuccess("");
-              },
-              style: {
-                background: "none",
-                border: "none",
-                color: "#6D28D9",
-                textDecoration: "underline",
-                cursor: "pointer",
-                fontSize: "inherit",
-                transition: "color 0.2s ease"
-              },
-              onMouseEnter: (e) => {
-                e.currentTarget.style.color = "#5B21B6";
-              },
-              onMouseLeave: (e) => {
-                e.currentTarget.style.color = "#6D28D9";
-              },
-              children: isSignUp ? "Sign In" : "Sign Up"
-            },
-            void 0,
-            false,
-            {
-              fileName: "C:/Users/DELL/Uswift/extension/src/Auth.tsx",
-              lineNumber: 345,
-              columnNumber: 9
-            },
-            this
-          )
-        ] }, void 0, true, {
-          fileName: "C:/Users/DELL/Uswift/extension/src/Auth.tsx",
-          lineNumber: 343,
-          columnNumber: 7
-        }, this)
-      ]
-    },
-    void 0,
-    true,
-    {
-      fileName: "C:/Users/DELL/Uswift/extension/src/Auth.tsx",
-      lineNumber: 128,
-      columnNumber: 5
-    },
-    this
+      isSignUp ? "Sign Up for Uswift" : "Sign In to Uswift"
+    ),
+    /* @__PURE__ */ React.createElement("form", { onSubmit: handleSubmit }, isSignUp && /* @__PURE__ */ React.createElement(
+      "input",
+      {
+        type: "text",
+        placeholder: "Full Name",
+        value: fullName,
+        onChange: (e) => setFullName(e.target.value),
+        style: {
+          width: "100%",
+          marginBottom: 12,
+          borderRadius: 8,
+          border: "1px solid #E5E7EB",
+          padding: 12,
+          fontSize: "1rem",
+          transition: "all 0.2s ease"
+        },
+        required: true
+      }
+    ), /* @__PURE__ */ React.createElement(
+      "input",
+      {
+        type: "email",
+        placeholder: "Email",
+        value: email,
+        onChange: (e) => setEmail(e.target.value),
+        style: {
+          width: "100%",
+          marginBottom: 12,
+          borderRadius: 8,
+          border: "1px solid #E5E7EB",
+          padding: 12,
+          fontSize: "1rem",
+          transition: "all 0.2s ease"
+        },
+        required: true
+      }
+    ), !isForgot && /* @__PURE__ */ React.createElement(
+      "input",
+      {
+        type: "password",
+        placeholder: "Password",
+        value: password,
+        onChange: (e) => setPassword(e.target.value),
+        style: {
+          width: "100%",
+          marginBottom: 16,
+          borderRadius: 8,
+          border: "1px solid #E5E7EB",
+          padding: 12,
+          fontSize: "1rem",
+          transition: "all 0.2s ease"
+        },
+        required: true
+      }
+    ), isForgot && /* @__PURE__ */ React.createElement(
+      "div",
+      {
+        style: { fontSize: "0.9rem", color: "#6B7280", marginBottom: 12 }
+      },
+      "Enter your email and we'll send a password reset link if an account exists."
+    ), error && /* @__PURE__ */ React.createElement(
+      "div",
+      {
+        style: {
+          color: "#DC2626",
+          fontSize: "0.9rem",
+          marginBottom: 12,
+          padding: "8px 12px",
+          background: "#FEF2F2",
+          border: "1px solid #FECACA",
+          borderRadius: 6
+        }
+      },
+      error
+    ), success && /* @__PURE__ */ React.createElement(
+      "div",
+      {
+        style: {
+          color: "#059669",
+          fontSize: "0.9rem",
+          marginBottom: 12,
+          padding: "8px 12px",
+          background: "#ECFDF5",
+          border: "1px solid #A7F3D0",
+          borderRadius: 6,
+          animation: "fadeIn 0.3s ease-in"
+        }
+      },
+      success,
+      pending && /* @__PURE__ */ React.createElement(
+        "div",
+        {
+          style: { fontSize: "0.85rem", color: "#065F46", marginTop: 8 }
+        },
+        "Verifying account... this may take a few seconds."
+      ),
+      !pending && success.includes("successfully") && /* @__PURE__ */ React.createElement(
+        "div",
+        {
+          style: { fontSize: "0.85rem", color: "#065F46", marginTop: 8 }
+        },
+        "Redirecting to dashboard..."
+      )
+    ), /* @__PURE__ */ React.createElement(
+      "button",
+      {
+        type: "submit",
+        className: "uswift-btn",
+        disabled: submitting,
+        style: {
+          width: "100%",
+          marginBottom: 16,
+          opacity: submitting ? 0.7 : 1,
+          cursor: submitting ? "not-allowed" : "pointer",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          gap: 8,
+          transition: "all 0.2s ease"
+        }
+      },
+      submitting && /* @__PURE__ */ React.createElement(
+        "div",
+        {
+          style: {
+            width: 16,
+            height: 16,
+            border: "2px solid #ffffff",
+            borderTop: "2px solid transparent",
+            borderRadius: "50%",
+            animation: "spin 1s linear infinite"
+          }
+        }
+      ),
+      submitting ? isSignUp ? "Creating Account..." : "Signing In..." : isSignUp ? "Sign Up" : "Sign In"
+    ), /* @__PURE__ */ React.createElement("div", { style: { textAlign: "center", marginTop: 8 } }, !isForgot ? /* @__PURE__ */ React.createElement(
+      "button",
+      {
+        type: "button",
+        onClick: () => {
+          setIsForgot(true);
+          setError("");
+          setSuccess("");
+        },
+        style: {
+          background: "none",
+          border: "none",
+          color: "#6D28D9",
+          cursor: "pointer",
+          textDecoration: "underline"
+        }
+      },
+      "Forgot password?"
+    ) : /* @__PURE__ */ React.createElement(
+      "button",
+      {
+        type: "button",
+        onClick: () => {
+          setIsForgot(false);
+          setError("");
+          setSuccess("");
+        },
+        style: {
+          background: "none",
+          border: "none",
+          color: "#6D28D9",
+          cursor: "pointer",
+          textDecoration: "underline"
+        }
+      },
+      "Back to sign in"
+    ))),
+    /* @__PURE__ */ React.createElement("p", { style: { textAlign: "center", color: "#4B5563" } }, isSignUp ? "Already have an account?" : "Don't have an account?", " ", /* @__PURE__ */ React.createElement(
+      "button",
+      {
+        onClick: () => {
+          setIsSignUp(!isSignUp);
+          setError("");
+          setSuccess("");
+        },
+        style: {
+          background: "none",
+          border: "none",
+          color: "#6D28D9",
+          textDecoration: "underline",
+          cursor: "pointer",
+          fontSize: "inherit",
+          transition: "color 0.2s ease"
+        },
+        onMouseEnter: (e) => {
+          e.currentTarget.style.color = "#5B21B6";
+        },
+        onMouseLeave: (e) => {
+          e.currentTarget.style.color = "#6D28D9";
+        }
+      },
+      isSignUp ? "Sign In" : "Sign Up"
+    ))
   );
 }
 
@@ -10085,25 +6170,29 @@ function Popup() {
         console.warn("Supabase client not available");
         return;
       }
-      const resumes = await supabase.makeRequest(
-        "resumes?user_id=eq." + user.id
-      );
-      const preferences = await supabase.makeRequest(
-        "user_preferences?user_id=eq." + user.id
-      );
-      const resume = resumes?.find((r) => r.type === "resume");
-      const coverLetter = resumes?.find((r) => r.type === "cover_letter");
-      const userPrefs = preferences?.[0] || {};
+      const { data: profileData, error: profileError } = await supabase.from("preferences").select("*").eq("user_id", user.id).single();
+      if (profileError && profileError.message?.includes("0 rows")) {
+        console.log("No profile found yet, using defaults");
+      } else if (profileError) {
+        console.error("Error loading profile:", profileError);
+      }
+      const { data: resumeData, error: resumeError } = await supabase.from("resumes").select("*").eq("user_id", user.id).single();
+      if (resumeError && resumeError.message?.includes("0 rows")) {
+        console.log("No resume found yet");
+      } else if (resumeError) {
+        console.error("Error loading resume:", resumeError);
+      }
       setProfile({
-        firstName: userPrefs.first_name || "",
-        lastName: userPrefs.last_name || "",
-        email: userPrefs.email || "",
-        phone: userPrefs.phone || "",
-        resume: resume?.content || resume?.file_url || "",
-        coverLetter: coverLetter?.content || coverLetter?.file_url || "",
-        linkedin: userPrefs.linkedin || "",
-        portfolio: userPrefs.portfolio || "",
-        qaProfile: userPrefs.qa_profile || ""
+        firstName: profileData?.first_name || "",
+        lastName: profileData?.last_name || "",
+        email: user.email || "",
+        // Get email from user object
+        phone: profileData?.phone || "",
+        linkedin: profileData?.linkedin || "",
+        portfolio: profileData?.portfolio || "",
+        resume: resumeData?.content || "",
+        coverLetter: profileData?.cover_letter || "",
+        qaProfile: profileData?.qa_profile || ""
       });
     } catch (error) {
       console.error("Error loading profile from Supabase:", error);
@@ -10224,7 +6313,7 @@ function Popup() {
     }
   };
   if (!isAuthenticated && !loading) {
-    return /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
+    return /* @__PURE__ */ React.createElement(
       Auth,
       {
         onAuthSuccess: async () => {
@@ -10236,19 +6325,11 @@ function Popup() {
             setForceRerender((prev) => prev + 1);
           }, 500);
         }
-      },
-      void 0,
-      false,
-      {
-        fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
-        lineNumber: 306,
-        columnNumber: 7
-      },
-      this
+      }
     );
   }
   if (loading) {
-    return /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
+    return /* @__PURE__ */ React.createElement(
       "div",
       {
         style: {
@@ -10258,548 +6339,257 @@ function Popup() {
           display: "flex",
           alignItems: "center",
           justifyContent: "center"
-        },
-        children: /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { children: [
-          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-            "div",
-            {
-              style: {
-                width: 40,
-                height: 40,
-                border: "4px solid #e5e7eb",
-                borderTop: "4px solid #6d28d9",
-                borderRadius: "50%",
-                animation: "spin 1s linear infinite",
-                margin: "0 auto 16px"
-              }
-            },
-            void 0,
-            false,
-            {
-              fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
-              lineNumber: 341,
-              columnNumber: 11
-            },
-            this
-          ),
-          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("p", { style: { color: "#6b7280", margin: 0 }, children: "Loading..." }, void 0, false, {
-            fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
-            lineNumber: 352,
-            columnNumber: 11
-          }, this)
-        ] }, void 0, true, {
-          fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
-          lineNumber: 340,
-          columnNumber: 9
-        }, this)
+        }
       },
-      void 0,
-      false,
-      {
-        fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
-        lineNumber: 330,
-        columnNumber: 7
-      },
-      this
+      /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement(
+        "div",
+        {
+          style: {
+            width: 40,
+            height: 40,
+            border: "4px solid #e5e7eb",
+            borderTop: "4px solid #6d28d9",
+            borderRadius: "50%",
+            animation: "spin 1s linear infinite",
+            margin: "0 auto 16px"
+          }
+        }
+      ), /* @__PURE__ */ React.createElement("p", { style: { color: "#6b7280", margin: 0 } }, "Loading..."))
     );
   }
   if (page === "profile") {
-    return /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { children: [
-      /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-        "div",
+    return /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement(
+      "div",
+      {
+        style: {
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          margin: "1rem"
+        }
+      },
+      /* @__PURE__ */ React.createElement("button", { className: "uswift-btn", onClick: () => setPage("home") }, "← Back"),
+      /* @__PURE__ */ React.createElement(
+        "button",
         {
+          onClick: signOut,
           style: {
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            margin: "1rem"
-          },
-          children: [
-            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("button", { className: "uswift-btn", onClick: () => setPage("home"), children: "← Back" }, void 0, false, {
-              fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
-              lineNumber: 369,
-              columnNumber: 11
-            }, this),
-            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-              "button",
-              {
-                onClick: signOut,
-                style: {
-                  background: "#EDE9FE",
-                  color: "#6D28D9",
-                  border: "none",
-                  borderRadius: 8,
-                  padding: "8px 12px",
-                  cursor: "pointer"
-                },
-                children: "Sign Out"
-              },
-              void 0,
-              false,
-              {
-                fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
-                lineNumber: 372,
-                columnNumber: 11
-              },
-              this
-            )
-          ]
+            background: "#EDE9FE",
+            color: "#6D28D9",
+            border: "none",
+            borderRadius: 8,
+            padding: "8px 12px",
+            cursor: "pointer"
+          }
         },
-        void 0,
-        true,
-        {
-          fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
-          lineNumber: 361,
-          columnNumber: 9
-        },
-        this
-      ),
-      /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(ProfileVault, {}, void 0, false, {
-        fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
-        lineNumber: 386,
-        columnNumber: 9
-      }, this)
-    ] }, void 0, true, {
-      fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
-      lineNumber: 360,
-      columnNumber: 7
-    }, this);
+        "Sign Out"
+      )
+    ), /* @__PURE__ */ React.createElement(ProfileVault, null));
   }
   if (page === "tracker") {
-    return /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { children: [
-      /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-        "div",
+    return /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement(
+      "div",
+      {
+        style: {
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          margin: "1rem"
+        }
+      },
+      /* @__PURE__ */ React.createElement("button", { className: "uswift-btn", onClick: () => setPage("home") }, "← Back"),
+      /* @__PURE__ */ React.createElement(
+        "button",
         {
+          onClick: signOut,
           style: {
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            margin: "1rem"
-          },
-          children: [
-            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("button", { className: "uswift-btn", onClick: () => setPage("home"), children: "← Back" }, void 0, false, {
-              fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
-              lineNumber: 402,
-              columnNumber: 11
-            }, this),
-            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-              "button",
-              {
-                onClick: signOut,
-                style: {
-                  background: "#EDE9FE",
-                  color: "#6D28D9",
-                  border: "none",
-                  borderRadius: 8,
-                  padding: "8px 12px",
-                  cursor: "pointer"
-                },
-                children: "Sign Out"
-              },
-              void 0,
-              false,
-              {
-                fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
-                lineNumber: 405,
-                columnNumber: 11
-              },
-              this
-            )
-          ]
+            background: "#EDE9FE",
+            color: "#6D28D9",
+            border: "none",
+            borderRadius: 8,
+            padding: "8px 12px",
+            cursor: "pointer"
+          }
         },
-        void 0,
-        true,
-        {
-          fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
-          lineNumber: 394,
-          columnNumber: 9
-        },
-        this
-      ),
-      /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(JobTracker, {}, void 0, false, {
-        fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
-        lineNumber: 419,
-        columnNumber: 9
-      }, this)
-    ] }, void 0, true, {
-      fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
-      lineNumber: 393,
-      columnNumber: 7
-    }, this);
+        "Sign Out"
+      )
+    ), /* @__PURE__ */ React.createElement(JobTracker, null));
   }
   if (page === "chat") {
-    return /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { children: [
-      /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-        "div",
+    return /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement(
+      "div",
+      {
+        style: {
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          margin: "1rem"
+        }
+      },
+      /* @__PURE__ */ React.createElement("button", { className: "uswift-btn", onClick: () => setPage("home") }, "← Back"),
+      /* @__PURE__ */ React.createElement(
+        "button",
         {
+          onClick: signOut,
           style: {
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            margin: "1rem"
-          },
-          children: [
-            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("button", { className: "uswift-btn", onClick: () => setPage("home"), children: "← Back" }, void 0, false, {
-              fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
-              lineNumber: 435,
-              columnNumber: 11
-            }, this),
-            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-              "button",
-              {
-                onClick: signOut,
-                style: {
-                  background: "#EDE9FE",
-                  color: "#6D28D9",
-                  border: "none",
-                  borderRadius: 8,
-                  padding: "8px 12px",
-                  cursor: "pointer"
-                },
-                children: "Sign Out"
-              },
-              void 0,
-              false,
-              {
-                fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
-                lineNumber: 438,
-                columnNumber: 11
-              },
-              this
-            )
-          ]
+            background: "#EDE9FE",
+            color: "#6D28D9",
+            border: "none",
+            borderRadius: 8,
+            padding: "8px 12px",
+            cursor: "pointer"
+          }
         },
-        void 0,
-        true,
-        {
-          fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
-          lineNumber: 427,
-          columnNumber: 9
-        },
-        this
-      ),
-      /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(ChatInterface, {}, void 0, false, {
-        fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
-        lineNumber: 452,
-        columnNumber: 9
-      }, this)
-    ] }, void 0, true, {
-      fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
-      lineNumber: 426,
-      columnNumber: 7
-    }, this);
+        "Sign Out"
+      )
+    ), /* @__PURE__ */ React.createElement(ChatInterface, null));
   }
   if (page === "resume") {
-    return /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { children: [
-      /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-        "div",
+    return /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement(
+      "div",
+      {
+        style: {
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          margin: "1rem"
+        }
+      },
+      /* @__PURE__ */ React.createElement("button", { className: "uswift-btn", onClick: () => setPage("home") }, "← Back"),
+      /* @__PURE__ */ React.createElement(
+        "button",
         {
+          onClick: signOut,
           style: {
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            margin: "1rem"
-          },
-          children: [
-            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("button", { className: "uswift-btn", onClick: () => setPage("home"), children: "← Back" }, void 0, false, {
-              fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
-              lineNumber: 468,
-              columnNumber: 11
-            }, this),
-            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-              "button",
-              {
-                onClick: signOut,
-                style: {
-                  background: "#EDE9FE",
-                  color: "#6D28D9",
-                  border: "none",
-                  borderRadius: 8,
-                  padding: "8px 12px",
-                  cursor: "pointer"
-                },
-                children: "Sign Out"
-              },
-              void 0,
-              false,
-              {
-                fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
-                lineNumber: 471,
-                columnNumber: 11
-              },
-              this
-            )
-          ]
+            background: "#EDE9FE",
+            color: "#6D28D9",
+            border: "none",
+            borderRadius: 8,
+            padding: "8px 12px",
+            cursor: "pointer"
+          }
         },
-        void 0,
-        true,
-        {
-          fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
-          lineNumber: 460,
-          columnNumber: 9
-        },
-        this
-      ),
-      /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(ResumeEnhancement, {}, void 0, false, {
-        fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
-        lineNumber: 485,
-        columnNumber: 9
-      }, this)
-    ] }, void 0, true, {
-      fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
-      lineNumber: 459,
-      columnNumber: 7
-    }, this);
+        "Sign Out"
+      )
+    ), /* @__PURE__ */ React.createElement(ResumeEnhancement, null));
   }
   if (page === "cover-letter") {
-    return /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { children: [
-      /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-        "div",
+    return /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement(
+      "div",
+      {
+        style: {
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          margin: "1rem"
+        }
+      },
+      /* @__PURE__ */ React.createElement("button", { className: "uswift-btn", onClick: () => setPage("home") }, "← Back"),
+      /* @__PURE__ */ React.createElement(
+        "button",
         {
+          onClick: signOut,
           style: {
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            margin: "1rem"
-          },
-          children: [
-            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("button", { className: "uswift-btn", onClick: () => setPage("home"), children: "← Back" }, void 0, false, {
-              fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
-              lineNumber: 501,
-              columnNumber: 11
-            }, this),
-            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-              "button",
-              {
-                onClick: signOut,
-                style: {
-                  background: "#EDE9FE",
-                  color: "#6D28D9",
-                  border: "none",
-                  borderRadius: 8,
-                  padding: "8px 12px",
-                  cursor: "pointer"
-                },
-                children: "Sign Out"
-              },
-              void 0,
-              false,
-              {
-                fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
-                lineNumber: 504,
-                columnNumber: 11
-              },
-              this
-            )
-          ]
+            background: "#EDE9FE",
+            color: "#6D28D9",
+            border: "none",
+            borderRadius: 8,
+            padding: "8px 12px",
+            cursor: "pointer"
+          }
         },
-        void 0,
-        true,
-        {
-          fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
-          lineNumber: 493,
-          columnNumber: 9
-        },
-        this
-      ),
-      /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(CoverLetterGenerator, {}, void 0, false, {
-        fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
-        lineNumber: 518,
-        columnNumber: 9
-      }, this)
-    ] }, void 0, true, {
-      fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
-      lineNumber: 492,
-      columnNumber: 7
-    }, this);
+        "Sign Out"
+      )
+    ), /* @__PURE__ */ React.createElement(CoverLetterGenerator, null));
   }
   if (page === "files") {
-    return /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { children: [
-      /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-        "div",
+    return /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement(
+      "div",
+      {
+        style: {
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          margin: "1rem"
+        }
+      },
+      /* @__PURE__ */ React.createElement("button", { className: "uswift-btn", onClick: () => setPage("home") }, "← Back"),
+      /* @__PURE__ */ React.createElement(
+        "button",
         {
+          onClick: signOut,
           style: {
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            margin: "1rem"
-          },
-          children: [
-            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("button", { className: "uswift-btn", onClick: () => setPage("home"), children: "← Back" }, void 0, false, {
-              fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
-              lineNumber: 534,
-              columnNumber: 11
-            }, this),
-            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-              "button",
-              {
-                onClick: signOut,
-                style: {
-                  background: "#EDE9FE",
-                  color: "#6D28D9",
-                  border: "none",
-                  borderRadius: 8,
-                  padding: "8px 12px",
-                  cursor: "pointer"
-                },
-                children: "Sign Out"
-              },
-              void 0,
-              false,
-              {
-                fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
-                lineNumber: 537,
-                columnNumber: 11
-              },
-              this
-            )
-          ]
+            background: "#EDE9FE",
+            color: "#6D28D9",
+            border: "none",
+            borderRadius: 8,
+            padding: "8px 12px",
+            cursor: "pointer"
+          }
         },
-        void 0,
-        true,
-        {
-          fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
-          lineNumber: 526,
-          columnNumber: 9
-        },
-        this
-      ),
-      /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(FileManager, {}, void 0, false, {
-        fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
-        lineNumber: 551,
-        columnNumber: 9
-      }, this)
-    ] }, void 0, true, {
-      fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
-      lineNumber: 525,
-      columnNumber: 7
-    }, this);
+        "Sign Out"
+      )
+    ), /* @__PURE__ */ React.createElement(FileManager, null));
   }
   if (page === "job-analysis") {
-    return /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { children: [
-      /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-        "div",
+    return /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement(
+      "div",
+      {
+        style: {
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          margin: "1rem"
+        }
+      },
+      /* @__PURE__ */ React.createElement("button", { className: "uswift-btn", onClick: () => setPage("home") }, "← Back"),
+      /* @__PURE__ */ React.createElement(
+        "button",
         {
+          onClick: signOut,
           style: {
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            margin: "1rem"
-          },
-          children: [
-            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("button", { className: "uswift-btn", onClick: () => setPage("home"), children: "← Back" }, void 0, false, {
-              fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
-              lineNumber: 567,
-              columnNumber: 11
-            }, this),
-            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-              "button",
-              {
-                onClick: signOut,
-                style: {
-                  background: "#EDE9FE",
-                  color: "#6D28D9",
-                  border: "none",
-                  borderRadius: 8,
-                  padding: "8px 12px",
-                  cursor: "pointer"
-                },
-                children: "Sign Out"
-              },
-              void 0,
-              false,
-              {
-                fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
-                lineNumber: 570,
-                columnNumber: 11
-              },
-              this
-            )
-          ]
+            background: "#EDE9FE",
+            color: "#6D28D9",
+            border: "none",
+            borderRadius: 8,
+            padding: "8px 12px",
+            cursor: "pointer"
+          }
         },
-        void 0,
-        true,
-        {
-          fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
-          lineNumber: 559,
-          columnNumber: 9
-        },
-        this
-      ),
-      /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(JobAnalysis, {}, void 0, false, {
-        fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
-        lineNumber: 584,
-        columnNumber: 9
-      }, this)
-    ] }, void 0, true, {
-      fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
-      lineNumber: 558,
-      columnNumber: 7
-    }, this);
+        "Sign Out"
+      )
+    ), /* @__PURE__ */ React.createElement(JobAnalysis, null));
   }
   if (page === "interview-prep") {
-    return /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { children: [
-      /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-        "div",
+    return /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement(
+      "div",
+      {
+        style: {
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          margin: "1rem"
+        }
+      },
+      /* @__PURE__ */ React.createElement("button", { className: "uswift-btn", onClick: () => setPage("home") }, "← Back"),
+      /* @__PURE__ */ React.createElement(
+        "button",
         {
+          onClick: signOut,
           style: {
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            margin: "1rem"
-          },
-          children: [
-            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("button", { className: "uswift-btn", onClick: () => setPage("home"), children: "← Back" }, void 0, false, {
-              fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
-              lineNumber: 600,
-              columnNumber: 11
-            }, this),
-            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-              "button",
-              {
-                onClick: signOut,
-                style: {
-                  background: "#EDE9FE",
-                  color: "#6D28D9",
-                  border: "none",
-                  borderRadius: 8,
-                  padding: "8px 12px",
-                  cursor: "pointer"
-                },
-                children: "Sign Out"
-              },
-              void 0,
-              false,
-              {
-                fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
-                lineNumber: 603,
-                columnNumber: 11
-              },
-              this
-            )
-          ]
+            background: "#EDE9FE",
+            color: "#6D28D9",
+            border: "none",
+            borderRadius: 8,
+            padding: "8px 12px",
+            cursor: "pointer"
+          }
         },
-        void 0,
-        true,
-        {
-          fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
-          lineNumber: 592,
-          columnNumber: 9
-        },
-        this
-      ),
-      /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(InterviewPrep, {}, void 0, false, {
-        fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
-        lineNumber: 617,
-        columnNumber: 9
-      }, this)
-    ] }, void 0, true, {
-      fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
-      lineNumber: 591,
-      columnNumber: 7
-    }, this);
+        "Sign Out"
+      )
+    ), /* @__PURE__ */ React.createElement(InterviewPrep, null));
   }
-  return /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
+  return /* @__PURE__ */ React.createElement(
     "div",
     {
       style: {
@@ -10813,1496 +6603,816 @@ function Popup() {
         border: "1px solid rgba(255, 255, 255, 0.8)",
         position: "relative",
         overflow: "hidden"
-      },
-      children: [
-        /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-          "div",
-          {
-            style: {
-              position: "absolute",
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              backgroundImage: `
+      }
+    },
+    /* @__PURE__ */ React.createElement(
+      "div",
+      {
+        style: {
+          position: "absolute",
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundImage: `
             radial-gradient(circle at 25% 25%, rgba(99, 102, 241, 0.05) 0%, transparent 50%),
             radial-gradient(circle at 75% 75%, rgba(168, 85, 247, 0.05) 0%, transparent 50%)
           `,
-              pointerEvents: "none"
-            }
-          },
-          void 0,
-          false,
-          {
-            fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
-            lineNumber: 640,
-            columnNumber: 7
-          },
-          this
-        ),
-        /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
+          pointerEvents: "none"
+        }
+      }
+    ),
+    /* @__PURE__ */ React.createElement(
+      "div",
+      {
+        style: {
+          background: "#FFFFFF",
+          borderRadius: "20px 20px 0 0",
+          padding: "2rem 2rem 1.5rem",
+          textAlign: "center",
+          color: "#1f2937",
+          position: "relative",
+          zIndex: 1,
+          boxShadow: "0 2px 8px rgba(0, 0, 0, 0.05)"
+        }
+      },
+      /* @__PURE__ */ React.createElement(
+        "div",
+        {
+          style: {
+            width: "60px",
+            height: "60px",
+            background: "linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%)",
+            borderRadius: "16px",
+            margin: "0 auto 1rem",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            border: "2px solid rgba(99, 102, 241, 0.2)"
+          }
+        },
+        /* @__PURE__ */ React.createElement("span", { style: { fontSize: "1.8rem" } }, "🚀")
+      ),
+      /* @__PURE__ */ React.createElement(
+        "h1",
+        {
+          style: {
+            fontSize: "1.8rem",
+            fontWeight: 800,
+            margin: "0 0 0.5rem 0",
+            color: "#1f2937"
+          }
+        },
+        "USwift"
+      ),
+      /* @__PURE__ */ React.createElement(
+        "p",
+        {
+          style: {
+            fontSize: "0.9rem",
+            margin: 0,
+            color: "#6b7280",
+            fontWeight: 500
+          }
+        },
+        "AI-Powered Career Excellence"
+      ),
+      /* @__PURE__ */ React.createElement(
+        "div",
+        {
+          style: {
+            marginTop: "1rem",
+            padding: "0.5rem 1rem",
+            background: "#f3f4f6",
+            borderRadius: "12px",
+            border: "1px solid #e5e7eb"
+          }
+        },
+        /* @__PURE__ */ React.createElement(
           "div",
           {
             style: {
-              background: "#FFFFFF",
-              borderRadius: "20px 20px 0 0",
-              padding: "2rem 2rem 1.5rem",
-              textAlign: "center",
-              color: "#1f2937",
-              position: "relative",
-              zIndex: 1,
-              boxShadow: "0 2px 8px rgba(0, 0, 0, 0.05)"
-            },
-            children: [
-              /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                "div",
-                {
-                  style: {
-                    width: "60px",
-                    height: "60px",
-                    background: "linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%)",
-                    borderRadius: "16px",
-                    margin: "0 auto 1rem",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    border: "2px solid rgba(99, 102, 241, 0.2)"
-                  },
-                  children: /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("span", { style: { fontSize: "1.8rem" }, children: "🚀" }, void 0, false, {
-                    fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
-                    lineNumber: 681,
-                    columnNumber: 11
-                  }, this)
-                },
-                void 0,
-                false,
-                {
-                  fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
-                  lineNumber: 668,
-                  columnNumber: 9
-                },
-                this
-              ),
-              /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                "h1",
-                {
-                  style: {
-                    fontSize: "1.8rem",
-                    fontWeight: 800,
-                    margin: "0 0 0.5rem 0",
-                    color: "#1f2937"
-                  },
-                  children: "USwift"
-                },
-                void 0,
-                false,
-                {
-                  fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
-                  lineNumber: 683,
-                  columnNumber: 9
-                },
-                this
-              ),
-              /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                "p",
-                {
-                  style: {
-                    fontSize: "0.9rem",
-                    margin: 0,
-                    color: "#6b7280",
-                    fontWeight: 500
-                  },
-                  children: "AI-Powered Career Excellence"
-                },
-                void 0,
-                false,
-                {
-                  fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
-                  lineNumber: 693,
-                  columnNumber: 9
-                },
-                this
-              ),
-              /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                "div",
-                {
-                  style: {
-                    marginTop: "1rem",
-                    padding: "0.5rem 1rem",
-                    background: "#f3f4f6",
-                    borderRadius: "12px",
-                    border: "1px solid #e5e7eb"
-                  },
-                  children: /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                    "div",
-                    {
-                      style: {
-                        fontSize: "0.8rem",
-                        color: "#374151",
-                        fontWeight: 600
-                      },
-                      children: [
-                        "Welcome back, ",
-                        user?.email?.split("@")[0] || "Professional"
-                      ]
-                    },
-                    void 0,
-                    true,
-                    {
-                      fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
-                      lineNumber: 714,
-                      columnNumber: 11
-                    },
-                    this
-                  )
-                },
-                void 0,
-                false,
-                {
-                  fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
-                  lineNumber: 705,
-                  columnNumber: 9
-                },
-                this
-              )
-            ]
+              fontSize: "0.8rem",
+              color: "#374151",
+              fontWeight: 600
+            }
           },
-          void 0,
-          true,
+          "Welcome back, ",
+          user?.email?.split("@")[0] || "Professional"
+        )
+      )
+    ),
+    /* @__PURE__ */ React.createElement("div", { style: { padding: "1.5rem 2rem", position: "relative", zIndex: 1 } }, /* @__PURE__ */ React.createElement("div", { style: { marginBottom: "2rem" } }, /* @__PURE__ */ React.createElement(
+      "h2",
+      {
+        style: {
+          fontSize: "1.2rem",
+          fontWeight: 700,
+          color: "#1f2937",
+          marginBottom: "1rem",
+          textAlign: "center"
+        }
+      },
+      "Quick Actions"
+    ), /* @__PURE__ */ React.createElement(
+      "div",
+      {
+        style: {
+          background: "linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%)",
+          borderRadius: "16px",
+          padding: "1.5rem",
+          marginBottom: "1.5rem",
+          border: "1px solid rgba(59, 130, 246, 0.1)",
+          position: "relative",
+          overflow: "hidden"
+        }
+      },
+      /* @__PURE__ */ React.createElement(
+        "div",
+        {
+          style: {
+            position: "absolute",
+            top: "-20px",
+            right: "-20px",
+            width: "60px",
+            height: "60px",
+            background: "radial-gradient(circle, rgba(59, 130, 246, 0.1) 0%, transparent 70%)",
+            borderRadius: "50%"
+          }
+        }
+      ),
+      /* @__PURE__ */ React.createElement(
+        "div",
+        {
+          style: {
+            display: "flex",
+            alignItems: "center",
+            gap: "0.75rem",
+            marginBottom: "1rem"
+          }
+        },
+        /* @__PURE__ */ React.createElement(
+          "div",
           {
-            fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
-            lineNumber: 656,
-            columnNumber: 7
+            style: {
+              width: "40px",
+              height: "40px",
+              background: "linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)",
+              borderRadius: "12px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              boxShadow: "0 4px 12px rgba(59, 130, 246, 0.3)"
+            }
           },
-          this
+          /* @__PURE__ */ React.createElement("span", { style: { fontSize: "1.2rem", color: "white" } }, "⚡")
         ),
-        /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { padding: "1.5rem 2rem", position: "relative", zIndex: 1 }, children: [
-          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { marginBottom: "2rem" }, children: [
-            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-              "h2",
-              {
-                style: {
-                  fontSize: "1.2rem",
-                  fontWeight: 700,
-                  color: "#1f2937",
-                  marginBottom: "1rem",
-                  textAlign: "center"
-                },
-                children: "Quick Actions"
-              },
-              void 0,
-              false,
-              {
-                fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
-                lineNumber: 730,
-                columnNumber: 11
-              },
-              this
-            ),
-            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-              "div",
-              {
-                style: {
-                  background: "linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%)",
-                  borderRadius: "16px",
-                  padding: "1.5rem",
-                  marginBottom: "1.5rem",
-                  border: "1px solid rgba(59, 130, 246, 0.1)",
-                  position: "relative",
-                  overflow: "hidden"
-                },
-                children: [
-                  /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                    "div",
-                    {
-                      style: {
-                        position: "absolute",
-                        top: "-20px",
-                        right: "-20px",
-                        width: "60px",
-                        height: "60px",
-                        background: "radial-gradient(circle, rgba(59, 130, 246, 0.1) 0%, transparent 70%)",
-                        borderRadius: "50%"
-                      }
-                    },
-                    void 0,
-                    false,
-                    {
-                      fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
-                      lineNumber: 754,
-                      columnNumber: 13
-                    },
-                    this
-                  ),
-                  /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                    "div",
-                    {
-                      style: {
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "0.75rem",
-                        marginBottom: "1rem"
-                      },
-                      children: [
-                        /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                          "div",
-                          {
-                            style: {
-                              width: "40px",
-                              height: "40px",
-                              background: "linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)",
-                              borderRadius: "12px",
-                              display: "flex",
-                              alignItems: "center",
-                              justifyContent: "center",
-                              boxShadow: "0 4px 12px rgba(59, 130, 246, 0.3)"
-                            },
-                            children: /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("span", { style: { fontSize: "1.2rem", color: "white" }, children: "⚡" }, void 0, false, {
-                              fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
-                              lineNumber: 788,
-                              columnNumber: 17
-                            }, this)
-                          },
-                          void 0,
-                          false,
-                          {
-                            fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
-                            lineNumber: 775,
-                            columnNumber: 15
-                          },
-                          this
-                        ),
-                        /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { children: [
-                          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                            "h3",
-                            {
-                              style: {
-                                fontSize: "1.1rem",
-                                fontWeight: 700,
-                                color: "#1e40af",
-                                margin: 0
-                              },
-                              children: "Smart Auto-Apply"
-                            },
-                            void 0,
-                            false,
-                            {
-                              fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
-                              lineNumber: 791,
-                              columnNumber: 17
-                            },
-                            this
-                          ),
-                          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                            "p",
-                            {
-                              style: {
-                                fontSize: "0.85rem",
-                                color: "#64748b",
-                                margin: "0.25rem 0 0 0"
-                              },
-                              children: "Apply to jobs instantly with AI-optimized profiles"
-                            },
-                            void 0,
-                            false,
-                            {
-                              fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
-                              lineNumber: 801,
-                              columnNumber: 17
-                            },
-                            this
-                          )
-                        ] }, void 0, true, {
-                          fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
-                          lineNumber: 790,
-                          columnNumber: 15
-                        }, this)
-                      ]
-                    },
-                    void 0,
-                    true,
-                    {
-                      fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
-                      lineNumber: 767,
-                      columnNumber: 13
-                    },
-                    this
-                  ),
-                  /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                    "button",
-                    {
-                      onClick: handleAutoApply,
-                      style: {
-                        width: "100%",
-                        background: "linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)",
-                        color: "#ffffff",
-                        border: "none",
-                        borderRadius: "12px",
-                        padding: "12px 20px",
-                        fontSize: "0.95rem",
-                        fontWeight: 600,
-                        cursor: "pointer",
-                        transition: "all 0.2s ease",
-                        boxShadow: "0 4px 12px rgba(59, 130, 246, 0.3)",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        gap: "8px"
-                      },
-                      onMouseEnter: (e) => {
-                        e.currentTarget.style.transform = "translateY(-2px)";
-                        e.currentTarget.style.boxShadow = "0 8px 20px rgba(59, 130, 246, 0.4)";
-                      },
-                      onMouseLeave: (e) => {
-                        e.currentTarget.style.transform = "translateY(0)";
-                        e.currentTarget.style.boxShadow = "0 4px 12px rgba(59, 130, 246, 0.3)";
-                      },
-                      children: [
-                        /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("span", { children: "🚀" }, void 0, false, {
-                          fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
-                          lineNumber: 843,
-                          columnNumber: 15
-                        }, this),
-                        "Auto-Apply to Job"
-                      ]
-                    },
-                    void 0,
-                    true,
-                    {
-                      fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
-                      lineNumber: 813,
-                      columnNumber: 13
-                    },
-                    this
-                  ),
-                  autoStatus && /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                    "div",
-                    {
-                      style: {
-                        marginTop: "1rem",
-                        padding: "1rem",
-                        borderRadius: "12px",
-                        fontSize: "0.9rem",
-                        background: autoStatus.status === "success" ? "linear-gradient(135deg, rgba(34, 197, 94, 0.1) 0%, rgba(34, 197, 94, 0.05) 100%)" : autoStatus.status === "error" ? "linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(239, 68, 68, 0.05) 100%)" : "linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(59, 130, 246, 0.05) 100%)",
-                        color: autoStatus.status === "success" ? "#16a34a" : autoStatus.status === "error" ? "#dc2626" : "#1e40af",
-                        border: `1px solid ${autoStatus.status === "success" ? "rgba(34, 197, 94, 0.3)" : autoStatus.status === "error" ? "rgba(239, 68, 68, 0.3)" : "rgba(59, 130, 246, 0.3)"}`
-                      },
-                      children: [
-                        autoStatus.status === "pending" && /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                          "div",
-                          {
-                            style: {
-                              display: "flex",
-                              alignItems: "center",
-                              justifyContent: "center",
-                              gap: "12px"
-                            },
-                            children: [
-                              /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                                "div",
-                                {
-                                  style: {
-                                    width: "20px",
-                                    height: "20px",
-                                    border: "3px solid rgba(59, 130, 246, 0.3)",
-                                    borderTop: "3px solid #3b82f6",
-                                    borderRadius: "50%",
-                                    animation: "spin 1s linear infinite"
-                                  }
-                                },
-                                void 0,
-                                false,
-                                {
-                                  fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
-                                  lineNumber: 884,
-                                  columnNumber: 21
-                                },
-                                this
-                              ),
-                              /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { children: [
-                                /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { fontWeight: 600, marginBottom: "4px" }, children: "🚀 Advanced Auto-Apply in Progress" }, void 0, false, {
-                                  fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
-                                  lineNumber: 895,
-                                  columnNumber: 23
-                                }, this),
-                                /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { fontSize: "0.8rem", opacity: 0.8 }, children: "Detecting job board, filling forms, uploading files..." }, void 0, false, {
-                                  fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
-                                  lineNumber: 898,
-                                  columnNumber: 23
-                                }, this)
-                              ] }, void 0, true, {
-                                fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
-                                lineNumber: 894,
-                                columnNumber: 21
-                              }, this)
-                            ]
-                          },
-                          void 0,
-                          true,
-                          {
-                            fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
-                            lineNumber: 876,
-                            columnNumber: 19
-                          },
-                          this
-                        ),
-                        autoStatus.status === "success" && /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { children: [
-                          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                            "div",
-                            {
-                              style: {
-                                display: "flex",
-                                alignItems: "center",
-                                gap: "8px",
-                                marginBottom: "8px",
-                                fontWeight: 600
-                              },
-                              children: [
-                                /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("span", { children: "✅" }, void 0, false, {
-                                  fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
-                                  lineNumber: 915,
-                                  columnNumber: 23
-                                }, this),
-                                /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("span", { children: "Application Submitted Successfully!" }, void 0, false, {
-                                  fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
-                                  lineNumber: 916,
-                                  columnNumber: 23
-                                }, this)
-                              ]
-                            },
-                            void 0,
-                            true,
-                            {
-                              fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
-                              lineNumber: 906,
-                              columnNumber: 21
-                            },
-                            this
-                          ),
-                          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                            "div",
-                            {
-                              style: {
-                                fontSize: "0.85rem",
-                                opacity: 0.9,
-                                marginBottom: "8px"
-                              },
-                              children: autoStatus.message
-                            },
-                            void 0,
-                            false,
-                            {
-                              fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
-                              lineNumber: 918,
-                              columnNumber: 21
-                            },
-                            this
-                          ),
-                          autoStatus.jobBoard && /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                            "div",
-                            {
-                              style: {
-                                fontSize: "0.75rem",
-                                opacity: 0.7,
-                                padding: "6px 12px",
-                                background: "rgba(255, 255, 255, 0.5)",
-                                borderRadius: "6px",
-                                display: "inline-block"
-                              },
-                              children: [
-                                "Platform: ",
-                                autoStatus.jobBoard
-                              ]
-                            },
-                            void 0,
-                            true,
-                            {
-                              fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
-                              lineNumber: 928,
-                              columnNumber: 23
-                            },
-                            this
-                          )
-                        ] }, void 0, true, {
-                          fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
-                          lineNumber: 905,
-                          columnNumber: 19
-                        }, this),
-                        autoStatus.status === "error" && /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { children: [
-                          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                            "div",
-                            {
-                              style: {
-                                display: "flex",
-                                alignItems: "center",
-                                gap: "8px",
-                                marginBottom: "8px",
-                                fontWeight: 600
-                              },
-                              children: [
-                                /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("span", { children: "❌" }, void 0, false, {
-                                  fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
-                                  lineNumber: 954,
-                                  columnNumber: 23
-                                }, this),
-                                /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("span", { children: "Auto-Apply Failed" }, void 0, false, {
-                                  fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
-                                  lineNumber: 955,
-                                  columnNumber: 23
-                                }, this)
-                              ]
-                            },
-                            void 0,
-                            true,
-                            {
-                              fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
-                              lineNumber: 945,
-                              columnNumber: 21
-                            },
-                            this
-                          ),
-                          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                            "div",
-                            {
-                              style: {
-                                fontSize: "0.85rem",
-                                opacity: 0.9,
-                                marginBottom: "12px"
-                              },
-                              children: autoStatus.message
-                            },
-                            void 0,
-                            false,
-                            {
-                              fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
-                              lineNumber: 957,
-                              columnNumber: 21
-                            },
-                            this
-                          ),
-                          autoStatus.session && autoStatus.session.errors && autoStatus.session.errors.length > 0 && /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                            "div",
-                            {
-                              style: {
-                                fontSize: "0.75rem",
-                                opacity: 0.8,
-                                marginBottom: "12px",
-                                padding: "8px",
-                                background: "rgba(255, 255, 255, 0.3)",
-                                borderRadius: "6px"
-                              },
-                              children: [
-                                /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { fontWeight: 600, marginBottom: "4px" }, children: "Issues detected:" }, void 0, false, {
-                                  fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
-                                  lineNumber: 979,
-                                  columnNumber: 27
-                                }, this),
-                                autoStatus.session.errors.slice(0, 3).map((error, index) => /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { marginBottom: "2px" }, children: [
-                                  "• ",
-                                  error
-                                ] }, index, true, {
-                                  fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
-                                  lineNumber: 985,
-                                  columnNumber: 31
-                                }, this)),
-                                autoStatus.session.errors.length > 3 && /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { children: [
-                                  "... and ",
-                                  autoStatus.session.errors.length - 3,
-                                  " ",
-                                  "more"
-                                ] }, void 0, true, {
-                                  fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
-                                  lineNumber: 990,
-                                  columnNumber: 29
-                                }, this)
-                              ]
-                            },
-                            void 0,
-                            true,
-                            {
-                              fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
-                              lineNumber: 969,
-                              columnNumber: 25
-                            },
-                            this
-                          ),
-                          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                            "button",
-                            {
-                              onClick: handleAutoApply,
-                              style: {
-                                background: "linear-gradient(135deg, #dc2626 0%, #b91c1c 100%)",
-                                color: "#ffffff",
-                                border: "none",
-                                borderRadius: "8px",
-                                padding: "8px 16px",
-                                fontSize: "0.85rem",
-                                fontWeight: 600,
-                                cursor: "pointer",
-                                boxShadow: "0 2px 8px rgba(220, 38, 38, 0.3)",
-                                transition: "all 0.2s ease"
-                              },
-                              onMouseEnter: (e) => {
-                                e.currentTarget.style.transform = "translateY(-1px)";
-                                e.currentTarget.style.boxShadow = "0 4px 12px rgba(220, 38, 38, 0.4)";
-                              },
-                              onMouseLeave: (e) => {
-                                e.currentTarget.style.transform = "translateY(0)";
-                                e.currentTarget.style.boxShadow = "0 2px 8px rgba(220, 38, 38, 0.3)";
-                              },
-                              children: "🔄 Retry Auto-Apply"
-                            },
-                            void 0,
-                            false,
-                            {
-                              fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
-                              lineNumber: 997,
-                              columnNumber: 21
-                            },
-                            this
-                          )
-                        ] }, void 0, true, {
-                          fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
-                          lineNumber: 944,
-                          columnNumber: 19
-                        }, this)
-                      ]
-                    },
-                    void 0,
-                    true,
-                    {
-                      fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
-                      lineNumber: 848,
-                      columnNumber: 15
-                    },
-                    this
-                  )
-                ]
-              },
-              void 0,
-              true,
-              {
-                fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
-                lineNumber: 743,
-                columnNumber: 11
-              },
-              this
-            ),
-            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { marginBottom: "2rem" }, children: [
-              /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                "h3",
-                {
-                  style: {
-                    fontSize: "1rem",
-                    fontWeight: 600,
-                    color: "#374151",
-                    marginBottom: "1rem",
-                    textAlign: "center"
-                  },
-                  children: "Core Features"
-                },
-                void 0,
-                false,
-                {
-                  fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
-                  lineNumber: 1033,
-                  columnNumber: 13
-                },
-                this
-              ),
-              /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                "div",
-                {
-                  style: {
-                    display: "grid",
-                    gridTemplateColumns: "1fr 1fr",
-                    gap: "0.75rem"
-                  },
-                  children: [
-                    /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                      "button",
-                      {
-                        onClick: () => setPage("profile"),
-                        style: {
-                          background: "#ffffff",
-                          border: "2px solid #e5e7eb",
-                          borderRadius: "12px",
-                          padding: "1rem",
-                          cursor: "pointer",
-                          transition: "all 0.2s ease",
-                          textAlign: "center",
-                          display: "flex",
-                          flexDirection: "column",
-                          alignItems: "center",
-                          gap: "0.5rem"
-                        },
-                        onMouseEnter: (e) => {
-                          e.currentTarget.style.borderColor = "#6366f1";
-                          e.currentTarget.style.transform = "translateY(-2px)";
-                          e.currentTarget.style.boxShadow = "0 8px 16px rgba(99, 102, 241, 0.15)";
-                        },
-                        onMouseLeave: (e) => {
-                          e.currentTarget.style.borderColor = "#e5e7eb";
-                          e.currentTarget.style.transform = "translateY(0)";
-                          e.currentTarget.style.boxShadow = "none";
-                        },
-                        children: [
-                          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                            "div",
-                            {
-                              style: {
-                                width: "32px",
-                                height: "32px",
-                                background: "linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)",
-                                borderRadius: "8px",
-                                display: "flex",
-                                alignItems: "center",
-                                justifyContent: "center"
-                              },
-                              children: /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("span", { style: { fontSize: "1rem", color: "white" }, children: "📋" }, void 0, false, {
-                                fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
-                                lineNumber: 1090,
-                                columnNumber: 19
-                              }, this)
-                            },
-                            void 0,
-                            false,
-                            {
-                              fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
-                              lineNumber: 1078,
-                              columnNumber: 17
-                            },
-                            this
-                          ),
-                          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { children: [
-                            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                              "div",
-                              {
-                                style: {
-                                  fontSize: "0.9rem",
-                                  fontWeight: 600,
-                                  color: "#1f2937"
-                                },
-                                children: "Profile Vault"
-                              },
-                              void 0,
-                              false,
-                              {
-                                fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
-                                lineNumber: 1093,
-                                columnNumber: 19
-                              },
-                              this
-                            ),
-                            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { fontSize: "0.75rem", color: "#6b7280" }, children: "Manage profiles" }, void 0, false, {
-                              fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
-                              lineNumber: 1102,
-                              columnNumber: 19
-                            }, this)
-                          ] }, void 0, true, {
-                            fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
-                            lineNumber: 1092,
-                            columnNumber: 17
-                          }, this)
-                        ]
-                      },
-                      void 0,
-                      true,
-                      {
-                        fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
-                        lineNumber: 1051,
-                        columnNumber: 15
-                      },
-                      this
-                    ),
-                    /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                      "button",
-                      {
-                        onClick: () => setPage("tracker"),
-                        style: {
-                          background: "#ffffff",
-                          border: "2px solid #e5e7eb",
-                          borderRadius: "12px",
-                          padding: "1rem",
-                          cursor: "pointer",
-                          transition: "all 0.2s ease",
-                          textAlign: "center",
-                          display: "flex",
-                          flexDirection: "column",
-                          alignItems: "center",
-                          gap: "0.5rem"
-                        },
-                        onMouseEnter: (e) => {
-                          e.currentTarget.style.borderColor = "#f59e0b";
-                          e.currentTarget.style.transform = "translateY(-2px)";
-                          e.currentTarget.style.boxShadow = "0 8px 16px rgba(245, 158, 11, 0.15)";
-                        },
-                        onMouseLeave: (e) => {
-                          e.currentTarget.style.borderColor = "#e5e7eb";
-                          e.currentTarget.style.transform = "translateY(0)";
-                          e.currentTarget.style.boxShadow = "none";
-                        },
-                        children: [
-                          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                            "div",
-                            {
-                              style: {
-                                width: "32px",
-                                height: "32px",
-                                background: "linear-gradient(135deg, #f59e0b 0%, #d97706 100%)",
-                                borderRadius: "8px",
-                                display: "flex",
-                                alignItems: "center",
-                                justifyContent: "center"
-                              },
-                              children: /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("span", { style: { fontSize: "1rem", color: "white" }, children: "📊" }, void 0, false, {
-                                fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
-                                lineNumber: 1147,
-                                columnNumber: 19
-                              }, this)
-                            },
-                            void 0,
-                            false,
-                            {
-                              fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
-                              lineNumber: 1135,
-                              columnNumber: 17
-                            },
-                            this
-                          ),
-                          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { children: [
-                            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                              "div",
-                              {
-                                style: {
-                                  fontSize: "0.9rem",
-                                  fontWeight: 600,
-                                  color: "#1f2937"
-                                },
-                                children: "Job Tracker"
-                              },
-                              void 0,
-                              false,
-                              {
-                                fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
-                                lineNumber: 1150,
-                                columnNumber: 19
-                              },
-                              this
-                            ),
-                            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { fontSize: "0.75rem", color: "#6b7280" }, children: "Track applications" }, void 0, false, {
-                              fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
-                              lineNumber: 1159,
-                              columnNumber: 19
-                            }, this)
-                          ] }, void 0, true, {
-                            fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
-                            lineNumber: 1149,
-                            columnNumber: 17
-                          }, this)
-                        ]
-                      },
-                      void 0,
-                      true,
-                      {
-                        fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
-                        lineNumber: 1108,
-                        columnNumber: 15
-                      },
-                      this
-                    )
-                  ]
-                },
-                void 0,
-                true,
-                {
-                  fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
-                  lineNumber: 1044,
-                  columnNumber: 13
-                },
-                this
-              )
-            ] }, void 0, true, {
-              fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
-              lineNumber: 1032,
-              columnNumber: 11
-            }, this),
-            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { children: [
-              /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                "h3",
-                {
-                  style: {
-                    fontSize: "1rem",
-                    fontWeight: 600,
-                    color: "#374151",
-                    marginBottom: "1rem",
-                    textAlign: "center"
-                  },
-                  children: "🤖 AI-Powered Tools"
-                },
-                void 0,
-                false,
-                {
-                  fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
-                  lineNumber: 1169,
-                  columnNumber: 13
-                },
-                this
-              ),
-              /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                "div",
-                {
-                  style: {
-                    display: "grid",
-                    gridTemplateColumns: "1fr 1fr",
-                    gap: "0.75rem",
-                    marginBottom: "1rem"
-                  },
-                  children: [
-                    /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                      "button",
-                      {
-                        onClick: () => setPage("chat"),
-                        style: {
-                          background: "linear-gradient(135deg, #10b981 0%, #059669 100%)",
-                          border: "none",
-                          borderRadius: "12px",
-                          padding: "1rem",
-                          cursor: "pointer",
-                          transition: "all 0.2s ease",
-                          color: "white",
-                          textAlign: "center",
-                          display: "flex",
-                          flexDirection: "column",
-                          alignItems: "center",
-                          gap: "0.5rem",
-                          boxShadow: "0 4px 12px rgba(16, 185, 129, 0.3)"
-                        },
-                        onMouseEnter: (e) => {
-                          e.currentTarget.style.transform = "translateY(-2px)";
-                          e.currentTarget.style.boxShadow = "0 8px 20px rgba(16, 185, 129, 0.4)";
-                        },
-                        onMouseLeave: (e) => {
-                          e.currentTarget.style.transform = "translateY(0)";
-                          e.currentTarget.style.boxShadow = "0 4px 12px rgba(16, 185, 129, 0.3)";
-                        },
-                        children: [
-                          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                            "div",
-                            {
-                              style: {
-                                width: "32px",
-                                height: "32px",
-                                background: "rgba(255, 255, 255, 0.2)",
-                                borderRadius: "8px",
-                                display: "flex",
-                                alignItems: "center",
-                                justifyContent: "center",
-                                backdropFilter: "blur(10px)"
-                              },
-                              children: /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("span", { style: { fontSize: "1rem" }, children: "💬" }, void 0, false, {
-                                fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
-                                lineNumber: 1231,
-                                columnNumber: 19
-                              }, this)
-                            },
-                            void 0,
-                            false,
-                            {
-                              fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
-                              lineNumber: 1219,
-                              columnNumber: 17
-                            },
-                            this
-                          ),
-                          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { children: [
-                            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { fontSize: "0.85rem", fontWeight: 600 }, children: "AI Assistant" }, void 0, false, {
-                              fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
-                              lineNumber: 1234,
-                              columnNumber: 19
-                            }, this),
-                            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { fontSize: "0.7rem", opacity: 0.9 }, children: "Career guidance" }, void 0, false, {
-                              fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
-                              lineNumber: 1237,
-                              columnNumber: 19
-                            }, this)
-                          ] }, void 0, true, {
-                            fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
-                            lineNumber: 1233,
-                            columnNumber: 17
-                          }, this)
-                        ]
-                      },
-                      void 0,
-                      true,
-                      {
-                        fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
-                        lineNumber: 1190,
-                        columnNumber: 15
-                      },
-                      this
-                    ),
-                    /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                      "button",
-                      {
-                        onClick: () => setPage("resume"),
-                        style: {
-                          background: "linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)",
-                          border: "none",
-                          borderRadius: "12px",
-                          padding: "1rem",
-                          cursor: "pointer",
-                          transition: "all 0.2s ease",
-                          color: "white",
-                          textAlign: "center",
-                          display: "flex",
-                          flexDirection: "column",
-                          alignItems: "center",
-                          gap: "0.5rem",
-                          boxShadow: "0 4px 12px rgba(59, 130, 246, 0.3)"
-                        },
-                        onMouseEnter: (e) => {
-                          e.currentTarget.style.transform = "translateY(-2px)";
-                          e.currentTarget.style.boxShadow = "0 8px 20px rgba(59, 130, 246, 0.4)";
-                        },
-                        onMouseLeave: (e) => {
-                          e.currentTarget.style.transform = "translateY(0)";
-                          e.currentTarget.style.boxShadow = "0 4px 12px rgba(59, 130, 246, 0.3)";
-                        },
-                        children: [
-                          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                            "div",
-                            {
-                              style: {
-                                width: "32px",
-                                height: "32px",
-                                background: "rgba(255, 255, 255, 0.2)",
-                                borderRadius: "8px",
-                                display: "flex",
-                                alignItems: "center",
-                                justifyContent: "center",
-                                backdropFilter: "blur(10px)"
-                              },
-                              children: /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("span", { style: { fontSize: "1rem" }, children: "📄" }, void 0, false, {
-                                fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
-                                lineNumber: 1284,
-                                columnNumber: 19
-                              }, this)
-                            },
-                            void 0,
-                            false,
-                            {
-                              fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
-                              lineNumber: 1272,
-                              columnNumber: 17
-                            },
-                            this
-                          ),
-                          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { children: [
-                            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { fontSize: "0.85rem", fontWeight: 600 }, children: "Resume AI" }, void 0, false, {
-                              fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
-                              lineNumber: 1287,
-                              columnNumber: 19
-                            }, this),
-                            /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { fontSize: "0.7rem", opacity: 0.9 }, children: "Enhance & optimize" }, void 0, false, {
-                              fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
-                              lineNumber: 1290,
-                              columnNumber: 19
-                            }, this)
-                          ] }, void 0, true, {
-                            fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
-                            lineNumber: 1286,
-                            columnNumber: 17
-                          }, this)
-                        ]
-                      },
-                      void 0,
-                      true,
-                      {
-                        fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
-                        lineNumber: 1243,
-                        columnNumber: 15
-                      },
-                      this
-                    )
-                  ]
-                },
-                void 0,
-                true,
-                {
-                  fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
-                  lineNumber: 1182,
-                  columnNumber: 13
-                },
-                this
-              ),
-              /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                "div",
-                {
-                  style: {
-                    display: "grid",
-                    gridTemplateColumns: "1fr 1fr 1fr",
-                    gap: "0.5rem"
-                  },
-                  children: [
-                    /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                      "button",
-                      {
-                        onClick: () => setPage("cover-letter"),
-                        style: {
-                          background: "#ffffff",
-                          border: "2px solid #e5e7eb",
-                          borderRadius: "8px",
-                          padding: "0.75rem",
-                          cursor: "pointer",
-                          transition: "all 0.2s ease",
-                          textAlign: "center",
-                          display: "flex",
-                          flexDirection: "column",
-                          alignItems: "center",
-                          gap: "0.25rem"
-                        },
-                        onMouseEnter: (e) => {
-                          e.currentTarget.style.borderColor = "#8b5cf6";
-                          e.currentTarget.style.background = "#faf5ff";
-                        },
-                        onMouseLeave: (e) => {
-                          e.currentTarget.style.borderColor = "#e5e7eb";
-                          e.currentTarget.style.background = "#ffffff";
-                        },
-                        children: [
-                          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("span", { style: { fontSize: "1rem" }, children: "✍️" }, void 0, false, {
-                            fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
-                            lineNumber: 1329,
-                            columnNumber: 17
-                          }, this),
-                          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                            "span",
-                            {
-                              style: {
-                                fontSize: "0.7rem",
-                                fontWeight: 600,
-                                color: "#1f2937"
-                              },
-                              children: "Cover Letter"
-                            },
-                            void 0,
-                            false,
-                            {
-                              fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
-                              lineNumber: 1330,
-                              columnNumber: 17
-                            },
-                            this
-                          )
-                        ]
-                      },
-                      void 0,
-                      true,
-                      {
-                        fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
-                        lineNumber: 1305,
-                        columnNumber: 15
-                      },
-                      this
-                    ),
-                    /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                      "button",
-                      {
-                        onClick: () => setPage("files"),
-                        style: {
-                          background: "#ffffff",
-                          border: "2px solid #e5e7eb",
-                          borderRadius: "8px",
-                          padding: "0.75rem",
-                          cursor: "pointer",
-                          transition: "all 0.2s ease",
-                          textAlign: "center",
-                          display: "flex",
-                          flexDirection: "column",
-                          alignItems: "center",
-                          gap: "0.25rem"
-                        },
-                        onMouseEnter: (e) => {
-                          e.currentTarget.style.borderColor = "#f59e0b";
-                          e.currentTarget.style.background = "#fffbeb";
-                        },
-                        onMouseLeave: (e) => {
-                          e.currentTarget.style.borderColor = "#e5e7eb";
-                          e.currentTarget.style.background = "#ffffff";
-                        },
-                        children: [
-                          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("span", { style: { fontSize: "1rem" }, children: "📁" }, void 0, false, {
-                            fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
-                            lineNumber: 1365,
-                            columnNumber: 17
-                          }, this),
-                          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                            "span",
-                            {
-                              style: {
-                                fontSize: "0.7rem",
-                                fontWeight: 600,
-                                color: "#1f2937"
-                              },
-                              children: "File Manager"
-                            },
-                            void 0,
-                            false,
-                            {
-                              fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
-                              lineNumber: 1366,
-                              columnNumber: 17
-                            },
-                            this
-                          )
-                        ]
-                      },
-                      void 0,
-                      true,
-                      {
-                        fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
-                        lineNumber: 1341,
-                        columnNumber: 15
-                      },
-                      this
-                    ),
-                    /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                      "button",
-                      {
-                        onClick: () => setPage("job-analysis"),
-                        style: {
-                          background: "#ffffff",
-                          border: "2px solid #e5e7eb",
-                          borderRadius: "8px",
-                          padding: "0.75rem",
-                          cursor: "pointer",
-                          transition: "all 0.2s ease",
-                          textAlign: "center",
-                          display: "flex",
-                          flexDirection: "column",
-                          alignItems: "center",
-                          gap: "0.25rem"
-                        },
-                        onMouseEnter: (e) => {
-                          e.currentTarget.style.borderColor = "#ec4899";
-                          e.currentTarget.style.background = "#fdf2f8";
-                        },
-                        onMouseLeave: (e) => {
-                          e.currentTarget.style.borderColor = "#e5e7eb";
-                          e.currentTarget.style.background = "#ffffff";
-                        },
-                        children: [
-                          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("span", { style: { fontSize: "1rem" }, children: "🔍" }, void 0, false, {
-                            fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
-                            lineNumber: 1401,
-                            columnNumber: 17
-                          }, this),
-                          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                            "span",
-                            {
-                              style: {
-                                fontSize: "0.7rem",
-                                fontWeight: 600,
-                                color: "#1f2937"
-                              },
-                              children: "Job Analysis"
-                            },
-                            void 0,
-                            false,
-                            {
-                              fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
-                              lineNumber: 1402,
-                              columnNumber: 17
-                            },
-                            this
-                          )
-                        ]
-                      },
-                      void 0,
-                      true,
-                      {
-                        fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
-                        lineNumber: 1377,
-                        columnNumber: 15
-                      },
-                      this
-                    )
-                  ]
-                },
-                void 0,
-                true,
-                {
-                  fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
-                  lineNumber: 1298,
-                  columnNumber: 13
-                },
-                this
-              ),
-              /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                "button",
-                {
-                  onClick: () => setPage("interview-prep"),
-                  style: {
-                    marginTop: "0.75rem",
-                    width: "100%",
-                    background: "linear-gradient(135deg, #14b8a6 0%, #0d9488 100%)",
-                    border: "none",
-                    borderRadius: "12px",
-                    padding: "1rem",
-                    cursor: "pointer",
-                    transition: "all 0.2s ease",
-                    color: "white",
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "0.75rem",
-                    boxShadow: "0 4px 12px rgba(20, 184, 166, 0.3)"
-                  },
-                  onMouseEnter: (e) => {
-                    e.currentTarget.style.transform = "translateY(-2px)";
-                    e.currentTarget.style.boxShadow = "0 8px 20px rgba(20, 184, 166, 0.4)";
-                  },
-                  onMouseLeave: (e) => {
-                    e.currentTarget.style.transform = "translateY(0)";
-                    e.currentTarget.style.boxShadow = "0 4px 12px rgba(20, 184, 166, 0.3)";
-                  },
-                  children: [
-                    /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                      "div",
-                      {
-                        style: {
-                          width: "40px",
-                          height: "40px",
-                          background: "rgba(255, 255, 255, 0.2)",
-                          borderRadius: "8px",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          backdropFilter: "blur(10px)"
-                        },
-                        children: /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("span", { style: { fontSize: "1.2rem" }, children: "🎤" }, void 0, false, {
-                          fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
-                          lineNumber: 1455,
-                          columnNumber: 17
-                        }, this)
-                      },
-                      void 0,
-                      false,
-                      {
-                        fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
-                        lineNumber: 1443,
-                        columnNumber: 15
-                      },
-                      this
-                    ),
-                    /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { textAlign: "left", flex: 1 }, children: [
-                      /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { fontSize: "0.95rem", fontWeight: 600 }, children: "Interview Preparation" }, void 0, false, {
-                        fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
-                        lineNumber: 1458,
-                        columnNumber: 17
-                      }, this),
-                      /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { fontSize: "0.8rem", opacity: 0.9 }, children: "AI-powered practice questions & tips" }, void 0, false, {
-                        fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
-                        lineNumber: 1461,
-                        columnNumber: 17
-                      }, this)
-                    ] }, void 0, true, {
-                      fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
-                      lineNumber: 1457,
-                      columnNumber: 15
-                    }, this),
-                    /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("span", { style: { fontSize: "1rem", opacity: 0.8 }, children: "→" }, void 0, false, {
-                      fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
-                      lineNumber: 1465,
-                      columnNumber: 15
-                    }, this)
-                  ]
-                },
-                void 0,
-                true,
-                {
-                  fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
-                  lineNumber: 1415,
-                  columnNumber: 13
-                },
-                this
-              )
-            ] }, void 0, true, {
-              fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
-              lineNumber: 1168,
-              columnNumber: 11
-            }, this)
-          ] }, void 0, true, {
-            fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
-            lineNumber: 729,
-            columnNumber: 9
-          }, this),
-          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { style: { textAlign: "center", marginTop: "1.5rem" }, children: /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-            "button",
+        /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement(
+          "h3",
+          {
+            style: {
+              fontSize: "1.1rem",
+              fontWeight: 700,
+              color: "#1e40af",
+              margin: 0
+            }
+          },
+          "Smart Auto-Apply"
+        ), /* @__PURE__ */ React.createElement(
+          "p",
+          {
+            style: {
+              fontSize: "0.85rem",
+              color: "#64748b",
+              margin: "0.25rem 0 0 0"
+            }
+          },
+          "Apply to jobs instantly with AI-optimized profiles"
+        ))
+      ),
+      /* @__PURE__ */ React.createElement(
+        "button",
+        {
+          onClick: handleAutoApply,
+          style: {
+            width: "100%",
+            background: "linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)",
+            color: "#ffffff",
+            border: "none",
+            borderRadius: "12px",
+            padding: "12px 20px",
+            fontSize: "0.95rem",
+            fontWeight: 600,
+            cursor: "pointer",
+            transition: "all 0.2s ease",
+            boxShadow: "0 4px 12px rgba(59, 130, 246, 0.3)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: "8px"
+          },
+          onMouseEnter: (e) => {
+            e.currentTarget.style.transform = "translateY(-2px)";
+            e.currentTarget.style.boxShadow = "0 8px 20px rgba(59, 130, 246, 0.4)";
+          },
+          onMouseLeave: (e) => {
+            e.currentTarget.style.transform = "translateY(0)";
+            e.currentTarget.style.boxShadow = "0 4px 12px rgba(59, 130, 246, 0.3)";
+          }
+        },
+        /* @__PURE__ */ React.createElement("span", null, "🚀"),
+        "Auto-Apply to Job"
+      ),
+      autoStatus && /* @__PURE__ */ React.createElement(
+        "div",
+        {
+          style: {
+            marginTop: "1rem",
+            padding: "1rem",
+            borderRadius: "12px",
+            fontSize: "0.9rem",
+            background: autoStatus.status === "success" ? "linear-gradient(135deg, rgba(34, 197, 94, 0.1) 0%, rgba(34, 197, 94, 0.05) 100%)" : autoStatus.status === "error" ? "linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(239, 68, 68, 0.05) 100%)" : "linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(59, 130, 246, 0.05) 100%)",
+            color: autoStatus.status === "success" ? "#16a34a" : autoStatus.status === "error" ? "#dc2626" : "#1e40af",
+            border: `1px solid ${autoStatus.status === "success" ? "rgba(34, 197, 94, 0.3)" : autoStatus.status === "error" ? "rgba(239, 68, 68, 0.3)" : "rgba(59, 130, 246, 0.3)"}`
+          }
+        },
+        autoStatus.status === "pending" && /* @__PURE__ */ React.createElement(
+          "div",
+          {
+            style: {
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: "12px"
+            }
+          },
+          /* @__PURE__ */ React.createElement(
+            "div",
             {
-              onClick: signOut,
               style: {
-                background: "transparent",
-                color: "#6b7280",
-                border: "1px solid #d1d5db",
-                borderRadius: "8px",
-                padding: "8px 16px",
-                cursor: "pointer",
-                fontSize: "0.85rem",
-                fontWeight: 500,
-                transition: "all 0.2s ease"
-              },
-              onMouseEnter: (e) => {
-                e.currentTarget.style.borderColor = "#9ca3af";
-                e.currentTarget.style.color = "#4b5563";
-              },
-              onMouseLeave: (e) => {
-                e.currentTarget.style.borderColor = "#d1d5db";
-                e.currentTarget.style.color = "#6b7280";
-              },
-              children: "Sign Out"
+                width: "20px",
+                height: "20px",
+                border: "3px solid rgba(59, 130, 246, 0.3)",
+                borderTop: "3px solid #3b82f6",
+                borderRadius: "50%",
+                animation: "spin 1s linear infinite"
+              }
+            }
+          ),
+          /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { style: { fontWeight: 600, marginBottom: "4px" } }, "🚀 Advanced Auto-Apply in Progress"), /* @__PURE__ */ React.createElement("div", { style: { fontSize: "0.8rem", opacity: 0.8 } }, "Detecting job board, filling forms, uploading files..."))
+        ),
+        autoStatus.status === "success" && /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement(
+          "div",
+          {
+            style: {
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
+              marginBottom: "8px",
+              fontWeight: 600
+            }
+          },
+          /* @__PURE__ */ React.createElement("span", null, "✅"),
+          /* @__PURE__ */ React.createElement("span", null, "Application Submitted Successfully!")
+        ), /* @__PURE__ */ React.createElement(
+          "div",
+          {
+            style: {
+              fontSize: "0.85rem",
+              opacity: 0.9,
+              marginBottom: "8px"
+            }
+          },
+          autoStatus.message
+        ), autoStatus.jobBoard && /* @__PURE__ */ React.createElement(
+          "div",
+          {
+            style: {
+              fontSize: "0.75rem",
+              opacity: 0.7,
+              padding: "6px 12px",
+              background: "rgba(255, 255, 255, 0.5)",
+              borderRadius: "6px",
+              display: "inline-block"
+            }
+          },
+          "Platform: ",
+          autoStatus.jobBoard
+        )),
+        autoStatus.status === "error" && /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement(
+          "div",
+          {
+            style: {
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
+              marginBottom: "8px",
+              fontWeight: 600
+            }
+          },
+          /* @__PURE__ */ React.createElement("span", null, "❌"),
+          /* @__PURE__ */ React.createElement("span", null, "Auto-Apply Failed")
+        ), /* @__PURE__ */ React.createElement(
+          "div",
+          {
+            style: {
+              fontSize: "0.85rem",
+              opacity: 0.9,
+              marginBottom: "12px"
+            }
+          },
+          autoStatus.message
+        ), autoStatus.session && autoStatus.session.errors && autoStatus.session.errors.length > 0 && /* @__PURE__ */ React.createElement(
+          "div",
+          {
+            style: {
+              fontSize: "0.75rem",
+              opacity: 0.8,
+              marginBottom: "12px",
+              padding: "8px",
+              background: "rgba(255, 255, 255, 0.3)",
+              borderRadius: "6px"
+            }
+          },
+          /* @__PURE__ */ React.createElement("div", { style: { fontWeight: 600, marginBottom: "4px" } }, "Issues detected:"),
+          autoStatus.session.errors.slice(0, 3).map((error, index) => /* @__PURE__ */ React.createElement("div", { key: index, style: { marginBottom: "2px" } }, "• ", error)),
+          autoStatus.session.errors.length > 3 && /* @__PURE__ */ React.createElement("div", null, "... and ", autoStatus.session.errors.length - 3, " ", "more")
+        ), /* @__PURE__ */ React.createElement(
+          "button",
+          {
+            onClick: handleAutoApply,
+            style: {
+              background: "linear-gradient(135deg, #dc2626 0%, #b91c1c 100%)",
+              color: "#ffffff",
+              border: "none",
+              borderRadius: "8px",
+              padding: "8px 16px",
+              fontSize: "0.85rem",
+              fontWeight: 600,
+              cursor: "pointer",
+              boxShadow: "0 2px 8px rgba(220, 38, 38, 0.3)",
+              transition: "all 0.2s ease"
             },
-            void 0,
-            false,
-            {
-              fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
-              lineNumber: 1472,
-              columnNumber: 11
+            onMouseEnter: (e) => {
+              e.currentTarget.style.transform = "translateY(-1px)";
+              e.currentTarget.style.boxShadow = "0 4px 12px rgba(220, 38, 38, 0.4)";
             },
-            this
-          ) }, void 0, false, {
-            fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
-            lineNumber: 1471,
-            columnNumber: 9
-          }, this)
-        ] }, void 0, true, {
-          fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
-          lineNumber: 727,
-          columnNumber: 7
-        }, this)
-      ]
-    },
-    void 0,
-    true,
-    {
-      fileName: "C:/Users/DELL/Uswift/extension/src/Popup.tsx",
-      lineNumber: 623,
-      columnNumber: 5
-    },
-    this
+            onMouseLeave: (e) => {
+              e.currentTarget.style.transform = "translateY(0)";
+              e.currentTarget.style.boxShadow = "0 2px 8px rgba(220, 38, 38, 0.3)";
+            }
+          },
+          "🔄 Retry Auto-Apply"
+        ))
+      )
+    ), /* @__PURE__ */ React.createElement("div", { style: { marginBottom: "2rem" } }, /* @__PURE__ */ React.createElement(
+      "h3",
+      {
+        style: {
+          fontSize: "1rem",
+          fontWeight: 600,
+          color: "#374151",
+          marginBottom: "1rem",
+          textAlign: "center"
+        }
+      },
+      "Core Features"
+    ), /* @__PURE__ */ React.createElement(
+      "div",
+      {
+        style: {
+          display: "grid",
+          gridTemplateColumns: "1fr 1fr",
+          gap: "0.75rem"
+        }
+      },
+      /* @__PURE__ */ React.createElement(
+        "button",
+        {
+          onClick: () => setPage("profile"),
+          style: {
+            background: "#ffffff",
+            border: "2px solid #e5e7eb",
+            borderRadius: "12px",
+            padding: "1rem",
+            cursor: "pointer",
+            transition: "all 0.2s ease",
+            textAlign: "center",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            gap: "0.5rem"
+          },
+          onMouseEnter: (e) => {
+            e.currentTarget.style.borderColor = "#6366f1";
+            e.currentTarget.style.transform = "translateY(-2px)";
+            e.currentTarget.style.boxShadow = "0 8px 16px rgba(99, 102, 241, 0.15)";
+          },
+          onMouseLeave: (e) => {
+            e.currentTarget.style.borderColor = "#e5e7eb";
+            e.currentTarget.style.transform = "translateY(0)";
+            e.currentTarget.style.boxShadow = "none";
+          }
+        },
+        /* @__PURE__ */ React.createElement(
+          "div",
+          {
+            style: {
+              width: "32px",
+              height: "32px",
+              background: "linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)",
+              borderRadius: "8px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center"
+            }
+          },
+          /* @__PURE__ */ React.createElement("span", { style: { fontSize: "1rem", color: "white" } }, "📋")
+        ),
+        /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement(
+          "div",
+          {
+            style: {
+              fontSize: "0.9rem",
+              fontWeight: 600,
+              color: "#1f2937"
+            }
+          },
+          "Profile Vault"
+        ), /* @__PURE__ */ React.createElement("div", { style: { fontSize: "0.75rem", color: "#6b7280" } }, "Manage profiles"))
+      ),
+      /* @__PURE__ */ React.createElement(
+        "button",
+        {
+          onClick: () => setPage("tracker"),
+          style: {
+            background: "#ffffff",
+            border: "2px solid #e5e7eb",
+            borderRadius: "12px",
+            padding: "1rem",
+            cursor: "pointer",
+            transition: "all 0.2s ease",
+            textAlign: "center",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            gap: "0.5rem"
+          },
+          onMouseEnter: (e) => {
+            e.currentTarget.style.borderColor = "#f59e0b";
+            e.currentTarget.style.transform = "translateY(-2px)";
+            e.currentTarget.style.boxShadow = "0 8px 16px rgba(245, 158, 11, 0.15)";
+          },
+          onMouseLeave: (e) => {
+            e.currentTarget.style.borderColor = "#e5e7eb";
+            e.currentTarget.style.transform = "translateY(0)";
+            e.currentTarget.style.boxShadow = "none";
+          }
+        },
+        /* @__PURE__ */ React.createElement(
+          "div",
+          {
+            style: {
+              width: "32px",
+              height: "32px",
+              background: "linear-gradient(135deg, #f59e0b 0%, #d97706 100%)",
+              borderRadius: "8px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center"
+            }
+          },
+          /* @__PURE__ */ React.createElement("span", { style: { fontSize: "1rem", color: "white" } }, "📊")
+        ),
+        /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement(
+          "div",
+          {
+            style: {
+              fontSize: "0.9rem",
+              fontWeight: 600,
+              color: "#1f2937"
+            }
+          },
+          "Job Tracker"
+        ), /* @__PURE__ */ React.createElement("div", { style: { fontSize: "0.75rem", color: "#6b7280" } }, "Track applications"))
+      )
+    )), /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement(
+      "h3",
+      {
+        style: {
+          fontSize: "1rem",
+          fontWeight: 600,
+          color: "#374151",
+          marginBottom: "1rem",
+          textAlign: "center"
+        }
+      },
+      "🤖 AI-Powered Tools"
+    ), /* @__PURE__ */ React.createElement(
+      "div",
+      {
+        style: {
+          display: "grid",
+          gridTemplateColumns: "1fr 1fr",
+          gap: "0.75rem",
+          marginBottom: "1rem"
+        }
+      },
+      /* @__PURE__ */ React.createElement(
+        "button",
+        {
+          onClick: () => setPage("chat"),
+          style: {
+            background: "linear-gradient(135deg, #10b981 0%, #059669 100%)",
+            border: "none",
+            borderRadius: "12px",
+            padding: "1rem",
+            cursor: "pointer",
+            transition: "all 0.2s ease",
+            color: "white",
+            textAlign: "center",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            gap: "0.5rem",
+            boxShadow: "0 4px 12px rgba(16, 185, 129, 0.3)"
+          },
+          onMouseEnter: (e) => {
+            e.currentTarget.style.transform = "translateY(-2px)";
+            e.currentTarget.style.boxShadow = "0 8px 20px rgba(16, 185, 129, 0.4)";
+          },
+          onMouseLeave: (e) => {
+            e.currentTarget.style.transform = "translateY(0)";
+            e.currentTarget.style.boxShadow = "0 4px 12px rgba(16, 185, 129, 0.3)";
+          }
+        },
+        /* @__PURE__ */ React.createElement(
+          "div",
+          {
+            style: {
+              width: "32px",
+              height: "32px",
+              background: "rgba(255, 255, 255, 0.2)",
+              borderRadius: "8px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              backdropFilter: "blur(10px)"
+            }
+          },
+          /* @__PURE__ */ React.createElement("span", { style: { fontSize: "1rem" } }, "💬")
+        ),
+        /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { style: { fontSize: "0.85rem", fontWeight: 600 } }, "AI Assistant"), /* @__PURE__ */ React.createElement("div", { style: { fontSize: "0.7rem", opacity: 0.9 } }, "Career guidance"))
+      ),
+      /* @__PURE__ */ React.createElement(
+        "button",
+        {
+          onClick: () => setPage("resume"),
+          style: {
+            background: "linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)",
+            border: "none",
+            borderRadius: "12px",
+            padding: "1rem",
+            cursor: "pointer",
+            transition: "all 0.2s ease",
+            color: "white",
+            textAlign: "center",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            gap: "0.5rem",
+            boxShadow: "0 4px 12px rgba(59, 130, 246, 0.3)"
+          },
+          onMouseEnter: (e) => {
+            e.currentTarget.style.transform = "translateY(-2px)";
+            e.currentTarget.style.boxShadow = "0 8px 20px rgba(59, 130, 246, 0.4)";
+          },
+          onMouseLeave: (e) => {
+            e.currentTarget.style.transform = "translateY(0)";
+            e.currentTarget.style.boxShadow = "0 4px 12px rgba(59, 130, 246, 0.3)";
+          }
+        },
+        /* @__PURE__ */ React.createElement(
+          "div",
+          {
+            style: {
+              width: "32px",
+              height: "32px",
+              background: "rgba(255, 255, 255, 0.2)",
+              borderRadius: "8px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              backdropFilter: "blur(10px)"
+            }
+          },
+          /* @__PURE__ */ React.createElement("span", { style: { fontSize: "1rem" } }, "📄")
+        ),
+        /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { style: { fontSize: "0.85rem", fontWeight: 600 } }, "Resume AI"), /* @__PURE__ */ React.createElement("div", { style: { fontSize: "0.7rem", opacity: 0.9 } }, "Enhance & optimize"))
+      )
+    ), /* @__PURE__ */ React.createElement(
+      "div",
+      {
+        style: {
+          display: "grid",
+          gridTemplateColumns: "1fr 1fr 1fr",
+          gap: "0.5rem"
+        }
+      },
+      /* @__PURE__ */ React.createElement(
+        "button",
+        {
+          onClick: () => setPage("cover-letter"),
+          style: {
+            background: "#ffffff",
+            border: "2px solid #e5e7eb",
+            borderRadius: "8px",
+            padding: "0.75rem",
+            cursor: "pointer",
+            transition: "all 0.2s ease",
+            textAlign: "center",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            gap: "0.25rem"
+          },
+          onMouseEnter: (e) => {
+            e.currentTarget.style.borderColor = "#8b5cf6";
+            e.currentTarget.style.background = "#faf5ff";
+          },
+          onMouseLeave: (e) => {
+            e.currentTarget.style.borderColor = "#e5e7eb";
+            e.currentTarget.style.background = "#ffffff";
+          }
+        },
+        /* @__PURE__ */ React.createElement("span", { style: { fontSize: "1rem" } }, "✍️"),
+        /* @__PURE__ */ React.createElement(
+          "span",
+          {
+            style: {
+              fontSize: "0.7rem",
+              fontWeight: 600,
+              color: "#1f2937"
+            }
+          },
+          "Cover Letter"
+        )
+      ),
+      /* @__PURE__ */ React.createElement(
+        "button",
+        {
+          onClick: () => setPage("files"),
+          style: {
+            background: "#ffffff",
+            border: "2px solid #e5e7eb",
+            borderRadius: "8px",
+            padding: "0.75rem",
+            cursor: "pointer",
+            transition: "all 0.2s ease",
+            textAlign: "center",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            gap: "0.25rem"
+          },
+          onMouseEnter: (e) => {
+            e.currentTarget.style.borderColor = "#f59e0b";
+            e.currentTarget.style.background = "#fffbeb";
+          },
+          onMouseLeave: (e) => {
+            e.currentTarget.style.borderColor = "#e5e7eb";
+            e.currentTarget.style.background = "#ffffff";
+          }
+        },
+        /* @__PURE__ */ React.createElement("span", { style: { fontSize: "1rem" } }, "📁"),
+        /* @__PURE__ */ React.createElement(
+          "span",
+          {
+            style: {
+              fontSize: "0.7rem",
+              fontWeight: 600,
+              color: "#1f2937"
+            }
+          },
+          "File Manager"
+        )
+      ),
+      /* @__PURE__ */ React.createElement(
+        "button",
+        {
+          onClick: () => setPage("job-analysis"),
+          style: {
+            background: "#ffffff",
+            border: "2px solid #e5e7eb",
+            borderRadius: "8px",
+            padding: "0.75rem",
+            cursor: "pointer",
+            transition: "all 0.2s ease",
+            textAlign: "center",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            gap: "0.25rem"
+          },
+          onMouseEnter: (e) => {
+            e.currentTarget.style.borderColor = "#ec4899";
+            e.currentTarget.style.background = "#fdf2f8";
+          },
+          onMouseLeave: (e) => {
+            e.currentTarget.style.borderColor = "#e5e7eb";
+            e.currentTarget.style.background = "#ffffff";
+          }
+        },
+        /* @__PURE__ */ React.createElement("span", { style: { fontSize: "1rem" } }, "🔍"),
+        /* @__PURE__ */ React.createElement(
+          "span",
+          {
+            style: {
+              fontSize: "0.7rem",
+              fontWeight: 600,
+              color: "#1f2937"
+            }
+          },
+          "Job Analysis"
+        )
+      )
+    ), /* @__PURE__ */ React.createElement(
+      "button",
+      {
+        onClick: () => setPage("interview-prep"),
+        style: {
+          marginTop: "0.75rem",
+          width: "100%",
+          background: "linear-gradient(135deg, #14b8a6 0%, #0d9488 100%)",
+          border: "none",
+          borderRadius: "12px",
+          padding: "1rem",
+          cursor: "pointer",
+          transition: "all 0.2s ease",
+          color: "white",
+          display: "flex",
+          alignItems: "center",
+          gap: "0.75rem",
+          boxShadow: "0 4px 12px rgba(20, 184, 166, 0.3)"
+        },
+        onMouseEnter: (e) => {
+          e.currentTarget.style.transform = "translateY(-2px)";
+          e.currentTarget.style.boxShadow = "0 8px 20px rgba(20, 184, 166, 0.4)";
+        },
+        onMouseLeave: (e) => {
+          e.currentTarget.style.transform = "translateY(0)";
+          e.currentTarget.style.boxShadow = "0 4px 12px rgba(20, 184, 166, 0.3)";
+        }
+      },
+      /* @__PURE__ */ React.createElement(
+        "div",
+        {
+          style: {
+            width: "40px",
+            height: "40px",
+            background: "rgba(255, 255, 255, 0.2)",
+            borderRadius: "8px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            backdropFilter: "blur(10px)"
+          }
+        },
+        /* @__PURE__ */ React.createElement("span", { style: { fontSize: "1.2rem" } }, "🎤")
+      ),
+      /* @__PURE__ */ React.createElement("div", { style: { textAlign: "left", flex: 1 } }, /* @__PURE__ */ React.createElement("div", { style: { fontSize: "0.95rem", fontWeight: 600 } }, "Interview Preparation"), /* @__PURE__ */ React.createElement("div", { style: { fontSize: "0.8rem", opacity: 0.9 } }, "AI-powered practice questions & tips")),
+      /* @__PURE__ */ React.createElement("span", { style: { fontSize: "1rem", opacity: 0.8 } }, "→")
+    ))), /* @__PURE__ */ React.createElement("div", { style: { textAlign: "center", marginTop: "1.5rem" } }, /* @__PURE__ */ React.createElement(
+      "button",
+      {
+        onClick: signOut,
+        style: {
+          background: "transparent",
+          color: "#6b7280",
+          border: "1px solid #d1d5db",
+          borderRadius: "8px",
+          padding: "8px 16px",
+          cursor: "pointer",
+          fontSize: "0.85rem",
+          fontWeight: 500,
+          transition: "all 0.2s ease"
+        },
+        onMouseEnter: (e) => {
+          e.currentTarget.style.borderColor = "#9ca3af";
+          e.currentTarget.style.color = "#4b5563";
+        },
+        onMouseLeave: (e) => {
+          e.currentTarget.style.borderColor = "#d1d5db";
+          e.currentTarget.style.color = "#6b7280";
+        }
+      },
+      "Sign Out"
+    )))
   );
 }
 
 client.createRoot(document.getElementById("root")).render(
-  /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(React.StrictMode, { children: /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(Popup, {}, void 0, false, {
-    fileName: "C:/Users/DELL/Uswift/extension/src/main.tsx",
-    lineNumber: 37,
-    columnNumber: 5
-  }, globalThis) }, void 0, false, {
-    fileName: "C:/Users/DELL/Uswift/extension/src/main.tsx",
-    lineNumber: 36,
-    columnNumber: 3
-  }, globalThis)
+  /* @__PURE__ */ React.createElement(React.StrictMode, null, /* @__PURE__ */ React.createElement(Popup, null))
 );
 try {
   getSupabaseClient();

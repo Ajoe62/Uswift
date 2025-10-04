@@ -9,11 +9,11 @@ export default function ProfileCard() {
       role="region"
       aria-labelledby={`${id}-title`}
       data-animate="reveal"
-      className="card bg-white text-black rounded-lg shadow p-3 sm:p-4 mb-4 card-magic card-magic--glow transform-gpu hover:-translate-y-0.5 transition-transform" // Changed: p-3 for mobile, sm:p-4 for larger screens
+      className="card bg-white text-black rounded-lg shadow p-3 sm:p-4 mb-4 card-magic card-magic--glow transform-gpu hover:-translate-y-0.5 transition-transform" 
     >
       <h4
         id={`${id}-title`}
-        className="font-bold text-base sm:text-lg" // Changed: text-base for mobile, sm:text-lg for larger screens
+        className="font-bold text-base sm:text-lg" 
         data-parallax="0.08"
       >
         Resume

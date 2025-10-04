@@ -1,6 +1,11 @@
 import { getSupabaseClient } from './supabaseClient.js';
 
-const scriptRel = 'modulepreload';const assetsURL = function(dep) { return "/"+dep };const seen = {};const __vitePreload = function preload(baseModule, deps, importerUrl) {
+const scriptRel = (function detectScriptRel() {
+    const relList = typeof document !== 'undefined' && document.createElement('link').relList;
+    return relList && relList.supports && relList.supports('modulepreload')
+        ? 'modulepreload'
+        : 'preload';
+})();const assetsURL = function(dep) { return "/"+dep };const seen = {};const __vitePreload = function preload(baseModule, deps, importerUrl) {
     // @ts-expect-error true will be replaced with boolean later
     if (!true || !deps || deps.length === 0) {
         return baseModule();
@@ -59,13 +64,12 @@ const scriptRel = 'modulepreload';const assetsURL = function(dep) { return "/"+d
 };
 
 class JobQueueService {
-  static instance;
-  processingQueue = /* @__PURE__ */ new Map();
-  rateLimitMap = /* @__PURE__ */ new Map();
-  // userId -> timestamps
-  maxAppliesPerHour = 20;
-  isProcessing = false;
   constructor() {
+    this.processingQueue = /* @__PURE__ */ new Map();
+    this.rateLimitMap = /* @__PURE__ */ new Map();
+    // userId -> timestamps
+    this.maxAppliesPerHour = 20;
+    this.isProcessing = false;
     this.startBackgroundProcessor();
   }
   static getInstance() {

@@ -109,33 +109,45 @@ export default function Popup() {
         return;
       }
 
-      // Load resumes from Supabase using makeRequest
-      const resumes = await supabase.makeRequest(
-        "resumes?user_id=eq." + user.id
-      );
+      // Load basic profile from preferences table
+      const { data: profileData, error: profileError } = await supabase
+        .from('preferences')
+        .select('*')
+        .eq('user_id', user.id)
+        .single();
 
-      // Load user preferences for basic info and Q&A profile
-      const preferences = await supabase.makeRequest(
-        "user_preferences?user_id=eq." + user.id
-      );
+      if (profileError && profileError.message?.includes('0 rows')) {
+        // No profile yet, that's okay
+        console.log('No profile found yet, using defaults');
+      } else if (profileError) {
+        console.error('Error loading profile:', profileError);
+      }
 
-      // Get the first resume and cover letter
-      const resume = resumes?.find((r: any) => r.type === "resume");
-      const coverLetter = resumes?.find((r: any) => r.type === "cover_letter");
+      // Load resume from resumes table
+      const { data: resumeData, error: resumeError } = await supabase
+        .from('resumes')
+        .select('*')
+        .eq('user_id', user.id)
+        .single();
 
-      // Get user preferences (should be single record)
-      const userPrefs = preferences?.[0] || {};
+      if (resumeError && resumeError.message?.includes('0 rows')) {
+        // No resume yet, that's okay
+        console.log('No resume found yet');
+      } else if (resumeError) {
+        console.error('Error loading resume:', resumeError);
+      }
 
+      // Update profile state with loaded data
       setProfile({
-        firstName: userPrefs.first_name || "",
-        lastName: userPrefs.last_name || "",
-        email: userPrefs.email || "",
-        phone: userPrefs.phone || "",
-        resume: resume?.content || resume?.file_url || "",
-        coverLetter: coverLetter?.content || coverLetter?.file_url || "",
-        linkedin: userPrefs.linkedin || "",
-        portfolio: userPrefs.portfolio || "",
-        qaProfile: userPrefs.qa_profile || "",
+        firstName: profileData?.first_name || "",
+        lastName: profileData?.last_name || "",
+        email: user.email || "", // Get email from user object
+        phone: profileData?.phone || "",
+        linkedin: profileData?.linkedin || "",
+        portfolio: profileData?.portfolio || "",
+        resume: resumeData?.content || "",
+        coverLetter: profileData?.cover_letter || "",
+        qaProfile: profileData?.qa_profile || "",
       });
     } catch (error) {
       console.error("Error loading profile from Supabase:", error);

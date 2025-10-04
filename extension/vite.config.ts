@@ -35,11 +35,14 @@ export default defineConfig({
         entryFileNames: "[name].js",
         chunkFileNames: "[name].js",
         assetFileNames: "[name].[ext]",
+        format: "es",
+        inlineDynamicImports: false,
       },
     },
     target: "esnext",
     minify: false,
     emptyOutDir: true,
+    modulePreload: false,
   },
   define: {
     "process.env.NODE_ENV": JSON.stringify(
