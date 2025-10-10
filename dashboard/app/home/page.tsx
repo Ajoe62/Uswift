@@ -4,17 +4,15 @@ import HowItWorks from "@/components/HowItWorks";
 import ResumeBuilder from "@/components/ResumeBuilder";
 import TrustStats from "@/components/TrustStats";
 import Testimonials from "@/components/Testimonials";
-// import CTAButton from "@/components/ui/CTAButton";
-// import ScrollEffects from "./ScrollEffects";
 import { ModernShowcase, SiteFooter } from "@/components/ModernShowcaseAndFooter";
 import NewsletterForm from "@/components/NewsletterForm";
 import ScrollEffects from "@/components/ScrollEffects";
 
-const HomePage = () => {
+export default function HomePage() {
   return (
     <>
       <ScrollEffects />
-      <div className="container mx-auto px-2 sm:px-4"> {/* Changed: px-2 for mobile, sm:px-4 for tablets and up */}
+      <div className="container mx-auto px-2 sm:px-4">
         <LandingHero />
         <FeaturesSection />
         <ResumeBuilder />
@@ -22,16 +20,9 @@ const HomePage = () => {
         <TrustStats />
         <Testimonials />
         <ModernShowcase />
-        <NewsletterForm />      
+        <NewsletterForm />
         <SiteFooter />
-        {/* <section className="text-center mt-8" data-animate="reveal">
-          <CTAButton href="/pricing" className="px-6 py-3">
-            See Pricing
-          </CTAButton>
-        </section> */}
       </div>
     </>
   );
-};
-
-export default HomePage;
+}
