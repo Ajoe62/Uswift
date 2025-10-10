@@ -5,6 +5,9 @@ body {
   background: linear-gradient(90deg, #1cb5e0 0%, #000851 100%);
   color: #111827;
   margin: 0;
+  width: 400px;
+  max-height: 600px;
+  overflow-y: auto;
 }
 
 .uswift-gradient {

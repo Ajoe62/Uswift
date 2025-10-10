@@ -735,15 +735,629 @@ export const workdayAdapter: BoardAdapter = {
   },
 };
 
+// LinkedIn Adapter
+export const linkedinAdapter: BoardAdapter = {
+  async detectFormReady() {
+    const formSelectors = [
+      ".jobs-easy-apply-content",
+      '[data-test-modal-id="easy-apply-modal"]',
+      ".artdeco-modal",
+    ];
+
+    for (const selector of formSelectors) {
+      const form = document.querySelector(selector) as HTMLElement;
+      if (form && form.offsetParent !== null) {
+        return true;
+      }
+    }
+
+    return false;
+  },
+
+  async fillForm(profile) {
+    const errors: string[] = [];
+    const warnings: string[] = [];
+
+    try {
+      const fields = findFormFields();
+
+      // LinkedIn Easy Apply specific selectors
+      const linkedinFields = [
+        {
+          field: fields.firstName,
+          value: profile.firstName,
+          name: "firstName",
+        },
+        { field: fields.lastName, value: profile.lastName, name: "lastName" },
+        { field: fields.email, value: profile.email, name: "email" },
+        { field: fields.phone, value: profile.phone, name: "phone" },
+      ];
+
+      for (const { field, value, name } of linkedinFields) {
+        if (field && value) {
+          try {
+            field.value = value;
+            field.dispatchEvent(new Event("input", { bubbles: true }));
+            field.dispatchEvent(new Event("change", { bubbles: true }));
+            field.dispatchEvent(new Event("blur", { bubbles: true }));
+
+            await new Promise((resolve) => setTimeout(resolve, 150));
+
+            if (field.validationMessage) {
+              warnings.push(`${name}: ${field.validationMessage}`);
+            }
+          } catch (e) {
+            errors.push(`Failed to fill ${name}: ${e}`);
+          }
+        }
+      }
+
+      return {
+        success: errors.length === 0,
+        errors,
+        warnings,
+        details: { platform: "LinkedIn Easy Apply" },
+      };
+    } catch (e) {
+      return {
+        success: false,
+        errors: [`Form filling failed: ${e}`],
+      };
+    }
+  },
+
+  async handleFileUpload(profile) {
+    const errors: string[] = [];
+    const warnings: string[] = [];
+
+    try {
+      const fields = findFormFields();
+
+      if (profile.resume && fields.resumeInput) {
+        const result = await attachFileToInput(
+          fields.resumeInput,
+          profile.resume
+        );
+        if (!result.success) {
+          errors.push(`Resume upload failed: ${result.errors?.join(", ")}`);
+        } else {
+          warnings.push(...(result.warnings || []));
+        }
+      }
+
+      return {
+        success: errors.length === 0,
+        errors,
+        warnings,
+      };
+    } catch (e) {
+      return {
+        success: false,
+        errors: [`File upload failed: ${e}`],
+      };
+    }
+  },
+
+  async clickApply() {
+    try {
+      const applySelectors = [
+        ".jobs-apply-button",
+        '[data-control-name="jobdetails_topcard_inapply"]',
+        ".artdeco-button--primary",
+        'button[aria-label*="Easy Apply" i]',
+      ];
+
+      for (const selector of applySelectors) {
+        const button = document.querySelector(selector) as HTMLElement;
+        if (button && button.offsetParent !== null) {
+          if (
+            button.hasAttribute("disabled") ||
+            button.getAttribute("aria-disabled") === "true"
+          ) {
+            return {
+              success: false,
+              errors: ["Apply button is disabled"],
+            };
+          }
+
+          button.click();
+          return { success: true, details: { selector, platform: "LinkedIn" } };
+        }
+      }
+
+      return {
+        success: false,
+        errors: ["Apply button not found"],
+      };
+    } catch (e) {
+      return {
+        success: false,
+        errors: [`Click apply failed: ${e}`],
+      };
+    }
+  },
+};
+
+// Indeed Adapter
+export const indeedAdapter: BoardAdapter = {
+  async detectFormReady() {
+    const formSelectors = [
+      "#ia-container",
+      ".ia-BasePage-content",
+      '[data-testid="IndeedApplyForm"]',
+    ];
+
+    for (const selector of formSelectors) {
+      const form = document.querySelector(selector) as HTMLElement;
+      if (form && form.offsetParent !== null) {
+        return true;
+      }
+    }
+
+    return false;
+  },
+
+  async fillForm(profile) {
+    const errors: string[] = [];
+    const warnings: string[] = [];
+
+    try {
+      const fields = findFormFields();
+
+      const textFields = [
+        {
+          field: fields.firstName,
+          value: profile.firstName,
+          name: "firstName",
+        },
+        { field: fields.lastName, value: profile.lastName, name: "lastName" },
+        { field: fields.email, value: profile.email, name: "email" },
+        { field: fields.phone, value: profile.phone, name: "phone" },
+      ];
+
+      for (const { field, value, name } of textFields) {
+        if (field && value) {
+          try {
+            field.value = value;
+            field.dispatchEvent(new Event("input", { bubbles: true }));
+            field.dispatchEvent(new Event("change", { bubbles: true }));
+
+            await new Promise((resolve) => setTimeout(resolve, 100));
+
+            if (field.validationMessage) {
+              warnings.push(`${name}: ${field.validationMessage}`);
+            }
+          } catch (e) {
+            errors.push(`Failed to fill ${name}: ${e}`);
+          }
+        }
+      }
+
+      return {
+        success: errors.length === 0,
+        errors,
+        warnings,
+        details: { platform: "Indeed" },
+      };
+    } catch (e) {
+      return {
+        success: false,
+        errors: [`Form filling failed: ${e}`],
+      };
+    }
+  },
+
+  async handleFileUpload(profile) {
+    const errors: string[] = [];
+
+    try {
+      const fields = findFormFields();
+
+      if (profile.resume && fields.resumeInput) {
+        const result = await attachFileToInput(
+          fields.resumeInput,
+          profile.resume
+        );
+        if (!result.success) {
+          errors.push(`Resume upload failed: ${result.errors?.join(", ")}`);
+        }
+      }
+
+      return {
+        success: errors.length === 0,
+        errors,
+      };
+    } catch (e) {
+      return {
+        success: false,
+        errors: [`File upload failed: ${e}`],
+      };
+    }
+  },
+
+  async clickApply() {
+    try {
+      const applySelectors = [
+        ".ia-continueButton",
+        '[data-testid="ApplyButton"]',
+        'button[type="submit"]',
+        ".indeed-apply-button",
+      ];
+
+      for (const selector of applySelectors) {
+        const button = document.querySelector(selector) as HTMLElement;
+        if (button && button.offsetParent !== null) {
+          button.click();
+          return { success: true, details: { selector, platform: "Indeed" } };
+        }
+      }
+
+      return {
+        success: false,
+        errors: ["Apply button not found"],
+      };
+    } catch (e) {
+      return {
+        success: false,
+        errors: [`Click apply failed: ${e}`],
+      };
+    }
+  },
+};
+
+// SmartRecruiters Adapter
+export const smartrecruitersAdapter: BoardAdapter = {
+  async detectFormReady() {
+    const formSelectors = [
+      ".application-form",
+      "#st-apply",
+      '[data-test="application-form"]',
+    ];
+
+    for (const selector of formSelectors) {
+      const form = document.querySelector(selector) as HTMLElement;
+      if (form && form.offsetParent !== null) {
+        return true;
+      }
+    }
+
+    return false;
+  },
+
+  async fillForm(profile) {
+    const errors: string[] = [];
+    const warnings: string[] = [];
+
+    try {
+      const fields = findFormFields();
+
+      const textFields = [
+        {
+          field: fields.firstName,
+          value: profile.firstName,
+          name: "firstName",
+        },
+        { field: fields.lastName, value: profile.lastName, name: "lastName" },
+        { field: fields.email, value: profile.email, name: "email" },
+        { field: fields.phone, value: profile.phone, name: "phone" },
+        { field: fields.linkedin, value: profile.linkedin, name: "linkedin" },
+      ];
+
+      for (const { field, value, name } of textFields) {
+        if (field && value) {
+          try {
+            field.value = value;
+            field.dispatchEvent(new Event("input", { bubbles: true }));
+            field.dispatchEvent(new Event("change", { bubbles: true }));
+
+            await new Promise((resolve) => setTimeout(resolve, 150));
+
+            if (field.validationMessage) {
+              warnings.push(`${name}: ${field.validationMessage}`);
+            }
+          } catch (e) {
+            errors.push(`Failed to fill ${name}: ${e}`);
+          }
+        }
+      }
+
+      return {
+        success: errors.length === 0,
+        errors,
+        warnings,
+        details: { platform: "SmartRecruiters" },
+      };
+    } catch (e) {
+      return {
+        success: false,
+        errors: [`Form filling failed: ${e}`],
+      };
+    }
+  },
+
+  async handleFileUpload(profile) {
+    const errors: string[] = [];
+
+    try {
+      const fields = findFormFields();
+
+      if (profile.resume && fields.resumeInput) {
+        const result = await attachFileToInput(
+          fields.resumeInput,
+          profile.resume
+        );
+        if (!result.success) {
+          errors.push(`Resume upload failed: ${result.errors?.join(", ")}`);
+        }
+      }
+
+      if (profile.coverLetter && fields.coverLetterInput) {
+        const result = await attachFileToInput(
+          fields.coverLetterInput,
+          profile.coverLetter
+        );
+        if (!result.success) {
+          errors.push(
+            `Cover letter upload failed: ${result.errors?.join(", ")}`
+          );
+        }
+      }
+
+      return {
+        success: errors.length === 0,
+        errors,
+      };
+    } catch (e) {
+      return {
+        success: false,
+        errors: [`File upload failed: ${e}`],
+      };
+    }
+  },
+
+  async clickApply() {
+    try {
+      const applySelectors = [
+        ".button-apply",
+        'button[type="submit"]',
+        '[data-test="submit-application"]',
+        ".apply-button",
+      ];
+
+      for (const selector of applySelectors) {
+        const button = document.querySelector(selector) as HTMLElement;
+        if (button && button.offsetParent !== null) {
+          button.click();
+          return {
+            success: true,
+            details: { selector, platform: "SmartRecruiters" },
+          };
+        }
+      }
+
+      return {
+        success: false,
+        errors: ["Apply button not found"],
+      };
+    } catch (e) {
+      return {
+        success: false,
+        errors: [`Click apply failed: ${e}`],
+      };
+    }
+  },
+};
+
+// Generic Adapter (Fallback for unknown platforms)
+export const genericAdapter: BoardAdapter = {
+  async detectFormReady() {
+    // Look for common form elements
+    const forms = document.querySelectorAll("form");
+    for (const form of Array.from(forms)) {
+      const hasEmailInput = form.querySelector('input[type="email"]');
+      const hasFileInput = form.querySelector('input[type="file"]');
+      if (hasEmailInput && form.offsetParent !== null) {
+        return true;
+      }
+    }
+    return false;
+  },
+
+  async fillForm(profile) {
+    const errors: string[] = [];
+    const warnings: string[] = [];
+
+    try {
+      const fields = findFormFields();
+
+      const textFields = [
+        {
+          field: fields.firstName,
+          value: profile.firstName,
+          name: "firstName",
+        },
+        { field: fields.lastName, value: profile.lastName, name: "lastName" },
+        { field: fields.email, value: profile.email, name: "email" },
+        { field: fields.phone, value: profile.phone, name: "phone" },
+        { field: fields.linkedin, value: profile.linkedin, name: "linkedin" },
+        {
+          field: fields.portfolio,
+          value: profile.portfolio,
+          name: "portfolio",
+        },
+      ];
+
+      for (const { field, value, name } of textFields) {
+        if (field && value) {
+          try {
+            field.value = value;
+            field.dispatchEvent(new Event("input", { bubbles: true }));
+            field.dispatchEvent(new Event("change", { bubbles: true }));
+            field.dispatchEvent(new Event("blur", { bubbles: true }));
+
+            await new Promise((resolve) => setTimeout(resolve, 100));
+
+            if (field.validationMessage) {
+              warnings.push(`${name}: ${field.validationMessage}`);
+            }
+          } catch (e) {
+            errors.push(`Failed to fill ${name}: ${e}`);
+          }
+        }
+      }
+
+      return {
+        success: errors.length === 0,
+        errors,
+        warnings,
+        details: { platform: "Generic", fieldsFound: Object.keys(fields).length },
+      };
+    } catch (e) {
+      return {
+        success: false,
+        errors: [`Form filling failed: ${e}`],
+      };
+    }
+  },
+
+  async handleFileUpload(profile) {
+    const errors: string[] = [];
+
+    try {
+      const fields = findFormFields();
+
+      if (profile.resume && fields.resumeInput) {
+        const result = await attachFileToInput(
+          fields.resumeInput,
+          profile.resume
+        );
+        if (!result.success) {
+          errors.push(`Resume upload failed: ${result.errors?.join(", ")}`);
+        }
+      }
+
+      if (profile.coverLetter && fields.coverLetterInput) {
+        const result = await attachFileToInput(
+          fields.coverLetterInput,
+          profile.coverLetter
+        );
+        if (!result.success) {
+          errors.push(
+            `Cover letter upload failed: ${result.errors?.join(", ")}`
+          );
+        }
+      }
+
+      return {
+        success: errors.length === 0,
+        errors,
+      };
+    } catch (e) {
+      return {
+        success: false,
+        errors: [`File upload failed: ${e}`],
+      };
+    }
+  },
+
+  async clickApply() {
+    try {
+      // Generic button detection
+      const applySelectors = [
+        'button[type="submit"]',
+        'input[type="submit"]',
+        'button:contains("Apply")',
+        'button:contains("Submit")',
+        ".apply-button",
+        ".submit-button",
+        '[role="button"][aria-label*="apply" i]',
+      ];
+
+      for (const selector of applySelectors) {
+        const button = document.querySelector(selector) as HTMLElement;
+        if (button && button.offsetParent !== null) {
+          const buttonText = button.textContent?.toLowerCase() || "";
+          if (buttonText.includes("apply") || buttonText.includes("submit")) {
+            button.click();
+            return { success: true, details: { selector, platform: "Generic" } };
+          }
+        }
+      }
+
+      // Fallback: Find any submit button
+      const submitButtons = document.querySelectorAll(
+        'button[type="submit"], input[type="submit"]'
+      );
+      for (const button of Array.from(submitButtons)) {
+        if ((button as HTMLElement).offsetParent !== null) {
+          (button as HTMLElement).click();
+          return {
+            success: true,
+            details: { selector: "submit button", platform: "Generic" },
+          };
+        }
+      }
+
+      return {
+        success: false,
+        errors: ["Apply button not found"],
+      };
+    } catch (e) {
+      return {
+        success: false,
+        errors: [`Click apply failed: ${e}`],
+      };
+    }
+  },
+};
+
 // Export comprehensive adapter map
 export const ADAPTERS: Record<string, BoardAdapter> = {
   greenhouse: greenhouseAdapter,
   lever: leverAdapter,
   workday: workdayAdapter,
-  // Ready for expansion
-  // smartrecruiters: smartrecruitersAdapter,
-  // icims: icimsAdapter,
-  // bamboohr: bamboohrAdapter,
-  // jobvite: jobviteAdapter,
-  // taleo: taleoAdapter,
+  linkedin: linkedinAdapter,
+  indeed: indeedAdapter,
+  smartrecruiters: smartrecruitersAdapter,
+  generic: genericAdapter,
 };
+
+// Helper function to get adapter by platform name
+export function getAdapter(platform: string): BoardAdapter {
+  const normalizedPlatform = platform.toLowerCase();
+  return ADAPTERS[normalizedPlatform] || genericAdapter;
+}
+
+// Helper function to detect and get appropriate adapter
+export async function detectAndGetAdapter(): Promise<{
+  adapter: BoardAdapter;
+  platform: string;
+}> {
+  const hostname = window.location.hostname.toLowerCase();
+
+  // Platform detection
+  if (hostname.includes("greenhouse.io")) {
+    return { adapter: greenhouseAdapter, platform: "greenhouse" };
+  } else if (hostname.includes("lever.co")) {
+    return { adapter: leverAdapter, platform: "lever" };
+  } else if (hostname.includes("myworkdayjobs.com")) {
+    return { adapter: workdayAdapter, platform: "workday" };
+  } else if (hostname.includes("linkedin.com")) {
+    return { adapter: linkedinAdapter, platform: "linkedin" };
+  } else if (hostname.includes("indeed.com")) {
+    return { adapter: indeedAdapter, platform: "indeed" };
+  } else if (hostname.includes("smartrecruiters.com")) {
+    return { adapter: smartrecruitersAdapter, platform: "smartrecruiters" };
+  }
+
+  // Try to detect form readiness for each adapter
+  for (const [platform, adapter] of Object.entries(ADAPTERS)) {
+    if (platform === "generic") continue;
+    if (adapter.detectFormReady && (await adapter.detectFormReady())) {
+      return { adapter, platform };
+    }
+  }
+
+  // Fallback to generic adapter
+  return { adapter: genericAdapter, platform: "generic" };
+}

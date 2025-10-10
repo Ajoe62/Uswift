@@ -35,15 +35,37 @@ export default defineConfig({
         entryFileNames: "[name].js",
         chunkFileNames: "[name].js",
         assetFileNames: "[name].[ext]",
+        format: "es",
+        inlineDynamicImports: false,
       },
     },
     target: "esnext",
     minify: false,
     emptyOutDir: true,
+    modulePreload: false,
   },
   define: {
     "process.env.NODE_ENV": JSON.stringify(
       process.env.NODE_ENV || "production"
+    ),
+    // Expose environment variables to extension
+    "import.meta.env.VITE_MISTRAL_API_KEY": JSON.stringify(
+      process.env.VITE_MISTRAL_API_KEY || ""
+    ),
+    "import.meta.env.VITE_MISTRAL_BASE_URL": JSON.stringify(
+      process.env.VITE_MISTRAL_BASE_URL || "https://api.mistral.ai"
+    ),
+    "import.meta.env.VITE_SUPABASE_URL": JSON.stringify(
+      process.env.VITE_SUPABASE_URL || ""
+    ),
+    "import.meta.env.VITE_SUPABASE_ANON_KEY": JSON.stringify(
+      process.env.VITE_SUPABASE_ANON_KEY || ""
+    ),
+    "import.meta.env.VITE_BACKEND_API_URL": JSON.stringify(
+      process.env.VITE_BACKEND_API_URL || ""
+    ),
+    "import.meta.env.VITE_DEBUG_MODE": JSON.stringify(
+      process.env.VITE_DEBUG_MODE === "true"
     ),
   },
 });

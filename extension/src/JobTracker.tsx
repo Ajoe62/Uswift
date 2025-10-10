@@ -142,24 +142,40 @@ const JobTracker: React.FC = () => {
         status: application.status,
         applied_at: application.dateApplied,
         job_url: application.jobUrl,
+        job_board: 'manual',
         notes: application.notes,
-        tags: application.tags,
+        tags: application.tags || [],
         updated_at: new Date().toISOString(),
       };
 
       if (client) {
         if (application.id) {
+          // Update existing application
           await client.makeRequest(`applications?id=eq.${application.id}`, {
             method: "PATCH",
             body: JSON.stringify(appData),
+            headers: {
+              "Prefer": "return=representation"
+            }
           });
-          return true;
+          return application.id; // Return the existing ID
         } else {
+          // Insert new application - must return the inserted row with ID
           const inserted = await client.makeRequest("applications", {
             method: "POST",
             body: JSON.stringify([appData]),
+            headers: {
+              "Prefer": "return=representation"
+            }
           });
-          return inserted?.[0]?.id || true;
+
+          // The response is an array of inserted rows
+          if (inserted && Array.isArray(inserted) && inserted.length > 0 && inserted[0].id) {
+            return inserted[0].id;
+          }
+
+          // If we didn't get an ID back, throw an error
+          throw new Error("Failed to get ID from inserted application");
         }
       }
 
@@ -205,33 +221,55 @@ const JobTracker: React.FC = () => {
       return;
     }
     setLoading(true);
-    if (isAuthenticated && user) {
-      const id = await saveToSupabase(newApplication);
-      if (id) {
-        const appWithId = {
-          ...newApplication,
-          id: typeof id === "string" ? id : String(id),
-        };
+    try {
+      if (isAuthenticated && user) {
+        const id = await saveToSupabase(newApplication);
+        if (id && typeof id === "string") {
+          const appWithId = {
+            ...newApplication,
+            id: id,
+          };
+          const updatedApps = [appWithId, ...applications];
+          setApplications(updatedApps);
+
+          // Reset form only on success
+          setNewApplication({
+            company: "",
+            position: "",
+            status: "applied",
+            dateApplied: new Date().toISOString().split("T")[0],
+            jobUrl: "",
+            notes: "",
+            tags: [],
+          });
+          setShowAddForm(false);
+        } else {
+          alert("Failed to save application. Please try again.");
+        }
+      } else {
+        const appWithId = { ...newApplication, id: Date.now().toString() };
         const updatedApps = [appWithId, ...applications];
         setApplications(updatedApps);
+        saveToChrome(updatedApps);
+
+        // Reset form
+        setNewApplication({
+          company: "",
+          position: "",
+          status: "applied",
+          dateApplied: new Date().toISOString().split("T")[0],
+          jobUrl: "",
+          notes: "",
+          tags: [],
+        });
+        setShowAddForm(false);
       }
-    } else {
-      const appWithId = { ...newApplication, id: Date.now().toString() };
-      const updatedApps = [appWithId, ...applications];
-      setApplications(updatedApps);
-      saveToChrome(updatedApps);
+    } catch (error) {
+      console.error("Error adding application:", error);
+      alert("Failed to add application. Please check the console for details.");
+    } finally {
+      setLoading(false);
     }
-    setNewApplication({
-      company: "",
-      position: "",
-      status: "applied",
-      dateApplied: new Date().toISOString().split("T")[0],
-      jobUrl: "",
-      notes: "",
-      tags: [],
-    });
-    setShowAddForm(false);
-    setLoading(false);
   };
 
   const updateStatus = async (id: string, status: JobStatus) => {
