@@ -19,7 +19,7 @@ export default function Navbar() {
   };
 
   return (
-    <nav className="w-full py-4 px-4 sm:px-8 flex justify-between items-center bg-uswift-gradient text-white relative"> {/* Changed: px-4 for mobile, sm:px-8 for tablets and up, relative for mobile menu */}
+    <nav className="w-full py-4 px-4 sm:px-8 flex justify-between items-center bg-white border-b border-gray-200 text-gray-900 relative shadow-sm">
       {/* Logo with icon - Hydration safe */}
       <div className="flex items-center gap-3">
         {isLoaded ? (
@@ -53,23 +53,23 @@ export default function Navbar() {
 
       {/* Navigation links - hidden on mobile, flex on tablet/desktop */}
       <div className="hidden sm:flex space-x-6 items-center">
-        <a href="/" className="hover:text-uswift-accent">
+        <a href="/" className="text-gray-700 hover:text-uswift-primary transition-colors">
           Home
         </a>
-        <a href="/features" className="hover:text-uswift-accent">
+        <a href="/features" className="text-gray-700 hover:text-uswift-primary transition-colors">
           Features
         </a>
-        <a href="/pricing" className="hover:text-uswift-accent">
+        <a href="/pricing" className="text-gray-700 hover:text-uswift-primary transition-colors">
           Pricing
         </a>
         {user ? (
           <div className="flex items-center gap-4">
-            <a href="/dashboard" className="hover:text-uswift-accent">
+            <a href="/dashboard" className="text-gray-700 hover:text-uswift-primary transition-colors">
               Dashboard
             </a>
             <button
               onClick={handleSignOut}
-              className="text-white hover:text-uswift-accent"
+              className="text-gray-700 hover:text-uswift-primary transition-colors"
             >
               Sign Out
             </button>
@@ -81,25 +81,25 @@ export default function Navbar() {
 
       {/* Mobile menu - visible when hamburger is open */}
       {menuOpen && (
-        <div className="absolute top-full left-0 w-full bg-uswift-gradient shadow-lg z-50 sm:hidden animate-fade-in"> {/* Changed: mobile menu styles, animate-fade-in for smoothness */}
+        <div className="absolute top-full left-0 w-full bg-white border-b border-gray-200 shadow-lg z-50 sm:hidden">
           <div className="flex flex-col gap-4 p-4">
-            <a href="/" className="hover:text-uswift-accent" onClick={() => setMenuOpen(false)}>
+            <a href="/" className="text-gray-700 hover:text-uswift-primary transition-colors" onClick={() => setMenuOpen(false)}>
               Home
             </a>
-            <a href="/features" className="hover:text-uswift-accent" onClick={() => setMenuOpen(false)}>
+            <a href="/features" className="text-gray-700 hover:text-uswift-primary transition-colors" onClick={() => setMenuOpen(false)}>
               Features
             </a>
-            <a href="/pricing" className="hover:text-uswift-accent" onClick={() => setMenuOpen(false)}>
+            <a href="/pricing" className="text-gray-700 hover:text-uswift-primary transition-colors" onClick={() => setMenuOpen(false)}>
               Pricing
             </a>
             {user ? (
               <>
-                <a href="/dashboard" className="hover:text-uswift-accent" onClick={() => setMenuOpen(false)}>
+                <a href="/dashboard" className="text-gray-700 hover:text-uswift-primary transition-colors" onClick={() => setMenuOpen(false)}>
                   Dashboard
                 </a>
                 <button
                   onClick={handleSignOut}
-                  className="text-white hover:text-uswift-accent text-left"
+                  className="text-gray-700 hover:text-uswift-primary text-left transition-colors"
                 >
                   Sign Out
                 </button>

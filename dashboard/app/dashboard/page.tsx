@@ -35,17 +35,17 @@ export default function DashboardHome() {
   return (
     <section className="space-y-6">
       {/* Welcome Header */}
-      <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl p-8 text-white shadow-xl">
+      <div className="card-blue-frame rounded-xl p-8">
         <div className="flex items-center justify-between flex-wrap gap-4">
           <div className="flex items-center gap-4">
-            <div className="w-16 h-16 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center text-2xl font-bold border-2 border-white/30">
+            <div className="w-16 h-16 rounded-full bg-blue-600 flex items-center justify-center text-2xl font-bold text-white">
               {getUserDisplayName().charAt(0).toUpperCase()}
             </div>
             <div>
-              <h1 className="text-3xl font-bold mb-1">
+              <h1 className="text-3xl font-bold mb-1 text-gray-900">
                 {getGreeting()}, {getUserDisplayName()}!
               </h1>
-              <p className="text-blue-100 text-sm">
+              <p className="text-gray-600 text-sm">
                 Welcome back to your job search dashboard
               </p>
             </div>
@@ -53,13 +53,13 @@ export default function DashboardHome() {
           <div className="flex gap-3">
             <Link
               href="/dashboard/jobs"
-              className="px-4 py-2 bg-white text-blue-600 rounded-lg font-medium hover:bg-blue-50 transition-colors shadow-lg"
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors"
             >
               View Applications
             </Link>
             <Link
               href="/dashboard/profile"
-              className="px-4 py-2 bg-white/10 backdrop-blur-sm text-white rounded-lg font-medium hover:bg-white/20 transition-colors border border-white/30"
+              className="px-4 py-2 bg-gray-100 text-gray-900 rounded-lg font-medium hover:bg-gray-200 transition-colors"
             >
               Edit Profile
             </Link>
@@ -68,7 +68,7 @@ export default function DashboardHome() {
       </div>
 
       {/* User Info Card */}
-      <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
+      <div className="card-blue-frame rounded-xl p-6">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-xl font-bold text-gray-900">Account Information</h2>
           <Link
@@ -82,7 +82,7 @@ export default function DashboardHome() {
           </Link>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="flex items-start gap-3 p-4 bg-gray-50 rounded-lg">
+          <div className="card-blue-frame flex items-start gap-3 p-4 rounded-lg">
             <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
               <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207" />
@@ -93,7 +93,7 @@ export default function DashboardHome() {
               <p className="text-base font-semibold text-gray-900 truncate">{user?.email || "Not set"}</p>
             </div>
           </div>
-          <div className="flex items-start gap-3 p-4 bg-gray-50 rounded-lg">
+          <div className="card-blue-frame flex items-start gap-3 p-4 rounded-lg">
             <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
               <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -104,7 +104,7 @@ export default function DashboardHome() {
               <p className="text-base font-semibold text-green-600">Active</p>
             </div>
           </div>
-          <div className="flex items-start gap-3 p-4 bg-gray-50 rounded-lg">
+          <div className="flex items-start gap-3 p-4 bg-white rounded-lg card-blue-frame">
             <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center flex-shrink-0">
               <svg className="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -117,7 +117,7 @@ export default function DashboardHome() {
               </p>
             </div>
           </div>
-          <div className="flex items-start gap-3 p-4 bg-gray-50 rounded-lg">
+          <div className="flex items-start gap-3 p-4 bg-white rounded-lg card-blue-frame">
             <div className="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center flex-shrink-0">
               <svg className="w-5 h-5 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -140,12 +140,12 @@ export default function DashboardHome() {
       </div>
 
       {/* Quick Actions */}
-      <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
+      <div className="bg-white rounded-xl shadow-md p-6 card-blue-frame">
         <h2 className="text-xl font-bold text-gray-900 mb-4">Quick Actions</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <Link
             href="/dashboard/jobs"
-            className="flex items-center gap-3 p-4 bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg hover:shadow-md transition-shadow border border-blue-200"
+            className="flex items-center gap-3 p-4 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors border border-blue-200"
           >
             <div className="w-10 h-10 rounded-lg bg-blue-600 flex items-center justify-center">
               <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -159,7 +159,7 @@ export default function DashboardHome() {
           </Link>
           <Link
             href="/dashboard/profile"
-            className="flex items-center gap-3 p-4 bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg hover:shadow-md transition-shadow border border-purple-200"
+            className="flex items-center gap-3 p-4 bg-purple-50 rounded-lg hover:bg-purple-100 transition-colors border border-purple-200"
           >
             <div className="w-10 h-10 rounded-lg bg-purple-600 flex items-center justify-center">
               <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -175,7 +175,7 @@ export default function DashboardHome() {
             href="https://chromewebstore.google.com"
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-3 p-4 bg-gradient-to-br from-green-50 to-green-100 rounded-lg hover:shadow-md transition-shadow border border-green-200"
+            className="flex items-center gap-3 p-4 bg-green-50 rounded-lg hover:bg-green-100 transition-colors border border-green-200"
           >
             <div className="w-10 h-10 rounded-lg bg-green-600 flex items-center justify-center">
               <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -189,7 +189,7 @@ export default function DashboardHome() {
           </a>
           <Link
             href="/dashboard/settings"
-            className="flex items-center gap-3 p-4 bg-gradient-to-br from-gray-50 to-gray-100 rounded-lg hover:shadow-md transition-shadow border border-gray-200"
+            className="flex items-center gap-3 p-4 bg-white rounded-lg hover:bg-blue-50 transition-colors card-blue-frame"
           >
             <div className="w-10 h-10 rounded-lg bg-gray-600 flex items-center justify-center">
               <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
