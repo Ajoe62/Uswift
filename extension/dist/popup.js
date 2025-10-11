@@ -4,6 +4,10 @@ function getDefaultExportFromCjs (x) {
 	return x && x.__esModule && Object.prototype.hasOwnProperty.call(x, 'default') ? x['default'] : x;
 }
 
+var jsxRuntime = {exports: {}};
+
+var reactJsxRuntime_production_min = {};
+
 var react = {exports: {}};
 
 var react_production_min = {};
@@ -17,20 +21,20 @@ var react_production_min = {};
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  */
-var l=Symbol.for("react.element"),n=Symbol.for("react.portal"),p$1=Symbol.for("react.fragment"),q=Symbol.for("react.strict_mode"),r=Symbol.for("react.profiler"),t=Symbol.for("react.provider"),u=Symbol.for("react.context"),v$1=Symbol.for("react.forward_ref"),w=Symbol.for("react.suspense"),x=Symbol.for("react.memo"),y=Symbol.for("react.lazy"),z$1=Symbol.iterator;function A$1(a){if(null===a||"object"!==typeof a)return null;a=z$1&&a[z$1]||a["@@iterator"];return "function"===typeof a?a:null}
+var l$1=Symbol.for("react.element"),n$1=Symbol.for("react.portal"),p$2=Symbol.for("react.fragment"),q$1=Symbol.for("react.strict_mode"),r=Symbol.for("react.profiler"),t=Symbol.for("react.provider"),u=Symbol.for("react.context"),v$1=Symbol.for("react.forward_ref"),w=Symbol.for("react.suspense"),x=Symbol.for("react.memo"),y=Symbol.for("react.lazy"),z$1=Symbol.iterator;function A$1(a){if(null===a||"object"!==typeof a)return null;a=z$1&&a[z$1]||a["@@iterator"];return "function"===typeof a?a:null}
 var B$1={isMounted:function(){return !1},enqueueForceUpdate:function(){},enqueueReplaceState:function(){},enqueueSetState:function(){}},C$1=Object.assign,D$1={};function E$1(a,b,e){this.props=a;this.context=b;this.refs=D$1;this.updater=e||B$1;}E$1.prototype.isReactComponent={};
 E$1.prototype.setState=function(a,b){if("object"!==typeof a&&"function"!==typeof a&&null!=a)throw Error("setState(...): takes an object of state variables to update or a function which returns an object of state variables.");this.updater.enqueueSetState(this,a,b,"setState");};E$1.prototype.forceUpdate=function(a){this.updater.enqueueForceUpdate(this,a,"forceUpdate");};function F(){}F.prototype=E$1.prototype;function G$1(a,b,e){this.props=a;this.context=b;this.refs=D$1;this.updater=e||B$1;}var H$1=G$1.prototype=new F;
 H$1.constructor=G$1;C$1(H$1,E$1.prototype);H$1.isPureReactComponent=!0;var I$1=Array.isArray,J=Object.prototype.hasOwnProperty,K$1={current:null},L$1={key:!0,ref:!0,__self:!0,__source:!0};
-function M$1(a,b,e){var d,c={},k=null,h=null;if(null!=b)for(d in void 0!==b.ref&&(h=b.ref),void 0!==b.key&&(k=""+b.key),b)J.call(b,d)&&!L$1.hasOwnProperty(d)&&(c[d]=b[d]);var g=arguments.length-2;if(1===g)c.children=e;else if(1<g){for(var f=Array(g),m=0;m<g;m++)f[m]=arguments[m+2];c.children=f;}if(a&&a.defaultProps)for(d in g=a.defaultProps,g)void 0===c[d]&&(c[d]=g[d]);return {$$typeof:l,type:a,key:k,ref:h,props:c,_owner:K$1.current}}
-function N$1(a,b){return {$$typeof:l,type:a.type,key:b,ref:a.ref,props:a.props,_owner:a._owner}}function O$1(a){return "object"===typeof a&&null!==a&&a.$$typeof===l}function escape(a){var b={"=":"=0",":":"=2"};return "$"+a.replace(/[=:]/g,function(a){return b[a]})}var P$1=/\/+/g;function Q$1(a,b){return "object"===typeof a&&null!==a&&null!=a.key?escape(""+a.key):b.toString(36)}
-function R$1(a,b,e,d,c){var k=typeof a;if("undefined"===k||"boolean"===k)a=null;var h=!1;if(null===a)h=!0;else switch(k){case "string":case "number":h=!0;break;case "object":switch(a.$$typeof){case l:case n:h=!0;}}if(h)return h=a,c=c(h),a=""===d?"."+Q$1(h,0):d,I$1(c)?(e="",null!=a&&(e=a.replace(P$1,"$&/")+"/"),R$1(c,b,e,"",function(a){return a})):null!=c&&(O$1(c)&&(c=N$1(c,e+(!c.key||h&&h.key===c.key?"":(""+c.key).replace(P$1,"$&/")+"/")+a)),b.push(c)),1;h=0;d=""===d?".":d+":";if(I$1(a))for(var g=0;g<a.length;g++){k=
+function M$1(a,b,e){var d,c={},k=null,h=null;if(null!=b)for(d in void 0!==b.ref&&(h=b.ref),void 0!==b.key&&(k=""+b.key),b)J.call(b,d)&&!L$1.hasOwnProperty(d)&&(c[d]=b[d]);var g=arguments.length-2;if(1===g)c.children=e;else if(1<g){for(var f=Array(g),m=0;m<g;m++)f[m]=arguments[m+2];c.children=f;}if(a&&a.defaultProps)for(d in g=a.defaultProps,g)void 0===c[d]&&(c[d]=g[d]);return {$$typeof:l$1,type:a,key:k,ref:h,props:c,_owner:K$1.current}}
+function N$1(a,b){return {$$typeof:l$1,type:a.type,key:b,ref:a.ref,props:a.props,_owner:a._owner}}function O$1(a){return "object"===typeof a&&null!==a&&a.$$typeof===l$1}function escape(a){var b={"=":"=0",":":"=2"};return "$"+a.replace(/[=:]/g,function(a){return b[a]})}var P$1=/\/+/g;function Q$1(a,b){return "object"===typeof a&&null!==a&&null!=a.key?escape(""+a.key):b.toString(36)}
+function R$1(a,b,e,d,c){var k=typeof a;if("undefined"===k||"boolean"===k)a=null;var h=!1;if(null===a)h=!0;else switch(k){case "string":case "number":h=!0;break;case "object":switch(a.$$typeof){case l$1:case n$1:h=!0;}}if(h)return h=a,c=c(h),a=""===d?"."+Q$1(h,0):d,I$1(c)?(e="",null!=a&&(e=a.replace(P$1,"$&/")+"/"),R$1(c,b,e,"",function(a){return a})):null!=c&&(O$1(c)&&(c=N$1(c,e+(!c.key||h&&h.key===c.key?"":(""+c.key).replace(P$1,"$&/")+"/")+a)),b.push(c)),1;h=0;d=""===d?".":d+":";if(I$1(a))for(var g=0;g<a.length;g++){k=
 a[g];var f=d+Q$1(k,g);h+=R$1(k,b,e,f,c);}else if(f=A$1(a),"function"===typeof f)for(a=f.call(a),g=0;!(k=a.next()).done;)k=k.value,f=d+Q$1(k,g++),h+=R$1(k,b,e,f,c);else if("object"===k)throw b=String(a),Error("Objects are not valid as a React child (found: "+("[object Object]"===b?"object with keys {"+Object.keys(a).join(", ")+"}":b)+"). If you meant to render a collection of children, use an array instead.");return h}
 function S$1(a,b,e){if(null==a)return a;var d=[],c=0;R$1(a,d,"","",function(a){return b.call(e,a,c++)});return d}function T$1(a){if(-1===a._status){var b=a._result;b=b();b.then(function(b){if(0===a._status||-1===a._status)a._status=1,a._result=b;},function(b){if(0===a._status||-1===a._status)a._status=2,a._result=b;});-1===a._status&&(a._status=0,a._result=b);}if(1===a._status)return a._result.default;throw a._result;}
 var U$1={current:null},V$1={transition:null},W$1={ReactCurrentDispatcher:U$1,ReactCurrentBatchConfig:V$1,ReactCurrentOwner:K$1};function X$1(){throw Error("act(...) is not supported in production builds of React.");}
-react_production_min.Children={map:S$1,forEach:function(a,b,e){S$1(a,function(){b.apply(this,arguments);},e);},count:function(a){var b=0;S$1(a,function(){b++;});return b},toArray:function(a){return S$1(a,function(a){return a})||[]},only:function(a){if(!O$1(a))throw Error("React.Children.only expected to receive a single React element child.");return a}};react_production_min.Component=E$1;react_production_min.Fragment=p$1;react_production_min.Profiler=r;react_production_min.PureComponent=G$1;react_production_min.StrictMode=q;react_production_min.Suspense=w;
+react_production_min.Children={map:S$1,forEach:function(a,b,e){S$1(a,function(){b.apply(this,arguments);},e);},count:function(a){var b=0;S$1(a,function(){b++;});return b},toArray:function(a){return S$1(a,function(a){return a})||[]},only:function(a){if(!O$1(a))throw Error("React.Children.only expected to receive a single React element child.");return a}};react_production_min.Component=E$1;react_production_min.Fragment=p$2;react_production_min.Profiler=r;react_production_min.PureComponent=G$1;react_production_min.StrictMode=q$1;react_production_min.Suspense=w;
 react_production_min.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED=W$1;react_production_min.act=X$1;
 react_production_min.cloneElement=function(a,b,e){if(null===a||void 0===a)throw Error("React.cloneElement(...): The argument must be a React element, but you passed "+a+".");var d=C$1({},a.props),c=a.key,k=a.ref,h=a._owner;if(null!=b){void 0!==b.ref&&(k=b.ref,h=K$1.current);void 0!==b.key&&(c=""+b.key);if(a.type&&a.type.defaultProps)var g=a.type.defaultProps;for(f in b)J.call(b,f)&&!L$1.hasOwnProperty(f)&&(d[f]=void 0===b[f]&&void 0!==g?g[f]:b[f]);}var f=arguments.length-2;if(1===f)d.children=e;else if(1<f){g=Array(f);
-for(var m=0;m<f;m++)g[m]=arguments[m+2];d.children=g;}return {$$typeof:l,type:a.type,key:c,ref:k,props:d,_owner:h}};react_production_min.createContext=function(a){a={$$typeof:u,_currentValue:a,_currentValue2:a,_threadCount:0,Provider:null,Consumer:null,_defaultValue:null,_globalName:null};a.Provider={$$typeof:t,_context:a};return a.Consumer=a};react_production_min.createElement=M$1;react_production_min.createFactory=function(a){var b=M$1.bind(null,a);b.type=a;return b};react_production_min.createRef=function(){return {current:null}};
+for(var m=0;m<f;m++)g[m]=arguments[m+2];d.children=g;}return {$$typeof:l$1,type:a.type,key:c,ref:k,props:d,_owner:h}};react_production_min.createContext=function(a){a={$$typeof:u,_currentValue:a,_currentValue2:a,_threadCount:0,Provider:null,Consumer:null,_defaultValue:null,_globalName:null};a.Provider={$$typeof:t,_context:a};return a.Consumer=a};react_production_min.createElement=M$1;react_production_min.createFactory=function(a){var b=M$1.bind(null,a);b.type=a;return b};react_production_min.createRef=function(){return {current:null}};
 react_production_min.forwardRef=function(a){return {$$typeof:v$1,render:a}};react_production_min.isValidElement=O$1;react_production_min.lazy=function(a){return {$$typeof:y,_payload:{_status:-1,_result:a},_init:T$1}};react_production_min.memo=function(a,b){return {$$typeof:x,type:a,compare:void 0===b?null:b}};react_production_min.startTransition=function(a){var b=V$1.transition;V$1.transition={};try{a();}finally{V$1.transition=b;}};react_production_min.unstable_act=X$1;react_production_min.useCallback=function(a,b){return U$1.current.useCallback(a,b)};react_production_min.useContext=function(a){return U$1.current.useContext(a)};
 react_production_min.useDebugValue=function(){};react_production_min.useDeferredValue=function(a){return U$1.current.useDeferredValue(a)};react_production_min.useEffect=function(a,b){return U$1.current.useEffect(a,b)};react_production_min.useId=function(){return U$1.current.useId()};react_production_min.useImperativeHandle=function(a,b,e){return U$1.current.useImperativeHandle(a,b,e)};react_production_min.useInsertionEffect=function(a,b){return U$1.current.useInsertionEffect(a,b)};react_production_min.useLayoutEffect=function(a,b){return U$1.current.useLayoutEffect(a,b)};
 react_production_min.useMemo=function(a,b){return U$1.current.useMemo(a,b)};react_production_min.useReducer=function(a,b,e){return U$1.current.useReducer(a,b,e)};react_production_min.useRef=function(a){return U$1.current.useRef(a)};react_production_min.useState=function(a){return U$1.current.useState(a)};react_production_min.useSyncExternalStore=function(a,b,e){return U$1.current.useSyncExternalStore(a,b,e)};react_production_min.useTransition=function(){return U$1.current.useTransition()};react_production_min.version="18.3.1";
@@ -41,6 +45,24 @@ react_production_min.useMemo=function(a,b){return U$1.current.useMemo(a,b)};reac
 
 var reactExports = react.exports;
 const React = /*@__PURE__*/getDefaultExportFromCjs(reactExports);
+
+/**
+ * @license React
+ * react-jsx-runtime.production.min.js
+ *
+ * Copyright (c) Facebook, Inc. and its affiliates.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+var f=reactExports,k=Symbol.for("react.element"),l=Symbol.for("react.fragment"),m$1=Object.prototype.hasOwnProperty,n=f.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED.ReactCurrentOwner,p$1={key:!0,ref:!0,__self:!0,__source:!0};
+function q(c,a,g){var b,d={},e=null,h=null;void 0!==g&&(e=""+g);void 0!==a.key&&(e=""+a.key);void 0!==a.ref&&(h=a.ref);for(b in a)m$1.call(a,b)&&!p$1.hasOwnProperty(b)&&(d[b]=a[b]);if(c&&c.defaultProps)for(b in a=c.defaultProps,a)void 0===d[b]&&(d[b]=a[b]);return {$$typeof:k,type:c,key:e,ref:h,props:d,_owner:n.current}}reactJsxRuntime_production_min.Fragment=l;reactJsxRuntime_production_min.jsx=q;reactJsxRuntime_production_min.jsxs=q;
+
+{
+  jsxRuntime.exports = reactJsxRuntime_production_min;
+}
+
+var jsxRuntimeExports = jsxRuntime.exports;
 
 var client = {};
 
@@ -746,224 +768,377 @@ function ProfileVault() {
     }
   }, [isAuthenticated, user]);
   const TourGuide = () => {
-    return /* @__PURE__ */ React.createElement("div", { style: {
+    return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: {
       background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
       color: "white",
       padding: "1.5rem",
       borderRadius: "1rem",
       marginBottom: "1.5rem",
       position: "relative"
-    } }, /* @__PURE__ */ React.createElement("div", { style: {
-      position: "absolute",
-      top: "10px",
-      right: "10px",
-      cursor: "pointer",
-      fontSize: "1.2rem"
-    }, onClick: () => setShowTour(false) }, "✕"), /* @__PURE__ */ React.createElement("h3", { style: { margin: "0 0 1rem 0", fontSize: "1.2rem" } }, "🚀 Auto-Apply Setup Guide"), /* @__PURE__ */ React.createElement("div", { style: { fontSize: "0.9rem", lineHeight: "1.5" } }, /* @__PURE__ */ React.createElement("div", { style: { marginBottom: "1rem" } }, /* @__PURE__ */ React.createElement("strong", null, "📋 Required Information:"), /* @__PURE__ */ React.createElement("ul", { style: { margin: "0.5rem 0", paddingLeft: "1.2rem" } }, /* @__PURE__ */ React.createElement("li", null, /* @__PURE__ */ React.createElement("strong", null, "Basic Info:"), " First Name, Last Name, Email, Phone"), /* @__PURE__ */ React.createElement("li", null, /* @__PURE__ */ React.createElement("strong", null, "Resume:"), " Upload your resume file (PDF/DOC)"))), /* @__PURE__ */ React.createElement("div", { style: { marginBottom: "1rem" } }, /* @__PURE__ */ React.createElement("strong", null, "📝 Optional but Recommended:"), /* @__PURE__ */ React.createElement("ul", { style: { margin: "0.5rem 0", paddingLeft: "1.2rem" } }, /* @__PURE__ */ React.createElement("li", null, /* @__PURE__ */ React.createElement("strong", null, "Cover Letter:"), " Template or custom content"), /* @__PURE__ */ React.createElement("li", null, /* @__PURE__ */ React.createElement("strong", null, "LinkedIn:"), " Your LinkedIn profile URL"), /* @__PURE__ */ React.createElement("li", null, /* @__PURE__ */ React.createElement("strong", null, "Portfolio:"), " Website or portfolio link"), /* @__PURE__ */ React.createElement("li", null, /* @__PURE__ */ React.createElement("strong", null, "Q&A Profile:"), " Interview answers and skills"))), /* @__PURE__ */ React.createElement("div", { style: { marginBottom: "1rem" } }, /* @__PURE__ */ React.createElement("strong", null, "🎯 How Auto-Apply Works:"), /* @__PURE__ */ React.createElement("ol", { style: { margin: "0.5rem 0", paddingLeft: "1.2rem" } }, /* @__PURE__ */ React.createElement("li", null, "Opens job application page"), /* @__PURE__ */ React.createElement("li", null, "Detects form fields automatically"), /* @__PURE__ */ React.createElement("li", null, "Fills your information"), /* @__PURE__ */ React.createElement("li", null, "Uploads your resume"), /* @__PURE__ */ React.createElement("li", null, "Submits the application"))), /* @__PURE__ */ React.createElement("div", { style: { marginTop: "1rem", padding: "0.8rem", background: "rgba(255,255,255,0.1)", borderRadius: "8px" } }, /* @__PURE__ */ React.createElement("strong", null, "💡 Pro Tip:"), " Complete all required fields to ensure successful auto-application on all major job boards!")));
-  };
-  return /* @__PURE__ */ React.createElement("div", { style: { background: "#FFFFFF", borderRadius: "1.5rem", padding: "2rem" } }, /* @__PURE__ */ React.createElement("div", { className: "uswift-gradient", style: { height: 8, borderRadius: 8, marginBottom: 24 } }), /* @__PURE__ */ React.createElement("div", { style: {
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 16
-  } }, /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("h2", { className: "uswift-text-gradient", style: { fontSize: "1.5rem", margin: 0 } }, "Profile Vault"), /* @__PURE__ */ React.createElement("p", { style: { color: "#6B7280", fontSize: "0.9rem", margin: "4px 0 0 0" } }, "Manage your career documents and auto-apply settings")), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", gap: "12px" } }, lastSaved && /* @__PURE__ */ React.createElement("span", { style: { fontSize: "0.8rem", color: "#10B981" } }, "✓ Saved ", lastSaved), /* @__PURE__ */ React.createElement(
-    "button",
-    {
-      onClick: () => setShowTour(!showTour),
-      style: {
-        background: "#F3F4F6",
-        border: "1px solid #E5E7EB",
-        borderRadius: "8px",
-        padding: "8px 12px",
-        fontSize: "0.8rem",
+    }, children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { style: {
+        position: "absolute",
+        top: "10px",
+        right: "10px",
         cursor: "pointer",
-        color: "#374151"
+        fontSize: "1.2rem"
+      }, onClick: () => setShowTour(false), children: "✕" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { style: { margin: "0 0 1rem 0", fontSize: "1.2rem" }, children: "🚀 Auto-Apply Setup Guide" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { fontSize: "0.9rem", lineHeight: "1.5" }, children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { marginBottom: "1rem" }, children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "📋 Required Information:" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("ul", { style: { margin: "0.5rem 0", paddingLeft: "1.2rem" }, children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Basic Info:" }),
+              " First Name, Last Name, Email, Phone"
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Resume:" }),
+              " Upload your resume file (PDF/DOC)"
+            ] })
+          ] })
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { marginBottom: "1rem" }, children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "📝 Optional but Recommended:" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("ul", { style: { margin: "0.5rem 0", paddingLeft: "1.2rem" }, children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Cover Letter:" }),
+              " Template or custom content"
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "LinkedIn:" }),
+              " Your LinkedIn profile URL"
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Portfolio:" }),
+              " Website or portfolio link"
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Q&A Profile:" }),
+              " Interview answers and skills"
+            ] })
+          ] })
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { marginBottom: "1rem" }, children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "🎯 How Auto-Apply Works:" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("ol", { style: { margin: "0.5rem 0", paddingLeft: "1.2rem" }, children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Opens job application page" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Detects form fields automatically" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Fills your information" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Uploads your resume" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Submits the application" })
+          ] })
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { marginTop: "1rem", padding: "0.8rem", background: "rgba(255,255,255,0.1)", borderRadius: "8px" }, children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "💡 Pro Tip:" }),
+          " Complete all required fields to ensure successful auto-application on all major job boards!"
+        ] })
+      ] })
+    ] });
+  };
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { background: "#FFFFFF", borderRadius: "1.5rem", padding: "2rem" }, children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "uswift-gradient", style: { height: 8, borderRadius: 8, marginBottom: 24 } }),
+    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: {
+      display: "flex",
+      justifyContent: "space-between",
+      alignItems: "center",
+      marginBottom: 16
+    }, children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("h2", { className: "uswift-text-gradient", style: { fontSize: "1.5rem", margin: 0 }, children: "Profile Vault" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { style: { color: "#6B7280", fontSize: "0.9rem", margin: "4px 0 0 0" }, children: "Manage your career documents and auto-apply settings" })
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { display: "flex", alignItems: "center", gap: "12px" }, children: [
+        lastSaved && /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { style: { fontSize: "0.8rem", color: "#10B981" }, children: [
+          "✓ Saved ",
+          lastSaved
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          "button",
+          {
+            onClick: () => setShowTour(!showTour),
+            style: {
+              background: "#F3F4F6",
+              border: "1px solid #E5E7EB",
+              borderRadius: "8px",
+              padding: "8px 12px",
+              fontSize: "0.8rem",
+              cursor: "pointer",
+              color: "#374151"
+            },
+            children: "❓ Guide"
+          }
+        )
+      ] })
+    ] }),
+    showTour && /* @__PURE__ */ jsxRuntimeExports.jsx(TourGuide, {}),
+    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { marginBottom: "1.5rem" }, children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("h3", { style: { fontSize: "1.1rem", fontWeight: 600, color: "#111827", marginBottom: "1rem", display: "flex", alignItems: "center", gap: "8px" }, children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { style: { color: "#EF4444" }, children: "●" }),
+        "Required for Auto-Apply"
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem", marginBottom: "1rem" }, children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "uswift-card", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("label", { style: { fontWeight: 600, display: "block", marginBottom: 8 }, children: "First Name *" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            "input",
+            {
+              type: "text",
+              value: firstName,
+              onChange: (e) => setFirstName(e.target.value),
+              style: {
+                width: "100%",
+                padding: "8px 12px",
+                borderRadius: 8,
+                border: "1px solid #E5E7EB",
+                fontSize: "0.9rem"
+              },
+              placeholder: "Your first name",
+              disabled: loading
+            }
+          )
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "uswift-card", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("label", { style: { fontWeight: 600, display: "block", marginBottom: 8 }, children: "Last Name *" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            "input",
+            {
+              type: "text",
+              value: lastName,
+              onChange: (e) => setLastName(e.target.value),
+              style: {
+                width: "100%",
+                padding: "8px 12px",
+                borderRadius: 8,
+                border: "1px solid #E5E7EB",
+                fontSize: "0.9rem"
+              },
+              placeholder: "Your last name",
+              disabled: loading
+            }
+          )
+        ] })
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { display: "grid", gridTemplateColumns: "2fr 1fr", gap: "1rem", marginBottom: "1rem" }, children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "uswift-card", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("label", { style: { fontWeight: 600, display: "block", marginBottom: 8 }, children: "Email Address *" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            "input",
+            {
+              type: "email",
+              value: email,
+              onChange: (e) => setEmail(e.target.value),
+              style: {
+                width: "100%",
+                padding: "8px 12px",
+                borderRadius: 8,
+                border: "1px solid #E5E7EB",
+                fontSize: "0.9rem"
+              },
+              placeholder: "your.email@example.com",
+              disabled: loading
+            }
+          )
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "uswift-card", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("label", { style: { fontWeight: 600, display: "block", marginBottom: 8 }, children: "Phone Number *" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            "input",
+            {
+              type: "tel",
+              value: phone,
+              onChange: (e) => setPhone(e.target.value),
+              style: {
+                width: "100%",
+                padding: "8px 12px",
+                borderRadius: 8,
+                border: "1px solid #E5E7EB",
+                fontSize: "0.9rem"
+              },
+              placeholder: "+1 (555) 123-4567",
+              disabled: loading
+            }
+          )
+        ] })
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "uswift-card", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("label", { style: { fontWeight: 600, display: "block", marginBottom: 8 }, children: "Resume File *" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { display: "flex", alignItems: "center", gap: "12px" }, children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            "input",
+            {
+              type: "file",
+              accept: ".pdf,.doc,.docx",
+              onChange: handleResumeFileUpload,
+              style: {
+                flex: 1,
+                padding: "8px",
+                borderRadius: 8,
+                border: "1px solid #E5E7EB",
+                fontSize: "0.9rem"
+              },
+              disabled: loading
+            }
+          ),
+          resumeFile && /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { style: { color: "#10B981", fontSize: "0.8rem", fontWeight: 500 }, children: [
+            "✓ ",
+            resumeFile.name
+          ] })
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("small", { style: { color: "#6B7280", fontSize: "0.8rem", marginTop: "4px", display: "block" }, children: "Supported formats: PDF, DOC, DOCX (Max 10MB)" })
+      ] })
+    ] }),
+    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { marginBottom: "1.5rem" }, children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("h3", { style: { fontSize: "1.1rem", fontWeight: 600, color: "#111827", marginBottom: "1rem", display: "flex", alignItems: "center", gap: "8px" }, children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { style: { color: "#F59E0B" }, children: "●" }),
+        "Optional (Recommended)"
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem", marginBottom: "1rem" }, children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "uswift-card", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("label", { style: { fontWeight: 600, display: "block", marginBottom: 8 }, children: "LinkedIn Profile" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            "input",
+            {
+              type: "url",
+              value: linkedin,
+              onChange: (e) => setLinkedin(e.target.value),
+              style: {
+                width: "100%",
+                padding: "8px 12px",
+                borderRadius: 8,
+                border: "1px solid #E5E7EB",
+                fontSize: "0.9rem"
+              },
+              placeholder: "https://linkedin.com/in/yourprofile",
+              disabled: loading
+            }
+          )
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "uswift-card", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("label", { style: { fontWeight: 600, display: "block", marginBottom: 8 }, children: "Portfolio/Website" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            "input",
+            {
+              type: "url",
+              value: portfolio,
+              onChange: (e) => setPortfolio(e.target.value),
+              style: {
+                width: "100%",
+                padding: "8px 12px",
+                borderRadius: 8,
+                border: "1px solid #E5E7EB",
+                fontSize: "0.9rem"
+              },
+              placeholder: "https://yourportfolio.com",
+              disabled: loading
+            }
+          )
+        ] })
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "uswift-card", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("label", { style: { fontWeight: 600, display: "block", marginBottom: 8 }, children: "Cover Letter Template" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          "textarea",
+          {
+            value: coverLetter,
+            onChange: (e) => setCoverLetter(e.target.value),
+            rows: 4,
+            style: {
+              width: "100%",
+              padding: "8px 12px",
+              borderRadius: 8,
+              border: "1px solid #E5E7EB",
+              fontSize: "0.9rem",
+              resize: "vertical"
+            },
+            placeholder: "Write your cover letter template here. Use [COMPANY] and [POSITION] as placeholders...",
+            disabled: loading
+          }
+        ),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("small", { style: { color: "#6B7280", fontSize: "0.8rem", marginTop: "4px", display: "block" }, children: "Tip: Use placeholders like [COMPANY] and [POSITION] for auto-customization" })
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "uswift-card", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("label", { style: { fontWeight: 600, display: "block", marginBottom: 8 }, children: "Interview Q&A Profile" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          "textarea",
+          {
+            value: qaProfile,
+            onChange: (e) => setQaProfile(e.target.value),
+            rows: 4,
+            style: {
+              width: "100%",
+              padding: "8px 12px",
+              borderRadius: 8,
+              border: "1px solid #E5E7EB",
+              fontSize: "0.9rem",
+              resize: "vertical"
+            },
+            placeholder: "List your key skills, experience highlights, and common interview answers...",
+            disabled: loading
+          }
+        ),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("small", { style: { color: "#6B7280", fontSize: "0.8rem", marginTop: "4px", display: "block" }, children: "Used by AI interview preparation features" })
+      ] })
+    ] }),
+    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: {
+      marginTop: "1.5rem",
+      padding: "1rem",
+      borderRadius: "8px",
+      background: isProfileCompleteForAutoApply() ? "linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(16, 185, 129, 0.05) 100%)" : "linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(245, 158, 11, 0.05) 100%)",
+      border: `1px solid ${isProfileCompleteForAutoApply() ? "#10B981" : "#F59E0B"}`
+    }, children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { display: "flex", alignItems: "center", gap: "8px", marginBottom: "0.5rem" }, children: [
+        isProfileCompleteForAutoApply() ? /* @__PURE__ */ jsxRuntimeExports.jsx("span", { style: { color: "#10B981", fontSize: "1.2rem" }, children: "✅" }) : /* @__PURE__ */ jsxRuntimeExports.jsx("span", { style: { color: "#F59E0B", fontSize: "1.2rem" }, children: "⚠️" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { style: { fontWeight: 600, color: "#111827" }, children: [
+          "Auto-Apply Status: ",
+          isProfileCompleteForAutoApply() ? "Ready" : "Incomplete"
+        ] })
+      ] }),
+      isProfileCompleteForAutoApply() ? /* @__PURE__ */ jsxRuntimeExports.jsx("p", { style: { color: "#10B981", fontSize: "0.9rem", margin: 0 }, children: "🎉 Your profile is complete! You can now use auto-apply on supported job boards." }) : /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { fontSize: "0.9rem", color: "#92400E" }, children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { style: { margin: "0 0 0.5rem 0", fontWeight: 500 }, children: "Complete these fields to enable auto-apply:" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("ul", { style: { margin: 0, paddingLeft: "1.2rem" }, children: [
+          !firstName.trim() && /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "First Name" }),
+          !lastName.trim() && /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Last Name" }),
+          !email.trim() && /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Email Address" }),
+          !phone.trim() && /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Phone Number" }),
+          !resume.trim() && /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Resume File" })
+        ] })
+      ] })
+    ] }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(
+      "button",
+      {
+        className: "uswift-btn",
+        style: { marginTop: 16, opacity: loading ? 0.6 : 1 },
+        onClick: saveProfile,
+        disabled: loading,
+        children: loading ? "Saving..." : isAuthenticated ? "Save to Cloud" : "Save Locally"
       }
-    },
-    "❓ Guide"
-  ))), showTour && /* @__PURE__ */ React.createElement(TourGuide, null), /* @__PURE__ */ React.createElement("div", { style: { marginBottom: "1.5rem" } }, /* @__PURE__ */ React.createElement("h3", { style: { fontSize: "1.1rem", fontWeight: 600, color: "#111827", marginBottom: "1rem", display: "flex", alignItems: "center", gap: "8px" } }, /* @__PURE__ */ React.createElement("span", { style: { color: "#EF4444" } }, "●"), "Required for Auto-Apply"), /* @__PURE__ */ React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem", marginBottom: "1rem" } }, /* @__PURE__ */ React.createElement("div", { className: "uswift-card" }, /* @__PURE__ */ React.createElement("label", { style: { fontWeight: 600, display: "block", marginBottom: 8 } }, "First Name *"), /* @__PURE__ */ React.createElement(
-    "input",
-    {
-      type: "text",
-      value: firstName,
-      onChange: (e) => setFirstName(e.target.value),
-      style: {
-        width: "100%",
-        padding: "8px 12px",
-        borderRadius: 8,
-        border: "1px solid #E5E7EB",
-        fontSize: "0.9rem"
-      },
-      placeholder: "Your first name",
-      disabled: loading
-    }
-  )), /* @__PURE__ */ React.createElement("div", { className: "uswift-card" }, /* @__PURE__ */ React.createElement("label", { style: { fontWeight: 600, display: "block", marginBottom: 8 } }, "Last Name *"), /* @__PURE__ */ React.createElement(
-    "input",
-    {
-      type: "text",
-      value: lastName,
-      onChange: (e) => setLastName(e.target.value),
-      style: {
-        width: "100%",
-        padding: "8px 12px",
-        borderRadius: 8,
-        border: "1px solid #E5E7EB",
-        fontSize: "0.9rem"
-      },
-      placeholder: "Your last name",
-      disabled: loading
-    }
-  ))), /* @__PURE__ */ React.createElement("div", { style: { display: "grid", gridTemplateColumns: "2fr 1fr", gap: "1rem", marginBottom: "1rem" } }, /* @__PURE__ */ React.createElement("div", { className: "uswift-card" }, /* @__PURE__ */ React.createElement("label", { style: { fontWeight: 600, display: "block", marginBottom: 8 } }, "Email Address *"), /* @__PURE__ */ React.createElement(
-    "input",
-    {
-      type: "email",
-      value: email,
-      onChange: (e) => setEmail(e.target.value),
-      style: {
-        width: "100%",
-        padding: "8px 12px",
-        borderRadius: 8,
-        border: "1px solid #E5E7EB",
-        fontSize: "0.9rem"
-      },
-      placeholder: "your.email@example.com",
-      disabled: loading
-    }
-  )), /* @__PURE__ */ React.createElement("div", { className: "uswift-card" }, /* @__PURE__ */ React.createElement("label", { style: { fontWeight: 600, display: "block", marginBottom: 8 } }, "Phone Number *"), /* @__PURE__ */ React.createElement(
-    "input",
-    {
-      type: "tel",
-      value: phone,
-      onChange: (e) => setPhone(e.target.value),
-      style: {
-        width: "100%",
-        padding: "8px 12px",
-        borderRadius: 8,
-        border: "1px solid #E5E7EB",
-        fontSize: "0.9rem"
-      },
-      placeholder: "+1 (555) 123-4567",
-      disabled: loading
-    }
-  ))), /* @__PURE__ */ React.createElement("div", { className: "uswift-card" }, /* @__PURE__ */ React.createElement("label", { style: { fontWeight: 600, display: "block", marginBottom: 8 } }, "Resume File *"), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", gap: "12px" } }, /* @__PURE__ */ React.createElement(
-    "input",
-    {
-      type: "file",
-      accept: ".pdf,.doc,.docx",
-      onChange: handleResumeFileUpload,
-      style: {
-        flex: 1,
-        padding: "8px",
-        borderRadius: 8,
-        border: "1px solid #E5E7EB",
-        fontSize: "0.9rem"
-      },
-      disabled: loading
-    }
-  ), resumeFile && /* @__PURE__ */ React.createElement("span", { style: { color: "#10B981", fontSize: "0.8rem", fontWeight: 500 } }, "✓ ", resumeFile.name)), /* @__PURE__ */ React.createElement("small", { style: { color: "#6B7280", fontSize: "0.8rem", marginTop: "4px", display: "block" } }, "Supported formats: PDF, DOC, DOCX (Max 10MB)"))), /* @__PURE__ */ React.createElement("div", { style: { marginBottom: "1.5rem" } }, /* @__PURE__ */ React.createElement("h3", { style: { fontSize: "1.1rem", fontWeight: 600, color: "#111827", marginBottom: "1rem", display: "flex", alignItems: "center", gap: "8px" } }, /* @__PURE__ */ React.createElement("span", { style: { color: "#F59E0B" } }, "●"), "Optional (Recommended)"), /* @__PURE__ */ React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem", marginBottom: "1rem" } }, /* @__PURE__ */ React.createElement("div", { className: "uswift-card" }, /* @__PURE__ */ React.createElement("label", { style: { fontWeight: 600, display: "block", marginBottom: 8 } }, "LinkedIn Profile"), /* @__PURE__ */ React.createElement(
-    "input",
-    {
-      type: "url",
-      value: linkedin,
-      onChange: (e) => setLinkedin(e.target.value),
-      style: {
-        width: "100%",
-        padding: "8px 12px",
-        borderRadius: 8,
-        border: "1px solid #E5E7EB",
-        fontSize: "0.9rem"
-      },
-      placeholder: "https://linkedin.com/in/yourprofile",
-      disabled: loading
-    }
-  )), /* @__PURE__ */ React.createElement("div", { className: "uswift-card" }, /* @__PURE__ */ React.createElement("label", { style: { fontWeight: 600, display: "block", marginBottom: 8 } }, "Portfolio/Website"), /* @__PURE__ */ React.createElement(
-    "input",
-    {
-      type: "url",
-      value: portfolio,
-      onChange: (e) => setPortfolio(e.target.value),
-      style: {
-        width: "100%",
-        padding: "8px 12px",
-        borderRadius: 8,
-        border: "1px solid #E5E7EB",
-        fontSize: "0.9rem"
-      },
-      placeholder: "https://yourportfolio.com",
-      disabled: loading
-    }
-  ))), /* @__PURE__ */ React.createElement("div", { className: "uswift-card" }, /* @__PURE__ */ React.createElement("label", { style: { fontWeight: 600, display: "block", marginBottom: 8 } }, "Cover Letter Template"), /* @__PURE__ */ React.createElement(
-    "textarea",
-    {
-      value: coverLetter,
-      onChange: (e) => setCoverLetter(e.target.value),
-      rows: 4,
-      style: {
-        width: "100%",
-        padding: "8px 12px",
-        borderRadius: 8,
-        border: "1px solid #E5E7EB",
-        fontSize: "0.9rem",
-        resize: "vertical"
-      },
-      placeholder: "Write your cover letter template here. Use [COMPANY] and [POSITION] as placeholders...",
-      disabled: loading
-    }
-  ), /* @__PURE__ */ React.createElement("small", { style: { color: "#6B7280", fontSize: "0.8rem", marginTop: "4px", display: "block" } }, "Tip: Use placeholders like [COMPANY] and [POSITION] for auto-customization")), /* @__PURE__ */ React.createElement("div", { className: "uswift-card" }, /* @__PURE__ */ React.createElement("label", { style: { fontWeight: 600, display: "block", marginBottom: 8 } }, "Interview Q&A Profile"), /* @__PURE__ */ React.createElement(
-    "textarea",
-    {
-      value: qaProfile,
-      onChange: (e) => setQaProfile(e.target.value),
-      rows: 4,
-      style: {
-        width: "100%",
-        padding: "8px 12px",
-        borderRadius: 8,
-        border: "1px solid #E5E7EB",
-        fontSize: "0.9rem",
-        resize: "vertical"
-      },
-      placeholder: "List your key skills, experience highlights, and common interview answers...",
-      disabled: loading
-    }
-  ), /* @__PURE__ */ React.createElement("small", { style: { color: "#6B7280", fontSize: "0.8rem", marginTop: "4px", display: "block" } }, "Used by AI interview preparation features"))), /* @__PURE__ */ React.createElement("div", { style: {
-    marginTop: "1.5rem",
-    padding: "1rem",
-    borderRadius: "8px",
-    background: isProfileCompleteForAutoApply() ? "linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(16, 185, 129, 0.05) 100%)" : "linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(245, 158, 11, 0.05) 100%)",
-    border: `1px solid ${isProfileCompleteForAutoApply() ? "#10B981" : "#F59E0B"}`
-  } }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", gap: "8px", marginBottom: "0.5rem" } }, isProfileCompleteForAutoApply() ? /* @__PURE__ */ React.createElement("span", { style: { color: "#10B981", fontSize: "1.2rem" } }, "✅") : /* @__PURE__ */ React.createElement("span", { style: { color: "#F59E0B", fontSize: "1.2rem" } }, "⚠️"), /* @__PURE__ */ React.createElement("span", { style: { fontWeight: 600, color: "#111827" } }, "Auto-Apply Status: ", isProfileCompleteForAutoApply() ? "Ready" : "Incomplete")), isProfileCompleteForAutoApply() ? /* @__PURE__ */ React.createElement("p", { style: { color: "#10B981", fontSize: "0.9rem", margin: 0 } }, "🎉 Your profile is complete! You can now use auto-apply on supported job boards.") : /* @__PURE__ */ React.createElement("div", { style: { fontSize: "0.9rem", color: "#92400E" } }, /* @__PURE__ */ React.createElement("p", { style: { margin: "0 0 0.5rem 0", fontWeight: 500 } }, "Complete these fields to enable auto-apply:"), /* @__PURE__ */ React.createElement("ul", { style: { margin: 0, paddingLeft: "1.2rem" } }, !firstName.trim() && /* @__PURE__ */ React.createElement("li", null, "First Name"), !lastName.trim() && /* @__PURE__ */ React.createElement("li", null, "Last Name"), !email.trim() && /* @__PURE__ */ React.createElement("li", null, "Email Address"), !phone.trim() && /* @__PURE__ */ React.createElement("li", null, "Phone Number"), !resume.trim() && /* @__PURE__ */ React.createElement("li", null, "Resume File")))), /* @__PURE__ */ React.createElement(
-    "button",
-    {
-      className: "uswift-btn",
-      style: { marginTop: 16, opacity: loading ? 0.6 : 1 },
-      onClick: saveProfile,
-      disabled: loading
-    },
-    loading ? "Saving..." : isAuthenticated ? "Save to Cloud" : "Save Locally"
-  ), isProfileCompleteForAutoApply() && /* @__PURE__ */ React.createElement(
-    "button",
-    {
-      onClick: () => {
-        const profile = createProfileForAutoApply();
-        console.log("📋 Profile for Auto-Apply:", profile);
-        navigator.clipboard.writeText(JSON.stringify(profile, null, 2));
-        alert("Profile copied to clipboard for debugging!");
-      },
-      style: {
-        marginTop: "8px",
-        marginLeft: "8px",
-        padding: "8px 16px",
-        background: "#F3F4F6",
-        color: "#6B7280",
-        border: "none",
-        borderRadius: "6px",
-        fontSize: "0.8rem",
-        cursor: "pointer"
+    ),
+    isProfileCompleteForAutoApply() && /* @__PURE__ */ jsxRuntimeExports.jsx(
+      "button",
+      {
+        onClick: () => {
+          const profile = createProfileForAutoApply();
+          console.log("📋 Profile for Auto-Apply:", profile);
+          navigator.clipboard.writeText(JSON.stringify(profile, null, 2));
+          alert("Profile copied to clipboard for debugging!");
+        },
+        style: {
+          marginTop: "8px",
+          marginLeft: "8px",
+          padding: "8px 16px",
+          background: "#F3F4F6",
+          color: "#6B7280",
+          border: "none",
+          borderRadius: "6px",
+          fontSize: "0.8rem",
+          cursor: "pointer"
+        },
+        children: "📋 Export Profile"
       }
-    },
-    "📋 Export Profile"
-  ));
+    )
+  ] });
 }
 
 const JobTracker = () => {
@@ -1263,7 +1438,7 @@ const JobTracker = () => {
     a.click();
     URL.revokeObjectURL(url);
   };
-  return /* @__PURE__ */ React.createElement(
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs(
     "div",
     {
       style: {
@@ -1272,476 +1447,522 @@ const JobTracker = () => {
         padding: "2rem",
         maxWidth: "100%",
         overflow: "hidden"
-      }
-    },
-    /* @__PURE__ */ React.createElement(
-      "div",
-      {
-        className: "uswift-gradient",
-        style: { height: 8, borderRadius: 8, marginBottom: 24 }
-      }
-    ),
-    /* @__PURE__ */ React.createElement(
-      "div",
-      {
-        style: {
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          marginBottom: 16
-        }
       },
-      /* @__PURE__ */ React.createElement("h2", { style: { fontSize: "1.4rem", fontWeight: 700, color: "#111827" } }, "Job Tracker"),
-      isAuthenticated && /* @__PURE__ */ React.createElement(
-        "span",
-        {
-          style: { color: "#10B981", fontSize: "0.8rem", fontWeight: 600 }
-        },
-        "☁️ Cloud Sync"
-      )
-    ),
-    /* @__PURE__ */ React.createElement(
-      "div",
-      {
-        style: {
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(120px, 1fr))",
-          gap: 12,
-          marginBottom: 20
-        }
-      },
-      /* @__PURE__ */ React.createElement(
-        "div",
-        {
-          style: {
-            background: "#F3F4F6",
-            padding: 12,
-            borderRadius: 8,
-            textAlign: "center"
-          }
-        },
-        /* @__PURE__ */ React.createElement(
+      children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
           "div",
           {
-            style: { fontSize: "1.5rem", fontWeight: 700, color: "#3B82F6" }
-          },
-          getStatusCount("applied")
-        ),
-        /* @__PURE__ */ React.createElement("div", { style: { fontSize: "0.8rem", color: "#6B7280" } }, "Applied")
-      ),
-      /* @__PURE__ */ React.createElement(
-        "div",
-        {
-          style: {
-            background: "#F3F4F6",
-            padding: 12,
-            borderRadius: 8,
-            textAlign: "center"
+            className: "uswift-gradient",
+            style: { height: 8, borderRadius: 8, marginBottom: 24 }
           }
-        },
-        /* @__PURE__ */ React.createElement(
+        ),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(
           "div",
           {
-            style: { fontSize: "1.5rem", fontWeight: 700, color: "#F59E0B" }
-          },
-          getStatusCount("interviewing")
-        ),
-        /* @__PURE__ */ React.createElement("div", { style: { fontSize: "0.8rem", color: "#6B7280" } }, "Interviewing")
-      ),
-      /* @__PURE__ */ React.createElement(
-        "div",
-        {
-          style: {
-            background: "#F3F4F6",
-            padding: 12,
-            borderRadius: 8,
-            textAlign: "center"
+            style: {
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              marginBottom: 16
+            },
+            children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("h2", { style: { fontSize: "1.4rem", fontWeight: 700, color: "#111827" }, children: "Job Tracker" }),
+              isAuthenticated && /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "span",
+                {
+                  style: { color: "#10B981", fontSize: "0.8rem", fontWeight: 600 },
+                  children: "☁️ Cloud Sync"
+                }
+              )
+            ]
           }
-        },
-        /* @__PURE__ */ React.createElement(
+        ),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(
           "div",
           {
-            style: { fontSize: "1.5rem", fontWeight: 700, color: "#10B981" }
-          },
-          getStatusCount("offer")
-        ),
-        /* @__PURE__ */ React.createElement("div", { style: { fontSize: "0.8rem", color: "#6B7280" } }, "Offers")
-      ),
-      /* @__PURE__ */ React.createElement(
-        "div",
-        {
-          style: {
-            background: "#F3F4F6",
-            padding: 12,
-            borderRadius: 8,
-            textAlign: "center"
+            style: {
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fit, minmax(120px, 1fr))",
+              gap: 12,
+              marginBottom: 20
+            },
+            children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                "div",
+                {
+                  style: {
+                    background: "#F3F4F6",
+                    padding: 12,
+                    borderRadius: 8,
+                    textAlign: "center"
+                  },
+                  children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(
+                      "div",
+                      {
+                        style: { fontSize: "1.5rem", fontWeight: 700, color: "#3B82F6" },
+                        children: getStatusCount("applied")
+                      }
+                    ),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { style: { fontSize: "0.8rem", color: "#6B7280" }, children: "Applied" })
+                  ]
+                }
+              ),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                "div",
+                {
+                  style: {
+                    background: "#F3F4F6",
+                    padding: 12,
+                    borderRadius: 8,
+                    textAlign: "center"
+                  },
+                  children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(
+                      "div",
+                      {
+                        style: { fontSize: "1.5rem", fontWeight: 700, color: "#F59E0B" },
+                        children: getStatusCount("interviewing")
+                      }
+                    ),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { style: { fontSize: "0.8rem", color: "#6B7280" }, children: "Interviewing" })
+                  ]
+                }
+              ),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                "div",
+                {
+                  style: {
+                    background: "#F3F4F6",
+                    padding: 12,
+                    borderRadius: 8,
+                    textAlign: "center"
+                  },
+                  children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(
+                      "div",
+                      {
+                        style: { fontSize: "1.5rem", fontWeight: 700, color: "#10B981" },
+                        children: getStatusCount("offer")
+                      }
+                    ),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { style: { fontSize: "0.8rem", color: "#6B7280" }, children: "Offers" })
+                  ]
+                }
+              ),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                "div",
+                {
+                  style: {
+                    background: "#F3F4F6",
+                    padding: 12,
+                    borderRadius: 8,
+                    textAlign: "center"
+                  },
+                  children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(
+                      "div",
+                      {
+                        style: { fontSize: "1.5rem", fontWeight: 700, color: "#EF4444" },
+                        children: getStatusCount("rejected")
+                      }
+                    ),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { style: { fontSize: "0.8rem", color: "#6B7280" }, children: "Rejected" })
+                  ]
+                }
+              )
+            ]
           }
-        },
-        /* @__PURE__ */ React.createElement(
+        ),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(
           "div",
           {
-            style: { fontSize: "1.5rem", fontWeight: 700, color: "#EF4444" }
-          },
-          getStatusCount("rejected")
-        ),
-        /* @__PURE__ */ React.createElement("div", { style: { fontSize: "0.8rem", color: "#6B7280" } }, "Rejected")
-      )
-    ),
-    /* @__PURE__ */ React.createElement(
-      "div",
-      {
-        style: { display: "flex", gap: 8, marginBottom: 16, flexWrap: "wrap" }
-      },
-      /* @__PURE__ */ React.createElement(
-        "input",
-        {
-          type: "text",
-          placeholder: "Search companies or positions...",
-          value: searchTerm,
-          onChange: (e) => setSearchTerm(e.target.value),
-          style: {
-            flex: 1,
-            minWidth: 200,
-            padding: 8,
-            borderRadius: 6,
-            border: "1px solid #E5E7EB",
-            fontSize: "0.9rem"
-          }
-        }
-      ),
-      /* @__PURE__ */ React.createElement(
-        "select",
-        {
-          value: statusFilter,
-          onChange: (e) => setStatusFilter(e.target.value),
-          style: {
-            padding: 8,
-            borderRadius: 6,
-            border: "1px solid #E5E7EB",
-            fontSize: "0.9rem"
-          }
-        },
-        /* @__PURE__ */ React.createElement("option", { value: "all" }, "All Status"),
-        /* @__PURE__ */ React.createElement("option", { value: "applied" }, "Applied"),
-        /* @__PURE__ */ React.createElement("option", { value: "interviewing" }, "Interviewing"),
-        /* @__PURE__ */ React.createElement("option", { value: "offer" }, "Offer"),
-        /* @__PURE__ */ React.createElement("option", { value: "rejected" }, "Rejected"),
-        /* @__PURE__ */ React.createElement("option", { value: "archived" }, "Archived")
-      ),
-      /* @__PURE__ */ React.createElement(
-        "select",
-        {
-          value: sortBy,
-          onChange: (e) => setSortBy(e.target.value),
-          style: {
-            padding: 8,
-            borderRadius: 6,
-            border: "1px solid #E5E7EB",
-            fontSize: "0.9rem"
-          }
-        },
-        /* @__PURE__ */ React.createElement("option", { value: "date" }, "Sort by Date"),
-        /* @__PURE__ */ React.createElement("option", { value: "company" }, "Sort by Company"),
-        /* @__PURE__ */ React.createElement("option", { value: "status" }, "Sort by Status")
-      ),
-      /* @__PURE__ */ React.createElement(
-        "button",
-        {
-          className: "uswift-btn",
-          style: { fontSize: "0.9rem", padding: "8px 12px" },
-          onClick: () => setShowAddForm(true)
-        },
-        "+ Add Job"
-      ),
-      /* @__PURE__ */ React.createElement(
-        "button",
-        {
-          onClick: exportToCSV,
-          style: {
-            background: "#EDE9FE",
-            color: "#6D28D9",
-            border: "none",
-            borderRadius: 6,
-            padding: "8px 12px",
-            cursor: "pointer",
-            fontSize: "0.9rem"
-          }
-        },
-        "Export CSV"
-      )
-    ),
-    showAddForm && /* @__PURE__ */ React.createElement(
-      "div",
-      {
-        style: {
-          background: "#F9FAFB",
-          padding: 16,
-          borderRadius: 8,
-          marginBottom: 16
-        }
-      },
-      /* @__PURE__ */ React.createElement("h3", { style: { marginBottom: 12, fontSize: "1rem", fontWeight: 600 } }, "Add New Application"),
-      /* @__PURE__ */ React.createElement(
-        "div",
-        {
-          style: {
-            display: "grid",
-            gridTemplateColumns: "1fr 1fr",
-            gap: 12,
-            marginBottom: 12
-          }
-        },
-        /* @__PURE__ */ React.createElement(
-          "input",
-          {
-            type: "text",
-            placeholder: "Company",
-            value: newApplication.company,
-            onChange: (e) => setNewApplication({
-              ...newApplication,
-              company: e.target.value
-            }),
-            style: {
-              padding: 8,
-              borderRadius: 6,
-              border: "1px solid #E5E7EB"
-            }
+            style: { display: "flex", gap: 8, marginBottom: 16, flexWrap: "wrap" },
+            children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "input",
+                {
+                  type: "text",
+                  placeholder: "Search companies or positions...",
+                  value: searchTerm,
+                  onChange: (e) => setSearchTerm(e.target.value),
+                  style: {
+                    flex: 1,
+                    minWidth: 200,
+                    padding: 8,
+                    borderRadius: 6,
+                    border: "1px solid #E5E7EB",
+                    fontSize: "0.9rem"
+                  }
+                }
+              ),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                "select",
+                {
+                  value: statusFilter,
+                  onChange: (e) => setStatusFilter(e.target.value),
+                  style: {
+                    padding: 8,
+                    borderRadius: 6,
+                    border: "1px solid #E5E7EB",
+                    fontSize: "0.9rem"
+                  },
+                  children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "all", children: "All Status" }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "applied", children: "Applied" }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "interviewing", children: "Interviewing" }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "offer", children: "Offer" }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "rejected", children: "Rejected" }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "archived", children: "Archived" })
+                  ]
+                }
+              ),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                "select",
+                {
+                  value: sortBy,
+                  onChange: (e) => setSortBy(e.target.value),
+                  style: {
+                    padding: 8,
+                    borderRadius: 6,
+                    border: "1px solid #E5E7EB",
+                    fontSize: "0.9rem"
+                  },
+                  children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "date", children: "Sort by Date" }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "company", children: "Sort by Company" }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "status", children: "Sort by Status" })
+                  ]
+                }
+              ),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "button",
+                {
+                  className: "uswift-btn",
+                  style: { fontSize: "0.9rem", padding: "8px 12px" },
+                  onClick: () => setShowAddForm(true),
+                  children: "+ Add Job"
+                }
+              ),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "button",
+                {
+                  onClick: exportToCSV,
+                  style: {
+                    background: "#EDE9FE",
+                    color: "#6D28D9",
+                    border: "none",
+                    borderRadius: 6,
+                    padding: "8px 12px",
+                    cursor: "pointer",
+                    fontSize: "0.9rem"
+                  },
+                  children: "Export CSV"
+                }
+              )
+            ]
           }
         ),
-        /* @__PURE__ */ React.createElement(
-          "input",
+        showAddForm && /* @__PURE__ */ jsxRuntimeExports.jsxs(
+          "div",
           {
-            type: "text",
-            placeholder: "Position",
-            value: newApplication.position,
-            onChange: (e) => setNewApplication({
-              ...newApplication,
-              position: e.target.value
-            }),
             style: {
-              padding: 8,
-              borderRadius: 6,
-              border: "1px solid #E5E7EB"
-            }
+              background: "#F9FAFB",
+              padding: 16,
+              borderRadius: 8,
+              marginBottom: 16
+            },
+            children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { style: { marginBottom: 12, fontSize: "1rem", fontWeight: 600 }, children: "Add New Application" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                "div",
+                {
+                  style: {
+                    display: "grid",
+                    gridTemplateColumns: "1fr 1fr",
+                    gap: 12,
+                    marginBottom: 12
+                  },
+                  children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(
+                      "input",
+                      {
+                        type: "text",
+                        placeholder: "Company",
+                        value: newApplication.company,
+                        onChange: (e) => setNewApplication({
+                          ...newApplication,
+                          company: e.target.value
+                        }),
+                        style: {
+                          padding: 8,
+                          borderRadius: 6,
+                          border: "1px solid #E5E7EB"
+                        }
+                      }
+                    ),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(
+                      "input",
+                      {
+                        type: "text",
+                        placeholder: "Position",
+                        value: newApplication.position,
+                        onChange: (e) => setNewApplication({
+                          ...newApplication,
+                          position: e.target.value
+                        }),
+                        style: {
+                          padding: 8,
+                          borderRadius: 6,
+                          border: "1px solid #E5E7EB"
+                        }
+                      }
+                    )
+                  ]
+                }
+              ),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                "div",
+                {
+                  style: {
+                    display: "grid",
+                    gridTemplateColumns: "1fr 1fr",
+                    gap: 12,
+                    marginBottom: 12
+                  },
+                  children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                      "select",
+                      {
+                        value: newApplication.status,
+                        onChange: (e) => setNewApplication({
+                          ...newApplication,
+                          status: e.target.value
+                        }),
+                        style: {
+                          padding: 8,
+                          borderRadius: 6,
+                          border: "1px solid #E5E7EB"
+                        },
+                        children: [
+                          /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "applied", children: "Applied" }),
+                          /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "interviewing", children: "Interviewing" }),
+                          /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "offer", children: "Offer" }),
+                          /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "rejected", children: "Rejected" }),
+                          /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "archived", children: "Archived" })
+                        ]
+                      }
+                    ),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(
+                      "input",
+                      {
+                        type: "date",
+                        value: newApplication.dateApplied,
+                        onChange: (e) => setNewApplication({
+                          ...newApplication,
+                          dateApplied: e.target.value
+                        }),
+                        style: {
+                          padding: 8,
+                          borderRadius: 6,
+                          border: "1px solid #E5E7EB"
+                        }
+                      }
+                    )
+                  ]
+                }
+              ),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "input",
+                {
+                  type: "url",
+                  placeholder: "Job URL (optional)",
+                  value: newApplication.jobUrl,
+                  onChange: (e) => setNewApplication({ ...newApplication, jobUrl: e.target.value }),
+                  style: {
+                    width: "100%",
+                    padding: 8,
+                    borderRadius: 6,
+                    border: "1px solid #E5E7EB",
+                    marginBottom: 12
+                  }
+                }
+              ),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "textarea",
+                {
+                  placeholder: "Notes (optional)",
+                  value: newApplication.notes,
+                  onChange: (e) => setNewApplication({ ...newApplication, notes: e.target.value }),
+                  rows: 2,
+                  style: {
+                    width: "100%",
+                    padding: 8,
+                    borderRadius: 6,
+                    border: "1px solid #E5E7EB",
+                    marginBottom: 12,
+                    resize: "vertical"
+                  }
+                }
+              ),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { display: "flex", gap: 8 }, children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  "button",
+                  {
+                    className: "uswift-btn",
+                    onClick: addApplication,
+                    disabled: loading,
+                    style: { opacity: loading ? 0.6 : 1 },
+                    children: loading ? "Adding..." : "Add Application"
+                  }
+                ),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  "button",
+                  {
+                    onClick: () => setShowAddForm(false),
+                    style: {
+                      background: "#F3F4F6",
+                      color: "#6B7280",
+                      border: "none",
+                      borderRadius: 6,
+                      padding: "8px 16px",
+                      cursor: "pointer"
+                    },
+                    children: "Cancel"
+                  }
+                )
+              ] })
+            ]
           }
-        )
-      ),
-      /* @__PURE__ */ React.createElement(
-        "div",
-        {
-          style: {
-            display: "grid",
-            gridTemplateColumns: "1fr 1fr",
-            gap: 12,
-            marginBottom: 12
-          }
-        },
-        /* @__PURE__ */ React.createElement(
-          "select",
-          {
-            value: newApplication.status,
-            onChange: (e) => setNewApplication({
-              ...newApplication,
-              status: e.target.value
-            }),
-            style: {
-              padding: 8,
-              borderRadius: 6,
-              border: "1px solid #E5E7EB"
-            }
-          },
-          /* @__PURE__ */ React.createElement("option", { value: "applied" }, "Applied"),
-          /* @__PURE__ */ React.createElement("option", { value: "interviewing" }, "Interviewing"),
-          /* @__PURE__ */ React.createElement("option", { value: "offer" }, "Offer"),
-          /* @__PURE__ */ React.createElement("option", { value: "rejected" }, "Rejected"),
-          /* @__PURE__ */ React.createElement("option", { value: "archived" }, "Archived")
         ),
-        /* @__PURE__ */ React.createElement(
-          "input",
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { style: { maxHeight: 400, overflowY: "auto" }, children: loading && applications.length === 0 ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { style: { textAlign: "center", padding: 40, color: "#6B7280" }, children: "Loading applications..." }) : filteredApplications.length === 0 ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { style: { textAlign: "center", padding: 40, color: "#6B7280" }, children: applications.length === 0 ? 'No applications yet. Click "Add Job" to get started!' : "No applications match your search." }) : filteredApplications.map((app) => /* @__PURE__ */ jsxRuntimeExports.jsx(
+          "div",
           {
-            type: "date",
-            value: newApplication.dateApplied,
-            onChange: (e) => setNewApplication({
-              ...newApplication,
-              dateApplied: e.target.value
-            }),
             style: {
-              padding: 8,
-              borderRadius: 6,
+              background: "#F9FAFB",
+              padding: 16,
+              borderRadius: 8,
+              marginBottom: 12,
               border: "1px solid #E5E7EB"
-            }
-          }
-        )
-      ),
-      /* @__PURE__ */ React.createElement(
-        "input",
-        {
-          type: "url",
-          placeholder: "Job URL (optional)",
-          value: newApplication.jobUrl,
-          onChange: (e) => setNewApplication({ ...newApplication, jobUrl: e.target.value }),
-          style: {
-            width: "100%",
-            padding: 8,
-            borderRadius: 6,
-            border: "1px solid #E5E7EB",
-            marginBottom: 12
-          }
-        }
-      ),
-      /* @__PURE__ */ React.createElement(
-        "textarea",
-        {
-          placeholder: "Notes (optional)",
-          value: newApplication.notes,
-          onChange: (e) => setNewApplication({ ...newApplication, notes: e.target.value }),
-          rows: 2,
-          style: {
-            width: "100%",
-            padding: 8,
-            borderRadius: 6,
-            border: "1px solid #E5E7EB",
-            marginBottom: 12,
-            resize: "vertical"
-          }
-        }
-      ),
-      /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 8 } }, /* @__PURE__ */ React.createElement(
-        "button",
-        {
-          className: "uswift-btn",
-          onClick: addApplication,
-          disabled: loading,
-          style: { opacity: loading ? 0.6 : 1 }
-        },
-        loading ? "Adding..." : "Add Application"
-      ), /* @__PURE__ */ React.createElement(
-        "button",
-        {
-          onClick: () => setShowAddForm(false),
-          style: {
-            background: "#F3F4F6",
-            color: "#6B7280",
-            border: "none",
-            borderRadius: 6,
-            padding: "8px 16px",
-            cursor: "pointer"
-          }
-        },
-        "Cancel"
-      ))
-    ),
-    /* @__PURE__ */ React.createElement("div", { style: { maxHeight: 400, overflowY: "auto" } }, loading && applications.length === 0 ? /* @__PURE__ */ React.createElement("div", { style: { textAlign: "center", padding: 40, color: "#6B7280" } }, "Loading applications...") : filteredApplications.length === 0 ? /* @__PURE__ */ React.createElement("div", { style: { textAlign: "center", padding: 40, color: "#6B7280" } }, applications.length === 0 ? 'No applications yet. Click "Add Job" to get started!' : "No applications match your search.") : filteredApplications.map((app) => /* @__PURE__ */ React.createElement(
-      "div",
-      {
-        key: app.id,
-        style: {
-          background: "#F9FAFB",
-          padding: 16,
-          borderRadius: 8,
-          marginBottom: 12,
-          border: "1px solid #E5E7EB"
-        }
-      },
-      /* @__PURE__ */ React.createElement(
-        "div",
-        {
-          style: {
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "flex-start",
-            marginBottom: 8
-          }
-        },
-        /* @__PURE__ */ React.createElement("div", { style: { flex: 1 } }, /* @__PURE__ */ React.createElement(
-          "h3",
-          {
-            style: {
-              fontSize: "1.1rem",
-              fontWeight: 600,
-              marginBottom: 4,
-              color: "#111827"
-            }
+            },
+            children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
+              "div",
+              {
+                style: {
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "flex-start",
+                  marginBottom: 8
+                },
+                children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { flex: 1 }, children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(
+                      "h3",
+                      {
+                        style: {
+                          fontSize: "1.1rem",
+                          fontWeight: 600,
+                          marginBottom: 4,
+                          color: "#111827"
+                        },
+                        children: app.position
+                      }
+                    ),
+                    /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                      "p",
+                      {
+                        style: {
+                          color: "#6B7280",
+                          fontSize: "0.9rem",
+                          marginBottom: 4
+                        },
+                        children: [
+                          app.company,
+                          " • Applied",
+                          " ",
+                          new Date(app.dateApplied).toLocaleDateString()
+                        ]
+                      }
+                    ),
+                    app.jobUrl && /* @__PURE__ */ jsxRuntimeExports.jsx(
+                      "a",
+                      {
+                        href: app.jobUrl,
+                        target: "_blank",
+                        rel: "noopener noreferrer",
+                        style: {
+                          color: "#6D28D9",
+                          fontSize: "0.85rem",
+                          textDecoration: "none"
+                        },
+                        children: "View Job Posting →"
+                      }
+                    ),
+                    app.notes && /* @__PURE__ */ jsxRuntimeExports.jsx(
+                      "p",
+                      {
+                        style: {
+                          color: "#4B5563",
+                          fontSize: "0.85rem",
+                          marginTop: 8
+                        },
+                        children: app.notes
+                      }
+                    )
+                  ] }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { display: "flex", alignItems: "center", gap: 8 }, children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                      "select",
+                      {
+                        value: app.status,
+                        onChange: (e) => updateStatus(app.id, e.target.value),
+                        style: {
+                          padding: "4px 8px",
+                          borderRadius: 6,
+                          border: "1px solid #E5E7EB",
+                          fontSize: "0.8rem",
+                          color: getStatusColor(app.status),
+                          fontWeight: 600
+                        },
+                        children: [
+                          /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "applied", children: "Applied" }),
+                          /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "interviewing", children: "Interviewing" }),
+                          /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "offer", children: "Offer" }),
+                          /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "rejected", children: "Rejected" }),
+                          /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "archived", children: "Archived" })
+                        ]
+                      }
+                    ),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(
+                      "button",
+                      {
+                        onClick: () => deleteApplication(app.id),
+                        style: {
+                          background: "#EF4444",
+                          color: "white",
+                          border: "none",
+                          borderRadius: 6,
+                          padding: "4px 8px",
+                          cursor: "pointer",
+                          fontSize: "0.8rem"
+                        },
+                        children: "Delete"
+                      }
+                    )
+                  ] })
+                ]
+              }
+            )
           },
-          app.position
-        ), /* @__PURE__ */ React.createElement(
-          "p",
-          {
-            style: {
-              color: "#6B7280",
-              fontSize: "0.9rem",
-              marginBottom: 4
-            }
-          },
-          app.company,
-          " • Applied",
-          " ",
-          new Date(app.dateApplied).toLocaleDateString()
-        ), app.jobUrl && /* @__PURE__ */ React.createElement(
-          "a",
-          {
-            href: app.jobUrl,
-            target: "_blank",
-            rel: "noopener noreferrer",
-            style: {
-              color: "#6D28D9",
-              fontSize: "0.85rem",
-              textDecoration: "none"
-            }
-          },
-          "View Job Posting →"
-        ), app.notes && /* @__PURE__ */ React.createElement(
-          "p",
-          {
-            style: {
-              color: "#4B5563",
-              fontSize: "0.85rem",
-              marginTop: 8
-            }
-          },
-          app.notes
-        )),
-        /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 8 } }, /* @__PURE__ */ React.createElement(
-          "select",
-          {
-            value: app.status,
-            onChange: (e) => updateStatus(app.id, e.target.value),
-            style: {
-              padding: "4px 8px",
-              borderRadius: 6,
-              border: "1px solid #E5E7EB",
-              fontSize: "0.8rem",
-              color: getStatusColor(app.status),
-              fontWeight: 600
-            }
-          },
-          /* @__PURE__ */ React.createElement("option", { value: "applied" }, "Applied"),
-          /* @__PURE__ */ React.createElement("option", { value: "interviewing" }, "Interviewing"),
-          /* @__PURE__ */ React.createElement("option", { value: "offer" }, "Offer"),
-          /* @__PURE__ */ React.createElement("option", { value: "rejected" }, "Rejected"),
-          /* @__PURE__ */ React.createElement("option", { value: "archived" }, "Archived")
-        ), /* @__PURE__ */ React.createElement(
-          "button",
-          {
-            onClick: () => deleteApplication(app.id),
-            style: {
-              background: "#EF4444",
-              color: "white",
-              border: "none",
-              borderRadius: 6,
-              padding: "4px 8px",
-              cursor: "pointer",
-              fontSize: "0.8rem"
-            }
-          },
-          "Delete"
-        ))
-      )
-    )))
+          app.id
+        )) })
+      ]
+    }
   );
 };
 
 class MistralClient {
+  config;
   constructor(config) {
     this.config = config;
   }
@@ -2129,9 +2350,12 @@ function ChatInterface() {
     ]);
   };
   const formatMessage = (content) => {
-    return content.split("\n").map((line, index) => /* @__PURE__ */ React.createElement("span", { key: index }, line, index < content.split("\n").length - 1 && /* @__PURE__ */ React.createElement("br", null)));
+    return content.split("\n").map((line, index) => /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { children: [
+      line,
+      index < content.split("\n").length - 1 && /* @__PURE__ */ jsxRuntimeExports.jsx("br", {})
+    ] }, index));
   };
-  return /* @__PURE__ */ React.createElement(
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs(
     "div",
     {
       style: {
@@ -2142,253 +2366,270 @@ function ChatInterface() {
         minHeight: 520,
         display: "flex",
         flexDirection: "column"
-      }
-    },
-    /* @__PURE__ */ React.createElement(
-      "div",
-      {
-        className: "uswift-gradient",
-        style: {
-          height: 8,
-          borderRadius: 8,
-          marginBottom: 16
-        }
-      }
-    ),
-    /* @__PURE__ */ React.createElement(
-      "div",
-      {
-        style: {
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          marginBottom: 16
-        }
       },
-      /* @__PURE__ */ React.createElement(
-        "h2",
-        {
-          style: {
-            fontSize: "1.4rem",
-            fontWeight: 700,
-            color: "#111827",
-            margin: 0
-          }
-        },
-        "AI Assistant"
-      ),
-      /* @__PURE__ */ React.createElement(
-        "button",
-        {
-          onClick: clearChat,
-          style: {
-            background: "#EDE9FE",
-            color: "#6D28D9",
-            border: "none",
-            borderRadius: 8,
-            padding: "6px 12px",
-            cursor: "pointer",
-            fontSize: "0.8rem"
-          }
-        },
-        "Clear Chat"
-      )
-    ),
-    /* @__PURE__ */ React.createElement("div", { style: { marginBottom: 16 } }, /* @__PURE__ */ React.createElement(
-      "div",
-      {
-        style: {
-          display: "flex",
-          gap: 8,
-          marginBottom: 12,
-          flexWrap: "wrap"
-        }
-      },
-      categories.map((category) => /* @__PURE__ */ React.createElement(
-        "button",
-        {
-          key: category,
-          onClick: () => setSelectedCategory(category),
-          style: {
-            background: selectedCategory === category ? "#6D28D9" : "#F3F4F6",
-            color: selectedCategory === category ? "#FFFFFF" : "#6B7280",
-            border: "none",
-            borderRadius: 6,
-            padding: "4px 12px",
-            cursor: "pointer",
-            fontSize: "0.8rem",
-            fontWeight: 500
-          }
-        },
-        category
-      ))
-    ), /* @__PURE__ */ React.createElement(
-      "div",
-      {
-        style: {
-          display: "flex",
-          gap: 8,
-          flexWrap: "wrap",
-          maxHeight: 120,
-          overflowY: "auto"
-        }
-      },
-      filteredPrompts.slice(0, 6).map((prompt) => /* @__PURE__ */ React.createElement(
-        "button",
-        {
-          key: prompt.id,
-          onClick: () => handleQuickPrompt(prompt),
-          disabled: isLoading,
-          style: {
-            background: "#F8F9FA",
-            border: "1px solid #E5E7EB",
-            borderRadius: 8,
-            padding: "8px 12px",
-            cursor: isLoading ? "not-allowed" : "pointer",
-            fontSize: "0.8rem",
-            color: "#4B5563",
-            opacity: isLoading ? 0.6 : 1,
-            transition: "all 0.2s ease",
-            flex: "1 1 auto",
-            minWidth: 120,
-            textAlign: "left",
-            whiteSpace: "nowrap",
-            overflow: "hidden",
-            textOverflow: "ellipsis"
-          },
-          onMouseEnter: (e) => {
-            if (!isLoading) {
-              e.currentTarget.style.background = "#EDE9FE";
-              e.currentTarget.style.borderColor = "#6D28D9";
-            }
-          },
-          onMouseLeave: (e) => {
-            if (!isLoading) {
-              e.currentTarget.style.background = "#F8F9FA";
-              e.currentTarget.style.borderColor = "#E5E7EB";
+      children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          "div",
+          {
+            className: "uswift-gradient",
+            style: {
+              height: 8,
+              borderRadius: 8,
+              marginBottom: 16
             }
           }
-        },
-        prompt.label
-      ))
-    )),
-    /* @__PURE__ */ React.createElement(
-      "div",
-      {
-        style: {
-          flex: 1,
-          overflowY: "auto",
-          marginBottom: 16,
-          maxHeight: 300
-        }
-      },
-      messages.map((message) => /* @__PURE__ */ React.createElement(
-        "div",
-        {
-          key: message.id,
-          style: {
-            marginBottom: 16,
-            display: "flex",
-            flexDirection: message.role === "user" ? "row-reverse" : "row"
-          }
-        },
-        /* @__PURE__ */ React.createElement(
+        ),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(
           "div",
           {
             style: {
-              maxWidth: "80%",
-              padding: "12px 16px",
-              borderRadius: 12,
-              background: message.role === "user" ? "#6D28D9" : "#F3F4F6",
-              color: message.role === "user" ? "#FFFFFF" : "#111827",
-              fontSize: "0.9rem",
-              lineHeight: 1.4,
-              position: "relative"
-            }
-          },
-          message.isLoading ? /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 8 } }, /* @__PURE__ */ React.createElement(
-            "div",
-            {
-              style: {
-                width: 16,
-                height: 16,
-                border: "2px solid #6D28D9",
-                borderTop: "2px solid transparent",
-                borderRadius: "50%",
-                animation: "spin 1s linear infinite"
-              }
-            }
-          ), /* @__PURE__ */ React.createElement("span", { style: { color: "#6B7280" } }, "Thinking...")) : formatMessage(message.content),
-          /* @__PURE__ */ React.createElement(
-            "div",
-            {
-              style: {
-                fontSize: "0.7rem",
-                opacity: 0.7,
-                marginTop: 4,
-                textAlign: message.role === "user" ? "right" : "left"
-              }
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              marginBottom: 16
             },
-            message.timestamp.toLocaleTimeString([], {
-              hour: "2-digit",
-              minute: "2-digit"
-            })
-          )
-        )
-      )),
-      /* @__PURE__ */ React.createElement("div", { ref: messagesEndRef })
-    ),
-    /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 8 } }, /* @__PURE__ */ React.createElement(
-      "input",
-      {
-        type: "text",
-        value: inputMessage,
-        onChange: (e) => setInputMessage(e.target.value),
-        onKeyPress: (e) => {
-          if (e.key === "Enter" && !e.shiftKey) {
-            e.preventDefault();
-            sendMessage(inputMessage);
+            children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "h2",
+                {
+                  style: {
+                    fontSize: "1.4rem",
+                    fontWeight: 700,
+                    color: "#111827",
+                    margin: 0
+                  },
+                  children: "AI Assistant"
+                }
+              ),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "button",
+                {
+                  onClick: clearChat,
+                  style: {
+                    background: "#EDE9FE",
+                    color: "#6D28D9",
+                    border: "none",
+                    borderRadius: 8,
+                    padding: "6px 12px",
+                    cursor: "pointer",
+                    fontSize: "0.8rem"
+                  },
+                  children: "Clear Chat"
+                }
+              )
+            ]
           }
-        },
-        placeholder: "Ask me anything about your career...",
-        disabled: isLoading,
-        style: {
-          flex: 1,
-          padding: "12px 16px",
-          borderRadius: 8,
-          border: "1px solid #E5E7EB",
-          fontSize: "0.9rem",
-          outline: "none",
-          opacity: isLoading ? 0.6 : 1
-        }
-      }
-    ), /* @__PURE__ */ React.createElement(
-      "button",
-      {
-        onClick: () => sendMessage(inputMessage),
-        disabled: isLoading || !inputMessage.trim(),
-        className: "uswift-btn",
-        style: {
-          padding: "12px 16px",
-          opacity: isLoading || !inputMessage.trim() ? 0.6 : 1,
-          cursor: isLoading || !inputMessage.trim() ? "not-allowed" : "pointer",
-          minWidth: 60
-        }
-      },
-      isLoading ? "..." : "Send"
-    )),
-    /* @__PURE__ */ React.createElement(
-      "div",
-      {
-        style: {
-          marginTop: 12,
-          textAlign: "center",
-          fontSize: "0.8rem",
-          color: "#6B7280"
-        }
-      },
-      "Powered by Mistral AI • Ask me about career advice, resume help, or interview tips!"
-    )
+        ),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { marginBottom: 16 }, children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            "div",
+            {
+              style: {
+                display: "flex",
+                gap: 8,
+                marginBottom: 12,
+                flexWrap: "wrap"
+              },
+              children: categories.map((category) => /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "button",
+                {
+                  onClick: () => setSelectedCategory(category),
+                  style: {
+                    background: selectedCategory === category ? "#6D28D9" : "#F3F4F6",
+                    color: selectedCategory === category ? "#FFFFFF" : "#6B7280",
+                    border: "none",
+                    borderRadius: 6,
+                    padding: "4px 12px",
+                    cursor: "pointer",
+                    fontSize: "0.8rem",
+                    fontWeight: 500
+                  },
+                  children: category
+                },
+                category
+              ))
+            }
+          ),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            "div",
+            {
+              style: {
+                display: "flex",
+                gap: 8,
+                flexWrap: "wrap",
+                maxHeight: 120,
+                overflowY: "auto"
+              },
+              children: filteredPrompts.slice(0, 6).map((prompt) => /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "button",
+                {
+                  onClick: () => handleQuickPrompt(prompt),
+                  disabled: isLoading,
+                  style: {
+                    background: "#F8F9FA",
+                    border: "1px solid #E5E7EB",
+                    borderRadius: 8,
+                    padding: "8px 12px",
+                    cursor: isLoading ? "not-allowed" : "pointer",
+                    fontSize: "0.8rem",
+                    color: "#4B5563",
+                    opacity: isLoading ? 0.6 : 1,
+                    transition: "all 0.2s ease",
+                    flex: "1 1 auto",
+                    minWidth: 120,
+                    textAlign: "left",
+                    whiteSpace: "nowrap",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis"
+                  },
+                  onMouseEnter: (e) => {
+                    if (!isLoading) {
+                      e.currentTarget.style.background = "#EDE9FE";
+                      e.currentTarget.style.borderColor = "#6D28D9";
+                    }
+                  },
+                  onMouseLeave: (e) => {
+                    if (!isLoading) {
+                      e.currentTarget.style.background = "#F8F9FA";
+                      e.currentTarget.style.borderColor = "#E5E7EB";
+                    }
+                  },
+                  children: prompt.label
+                },
+                prompt.id
+              ))
+            }
+          )
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(
+          "div",
+          {
+            style: {
+              flex: 1,
+              overflowY: "auto",
+              marginBottom: 16,
+              maxHeight: 300
+            },
+            children: [
+              messages.map((message) => /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "div",
+                {
+                  style: {
+                    marginBottom: 16,
+                    display: "flex",
+                    flexDirection: message.role === "user" ? "row-reverse" : "row"
+                  },
+                  children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                    "div",
+                    {
+                      style: {
+                        maxWidth: "80%",
+                        padding: "12px 16px",
+                        borderRadius: 12,
+                        background: message.role === "user" ? "#6D28D9" : "#F3F4F6",
+                        color: message.role === "user" ? "#FFFFFF" : "#111827",
+                        fontSize: "0.9rem",
+                        lineHeight: 1.4,
+                        position: "relative"
+                      },
+                      children: [
+                        message.isLoading ? /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { display: "flex", alignItems: "center", gap: 8 }, children: [
+                          /* @__PURE__ */ jsxRuntimeExports.jsx(
+                            "div",
+                            {
+                              style: {
+                                width: 16,
+                                height: 16,
+                                border: "2px solid #6D28D9",
+                                borderTop: "2px solid transparent",
+                                borderRadius: "50%",
+                                animation: "spin 1s linear infinite"
+                              }
+                            }
+                          ),
+                          /* @__PURE__ */ jsxRuntimeExports.jsx("span", { style: { color: "#6B7280" }, children: "Thinking..." })
+                        ] }) : formatMessage(message.content),
+                        /* @__PURE__ */ jsxRuntimeExports.jsx(
+                          "div",
+                          {
+                            style: {
+                              fontSize: "0.7rem",
+                              opacity: 0.7,
+                              marginTop: 4,
+                              textAlign: message.role === "user" ? "right" : "left"
+                            },
+                            children: message.timestamp.toLocaleTimeString([], {
+                              hour: "2-digit",
+                              minute: "2-digit"
+                            })
+                          }
+                        )
+                      ]
+                    }
+                  )
+                },
+                message.id
+              )),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { ref: messagesEndRef })
+            ]
+          }
+        ),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { display: "flex", gap: 8 }, children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            "input",
+            {
+              type: "text",
+              value: inputMessage,
+              onChange: (e) => setInputMessage(e.target.value),
+              onKeyPress: (e) => {
+                if (e.key === "Enter" && !e.shiftKey) {
+                  e.preventDefault();
+                  sendMessage(inputMessage);
+                }
+              },
+              placeholder: "Ask me anything about your career...",
+              disabled: isLoading,
+              style: {
+                flex: 1,
+                padding: "12px 16px",
+                borderRadius: 8,
+                border: "1px solid #E5E7EB",
+                fontSize: "0.9rem",
+                outline: "none",
+                opacity: isLoading ? 0.6 : 1
+              }
+            }
+          ),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            "button",
+            {
+              onClick: () => sendMessage(inputMessage),
+              disabled: isLoading || !inputMessage.trim(),
+              className: "uswift-btn",
+              style: {
+                padding: "12px 16px",
+                opacity: isLoading || !inputMessage.trim() ? 0.6 : 1,
+                cursor: isLoading || !inputMessage.trim() ? "not-allowed" : "pointer",
+                minWidth: 60
+              },
+              children: isLoading ? "..." : "Send"
+            }
+          )
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          "div",
+          {
+            style: {
+              marginTop: 12,
+              textAlign: "center",
+              fontSize: "0.8rem",
+              color: "#6B7280"
+            },
+            children: "Powered by Mistral AI • Ask me about career advice, resume help, or interview tips!"
+          }
+        )
+      ]
+    }
   );
 }
 
@@ -2489,7 +2730,7 @@ function ResumeEnhancement() {
       alert("Copied to clipboard!");
     });
   };
-  return /* @__PURE__ */ React.createElement(
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs(
     "div",
     {
       style: {
@@ -2498,431 +2739,494 @@ function ResumeEnhancement() {
         padding: "2rem",
         minWidth: 350,
         minHeight: 520
-      }
-    },
-    /* @__PURE__ */ React.createElement(
-      "div",
-      {
-        className: "uswift-gradient",
-        style: {
-          height: 8,
-          borderRadius: 8,
-          marginBottom: 16
-        }
-      }
-    ),
-    /* @__PURE__ */ React.createElement(
-      "div",
-      {
-        style: {
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          marginBottom: 16
-        }
       },
-      /* @__PURE__ */ React.createElement(
-        "h2",
-        {
-          style: {
-            fontSize: "1.4rem",
-            fontWeight: 700,
-            color: "#111827",
-            margin: 0
-          }
-        },
-        "Resume Enhancement"
-      ),
-      activeTab === "result" && /* @__PURE__ */ React.createElement(
-        "button",
-        {
-          onClick: () => setActiveTab("input"),
-          style: {
-            background: "#EDE9FE",
-            color: "#6D28D9",
-            border: "none",
-            borderRadius: 8,
-            padding: "6px 12px",
-            cursor: "pointer",
-            fontSize: "0.8rem"
-          }
-        },
-        "← Back to Edit"
-      )
-    ),
-    /* @__PURE__ */ React.createElement(
-      "div",
-      {
-        style: {
-          display: "flex",
-          marginBottom: 16,
-          borderBottom: "1px solid #E5E7EB"
-        }
-      },
-      /* @__PURE__ */ React.createElement(
-        "button",
-        {
-          onClick: () => setActiveTab("input"),
-          style: {
-            background: "none",
-            border: "none",
-            padding: "12px 16px",
-            cursor: "pointer",
-            fontSize: "0.9rem",
-            fontWeight: activeTab === "input" ? 600 : 400,
-            color: activeTab === "input" ? "#6D28D9" : "#6B7280",
-            borderBottom: activeTab === "input" ? "2px solid #6D28D9" : "none"
-          }
-        },
-        "Input"
-      ),
-      /* @__PURE__ */ React.createElement(
-        "button",
-        {
-          onClick: () => setActiveTab("result"),
-          disabled: !result,
-          style: {
-            background: "none",
-            border: "none",
-            padding: "12px 16px",
-            cursor: result ? "pointer" : "not-allowed",
-            fontSize: "0.9rem",
-            fontWeight: activeTab === "result" ? 600 : 400,
-            color: activeTab === "result" ? "#6D28D9" : "#6B7280",
-            borderBottom: activeTab === "result" ? "2px solid #6D28D9" : "none",
-            opacity: result ? 1 : 0.5
-          }
-        },
-        "Enhanced Resume"
-      )
-    ),
-    activeTab === "input" && /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { style: { marginBottom: 16 } }, /* @__PURE__ */ React.createElement(
-      "label",
-      {
-        style: {
-          display: "block",
-          fontSize: "0.9rem",
-          fontWeight: 600,
-          color: "#374151",
-          marginBottom: 8
-        }
-      },
-      "Enhancement Type:"
-    ), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 8 } }, /* @__PURE__ */ React.createElement(
-      "button",
-      {
-        onClick: () => setEnhancementType("general"),
-        style: {
-          background: enhancementType === "general" ? "#6D28D9" : "#F3F4F6",
-          color: enhancementType === "general" ? "#FFFFFF" : "#6B7280",
-          border: "none",
-          borderRadius: 6,
-          padding: "8px 16px",
-          cursor: "pointer",
-          fontSize: "0.8rem",
-          fontWeight: 500
-        }
-      },
-      "General Enhancement"
-    ), /* @__PURE__ */ React.createElement(
-      "button",
-      {
-        onClick: () => setEnhancementType("job-specific"),
-        style: {
-          background: enhancementType === "job-specific" ? "#6D28D9" : "#F3F4F6",
-          color: enhancementType === "job-specific" ? "#FFFFFF" : "#6B7280",
-          border: "none",
-          borderRadius: 6,
-          padding: "8px 16px",
-          cursor: "pointer",
-          fontSize: "0.8rem",
-          fontWeight: 500
-        }
-      },
-      "Job-Specific Tailoring"
-    ))), /* @__PURE__ */ React.createElement("div", { className: "uswift-card", style: { marginBottom: 16 } }, /* @__PURE__ */ React.createElement(
-      "label",
-      {
-        style: {
-          fontWeight: 600,
-          display: "block",
-          marginBottom: 8,
-          color: "#374151"
-        }
-      },
-      "Your Resume Content:"
-    ), /* @__PURE__ */ React.createElement(
-      "textarea",
-      {
-        value: resumeContent,
-        onChange: (e) => setResumeContent(e.target.value),
-        placeholder: "Paste your current resume content here...",
-        rows: 8,
-        style: {
-          width: "100%",
-          padding: 12,
-          borderRadius: 8,
-          border: "1px solid #E5E7EB",
-          fontSize: "0.9rem",
-          resize: "vertical",
-          fontFamily: "monospace"
-        }
-      }
-    )), enhancementType === "job-specific" && /* @__PURE__ */ React.createElement("div", { className: "uswift-card", style: { marginBottom: 16 } }, /* @__PURE__ */ React.createElement(
-      "label",
-      {
-        style: {
-          fontWeight: 600,
-          display: "block",
-          marginBottom: 8,
-          color: "#374151"
-        }
-      },
-      "Job Description (Optional):"
-    ), /* @__PURE__ */ React.createElement(
-      "textarea",
-      {
-        value: jobDescription,
-        onChange: (e) => setJobDescription(e.target.value),
-        placeholder: "Paste the job description to tailor your resume specifically for this role...",
-        rows: 6,
-        style: {
-          width: "100%",
-          padding: 12,
-          borderRadius: 8,
-          border: "1px solid #E5E7EB",
-          fontSize: "0.9rem",
-          resize: "vertical"
-        }
-      }
-    )), /* @__PURE__ */ React.createElement(
-      "button",
-      {
-        onClick: handleEnhance,
-        disabled: isLoading || !resumeContent.trim(),
-        className: "uswift-btn",
-        style: {
-          width: "100%",
-          opacity: isLoading || !resumeContent.trim() ? 0.6 : 1,
-          cursor: isLoading || !resumeContent.trim() ? "not-allowed" : "pointer"
-        }
-      },
-      isLoading ? /* @__PURE__ */ React.createElement(
-        "div",
-        {
-          style: {
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            gap: 8
-          }
-        },
-        /* @__PURE__ */ React.createElement(
+      children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
           "div",
           {
+            className: "uswift-gradient",
             style: {
-              width: 16,
-              height: 16,
-              border: "2px solid #ffffff",
-              borderTop: "2px solid transparent",
-              borderRadius: "50%",
-              animation: "spin 1s linear infinite"
+              height: 8,
+              borderRadius: 8,
+              marginBottom: 16
             }
           }
         ),
-        "Enhancing Resume..."
-      ) : "Enhance My Resume"
-    ), /* @__PURE__ */ React.createElement(
-      "div",
-      {
-        style: {
-          marginTop: 16,
-          padding: 12,
-          background: "#F8F9FA",
-          borderRadius: 8,
-          fontSize: "0.8rem",
-          color: "#6B7280"
-        }
-      },
-      /* @__PURE__ */ React.createElement("strong", null, "Tips:"),
-      /* @__PURE__ */ React.createElement("ul", { style: { margin: "8px 0 0 16px", padding: 0 } }, /* @__PURE__ */ React.createElement("li", null, "Include your full work history and key achievements"), /* @__PURE__ */ React.createElement("li", null, "Use quantifiable metrics where possible"), /* @__PURE__ */ React.createElement("li", null, "Keep it concise but comprehensive"), /* @__PURE__ */ React.createElement("li", null, "For job-specific enhancement, include relevant keywords from the job posting"))
-    )),
-    activeTab === "result" && result && /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement(
-      "div",
-      {
-        style: {
-          display: "flex",
-          alignItems: "center",
-          gap: 16,
-          marginBottom: 20,
-          padding: 16,
-          background: "#F8F9FA",
-          borderRadius: 8
-        }
-      },
-      /* @__PURE__ */ React.createElement("div", { style: { textAlign: "center" } }, /* @__PURE__ */ React.createElement(
-        "div",
-        {
-          style: {
-            fontSize: "2rem",
-            fontWeight: 700,
-            color: getScoreColor(result.score),
-            marginBottom: 4
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(
+          "div",
+          {
+            style: {
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              marginBottom: 16
+            },
+            children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "h2",
+                {
+                  style: {
+                    fontSize: "1.4rem",
+                    fontWeight: 700,
+                    color: "#111827",
+                    margin: 0
+                  },
+                  children: "Resume Enhancement"
+                }
+              ),
+              activeTab === "result" && /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "button",
+                {
+                  onClick: () => setActiveTab("input"),
+                  style: {
+                    background: "#EDE9FE",
+                    color: "#6D28D9",
+                    border: "none",
+                    borderRadius: 8,
+                    padding: "6px 12px",
+                    cursor: "pointer",
+                    fontSize: "0.8rem"
+                  },
+                  children: "← Back to Edit"
+                }
+              )
+            ]
           }
-        },
-        result.score,
-        "/100"
-      ), /* @__PURE__ */ React.createElement(
-        "div",
-        {
-          style: {
-            fontSize: "0.8rem",
-            color: "#6B7280",
-            fontWeight: 500
+        ),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(
+          "div",
+          {
+            style: {
+              display: "flex",
+              marginBottom: 16,
+              borderBottom: "1px solid #E5E7EB"
+            },
+            children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "button",
+                {
+                  onClick: () => setActiveTab("input"),
+                  style: {
+                    background: "none",
+                    border: "none",
+                    padding: "12px 16px",
+                    cursor: "pointer",
+                    fontSize: "0.9rem",
+                    fontWeight: activeTab === "input" ? 600 : 400,
+                    color: activeTab === "input" ? "#6D28D9" : "#6B7280",
+                    borderBottom: activeTab === "input" ? "2px solid #6D28D9" : "none"
+                  },
+                  children: "Input"
+                }
+              ),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "button",
+                {
+                  onClick: () => setActiveTab("result"),
+                  disabled: !result,
+                  style: {
+                    background: "none",
+                    border: "none",
+                    padding: "12px 16px",
+                    cursor: result ? "pointer" : "not-allowed",
+                    fontSize: "0.9rem",
+                    fontWeight: activeTab === "result" ? 600 : 400,
+                    color: activeTab === "result" ? "#6D28D9" : "#6B7280",
+                    borderBottom: activeTab === "result" ? "2px solid #6D28D9" : "none",
+                    opacity: result ? 1 : 0.5
+                  },
+                  children: "Enhanced Resume"
+                }
+              )
+            ]
           }
-        },
-        getScoreLabel(result.score)
-      )),
-      /* @__PURE__ */ React.createElement("div", { style: { flex: 1 } }, /* @__PURE__ */ React.createElement(
-        "h3",
-        {
-          style: {
-            margin: "0 0 8px 0",
-            fontSize: "1rem",
-            color: "#111827"
+        ),
+        activeTab === "input" && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { marginBottom: 16 }, children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "label",
+              {
+                style: {
+                  display: "block",
+                  fontSize: "0.9rem",
+                  fontWeight: 600,
+                  color: "#374151",
+                  marginBottom: 8
+                },
+                children: "Enhancement Type:"
+              }
+            ),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { display: "flex", gap: 8 }, children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "button",
+                {
+                  onClick: () => setEnhancementType("general"),
+                  style: {
+                    background: enhancementType === "general" ? "#6D28D9" : "#F3F4F6",
+                    color: enhancementType === "general" ? "#FFFFFF" : "#6B7280",
+                    border: "none",
+                    borderRadius: 6,
+                    padding: "8px 16px",
+                    cursor: "pointer",
+                    fontSize: "0.8rem",
+                    fontWeight: 500
+                  },
+                  children: "General Enhancement"
+                }
+              ),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "button",
+                {
+                  onClick: () => setEnhancementType("job-specific"),
+                  style: {
+                    background: enhancementType === "job-specific" ? "#6D28D9" : "#F3F4F6",
+                    color: enhancementType === "job-specific" ? "#FFFFFF" : "#6B7280",
+                    border: "none",
+                    borderRadius: 6,
+                    padding: "8px 16px",
+                    cursor: "pointer",
+                    fontSize: "0.8rem",
+                    fontWeight: 500
+                  },
+                  children: "Job-Specific Tailoring"
+                }
+              )
+            ] })
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "uswift-card", style: { marginBottom: 16 }, children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "label",
+              {
+                style: {
+                  fontWeight: 600,
+                  display: "block",
+                  marginBottom: 8,
+                  color: "#374151"
+                },
+                children: "Your Resume Content:"
+              }
+            ),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "textarea",
+              {
+                value: resumeContent,
+                onChange: (e) => setResumeContent(e.target.value),
+                placeholder: "Paste your current resume content here...",
+                rows: 8,
+                style: {
+                  width: "100%",
+                  padding: 12,
+                  borderRadius: 8,
+                  border: "1px solid #E5E7EB",
+                  fontSize: "0.9rem",
+                  resize: "vertical",
+                  fontFamily: "monospace"
+                }
+              }
+            )
+          ] }),
+          enhancementType === "job-specific" && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "uswift-card", style: { marginBottom: 16 }, children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "label",
+              {
+                style: {
+                  fontWeight: 600,
+                  display: "block",
+                  marginBottom: 8,
+                  color: "#374151"
+                },
+                children: "Job Description (Optional):"
+              }
+            ),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "textarea",
+              {
+                value: jobDescription,
+                onChange: (e) => setJobDescription(e.target.value),
+                placeholder: "Paste the job description to tailor your resume specifically for this role...",
+                rows: 6,
+                style: {
+                  width: "100%",
+                  padding: 12,
+                  borderRadius: 8,
+                  border: "1px solid #E5E7EB",
+                  fontSize: "0.9rem",
+                  resize: "vertical"
+                }
+              }
+            )
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            "button",
+            {
+              onClick: handleEnhance,
+              disabled: isLoading || !resumeContent.trim(),
+              className: "uswift-btn",
+              style: {
+                width: "100%",
+                opacity: isLoading || !resumeContent.trim() ? 0.6 : 1,
+                cursor: isLoading || !resumeContent.trim() ? "not-allowed" : "pointer"
+              },
+              children: isLoading ? /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                "div",
+                {
+                  style: {
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gap: 8
+                  },
+                  children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(
+                      "div",
+                      {
+                        style: {
+                          width: 16,
+                          height: 16,
+                          border: "2px solid #ffffff",
+                          borderTop: "2px solid transparent",
+                          borderRadius: "50%",
+                          animation: "spin 1s linear infinite"
+                        }
+                      }
+                    ),
+                    "Enhancing Resume..."
+                  ]
+                }
+              ) : "Enhance My Resume"
+            }
+          ),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(
+            "div",
+            {
+              style: {
+                marginTop: 16,
+                padding: 12,
+                background: "#F8F9FA",
+                borderRadius: 8,
+                fontSize: "0.8rem",
+                color: "#6B7280"
+              },
+              children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Tips:" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("ul", { style: { margin: "8px 0 0 16px", padding: 0 }, children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Include your full work history and key achievements" }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Use quantifiable metrics where possible" }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Keep it concise but comprehensive" }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "For job-specific enhancement, include relevant keywords from the job posting" })
+                ] })
+              ]
+            }
+          )
+        ] }),
+        activeTab === "result" && result && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(
+            "div",
+            {
+              style: {
+                display: "flex",
+                alignItems: "center",
+                gap: 16,
+                marginBottom: 20,
+                padding: 16,
+                background: "#F8F9FA",
+                borderRadius: 8
+              },
+              children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { textAlign: "center" }, children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                    "div",
+                    {
+                      style: {
+                        fontSize: "2rem",
+                        fontWeight: 700,
+                        color: getScoreColor(result.score),
+                        marginBottom: 4
+                      },
+                      children: [
+                        result.score,
+                        "/100"
+                      ]
+                    }
+                  ),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(
+                    "div",
+                    {
+                      style: {
+                        fontSize: "0.8rem",
+                        color: "#6B7280",
+                        fontWeight: 500
+                      },
+                      children: getScoreLabel(result.score)
+                    }
+                  )
+                ] }),
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { flex: 1 }, children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(
+                    "h3",
+                    {
+                      style: {
+                        margin: "0 0 8px 0",
+                        fontSize: "1rem",
+                        color: "#111827"
+                      },
+                      children: "Resume Quality Score"
+                    }
+                  ),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("p", { style: { margin: 0, fontSize: "0.8rem", color: "#6B7280" }, children: "Based on content relevance, formatting, and impact statements" })
+                ] })
+              ]
+            }
+          ),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "uswift-card", style: { marginBottom: 16 }, children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "h3",
+              {
+                style: {
+                  fontSize: "1.1rem",
+                  fontWeight: 600,
+                  color: "#111827",
+                  marginBottom: 12
+                },
+                children: "Key Suggestions"
+              }
+            ),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "div",
+              {
+                style: { fontSize: "0.9rem", lineHeight: 1.6, color: "#4B5563" },
+                children: result.suggestions
+              }
+            )
+          ] }),
+          result.improvements.length > 0 && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "uswift-card", style: { marginBottom: 16 }, children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "h3",
+              {
+                style: {
+                  fontSize: "1.1rem",
+                  fontWeight: 600,
+                  color: "#111827",
+                  marginBottom: 12
+                },
+                children: "Top Improvements Made"
+              }
+            ),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("ul", { style: { margin: 0, paddingLeft: 20 }, children: result.improvements.map((improvement, index) => /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "li",
+              {
+                style: {
+                  fontSize: "0.9rem",
+                  color: "#4B5563",
+                  marginBottom: 8
+                },
+                children: improvement
+              },
+              index
+            )) })
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "uswift-card", style: { marginBottom: 16 }, children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsxs(
+              "div",
+              {
+                style: {
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  marginBottom: 12
+                },
+                children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(
+                    "h3",
+                    {
+                      style: {
+                        fontSize: "1.1rem",
+                        fontWeight: 600,
+                        color: "#111827",
+                        margin: 0
+                      },
+                      children: "Enhanced Resume"
+                    }
+                  ),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(
+                    "button",
+                    {
+                      onClick: () => copyToClipboard(result.enhancedResume),
+                      style: {
+                        background: "#EDE9FE",
+                        color: "#6D28D9",
+                        border: "none",
+                        borderRadius: 6,
+                        padding: "6px 12px",
+                        cursor: "pointer",
+                        fontSize: "0.8rem"
+                      },
+                      children: "Copy"
+                    }
+                  )
+                ]
+              }
+            ),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "div",
+              {
+                style: {
+                  background: "#F8F9FA",
+                  padding: 16,
+                  borderRadius: 8,
+                  fontSize: "0.85rem",
+                  fontFamily: "monospace",
+                  whiteSpace: "pre-wrap",
+                  maxHeight: 300,
+                  overflowY: "auto",
+                  border: "1px solid #E5E7EB"
+                },
+                children: result.enhancedResume
+              }
+            )
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { display: "flex", gap: 8 }, children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "button",
+              {
+                onClick: () => copyToClipboard(result.enhancedResume),
+                className: "uswift-btn",
+                style: { flex: 1 },
+                children: "Copy Enhanced Resume"
+              }
+            ),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "button",
+              {
+                onClick: () => setActiveTab("input"),
+                style: {
+                  flex: 1,
+                  background: "#F3F4F6",
+                  color: "#6B7280",
+                  border: "1px solid #E5E7EB",
+                  borderRadius: 8,
+                  padding: "12px",
+                  cursor: "pointer"
+                },
+                children: "Make Another Edit"
+              }
+            )
+          ] })
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          "div",
+          {
+            style: {
+              marginTop: 16,
+              textAlign: "center",
+              fontSize: "0.8rem",
+              color: "#6B7280"
+            },
+            children: "Powered by Mistral AI • Get professional resume enhancement suggestions"
           }
-        },
-        "Resume Quality Score"
-      ), /* @__PURE__ */ React.createElement("p", { style: { margin: 0, fontSize: "0.8rem", color: "#6B7280" } }, "Based on content relevance, formatting, and impact statements"))
-    ), /* @__PURE__ */ React.createElement("div", { className: "uswift-card", style: { marginBottom: 16 } }, /* @__PURE__ */ React.createElement(
-      "h3",
-      {
-        style: {
-          fontSize: "1.1rem",
-          fontWeight: 600,
-          color: "#111827",
-          marginBottom: 12
-        }
-      },
-      "Key Suggestions"
-    ), /* @__PURE__ */ React.createElement(
-      "div",
-      {
-        style: { fontSize: "0.9rem", lineHeight: 1.6, color: "#4B5563" }
-      },
-      result.suggestions
-    )), result.improvements.length > 0 && /* @__PURE__ */ React.createElement("div", { className: "uswift-card", style: { marginBottom: 16 } }, /* @__PURE__ */ React.createElement(
-      "h3",
-      {
-        style: {
-          fontSize: "1.1rem",
-          fontWeight: 600,
-          color: "#111827",
-          marginBottom: 12
-        }
-      },
-      "Top Improvements Made"
-    ), /* @__PURE__ */ React.createElement("ul", { style: { margin: 0, paddingLeft: 20 } }, result.improvements.map((improvement, index) => /* @__PURE__ */ React.createElement(
-      "li",
-      {
-        key: index,
-        style: {
-          fontSize: "0.9rem",
-          color: "#4B5563",
-          marginBottom: 8
-        }
-      },
-      improvement
-    )))), /* @__PURE__ */ React.createElement("div", { className: "uswift-card", style: { marginBottom: 16 } }, /* @__PURE__ */ React.createElement(
-      "div",
-      {
-        style: {
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          marginBottom: 12
-        }
-      },
-      /* @__PURE__ */ React.createElement(
-        "h3",
-        {
-          style: {
-            fontSize: "1.1rem",
-            fontWeight: 600,
-            color: "#111827",
-            margin: 0
-          }
-        },
-        "Enhanced Resume"
-      ),
-      /* @__PURE__ */ React.createElement(
-        "button",
-        {
-          onClick: () => copyToClipboard(result.enhancedResume),
-          style: {
-            background: "#EDE9FE",
-            color: "#6D28D9",
-            border: "none",
-            borderRadius: 6,
-            padding: "6px 12px",
-            cursor: "pointer",
-            fontSize: "0.8rem"
-          }
-        },
-        "Copy"
-      )
-    ), /* @__PURE__ */ React.createElement(
-      "div",
-      {
-        style: {
-          background: "#F8F9FA",
-          padding: 16,
-          borderRadius: 8,
-          fontSize: "0.85rem",
-          fontFamily: "monospace",
-          whiteSpace: "pre-wrap",
-          maxHeight: 300,
-          overflowY: "auto",
-          border: "1px solid #E5E7EB"
-        }
-      },
-      result.enhancedResume
-    )), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 8 } }, /* @__PURE__ */ React.createElement(
-      "button",
-      {
-        onClick: () => copyToClipboard(result.enhancedResume),
-        className: "uswift-btn",
-        style: { flex: 1 }
-      },
-      "Copy Enhanced Resume"
-    ), /* @__PURE__ */ React.createElement(
-      "button",
-      {
-        onClick: () => setActiveTab("input"),
-        style: {
-          flex: 1,
-          background: "#F3F4F6",
-          color: "#6B7280",
-          border: "1px solid #E5E7EB",
-          borderRadius: 8,
-          padding: "12px",
-          cursor: "pointer"
-        }
-      },
-      "Make Another Edit"
-    ))),
-    /* @__PURE__ */ React.createElement(
-      "div",
-      {
-        style: {
-          marginTop: 16,
-          textAlign: "center",
-          fontSize: "0.8rem",
-          color: "#6B7280"
-        }
-      },
-      "Powered by Mistral AI • Get professional resume enhancement suggestions"
-    )
+        )
+      ]
+    }
   );
 }
 
@@ -3026,7 +3330,7 @@ function CoverLetterGenerator() {
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
   };
-  return /* @__PURE__ */ React.createElement(
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs(
     "div",
     {
       style: {
@@ -3035,480 +3339,549 @@ function CoverLetterGenerator() {
         padding: "2rem",
         minWidth: 350,
         minHeight: 520
-      }
-    },
-    /* @__PURE__ */ React.createElement(
-      "div",
-      {
-        className: "uswift-gradient",
-        style: {
-          height: 8,
-          borderRadius: 8,
-          marginBottom: 16
-        }
-      }
-    ),
-    /* @__PURE__ */ React.createElement(
-      "div",
-      {
-        style: {
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          marginBottom: 16
-        }
       },
-      /* @__PURE__ */ React.createElement(
-        "h2",
-        {
-          style: {
-            fontSize: "1.4rem",
-            fontWeight: 700,
-            color: "#111827",
-            margin: 0
-          }
-        },
-        "Cover Letter Generator"
-      ),
-      activeTab === "result" && /* @__PURE__ */ React.createElement(
-        "button",
-        {
-          onClick: () => setActiveTab("input"),
-          style: {
-            background: "#EDE9FE",
-            color: "#6D28D9",
-            border: "none",
-            borderRadius: 8,
-            padding: "6px 12px",
-            cursor: "pointer",
-            fontSize: "0.8rem"
-          }
-        },
-        "← Back to Edit"
-      )
-    ),
-    /* @__PURE__ */ React.createElement(
-      "div",
-      {
-        style: {
-          display: "flex",
-          marginBottom: 16,
-          borderBottom: "1px solid #E5E7EB"
-        }
-      },
-      /* @__PURE__ */ React.createElement(
-        "button",
-        {
-          onClick: () => setActiveTab("input"),
-          style: {
-            background: "none",
-            border: "none",
-            padding: "12px 16px",
-            cursor: "pointer",
-            fontSize: "0.9rem",
-            fontWeight: activeTab === "input" ? 600 : 400,
-            color: activeTab === "input" ? "#6D28D9" : "#6B7280",
-            borderBottom: activeTab === "input" ? "2px solid #6D28D9" : "none"
-          }
-        },
-        "Input"
-      ),
-      /* @__PURE__ */ React.createElement(
-        "button",
-        {
-          onClick: () => setActiveTab("result"),
-          disabled: !result,
-          style: {
-            background: "none",
-            border: "none",
-            padding: "12px 16px",
-            cursor: result ? "pointer" : "not-allowed",
-            fontSize: "0.9rem",
-            fontWeight: activeTab === "result" ? 600 : 400,
-            color: activeTab === "result" ? "#6D28D9" : "#6B7280",
-            borderBottom: activeTab === "result" ? "2px solid #6D28D9" : "none",
-            opacity: result ? 1 : 0.5
-          }
-        },
-        "Generated Letter"
-      )
-    ),
-    activeTab === "input" && /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 12, marginBottom: 16 } }, /* @__PURE__ */ React.createElement("div", { style: { flex: 1 } }, /* @__PURE__ */ React.createElement(
-      "label",
-      {
-        style: {
-          display: "block",
-          fontSize: "0.9rem",
-          fontWeight: 600,
-          color: "#374151",
-          marginBottom: 4
-        }
-      },
-      "Job Title"
-    ), /* @__PURE__ */ React.createElement(
-      "input",
-      {
-        type: "text",
-        value: jobTitle,
-        onChange: (e) => setJobTitle(e.target.value),
-        placeholder: "e.g., Senior Software Engineer",
-        style: {
-          width: "100%",
-          padding: "8px 12px",
-          borderRadius: 6,
-          border: "1px solid #E5E7EB",
-          fontSize: "0.9rem"
-        }
-      }
-    )), /* @__PURE__ */ React.createElement("div", { style: { flex: 1 } }, /* @__PURE__ */ React.createElement(
-      "label",
-      {
-        style: {
-          display: "block",
-          fontSize: "0.9rem",
-          fontWeight: 600,
-          color: "#374151",
-          marginBottom: 4
-        }
-      },
-      "Company Name"
-    ), /* @__PURE__ */ React.createElement(
-      "input",
-      {
-        type: "text",
-        value: companyName,
-        onChange: (e) => setCompanyName(e.target.value),
-        placeholder: "e.g., Google",
-        style: {
-          width: "100%",
-          padding: "8px 12px",
-          borderRadius: 6,
-          border: "1px solid #E5E7EB",
-          fontSize: "0.9rem"
-        }
-      }
-    ))), /* @__PURE__ */ React.createElement("div", { style: { marginBottom: 16 } }, /* @__PURE__ */ React.createElement(
-      "label",
-      {
-        style: {
-          display: "block",
-          fontSize: "0.9rem",
-          fontWeight: 600,
-          color: "#374151",
-          marginBottom: 8
-        }
-      },
-      "Cover Letter Tone:"
-    ), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 8, flexWrap: "wrap" } }, toneOptions.map((option) => /* @__PURE__ */ React.createElement(
-      "button",
-      {
-        key: option.value,
-        onClick: () => setTone(option.value),
-        style: {
-          background: tone === option.value ? "#6D28D9" : "#F3F4F6",
-          color: tone === option.value ? "#FFFFFF" : "#6B7280",
-          border: "none",
-          borderRadius: 6,
-          padding: "8px 16px",
-          cursor: "pointer",
-          fontSize: "0.8rem",
-          fontWeight: 500,
-          minWidth: 120,
-          textAlign: "left"
-        },
-        title: option.description
-      },
-      /* @__PURE__ */ React.createElement("div", { style: { fontWeight: 600 } }, option.label),
-      /* @__PURE__ */ React.createElement("div", { style: { fontSize: "0.7rem", opacity: 0.8 } }, option.description)
-    )))), /* @__PURE__ */ React.createElement("div", { className: "uswift-card", style: { marginBottom: 16 } }, /* @__PURE__ */ React.createElement(
-      "label",
-      {
-        style: {
-          fontWeight: 600,
-          display: "block",
-          marginBottom: 8,
-          color: "#374151"
-        }
-      },
-      "Your Resume Content:"
-    ), /* @__PURE__ */ React.createElement(
-      "textarea",
-      {
-        value: resumeContent,
-        onChange: (e) => setResumeContent(e.target.value),
-        placeholder: "Paste your resume content here to help tailor the cover letter...",
-        rows: 6,
-        style: {
-          width: "100%",
-          padding: 12,
-          borderRadius: 8,
-          border: "1px solid #E5E7EB",
-          fontSize: "0.9rem",
-          resize: "vertical"
-        }
-      }
-    )), /* @__PURE__ */ React.createElement("div", { className: "uswift-card", style: { marginBottom: 16 } }, /* @__PURE__ */ React.createElement(
-      "label",
-      {
-        style: {
-          fontWeight: 600,
-          display: "block",
-          marginBottom: 8,
-          color: "#374151"
-        }
-      },
-      "Job Description:"
-    ), /* @__PURE__ */ React.createElement(
-      "textarea",
-      {
-        value: jobDescription,
-        onChange: (e) => setJobDescription(e.target.value),
-        placeholder: "Paste the complete job description here...",
-        rows: 8,
-        style: {
-          width: "100%",
-          padding: 12,
-          borderRadius: 8,
-          border: "1px solid #E5E7EB",
-          fontSize: "0.9rem",
-          resize: "vertical"
-        }
-      }
-    )), /* @__PURE__ */ React.createElement(
-      "button",
-      {
-        onClick: handleGenerate,
-        disabled: isLoading || !resumeContent.trim() || !jobDescription.trim(),
-        className: "uswift-btn",
-        style: {
-          width: "100%",
-          opacity: isLoading || !resumeContent.trim() || !jobDescription.trim() ? 0.6 : 1,
-          cursor: isLoading || !resumeContent.trim() || !jobDescription.trim() ? "not-allowed" : "pointer"
-        }
-      },
-      isLoading ? /* @__PURE__ */ React.createElement(
-        "div",
-        {
-          style: {
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            gap: 8
-          }
-        },
-        /* @__PURE__ */ React.createElement(
+      children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
           "div",
           {
+            className: "uswift-gradient",
             style: {
-              width: 16,
-              height: 16,
-              border: "2px solid #ffffff",
-              borderTop: "2px solid transparent",
-              borderRadius: "50%",
-              animation: "spin 1s linear infinite"
+              height: 8,
+              borderRadius: 8,
+              marginBottom: 16
             }
           }
         ),
-        "Generating Cover Letter..."
-      ) : "Generate Cover Letter"
-    ), /* @__PURE__ */ React.createElement(
-      "div",
-      {
-        style: {
-          marginTop: 16,
-          padding: 12,
-          background: "#F8F9FA",
-          borderRadius: 8,
-          fontSize: "0.8rem",
-          color: "#6B7280"
-        }
-      },
-      /* @__PURE__ */ React.createElement("strong", null, "Tips for Better Results:"),
-      /* @__PURE__ */ React.createElement("ul", { style: { margin: "8px 0 0 16px", padding: 0 } }, /* @__PURE__ */ React.createElement("li", null, "Include specific achievements and metrics from your resume"), /* @__PURE__ */ React.createElement("li", null, "Highlight relevant skills that match the job requirements"), /* @__PURE__ */ React.createElement("li", null, "Keep the job description comprehensive for better tailoring"), /* @__PURE__ */ React.createElement("li", null, "Choose a tone that matches the company culture"))
-    )),
-    activeTab === "result" && result && /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement(
-      "div",
-      {
-        style: {
-          display: "flex",
-          gap: 16,
-          marginBottom: 20,
-          padding: 16,
-          background: "#F8F9FA",
-          borderRadius: 8
-        }
-      },
-      /* @__PURE__ */ React.createElement("div", { style: { textAlign: "center", flex: 1 } }, /* @__PURE__ */ React.createElement(
-        "div",
-        {
-          style: {
-            fontSize: "1.5rem",
-            fontWeight: 700,
-            color: "#6D28D9",
-            marginBottom: 4
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(
+          "div",
+          {
+            style: {
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              marginBottom: 16
+            },
+            children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "h2",
+                {
+                  style: {
+                    fontSize: "1.4rem",
+                    fontWeight: 700,
+                    color: "#111827",
+                    margin: 0
+                  },
+                  children: "Cover Letter Generator"
+                }
+              ),
+              activeTab === "result" && /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "button",
+                {
+                  onClick: () => setActiveTab("input"),
+                  style: {
+                    background: "#EDE9FE",
+                    color: "#6D28D9",
+                    border: "none",
+                    borderRadius: 8,
+                    padding: "6px 12px",
+                    cursor: "pointer",
+                    fontSize: "0.8rem"
+                  },
+                  children: "← Back to Edit"
+                }
+              )
+            ]
           }
-        },
-        result.wordCount
-      ), /* @__PURE__ */ React.createElement(
-        "div",
-        {
-          style: {
-            fontSize: "0.8rem",
-            color: "#6B7280",
-            fontWeight: 500
+        ),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(
+          "div",
+          {
+            style: {
+              display: "flex",
+              marginBottom: 16,
+              borderBottom: "1px solid #E5E7EB"
+            },
+            children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "button",
+                {
+                  onClick: () => setActiveTab("input"),
+                  style: {
+                    background: "none",
+                    border: "none",
+                    padding: "12px 16px",
+                    cursor: "pointer",
+                    fontSize: "0.9rem",
+                    fontWeight: activeTab === "input" ? 600 : 400,
+                    color: activeTab === "input" ? "#6D28D9" : "#6B7280",
+                    borderBottom: activeTab === "input" ? "2px solid #6D28D9" : "none"
+                  },
+                  children: "Input"
+                }
+              ),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "button",
+                {
+                  onClick: () => setActiveTab("result"),
+                  disabled: !result,
+                  style: {
+                    background: "none",
+                    border: "none",
+                    padding: "12px 16px",
+                    cursor: result ? "pointer" : "not-allowed",
+                    fontSize: "0.9rem",
+                    fontWeight: activeTab === "result" ? 600 : 400,
+                    color: activeTab === "result" ? "#6D28D9" : "#6B7280",
+                    borderBottom: activeTab === "result" ? "2px solid #6D28D9" : "none",
+                    opacity: result ? 1 : 0.5
+                  },
+                  children: "Generated Letter"
+                }
+              )
+            ]
           }
-        },
-        "Words"
-      )),
-      /* @__PURE__ */ React.createElement("div", { style: { textAlign: "center", flex: 1 } }, /* @__PURE__ */ React.createElement(
-        "div",
-        {
-          style: {
-            fontSize: "1.2rem",
-            fontWeight: 600,
-            color: "#10B981",
-            marginBottom: 4
+        ),
+        activeTab === "input" && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { display: "flex", gap: 12, marginBottom: 16 }, children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { flex: 1 }, children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "label",
+                {
+                  style: {
+                    display: "block",
+                    fontSize: "0.9rem",
+                    fontWeight: 600,
+                    color: "#374151",
+                    marginBottom: 4
+                  },
+                  children: "Job Title"
+                }
+              ),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "input",
+                {
+                  type: "text",
+                  value: jobTitle,
+                  onChange: (e) => setJobTitle(e.target.value),
+                  placeholder: "e.g., Senior Software Engineer",
+                  style: {
+                    width: "100%",
+                    padding: "8px 12px",
+                    borderRadius: 6,
+                    border: "1px solid #E5E7EB",
+                    fontSize: "0.9rem"
+                  }
+                }
+              )
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { flex: 1 }, children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "label",
+                {
+                  style: {
+                    display: "block",
+                    fontSize: "0.9rem",
+                    fontWeight: 600,
+                    color: "#374151",
+                    marginBottom: 4
+                  },
+                  children: "Company Name"
+                }
+              ),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "input",
+                {
+                  type: "text",
+                  value: companyName,
+                  onChange: (e) => setCompanyName(e.target.value),
+                  placeholder: "e.g., Google",
+                  style: {
+                    width: "100%",
+                    padding: "8px 12px",
+                    borderRadius: 6,
+                    border: "1px solid #E5E7EB",
+                    fontSize: "0.9rem"
+                  }
+                }
+              )
+            ] })
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { marginBottom: 16 }, children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "label",
+              {
+                style: {
+                  display: "block",
+                  fontSize: "0.9rem",
+                  fontWeight: 600,
+                  color: "#374151",
+                  marginBottom: 8
+                },
+                children: "Cover Letter Tone:"
+              }
+            ),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { style: { display: "flex", gap: 8, flexWrap: "wrap" }, children: toneOptions.map((option) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
+              "button",
+              {
+                onClick: () => setTone(option.value),
+                style: {
+                  background: tone === option.value ? "#6D28D9" : "#F3F4F6",
+                  color: tone === option.value ? "#FFFFFF" : "#6B7280",
+                  border: "none",
+                  borderRadius: 6,
+                  padding: "8px 16px",
+                  cursor: "pointer",
+                  fontSize: "0.8rem",
+                  fontWeight: 500,
+                  minWidth: 120,
+                  textAlign: "left"
+                },
+                title: option.description,
+                children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("div", { style: { fontWeight: 600 }, children: option.label }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("div", { style: { fontSize: "0.7rem", opacity: 0.8 }, children: option.description })
+                ]
+              },
+              option.value
+            )) })
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "uswift-card", style: { marginBottom: 16 }, children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "label",
+              {
+                style: {
+                  fontWeight: 600,
+                  display: "block",
+                  marginBottom: 8,
+                  color: "#374151"
+                },
+                children: "Your Resume Content:"
+              }
+            ),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "textarea",
+              {
+                value: resumeContent,
+                onChange: (e) => setResumeContent(e.target.value),
+                placeholder: "Paste your resume content here to help tailor the cover letter...",
+                rows: 6,
+                style: {
+                  width: "100%",
+                  padding: 12,
+                  borderRadius: 8,
+                  border: "1px solid #E5E7EB",
+                  fontSize: "0.9rem",
+                  resize: "vertical"
+                }
+              }
+            )
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "uswift-card", style: { marginBottom: 16 }, children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "label",
+              {
+                style: {
+                  fontWeight: 600,
+                  display: "block",
+                  marginBottom: 8,
+                  color: "#374151"
+                },
+                children: "Job Description:"
+              }
+            ),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "textarea",
+              {
+                value: jobDescription,
+                onChange: (e) => setJobDescription(e.target.value),
+                placeholder: "Paste the complete job description here...",
+                rows: 8,
+                style: {
+                  width: "100%",
+                  padding: 12,
+                  borderRadius: 8,
+                  border: "1px solid #E5E7EB",
+                  fontSize: "0.9rem",
+                  resize: "vertical"
+                }
+              }
+            )
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            "button",
+            {
+              onClick: handleGenerate,
+              disabled: isLoading || !resumeContent.trim() || !jobDescription.trim(),
+              className: "uswift-btn",
+              style: {
+                width: "100%",
+                opacity: isLoading || !resumeContent.trim() || !jobDescription.trim() ? 0.6 : 1,
+                cursor: isLoading || !resumeContent.trim() || !jobDescription.trim() ? "not-allowed" : "pointer"
+              },
+              children: isLoading ? /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                "div",
+                {
+                  style: {
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gap: 8
+                  },
+                  children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(
+                      "div",
+                      {
+                        style: {
+                          width: 16,
+                          height: 16,
+                          border: "2px solid #ffffff",
+                          borderTop: "2px solid transparent",
+                          borderRadius: "50%",
+                          animation: "spin 1s linear infinite"
+                        }
+                      }
+                    ),
+                    "Generating Cover Letter..."
+                  ]
+                }
+              ) : "Generate Cover Letter"
+            }
+          ),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(
+            "div",
+            {
+              style: {
+                marginTop: 16,
+                padding: 12,
+                background: "#F8F9FA",
+                borderRadius: 8,
+                fontSize: "0.8rem",
+                color: "#6B7280"
+              },
+              children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Tips for Better Results:" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("ul", { style: { margin: "8px 0 0 16px", padding: 0 }, children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Include specific achievements and metrics from your resume" }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Highlight relevant skills that match the job requirements" }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Keep the job description comprehensive for better tailoring" }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Choose a tone that matches the company culture" })
+                ] })
+              ]
+            }
+          )
+        ] }),
+        activeTab === "result" && result && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(
+            "div",
+            {
+              style: {
+                display: "flex",
+                gap: 16,
+                marginBottom: 20,
+                padding: 16,
+                background: "#F8F9FA",
+                borderRadius: 8
+              },
+              children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { textAlign: "center", flex: 1 }, children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(
+                    "div",
+                    {
+                      style: {
+                        fontSize: "1.5rem",
+                        fontWeight: 700,
+                        color: "#6D28D9",
+                        marginBottom: 4
+                      },
+                      children: result.wordCount
+                    }
+                  ),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(
+                    "div",
+                    {
+                      style: {
+                        fontSize: "0.8rem",
+                        color: "#6B7280",
+                        fontWeight: 500
+                      },
+                      children: "Words"
+                    }
+                  )
+                ] }),
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { textAlign: "center", flex: 1 }, children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(
+                    "div",
+                    {
+                      style: {
+                        fontSize: "1.2rem",
+                        fontWeight: 600,
+                        color: "#10B981",
+                        marginBottom: 4
+                      },
+                      children: result.tone
+                    }
+                  ),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(
+                    "div",
+                    {
+                      style: {
+                        fontSize: "0.8rem",
+                        color: "#6B7280",
+                        fontWeight: 500
+                      },
+                      children: "Tone"
+                    }
+                  )
+                ] })
+              ]
+            }
+          ),
+          result.keyPoints.length > 0 && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "uswift-card", style: { marginBottom: 16 }, children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "h3",
+              {
+                style: {
+                  fontSize: "1.1rem",
+                  fontWeight: 600,
+                  color: "#111827",
+                  marginBottom: 12
+                },
+                children: "Key Highlights"
+              }
+            ),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("ul", { style: { margin: 0, paddingLeft: 20 }, children: result.keyPoints.map((point, index) => /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "li",
+              {
+                style: {
+                  fontSize: "0.9rem",
+                  color: "#4B5563",
+                  marginBottom: 8
+                },
+                children: point
+              },
+              index
+            )) })
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "uswift-card", style: { marginBottom: 16 }, children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsxs(
+              "div",
+              {
+                style: {
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  marginBottom: 12
+                },
+                children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(
+                    "h3",
+                    {
+                      style: {
+                        fontSize: "1.1rem",
+                        fontWeight: 600,
+                        color: "#111827",
+                        margin: 0
+                      },
+                      children: "Your Cover Letter"
+                    }
+                  ),
+                  /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { display: "flex", gap: 8 }, children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(
+                      "button",
+                      {
+                        onClick: () => copyToClipboard(result.content),
+                        style: {
+                          background: "#EDE9FE",
+                          color: "#6D28D9",
+                          border: "none",
+                          borderRadius: 6,
+                          padding: "6px 12px",
+                          cursor: "pointer",
+                          fontSize: "0.8rem"
+                        },
+                        children: "Copy"
+                      }
+                    ),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(
+                      "button",
+                      {
+                        onClick: () => downloadAsText(result.content, "cover-letter.txt"),
+                        style: {
+                          background: "#EDE9FE",
+                          color: "#6D28D9",
+                          border: "none",
+                          borderRadius: 6,
+                          padding: "6px 12px",
+                          cursor: "pointer",
+                          fontSize: "0.8rem"
+                        },
+                        children: "Download"
+                      }
+                    )
+                  ] })
+                ]
+              }
+            ),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "div",
+              {
+                style: {
+                  background: "#F8F9FA",
+                  padding: 16,
+                  borderRadius: 8,
+                  fontSize: "0.9rem",
+                  lineHeight: 1.6,
+                  whiteSpace: "pre-wrap",
+                  maxHeight: 400,
+                  overflowY: "auto",
+                  border: "1px solid #E5E7EB"
+                },
+                children: result.content
+              }
+            )
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { display: "flex", gap: 8 }, children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "button",
+              {
+                onClick: () => copyToClipboard(result.content),
+                className: "uswift-btn",
+                style: { flex: 1 },
+                children: "Copy to Clipboard"
+              }
+            ),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "button",
+              {
+                onClick: () => setActiveTab("input"),
+                style: {
+                  flex: 1,
+                  background: "#F3F4F6",
+                  color: "#6B7280",
+                  border: "1px solid #E5E7EB",
+                  borderRadius: 8,
+                  padding: "12px",
+                  cursor: "pointer"
+                },
+                children: "Generate Another"
+              }
+            )
+          ] })
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          "div",
+          {
+            style: {
+              marginTop: 16,
+              textAlign: "center",
+              fontSize: "0.8rem",
+              color: "#6B7280"
+            },
+            children: "Powered by Mistral AI • Create professional cover letters tailored to each job"
           }
-        },
-        result.tone
-      ), /* @__PURE__ */ React.createElement(
-        "div",
-        {
-          style: {
-            fontSize: "0.8rem",
-            color: "#6B7280",
-            fontWeight: 500
-          }
-        },
-        "Tone"
-      ))
-    ), result.keyPoints.length > 0 && /* @__PURE__ */ React.createElement("div", { className: "uswift-card", style: { marginBottom: 16 } }, /* @__PURE__ */ React.createElement(
-      "h3",
-      {
-        style: {
-          fontSize: "1.1rem",
-          fontWeight: 600,
-          color: "#111827",
-          marginBottom: 12
-        }
-      },
-      "Key Highlights"
-    ), /* @__PURE__ */ React.createElement("ul", { style: { margin: 0, paddingLeft: 20 } }, result.keyPoints.map((point, index) => /* @__PURE__ */ React.createElement(
-      "li",
-      {
-        key: index,
-        style: {
-          fontSize: "0.9rem",
-          color: "#4B5563",
-          marginBottom: 8
-        }
-      },
-      point
-    )))), /* @__PURE__ */ React.createElement("div", { className: "uswift-card", style: { marginBottom: 16 } }, /* @__PURE__ */ React.createElement(
-      "div",
-      {
-        style: {
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          marginBottom: 12
-        }
-      },
-      /* @__PURE__ */ React.createElement(
-        "h3",
-        {
-          style: {
-            fontSize: "1.1rem",
-            fontWeight: 600,
-            color: "#111827",
-            margin: 0
-          }
-        },
-        "Your Cover Letter"
-      ),
-      /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 8 } }, /* @__PURE__ */ React.createElement(
-        "button",
-        {
-          onClick: () => copyToClipboard(result.content),
-          style: {
-            background: "#EDE9FE",
-            color: "#6D28D9",
-            border: "none",
-            borderRadius: 6,
-            padding: "6px 12px",
-            cursor: "pointer",
-            fontSize: "0.8rem"
-          }
-        },
-        "Copy"
-      ), /* @__PURE__ */ React.createElement(
-        "button",
-        {
-          onClick: () => downloadAsText(result.content, "cover-letter.txt"),
-          style: {
-            background: "#EDE9FE",
-            color: "#6D28D9",
-            border: "none",
-            borderRadius: 6,
-            padding: "6px 12px",
-            cursor: "pointer",
-            fontSize: "0.8rem"
-          }
-        },
-        "Download"
-      ))
-    ), /* @__PURE__ */ React.createElement(
-      "div",
-      {
-        style: {
-          background: "#F8F9FA",
-          padding: 16,
-          borderRadius: 8,
-          fontSize: "0.9rem",
-          lineHeight: 1.6,
-          whiteSpace: "pre-wrap",
-          maxHeight: 400,
-          overflowY: "auto",
-          border: "1px solid #E5E7EB"
-        }
-      },
-      result.content
-    )), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 8 } }, /* @__PURE__ */ React.createElement(
-      "button",
-      {
-        onClick: () => copyToClipboard(result.content),
-        className: "uswift-btn",
-        style: { flex: 1 }
-      },
-      "Copy to Clipboard"
-    ), /* @__PURE__ */ React.createElement(
-      "button",
-      {
-        onClick: () => setActiveTab("input"),
-        style: {
-          flex: 1,
-          background: "#F3F4F6",
-          color: "#6B7280",
-          border: "1px solid #E5E7EB",
-          borderRadius: 8,
-          padding: "12px",
-          cursor: "pointer"
-        }
-      },
-      "Generate Another"
-    ))),
-    /* @__PURE__ */ React.createElement(
-      "div",
-      {
-        style: {
-          marginTop: 16,
-          textAlign: "center",
-          fontSize: "0.8rem",
-          color: "#6B7280"
-        }
-      },
-      "Powered by Mistral AI • Create professional cover letters tailored to each job"
-    )
+        )
+      ]
+    }
   );
 }
 
@@ -3733,7 +4106,7 @@ ${file.content}`;
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
   };
-  return /* @__PURE__ */ React.createElement(
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs(
     "div",
     {
       style: {
@@ -3742,528 +4115,602 @@ ${file.content}`;
         padding: "2rem",
         minWidth: 350,
         minHeight: 520
-      }
-    },
-    /* @__PURE__ */ React.createElement(
-      "div",
-      {
-        className: "uswift-gradient",
-        style: {
-          height: 8,
-          borderRadius: 8,
-          marginBottom: 16
-        }
-      }
-    ),
-    /* @__PURE__ */ React.createElement(
-      "div",
-      {
-        style: {
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          marginBottom: 16
-        }
       },
-      /* @__PURE__ */ React.createElement(
-        "h2",
-        {
-          style: {
-            fontSize: "1.4rem",
-            fontWeight: 700,
-            color: "#111827",
-            margin: 0
+      children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          "div",
+          {
+            className: "uswift-gradient",
+            style: {
+              height: 8,
+              borderRadius: 8,
+              marginBottom: 16
+            }
           }
-        },
-        "File Manager"
-      ),
-      /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 8 } }, /* @__PURE__ */ React.createElement(
-        "span",
-        {
-          style: {
-            color: "#6B7280",
-            fontSize: "0.8rem",
-            alignSelf: "center"
-          }
-        },
-        files.length,
-        " files"
-      ))
-    ),
-    /* @__PURE__ */ React.createElement(
-      "div",
-      {
-        style: {
-          display: "flex",
-          marginBottom: 16,
-          borderBottom: "1px solid #E5E7EB"
-        }
-      },
-      /* @__PURE__ */ React.createElement(
-        "button",
-        {
-          onClick: () => setActiveTab("upload"),
-          style: {
-            background: "none",
-            border: "none",
-            padding: "12px 16px",
-            cursor: "pointer",
-            fontSize: "0.9rem",
-            fontWeight: activeTab === "upload" ? 600 : 400,
-            color: activeTab === "upload" ? "#6D28D9" : "#6B7280",
-            borderBottom: activeTab === "upload" ? "2px solid #6D28D9" : "none"
-          }
-        },
-        "Upload"
-      ),
-      /* @__PURE__ */ React.createElement(
-        "button",
-        {
-          onClick: () => setActiveTab("manage"),
-          style: {
-            background: "none",
-            border: "none",
-            padding: "12px 16px",
-            cursor: "pointer",
-            fontSize: "0.9rem",
-            fontWeight: activeTab === "manage" ? 600 : 400,
-            color: activeTab === "manage" ? "#6D28D9" : "#6B7280",
-            borderBottom: activeTab === "manage" ? "2px solid #6D28D9" : "none"
-          }
-        },
-        "Manage (",
-        files.length,
-        ")"
-      ),
-      /* @__PURE__ */ React.createElement(
-        "button",
-        {
-          onClick: () => setActiveTab("analyze"),
-          disabled: !selectedFile,
-          style: {
-            background: "none",
-            border: "none",
-            padding: "12px 16px",
-            cursor: selectedFile ? "pointer" : "not-allowed",
-            fontSize: "0.9rem",
-            fontWeight: activeTab === "analyze" ? 600 : 400,
-            color: activeTab === "analyze" ? "#6D28D9" : "#6B7280",
-            borderBottom: activeTab === "analyze" ? "2px solid #6D28D9" : "none",
-            opacity: selectedFile ? 1 : 0.5
-          }
-        },
-        "Analyze"
-      )
-    ),
-    activeTab === "upload" && /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { style: { marginBottom: 16 } }, /* @__PURE__ */ React.createElement(
-      "label",
-      {
-        style: {
-          display: "block",
-          fontSize: "0.9rem",
-          fontWeight: 600,
-          color: "#374151",
-          marginBottom: 8
-        }
-      },
-      "Document Type:"
-    ), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 8, flexWrap: "wrap" } }, [
-      { value: "resume", label: "Resume", icon: "📄" },
-      { value: "cover_letter", label: "Cover Letter", icon: "✉️" },
-      { value: "portfolio", label: "Portfolio", icon: "💼" },
-      { value: "certificate", label: "Certificate", icon: "🏆" },
-      { value: "other", label: "Other", icon: "📎" }
-    ].map((option) => /* @__PURE__ */ React.createElement(
-      "button",
-      {
-        key: option.value,
-        onClick: () => setFileType(option.value),
-        style: {
-          background: fileType === option.value ? "#6D28D9" : "#F3F4F6",
-          color: fileType === option.value ? "#FFFFFF" : "#6B7280",
-          border: "none",
-          borderRadius: 6,
-          padding: "8px 16px",
-          cursor: "pointer",
-          fontSize: "0.8rem",
-          fontWeight: 500,
-          display: "flex",
-          alignItems: "center",
-          gap: 4
-        }
-      },
-      /* @__PURE__ */ React.createElement("span", null, option.icon),
-      option.label
-    )))), /* @__PURE__ */ React.createElement(
-      "div",
-      {
-        className: "uswift-card",
-        onDragOver: handleDragOver,
-        onDragLeave: handleDragLeave,
-        onDrop: handleDrop,
-        style: {
-          border: dragActive ? "2px dashed #6D28D9" : "2px dashed #E5E7EB",
-          background: dragActive ? "#F8F9FA" : "#FFFFFF",
-          cursor: "pointer",
-          transition: "all 0.2s ease",
-          textAlign: "center",
-          padding: "2rem",
-          marginBottom: 16
-        }
-      },
-      /* @__PURE__ */ React.createElement("div", { style: { marginBottom: 16 } }, /* @__PURE__ */ React.createElement(
-        "div",
-        {
-          style: {
-            fontSize: "2rem",
-            marginBottom: 8,
-            color: dragActive ? "#6D28D9" : "#6B7280"
-          }
-        },
-        "📁"
-      ), /* @__PURE__ */ React.createElement(
-        "h3",
-        {
-          style: {
-            fontSize: "1.1rem",
-            fontWeight: 600,
-            color: "#111827",
-            marginBottom: 8
-          }
-        },
-        "Drop your file here"
-      ), /* @__PURE__ */ React.createElement(
-        "p",
-        {
-          style: {
-            color: "#6B7280",
-            fontSize: "0.9rem",
-            marginBottom: 16
-          }
-        },
-        "or click to browse"
-      )),
-      /* @__PURE__ */ React.createElement(
-        "input",
-        {
-          type: "file",
-          accept: ".txt,.pdf,.doc,.docx",
-          onChange: handleFileSelect,
-          style: { display: "none" },
-          id: "file-input"
-        }
-      ),
-      /* @__PURE__ */ React.createElement(
-        "label",
-        {
-          htmlFor: "file-input",
-          style: {
-            background: "#6D28D9",
-            color: "#FFFFFF",
-            border: "none",
-            borderRadius: 8,
-            padding: "12px 24px",
-            cursor: "pointer",
-            fontSize: "0.9rem",
-            fontWeight: 500
-          }
-        },
-        "Choose File"
-      )
-    ), /* @__PURE__ */ React.createElement(
-      "div",
-      {
-        style: {
-          padding: 12,
-          background: "#F8F9FA",
-          borderRadius: 8,
-          fontSize: "0.8rem",
-          color: "#6B7280"
-        }
-      },
-      /* @__PURE__ */ React.createElement("strong", null, "Supported formats:"),
-      " .txt, .pdf, .doc, .docx",
-      /* @__PURE__ */ React.createElement("br", null),
-      /* @__PURE__ */ React.createElement("strong", null, "Max file size:"),
-      " 5MB",
-      /* @__PURE__ */ React.createElement("br", null),
-      /* @__PURE__ */ React.createElement("strong", null, "Recommended:"),
-      " Plain text files work best for AI analysis"
-    )),
-    activeTab === "manage" && /* @__PURE__ */ React.createElement("div", null, files.length === 0 ? /* @__PURE__ */ React.createElement(
-      "div",
-      {
-        style: {
-          textAlign: "center",
-          padding: "3rem",
-          color: "#6B7280"
-        }
-      },
-      /* @__PURE__ */ React.createElement("div", { style: { fontSize: "3rem", marginBottom: 16 } }, "📂"),
-      /* @__PURE__ */ React.createElement("h3", { style: { fontSize: "1.1rem", marginBottom: 8 } }, "No files uploaded yet"),
-      /* @__PURE__ */ React.createElement("p", { style: { fontSize: "0.9rem" } }, "Upload your first document to get started")
-    ) : /* @__PURE__ */ React.createElement("div", { style: { maxHeight: 400, overflowY: "auto" } }, files.map((file) => /* @__PURE__ */ React.createElement(
-      "div",
-      {
-        key: file.id,
-        className: "uswift-card",
-        style: {
-          marginBottom: 12,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between"
-        }
-      },
-      /* @__PURE__ */ React.createElement("div", { style: { flex: 1 } }, /* @__PURE__ */ React.createElement(
-        "div",
-        {
-          style: {
-            display: "flex",
-            alignItems: "center",
-            gap: 8,
-            marginBottom: 4
-          }
-        },
-        /* @__PURE__ */ React.createElement("span", { style: { fontSize: "1.2rem" } }, getFileTypeIcon(file.type)),
-        /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement(
-          "h4",
+        ),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(
+          "div",
           {
             style: {
-              fontSize: "0.9rem",
-              fontWeight: 600,
-              color: "#111827",
-              margin: 0
-            }
-          },
-          file.name
-        ), /* @__PURE__ */ React.createElement(
-          "p",
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              marginBottom: 16
+            },
+            children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "h2",
+                {
+                  style: {
+                    fontSize: "1.4rem",
+                    fontWeight: 700,
+                    color: "#111827",
+                    margin: 0
+                  },
+                  children: "File Manager"
+                }
+              ),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { style: { display: "flex", gap: 8 }, children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                "span",
+                {
+                  style: {
+                    color: "#6B7280",
+                    fontSize: "0.8rem",
+                    alignSelf: "center"
+                  },
+                  children: [
+                    files.length,
+                    " files"
+                  ]
+                }
+              ) })
+            ]
+          }
+        ),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(
+          "div",
           {
             style: {
-              fontSize: "0.7rem",
-              color: "#6B7280",
-              margin: 0
+              display: "flex",
+              marginBottom: 16,
+              borderBottom: "1px solid #E5E7EB"
+            },
+            children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "button",
+                {
+                  onClick: () => setActiveTab("upload"),
+                  style: {
+                    background: "none",
+                    border: "none",
+                    padding: "12px 16px",
+                    cursor: "pointer",
+                    fontSize: "0.9rem",
+                    fontWeight: activeTab === "upload" ? 600 : 400,
+                    color: activeTab === "upload" ? "#6D28D9" : "#6B7280",
+                    borderBottom: activeTab === "upload" ? "2px solid #6D28D9" : "none"
+                  },
+                  children: "Upload"
+                }
+              ),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                "button",
+                {
+                  onClick: () => setActiveTab("manage"),
+                  style: {
+                    background: "none",
+                    border: "none",
+                    padding: "12px 16px",
+                    cursor: "pointer",
+                    fontSize: "0.9rem",
+                    fontWeight: activeTab === "manage" ? 600 : 400,
+                    color: activeTab === "manage" ? "#6D28D9" : "#6B7280",
+                    borderBottom: activeTab === "manage" ? "2px solid #6D28D9" : "none"
+                  },
+                  children: [
+                    "Manage (",
+                    files.length,
+                    ")"
+                  ]
+                }
+              ),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "button",
+                {
+                  onClick: () => setActiveTab("analyze"),
+                  disabled: !selectedFile,
+                  style: {
+                    background: "none",
+                    border: "none",
+                    padding: "12px 16px",
+                    cursor: selectedFile ? "pointer" : "not-allowed",
+                    fontSize: "0.9rem",
+                    fontWeight: activeTab === "analyze" ? 600 : 400,
+                    color: activeTab === "analyze" ? "#6D28D9" : "#6B7280",
+                    borderBottom: activeTab === "analyze" ? "2px solid #6D28D9" : "none",
+                    opacity: selectedFile ? 1 : 0.5
+                  },
+                  children: "Analyze"
+                }
+              )
+            ]
+          }
+        ),
+        activeTab === "upload" && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { marginBottom: 16 }, children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "label",
+              {
+                style: {
+                  display: "block",
+                  fontSize: "0.9rem",
+                  fontWeight: 600,
+                  color: "#374151",
+                  marginBottom: 8
+                },
+                children: "Document Type:"
+              }
+            ),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { style: { display: "flex", gap: 8, flexWrap: "wrap" }, children: [
+              { value: "resume", label: "Resume", icon: "📄" },
+              { value: "cover_letter", label: "Cover Letter", icon: "✉️" },
+              { value: "portfolio", label: "Portfolio", icon: "💼" },
+              { value: "certificate", label: "Certificate", icon: "🏆" },
+              { value: "other", label: "Other", icon: "📎" }
+            ].map((option) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
+              "button",
+              {
+                onClick: () => setFileType(option.value),
+                style: {
+                  background: fileType === option.value ? "#6D28D9" : "#F3F4F6",
+                  color: fileType === option.value ? "#FFFFFF" : "#6B7280",
+                  border: "none",
+                  borderRadius: 6,
+                  padding: "8px 16px",
+                  cursor: "pointer",
+                  fontSize: "0.8rem",
+                  fontWeight: 500,
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 4
+                },
+                children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: option.icon }),
+                  option.label
+                ]
+              },
+              option.value
+            )) })
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(
+            "div",
+            {
+              className: "uswift-card",
+              onDragOver: handleDragOver,
+              onDragLeave: handleDragLeave,
+              onDrop: handleDrop,
+              style: {
+                border: dragActive ? "2px dashed #6D28D9" : "2px dashed #E5E7EB",
+                background: dragActive ? "#F8F9FA" : "#FFFFFF",
+                cursor: "pointer",
+                transition: "all 0.2s ease",
+                textAlign: "center",
+                padding: "2rem",
+                marginBottom: 16
+              },
+              children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { marginBottom: 16 }, children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(
+                    "div",
+                    {
+                      style: {
+                        fontSize: "2rem",
+                        marginBottom: 8,
+                        color: dragActive ? "#6D28D9" : "#6B7280"
+                      },
+                      children: "📁"
+                    }
+                  ),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(
+                    "h3",
+                    {
+                      style: {
+                        fontSize: "1.1rem",
+                        fontWeight: 600,
+                        color: "#111827",
+                        marginBottom: 8
+                      },
+                      children: "Drop your file here"
+                    }
+                  ),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(
+                    "p",
+                    {
+                      style: {
+                        color: "#6B7280",
+                        fontSize: "0.9rem",
+                        marginBottom: 16
+                      },
+                      children: "or click to browse"
+                    }
+                  )
+                ] }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  "input",
+                  {
+                    type: "file",
+                    accept: ".txt,.pdf,.doc,.docx",
+                    onChange: handleFileSelect,
+                    style: { display: "none" },
+                    id: "file-input"
+                  }
+                ),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  "label",
+                  {
+                    htmlFor: "file-input",
+                    style: {
+                      background: "#6D28D9",
+                      color: "#FFFFFF",
+                      border: "none",
+                      borderRadius: 8,
+                      padding: "12px 24px",
+                      cursor: "pointer",
+                      fontSize: "0.9rem",
+                      fontWeight: 500
+                    },
+                    children: "Choose File"
+                  }
+                )
+              ]
             }
+          ),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(
+            "div",
+            {
+              style: {
+                padding: 12,
+                background: "#F8F9FA",
+                borderRadius: 8,
+                fontSize: "0.8rem",
+                color: "#6B7280"
+              },
+              children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Supported formats:" }),
+                " .txt, .pdf, .doc, .docx",
+                /* @__PURE__ */ jsxRuntimeExports.jsx("br", {}),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Max file size:" }),
+                " 5MB",
+                /* @__PURE__ */ jsxRuntimeExports.jsx("br", {}),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Recommended:" }),
+                " Plain text files work best for AI analysis"
+              ]
+            }
+          )
+        ] }),
+        activeTab === "manage" && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { children: files.length === 0 ? /* @__PURE__ */ jsxRuntimeExports.jsxs(
+          "div",
+          {
+            style: {
+              textAlign: "center",
+              padding: "3rem",
+              color: "#6B7280"
+            },
+            children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { style: { fontSize: "3rem", marginBottom: 16 }, children: "📂" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { style: { fontSize: "1.1rem", marginBottom: 8 }, children: "No files uploaded yet" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("p", { style: { fontSize: "0.9rem" }, children: "Upload your first document to get started" })
+            ]
+          }
+        ) : /* @__PURE__ */ jsxRuntimeExports.jsx("div", { style: { maxHeight: 400, overflowY: "auto" }, children: files.map((file) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
+          "div",
+          {
+            className: "uswift-card",
+            style: {
+              marginBottom: 12,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between"
+            },
+            children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { style: { flex: 1 }, children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                "div",
+                {
+                  style: {
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 8,
+                    marginBottom: 4
+                  },
+                  children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("span", { style: { fontSize: "1.2rem" }, children: getFileTypeIcon(file.type) }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+                      /* @__PURE__ */ jsxRuntimeExports.jsx(
+                        "h4",
+                        {
+                          style: {
+                            fontSize: "0.9rem",
+                            fontWeight: 600,
+                            color: "#111827",
+                            margin: 0
+                          },
+                          children: file.name
+                        }
+                      ),
+                      /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                        "p",
+                        {
+                          style: {
+                            fontSize: "0.7rem",
+                            color: "#6B7280",
+                            margin: 0
+                          },
+                          children: [
+                            file.type.replace("_", " "),
+                            " •",
+                            " ",
+                            formatFileSize(file.size),
+                            " •",
+                            " ",
+                            file.uploadedAt.toLocaleDateString()
+                          ]
+                        }
+                      )
+                    ] })
+                  ]
+                }
+              ) }),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { display: "flex", gap: 4 }, children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  "button",
+                  {
+                    onClick: () => analyzeFile(file),
+                    disabled: isLoading,
+                    style: {
+                      background: "#10B981",
+                      color: "#FFFFFF",
+                      border: "none",
+                      borderRadius: 4,
+                      padding: "4px 8px",
+                      cursor: "pointer",
+                      fontSize: "0.7rem"
+                    },
+                    children: "Analyze"
+                  }
+                ),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  "button",
+                  {
+                    onClick: () => deleteFile(file.id),
+                    style: {
+                      background: "#EF4444",
+                      color: "#FFFFFF",
+                      border: "none",
+                      borderRadius: 4,
+                      padding: "4px 8px",
+                      cursor: "pointer",
+                      fontSize: "0.7rem"
+                    },
+                    children: "Delete"
+                  }
+                )
+              ] })
+            ]
           },
-          file.type.replace("_", " "),
-          " •",
-          " ",
-          formatFileSize(file.size),
-          " •",
-          " ",
-          file.uploadedAt.toLocaleDateString()
-        ))
-      )),
-      /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 4 } }, /* @__PURE__ */ React.createElement(
-        "button",
-        {
-          onClick: () => analyzeFile(file),
-          disabled: isLoading,
-          style: {
-            background: "#10B981",
-            color: "#FFFFFF",
-            border: "none",
-            borderRadius: 4,
-            padding: "4px 8px",
-            cursor: "pointer",
-            fontSize: "0.7rem"
+          file.id
+        )) }) }),
+        activeTab === "analyze" && selectedFile && analysis && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "uswift-card", style: { marginBottom: 16 }, children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsxs(
+              "div",
+              {
+                style: {
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 8,
+                  marginBottom: 12
+                },
+                children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("span", { style: { fontSize: "1.5rem" }, children: getFileTypeIcon(selectedFile.type) }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(
+                      "h3",
+                      {
+                        style: {
+                          fontSize: "1.1rem",
+                          fontWeight: 600,
+                          color: "#111827",
+                          margin: 0
+                        },
+                        children: selectedFile.name
+                      }
+                    ),
+                    /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                      "p",
+                      {
+                        style: {
+                          fontSize: "0.8rem",
+                          color: "#6B7280",
+                          margin: 0
+                        },
+                        children: [
+                          selectedFile.type.replace("_", " "),
+                          " •",
+                          " ",
+                          formatFileSize(selectedFile.size)
+                        ]
+                      }
+                    )
+                  ] })
+                ]
+              }
+            ),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "div",
+              {
+                style: {
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 12,
+                  padding: 12,
+                  background: "#F8F9FA",
+                  borderRadius: 8,
+                  marginBottom: 12
+                },
+                children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { textAlign: "center" }, children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                    "div",
+                    {
+                      style: {
+                        fontSize: "1.8rem",
+                        fontWeight: 700,
+                        color: analysis.score >= 80 ? "#10B981" : analysis.score >= 60 ? "#F59E0B" : "#EF4444",
+                        marginBottom: 4
+                      },
+                      children: [
+                        analysis.score,
+                        "/100"
+                      ]
+                    }
+                  ),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(
+                    "div",
+                    {
+                      style: {
+                        fontSize: "0.8rem",
+                        color: "#6B7280",
+                        fontWeight: 500
+                      },
+                      children: "Quality Score"
+                    }
+                  )
+                ] })
+              }
+            )
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "uswift-card", style: { marginBottom: 16 }, children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "h3",
+              {
+                style: {
+                  fontSize: "1.1rem",
+                  fontWeight: 600,
+                  color: "#111827",
+                  marginBottom: 12
+                },
+                children: "Analysis Summary"
+              }
+            ),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "p",
+              {
+                style: {
+                  fontSize: "0.9rem",
+                  lineHeight: 1.6,
+                  color: "#4B5563",
+                  margin: 0
+                },
+                children: analysis.summary
+              }
+            )
+          ] }),
+          analysis.keywords.length > 0 && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "uswift-card", style: { marginBottom: 16 }, children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "h3",
+              {
+                style: {
+                  fontSize: "1.1rem",
+                  fontWeight: 600,
+                  color: "#111827",
+                  marginBottom: 12
+                },
+                children: "Key Keywords"
+              }
+            ),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { style: { display: "flex", gap: 4, flexWrap: "wrap" }, children: analysis.keywords.map((keyword, index) => /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "span",
+              {
+                style: {
+                  background: "#EDE9FE",
+                  color: "#6D28D9",
+                  padding: "4px 8px",
+                  borderRadius: 4,
+                  fontSize: "0.8rem",
+                  fontWeight: 500
+                },
+                children: keyword
+              },
+              index
+            )) })
+          ] }),
+          analysis.suggestions.length > 0 && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "uswift-card", style: { marginBottom: 16 }, children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "h3",
+              {
+                style: {
+                  fontSize: "1.1rem",
+                  fontWeight: 600,
+                  color: "#111827",
+                  marginBottom: 12
+                },
+                children: "Improvement Suggestions"
+              }
+            ),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("ul", { style: { margin: 0, paddingLeft: 20 }, children: analysis.suggestions.map((suggestion, index) => /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "li",
+              {
+                style: {
+                  fontSize: "0.9rem",
+                  color: "#4B5563",
+                  marginBottom: 8
+                },
+                children: suggestion
+              },
+              index
+            )) })
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { display: "flex", gap: 8 }, children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "button",
+              {
+                onClick: () => setActiveTab("upload"),
+                className: "uswift-btn",
+                style: { flex: 1 },
+                children: "Upload Another File"
+              }
+            ),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "button",
+              {
+                onClick: () => setActiveTab("manage"),
+                style: {
+                  flex: 1,
+                  background: "#F3F4F6",
+                  color: "#6B7280",
+                  border: "1px solid #E5E7EB",
+                  borderRadius: 8,
+                  padding: "12px",
+                  cursor: "pointer"
+                },
+                children: "Back to Files"
+              }
+            )
+          ] })
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          "div",
+          {
+            style: {
+              marginTop: 16,
+              textAlign: "center",
+              fontSize: "0.8rem",
+              color: "#6B7280"
+            },
+            children: "Powered by Mistral AI • Secure file storage and AI-powered analysis"
           }
-        },
-        "Analyze"
-      ), /* @__PURE__ */ React.createElement(
-        "button",
-        {
-          onClick: () => deleteFile(file.id),
-          style: {
-            background: "#EF4444",
-            color: "#FFFFFF",
-            border: "none",
-            borderRadius: 4,
-            padding: "4px 8px",
-            cursor: "pointer",
-            fontSize: "0.7rem"
-          }
-        },
-        "Delete"
-      ))
-    )))),
-    activeTab === "analyze" && selectedFile && analysis && /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { className: "uswift-card", style: { marginBottom: 16 } }, /* @__PURE__ */ React.createElement(
-      "div",
-      {
-        style: {
-          display: "flex",
-          alignItems: "center",
-          gap: 8,
-          marginBottom: 12
-        }
-      },
-      /* @__PURE__ */ React.createElement("span", { style: { fontSize: "1.5rem" } }, getFileTypeIcon(selectedFile.type)),
-      /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement(
-        "h3",
-        {
-          style: {
-            fontSize: "1.1rem",
-            fontWeight: 600,
-            color: "#111827",
-            margin: 0
-          }
-        },
-        selectedFile.name
-      ), /* @__PURE__ */ React.createElement(
-        "p",
-        {
-          style: {
-            fontSize: "0.8rem",
-            color: "#6B7280",
-            margin: 0
-          }
-        },
-        selectedFile.type.replace("_", " "),
-        " •",
-        " ",
-        formatFileSize(selectedFile.size)
-      ))
-    ), /* @__PURE__ */ React.createElement(
-      "div",
-      {
-        style: {
-          display: "flex",
-          alignItems: "center",
-          gap: 12,
-          padding: 12,
-          background: "#F8F9FA",
-          borderRadius: 8,
-          marginBottom: 12
-        }
-      },
-      /* @__PURE__ */ React.createElement("div", { style: { textAlign: "center" } }, /* @__PURE__ */ React.createElement(
-        "div",
-        {
-          style: {
-            fontSize: "1.8rem",
-            fontWeight: 700,
-            color: analysis.score >= 80 ? "#10B981" : analysis.score >= 60 ? "#F59E0B" : "#EF4444",
-            marginBottom: 4
-          }
-        },
-        analysis.score,
-        "/100"
-      ), /* @__PURE__ */ React.createElement(
-        "div",
-        {
-          style: {
-            fontSize: "0.8rem",
-            color: "#6B7280",
-            fontWeight: 500
-          }
-        },
-        "Quality Score"
-      ))
-    )), /* @__PURE__ */ React.createElement("div", { className: "uswift-card", style: { marginBottom: 16 } }, /* @__PURE__ */ React.createElement(
-      "h3",
-      {
-        style: {
-          fontSize: "1.1rem",
-          fontWeight: 600,
-          color: "#111827",
-          marginBottom: 12
-        }
-      },
-      "Analysis Summary"
-    ), /* @__PURE__ */ React.createElement(
-      "p",
-      {
-        style: {
-          fontSize: "0.9rem",
-          lineHeight: 1.6,
-          color: "#4B5563",
-          margin: 0
-        }
-      },
-      analysis.summary
-    )), analysis.keywords.length > 0 && /* @__PURE__ */ React.createElement("div", { className: "uswift-card", style: { marginBottom: 16 } }, /* @__PURE__ */ React.createElement(
-      "h3",
-      {
-        style: {
-          fontSize: "1.1rem",
-          fontWeight: 600,
-          color: "#111827",
-          marginBottom: 12
-        }
-      },
-      "Key Keywords"
-    ), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 4, flexWrap: "wrap" } }, analysis.keywords.map((keyword, index) => /* @__PURE__ */ React.createElement(
-      "span",
-      {
-        key: index,
-        style: {
-          background: "#EDE9FE",
-          color: "#6D28D9",
-          padding: "4px 8px",
-          borderRadius: 4,
-          fontSize: "0.8rem",
-          fontWeight: 500
-        }
-      },
-      keyword
-    )))), analysis.suggestions.length > 0 && /* @__PURE__ */ React.createElement("div", { className: "uswift-card", style: { marginBottom: 16 } }, /* @__PURE__ */ React.createElement(
-      "h3",
-      {
-        style: {
-          fontSize: "1.1rem",
-          fontWeight: 600,
-          color: "#111827",
-          marginBottom: 12
-        }
-      },
-      "Improvement Suggestions"
-    ), /* @__PURE__ */ React.createElement("ul", { style: { margin: 0, paddingLeft: 20 } }, analysis.suggestions.map((suggestion, index) => /* @__PURE__ */ React.createElement(
-      "li",
-      {
-        key: index,
-        style: {
-          fontSize: "0.9rem",
-          color: "#4B5563",
-          marginBottom: 8
-        }
-      },
-      suggestion
-    )))), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 8 } }, /* @__PURE__ */ React.createElement(
-      "button",
-      {
-        onClick: () => setActiveTab("upload"),
-        className: "uswift-btn",
-        style: { flex: 1 }
-      },
-      "Upload Another File"
-    ), /* @__PURE__ */ React.createElement(
-      "button",
-      {
-        onClick: () => setActiveTab("manage"),
-        style: {
-          flex: 1,
-          background: "#F3F4F6",
-          color: "#6B7280",
-          border: "1px solid #E5E7EB",
-          borderRadius: 8,
-          padding: "12px",
-          cursor: "pointer"
-        }
-      },
-      "Back to Files"
-    ))),
-    /* @__PURE__ */ React.createElement(
-      "div",
-      {
-        style: {
-          marginTop: 16,
-          textAlign: "center",
-          fontSize: "0.8rem",
-          color: "#6B7280"
-        }
-      },
-      "Powered by Mistral AI • Secure file storage and AI-powered analysis"
-    )
+        )
+      ]
+    }
   );
 }
 
@@ -4429,7 +4876,7 @@ Format your response clearly with sections and bullet points.`;
       alert("Analysis copied to clipboard!");
     });
   };
-  return /* @__PURE__ */ React.createElement(
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs(
     "div",
     {
       style: {
@@ -4438,574 +4885,670 @@ Format your response clearly with sections and bullet points.`;
         padding: "2rem",
         minWidth: 350,
         minHeight: 520
-      }
-    },
-    /* @__PURE__ */ React.createElement(
-      "div",
-      {
-        className: "uswift-gradient",
-        style: {
-          height: 8,
-          borderRadius: 8,
-          marginBottom: 16
-        }
-      }
-    ),
-    /* @__PURE__ */ React.createElement(
-      "div",
-      {
-        style: {
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          marginBottom: 16
-        }
       },
-      /* @__PURE__ */ React.createElement(
-        "h2",
-        {
-          style: {
-            fontSize: "1.4rem",
-            fontWeight: 700,
-            color: "#111827",
-            margin: 0
-          }
-        },
-        "Job Analysis"
-      ),
-      activeTab === "analysis" && /* @__PURE__ */ React.createElement(
-        "button",
-        {
-          onClick: () => setActiveTab("input"),
-          style: {
-            background: "#EDE9FE",
-            color: "#6D28D9",
-            border: "none",
-            borderRadius: 8,
-            padding: "6px 12px",
-            cursor: "pointer",
-            fontSize: "0.8rem"
-          }
-        },
-        "← Back to Input"
-      )
-    ),
-    /* @__PURE__ */ React.createElement(
-      "div",
-      {
-        style: {
-          display: "flex",
-          marginBottom: 16,
-          borderBottom: "1px solid #E5E7EB"
-        }
-      },
-      /* @__PURE__ */ React.createElement(
-        "button",
-        {
-          onClick: () => setActiveTab("input"),
-          style: {
-            background: "none",
-            border: "none",
-            padding: "12px 16px",
-            cursor: "pointer",
-            fontSize: "0.9rem",
-            fontWeight: activeTab === "input" ? 600 : 400,
-            color: activeTab === "input" ? "#6D28D9" : "#6B7280",
-            borderBottom: activeTab === "input" ? "2px solid #6D28D9" : "none"
-          }
-        },
-        "Input"
-      ),
-      /* @__PURE__ */ React.createElement(
-        "button",
-        {
-          onClick: () => setActiveTab("analysis"),
-          disabled: !result,
-          style: {
-            background: "none",
-            border: "none",
-            padding: "12px 16px",
-            cursor: result ? "pointer" : "not-allowed",
-            fontSize: "0.9rem",
-            fontWeight: activeTab === "analysis" ? 600 : 400,
-            color: activeTab === "analysis" ? "#6D28D9" : "#6B7280",
-            borderBottom: activeTab === "analysis" ? "2px solid #6D28D9" : "none",
-            opacity: result ? 1 : 0.5
-          }
-        },
-        "Analysis"
-      )
-    ),
-    activeTab === "input" && /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { className: "uswift-card", style: { marginBottom: 16 } }, /* @__PURE__ */ React.createElement(
-      "h3",
-      {
-        style: {
-          fontSize: "1.1rem",
-          fontWeight: 600,
-          color: "#111827",
-          marginBottom: 12
-        }
-      },
-      "Job Details"
-    ), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 12, marginBottom: 12 } }, /* @__PURE__ */ React.createElement("div", { style: { flex: 1 } }, /* @__PURE__ */ React.createElement(
-      "label",
-      {
-        style: {
-          display: "block",
-          fontSize: "0.9rem",
-          fontWeight: 600,
-          color: "#374151",
-          marginBottom: 4
-        }
-      },
-      "Job Title"
-    ), /* @__PURE__ */ React.createElement(
-      "input",
-      {
-        type: "text",
-        value: jobDetails.title,
-        onChange: (e) => setJobDetails({ ...jobDetails, title: e.target.value }),
-        placeholder: "e.g., Senior Software Engineer",
-        style: {
-          width: "100%",
-          padding: "8px 12px",
-          borderRadius: 6,
-          border: "1px solid #E5E7EB",
-          fontSize: "0.9rem"
-        }
-      }
-    )), /* @__PURE__ */ React.createElement("div", { style: { flex: 1 } }, /* @__PURE__ */ React.createElement(
-      "label",
-      {
-        style: {
-          display: "block",
-          fontSize: "0.9rem",
-          fontWeight: 600,
-          color: "#374151",
-          marginBottom: 4
-        }
-      },
-      "Company"
-    ), /* @__PURE__ */ React.createElement(
-      "input",
-      {
-        type: "text",
-        value: jobDetails.company,
-        onChange: (e) => setJobDetails({ ...jobDetails, company: e.target.value }),
-        placeholder: "e.g., Google",
-        style: {
-          width: "100%",
-          padding: "8px 12px",
-          borderRadius: 6,
-          border: "1px solid #E5E7EB",
-          fontSize: "0.9rem"
-        }
-      }
-    ))), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 12, marginBottom: 12 } }, /* @__PURE__ */ React.createElement("div", { style: { flex: 1 } }, /* @__PURE__ */ React.createElement(
-      "label",
-      {
-        style: {
-          display: "block",
-          fontSize: "0.9rem",
-          fontWeight: 600,
-          color: "#374151",
-          marginBottom: 4
-        }
-      },
-      "Location"
-    ), /* @__PURE__ */ React.createElement(
-      "input",
-      {
-        type: "text",
-        value: jobDetails.location,
-        onChange: (e) => setJobDetails({ ...jobDetails, location: e.target.value }),
-        placeholder: "e.g., San Francisco, CA",
-        style: {
-          width: "100%",
-          padding: "8px 12px",
-          borderRadius: 6,
-          border: "1px solid #E5E7EB",
-          fontSize: "0.9rem"
-        }
-      }
-    )), /* @__PURE__ */ React.createElement("div", { style: { flex: 1 } }, /* @__PURE__ */ React.createElement(
-      "label",
-      {
-        style: {
-          display: "block",
-          fontSize: "0.9rem",
-          fontWeight: 600,
-          color: "#374151",
-          marginBottom: 4
-        }
-      },
-      "Job Type"
-    ), /* @__PURE__ */ React.createElement(
-      "select",
-      {
-        value: jobDetails.type,
-        onChange: (e) => setJobDetails({ ...jobDetails, type: e.target.value }),
-        style: {
-          width: "100%",
-          padding: "8px 12px",
-          borderRadius: 6,
-          border: "1px solid #E5E7EB",
-          fontSize: "0.9rem",
-          background: "#FFFFFF"
-        }
-      },
-      jobTypes.map((type) => /* @__PURE__ */ React.createElement("option", { key: type, value: type }, type.charAt(0).toUpperCase() + type.slice(1)))
-    ))), /* @__PURE__ */ React.createElement("div", { style: { marginBottom: 12 } }, /* @__PURE__ */ React.createElement(
-      "label",
-      {
-        style: {
-          display: "block",
-          fontSize: "0.9rem",
-          fontWeight: 600,
-          color: "#374151",
-          marginBottom: 4
-        }
-      },
-      "Salary Range (Optional)"
-    ), /* @__PURE__ */ React.createElement(
-      "input",
-      {
-        type: "text",
-        value: jobDetails.salary,
-        onChange: (e) => setJobDetails({ ...jobDetails, salary: e.target.value }),
-        placeholder: "e.g., $120K - $150K",
-        style: {
-          width: "100%",
-          padding: "8px 12px",
-          borderRadius: 6,
-          border: "1px solid #E5E7EB",
-          fontSize: "0.9rem"
-        }
-      }
-    ))), /* @__PURE__ */ React.createElement("div", { className: "uswift-card", style: { marginBottom: 16 } }, /* @__PURE__ */ React.createElement(
-      "label",
-      {
-        style: {
-          fontWeight: 600,
-          display: "block",
-          marginBottom: 8,
-          color: "#374151"
-        }
-      },
-      "Job Description:"
-    ), /* @__PURE__ */ React.createElement(
-      "textarea",
-      {
-        value: jobDescription,
-        onChange: (e) => setJobDescription(e.target.value),
-        placeholder: "Paste the complete job description here...",
-        rows: 8,
-        style: {
-          width: "100%",
-          padding: 12,
-          borderRadius: 8,
-          border: "1px solid #E5E7EB",
-          fontSize: "0.9rem",
-          resize: "vertical"
-        }
-      }
-    )), /* @__PURE__ */ React.createElement("div", { className: "uswift-card", style: { marginBottom: 16 } }, /* @__PURE__ */ React.createElement(
-      "label",
-      {
-        style: {
-          fontWeight: 600,
-          display: "block",
-          marginBottom: 8,
-          color: "#374151"
-        }
-      },
-      "Your Profile/Skills (Optional):"
-    ), /* @__PURE__ */ React.createElement(
-      "textarea",
-      {
-        value: userProfile,
-        onChange: (e) => setUserProfile(e.target.value),
-        placeholder: "Describe your skills, experience, and qualifications to get personalized analysis...",
-        rows: 4,
-        style: {
-          width: "100%",
-          padding: 12,
-          borderRadius: 8,
-          border: "1px solid #E5E7EB",
-          fontSize: "0.9rem",
-          resize: "vertical"
-        }
-      }
-    )), /* @__PURE__ */ React.createElement(
-      "button",
-      {
-        onClick: handleAnalyze,
-        disabled: isLoading || !jobDescription.trim(),
-        className: "uswift-btn",
-        style: {
-          width: "100%",
-          opacity: isLoading || !jobDescription.trim() ? 0.6 : 1,
-          cursor: isLoading || !jobDescription.trim() ? "not-allowed" : "pointer"
-        }
-      },
-      isLoading ? /* @__PURE__ */ React.createElement(
-        "div",
-        {
-          style: {
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            gap: 8
-          }
-        },
-        /* @__PURE__ */ React.createElement(
+      children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
           "div",
           {
+            className: "uswift-gradient",
             style: {
-              width: 16,
-              height: 16,
-              border: "2px solid #ffffff",
-              borderTop: "2px solid transparent",
-              borderRadius: "50%",
-              animation: "spin 1s linear infinite"
+              height: 8,
+              borderRadius: 8,
+              marginBottom: 16
             }
           }
         ),
-        "Analyzing Job..."
-      ) : "Analyze Job"
-    ), /* @__PURE__ */ React.createElement(
-      "div",
-      {
-        style: {
-          marginTop: 16,
-          padding: 12,
-          background: "#F8F9FA",
-          borderRadius: 8,
-          fontSize: "0.8rem",
-          color: "#6B7280"
-        }
-      },
-      /* @__PURE__ */ React.createElement("strong", null, "Pro Tips:"),
-      /* @__PURE__ */ React.createElement("ul", { style: { margin: "8px 0 0 16px", padding: 0 } }, /* @__PURE__ */ React.createElement("li", null, "Include your skills section for personalized matching analysis"), /* @__PURE__ */ React.createElement("li", null, "The more detailed the job description, the better the analysis"), /* @__PURE__ */ React.createElement("li", null, "Look for key requirements, responsibilities, and qualifications"), /* @__PURE__ */ React.createElement("li", null, "Consider both technical skills and soft skills mentioned"))
-    )),
-    activeTab === "analysis" && result && /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement(
-      "div",
-      {
-        style: {
-          display: "flex",
-          alignItems: "center",
-          gap: 16,
-          marginBottom: 20,
-          padding: 20,
-          background: "#F8F9FA",
-          borderRadius: 8
-        }
-      },
-      /* @__PURE__ */ React.createElement("div", { style: { textAlign: "center" } }, /* @__PURE__ */ React.createElement(
-        "div",
-        {
-          style: {
-            fontSize: "2.5rem",
-            fontWeight: 700,
-            color: getMatchColor(result.overallMatch),
-            marginBottom: 8
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(
+          "div",
+          {
+            style: {
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              marginBottom: 16
+            },
+            children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "h2",
+                {
+                  style: {
+                    fontSize: "1.4rem",
+                    fontWeight: 700,
+                    color: "#111827",
+                    margin: 0
+                  },
+                  children: "Job Analysis"
+                }
+              ),
+              activeTab === "analysis" && /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "button",
+                {
+                  onClick: () => setActiveTab("input"),
+                  style: {
+                    background: "#EDE9FE",
+                    color: "#6D28D9",
+                    border: "none",
+                    borderRadius: 8,
+                    padding: "6px 12px",
+                    cursor: "pointer",
+                    fontSize: "0.8rem"
+                  },
+                  children: "← Back to Input"
+                }
+              )
+            ]
           }
-        },
-        result.overallMatch,
-        "/100"
-      ), /* @__PURE__ */ React.createElement(
-        "div",
-        {
-          style: {
-            fontSize: "1rem",
-            color: "#6B7280",
-            fontWeight: 600
+        ),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(
+          "div",
+          {
+            style: {
+              display: "flex",
+              marginBottom: 16,
+              borderBottom: "1px solid #E5E7EB"
+            },
+            children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "button",
+                {
+                  onClick: () => setActiveTab("input"),
+                  style: {
+                    background: "none",
+                    border: "none",
+                    padding: "12px 16px",
+                    cursor: "pointer",
+                    fontSize: "0.9rem",
+                    fontWeight: activeTab === "input" ? 600 : 400,
+                    color: activeTab === "input" ? "#6D28D9" : "#6B7280",
+                    borderBottom: activeTab === "input" ? "2px solid #6D28D9" : "none"
+                  },
+                  children: "Input"
+                }
+              ),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "button",
+                {
+                  onClick: () => setActiveTab("analysis"),
+                  disabled: !result,
+                  style: {
+                    background: "none",
+                    border: "none",
+                    padding: "12px 16px",
+                    cursor: result ? "pointer" : "not-allowed",
+                    fontSize: "0.9rem",
+                    fontWeight: activeTab === "analysis" ? 600 : 400,
+                    color: activeTab === "analysis" ? "#6D28D9" : "#6B7280",
+                    borderBottom: activeTab === "analysis" ? "2px solid #6D28D9" : "none",
+                    opacity: result ? 1 : 0.5
+                  },
+                  children: "Analysis"
+                }
+              )
+            ]
           }
-        },
-        getMatchLabel(result.overallMatch)
-      )),
-      /* @__PURE__ */ React.createElement("div", { style: { flex: 1 } }, /* @__PURE__ */ React.createElement(
-        "h3",
-        {
-          style: {
-            margin: "0 0 8px 0",
-            fontSize: "1.2rem",
-            color: "#111827"
-          }
-        },
-        "Job Match Analysis"
-      ), /* @__PURE__ */ React.createElement("p", { style: { margin: 0, fontSize: "0.9rem", color: "#6B7280" } }, "Based on requirements analysis and market standards"))
-    ), /* @__PURE__ */ React.createElement("div", { className: "uswift-card", style: { marginBottom: 16 } }, /* @__PURE__ */ React.createElement(
-      "h3",
-      {
-        style: {
-          fontSize: "1.1rem",
-          fontWeight: 600,
-          color: "#111827",
-          marginBottom: 12
-        }
-      },
-      "Key Requirements"
-    ), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 4, flexWrap: "wrap" } }, result.keyRequirements.map((req, index) => /* @__PURE__ */ React.createElement(
-      "span",
-      {
-        key: index,
-        style: {
-          background: "#DBEAFE",
-          color: "#1E40AF",
-          padding: "6px 12px",
-          borderRadius: 6,
-          fontSize: "0.8rem",
-          fontWeight: 500,
-          display: "inline-block",
-          marginBottom: 4
-        }
-      },
-      req
-    )))), result.matchingSkills.length > 0 && /* @__PURE__ */ React.createElement("div", { className: "uswift-card", style: { marginBottom: 16 } }, /* @__PURE__ */ React.createElement(
-      "h3",
-      {
-        style: {
-          fontSize: "1.1rem",
-          fontWeight: 600,
-          color: "#111827",
-          marginBottom: 12
-        }
-      },
-      "Matching Skills"
-    ), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 4, flexWrap: "wrap" } }, result.matchingSkills.map((skill, index) => /* @__PURE__ */ React.createElement(
-      "span",
-      {
-        key: index,
-        style: {
-          background: "#D1FAE5",
-          color: "#065F46",
-          padding: "4px 8px",
-          borderRadius: 4,
-          fontSize: "0.8rem",
-          fontWeight: 500
-        }
-      },
-      "✓ ",
-      skill
-    )))), result.missingSkills.length > 0 && /* @__PURE__ */ React.createElement("div", { className: "uswift-card", style: { marginBottom: 16 } }, /* @__PURE__ */ React.createElement(
-      "h3",
-      {
-        style: {
-          fontSize: "1.1rem",
-          fontWeight: 600,
-          color: "#111827",
-          marginBottom: 12
-        }
-      },
-      "Beneficial Skills (Not Required)"
-    ), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 4, flexWrap: "wrap" } }, result.missingSkills.map((skill, index) => /* @__PURE__ */ React.createElement(
-      "span",
-      {
-        key: index,
-        style: {
-          background: "#FEF3C7",
-          color: "#92400E",
-          padding: "4px 8px",
-          borderRadius: 4,
-          fontSize: "0.8rem",
-          fontWeight: 500
-        }
-      },
-      "+ ",
-      skill
-    )))), /* @__PURE__ */ React.createElement("div", { className: "uswift-card", style: { marginBottom: 16 } }, /* @__PURE__ */ React.createElement(
-      "h3",
-      {
-        style: {
-          fontSize: "1.1rem",
-          fontWeight: 600,
-          color: "#111827",
-          marginBottom: 12
-        }
-      },
-      "💰 Salary Insights"
-    ), /* @__PURE__ */ React.createElement(
-      "p",
-      {
-        style: {
-          fontSize: "0.9rem",
-          lineHeight: 1.6,
-          color: "#4B5563",
-          margin: 0
-        }
-      },
-      result.salaryInsights
-    )), /* @__PURE__ */ React.createElement("div", { className: "uswift-card", style: { marginBottom: 16 } }, /* @__PURE__ */ React.createElement(
-      "h3",
-      {
-        style: {
-          fontSize: "1.1rem",
-          fontWeight: 600,
-          color: "#111827",
-          marginBottom: 12
-        }
-      },
-      "🏢 Company Culture Indicators"
-    ), /* @__PURE__ */ React.createElement(
-      "p",
-      {
-        style: {
-          fontSize: "0.9rem",
-          lineHeight: 1.6,
-          color: "#4B5563",
-          margin: 0
-        }
-      },
-      result.companyCulture
-    )), /* @__PURE__ */ React.createElement("div", { className: "uswift-card", style: { marginBottom: 16 } }, /* @__PURE__ */ React.createElement(
-      "h3",
-      {
-        style: {
-          fontSize: "1.1rem",
-          fontWeight: 600,
-          color: "#111827",
-          marginBottom: 12
-        }
-      },
-      "🎯 Application Tips"
-    ), /* @__PURE__ */ React.createElement("ul", { style: { margin: 0, paddingLeft: 20 } }, result.applicationTips.map((tip, index) => /* @__PURE__ */ React.createElement(
-      "li",
-      {
-        key: index,
-        style: {
-          fontSize: "0.9rem",
-          color: "#4B5563",
-          marginBottom: 8
-        }
-      },
-      tip
-    )))), result.recommendations.length > 0 && /* @__PURE__ */ React.createElement("div", { className: "uswift-card", style: { marginBottom: 16 } }, /* @__PURE__ */ React.createElement(
-      "h3",
-      {
-        style: {
-          fontSize: "1.1rem",
-          fontWeight: 600,
-          color: "#111827",
-          marginBottom: 12
-        }
-      },
-      "💡 Recommendations"
-    ), /* @__PURE__ */ React.createElement("ul", { style: { margin: 0, paddingLeft: 20 } }, result.recommendations.map((rec, index) => /* @__PURE__ */ React.createElement(
-      "li",
-      {
-        key: index,
-        style: {
-          fontSize: "0.9rem",
-          color: "#4B5563",
-          marginBottom: 8
-        }
-      },
-      rec
-    )))), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 8 } }, /* @__PURE__ */ React.createElement(
-      "button",
-      {
-        onClick: () => copyToClipboard(`
+        ),
+        activeTab === "input" && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "uswift-card", style: { marginBottom: 16 }, children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "h3",
+              {
+                style: {
+                  fontSize: "1.1rem",
+                  fontWeight: 600,
+                  color: "#111827",
+                  marginBottom: 12
+                },
+                children: "Job Details"
+              }
+            ),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { display: "flex", gap: 12, marginBottom: 12 }, children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { flex: 1 }, children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  "label",
+                  {
+                    style: {
+                      display: "block",
+                      fontSize: "0.9rem",
+                      fontWeight: 600,
+                      color: "#374151",
+                      marginBottom: 4
+                    },
+                    children: "Job Title"
+                  }
+                ),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  "input",
+                  {
+                    type: "text",
+                    value: jobDetails.title,
+                    onChange: (e) => setJobDetails({ ...jobDetails, title: e.target.value }),
+                    placeholder: "e.g., Senior Software Engineer",
+                    style: {
+                      width: "100%",
+                      padding: "8px 12px",
+                      borderRadius: 6,
+                      border: "1px solid #E5E7EB",
+                      fontSize: "0.9rem"
+                    }
+                  }
+                )
+              ] }),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { flex: 1 }, children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  "label",
+                  {
+                    style: {
+                      display: "block",
+                      fontSize: "0.9rem",
+                      fontWeight: 600,
+                      color: "#374151",
+                      marginBottom: 4
+                    },
+                    children: "Company"
+                  }
+                ),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  "input",
+                  {
+                    type: "text",
+                    value: jobDetails.company,
+                    onChange: (e) => setJobDetails({ ...jobDetails, company: e.target.value }),
+                    placeholder: "e.g., Google",
+                    style: {
+                      width: "100%",
+                      padding: "8px 12px",
+                      borderRadius: 6,
+                      border: "1px solid #E5E7EB",
+                      fontSize: "0.9rem"
+                    }
+                  }
+                )
+              ] })
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { display: "flex", gap: 12, marginBottom: 12 }, children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { flex: 1 }, children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  "label",
+                  {
+                    style: {
+                      display: "block",
+                      fontSize: "0.9rem",
+                      fontWeight: 600,
+                      color: "#374151",
+                      marginBottom: 4
+                    },
+                    children: "Location"
+                  }
+                ),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  "input",
+                  {
+                    type: "text",
+                    value: jobDetails.location,
+                    onChange: (e) => setJobDetails({ ...jobDetails, location: e.target.value }),
+                    placeholder: "e.g., San Francisco, CA",
+                    style: {
+                      width: "100%",
+                      padding: "8px 12px",
+                      borderRadius: 6,
+                      border: "1px solid #E5E7EB",
+                      fontSize: "0.9rem"
+                    }
+                  }
+                )
+              ] }),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { flex: 1 }, children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  "label",
+                  {
+                    style: {
+                      display: "block",
+                      fontSize: "0.9rem",
+                      fontWeight: 600,
+                      color: "#374151",
+                      marginBottom: 4
+                    },
+                    children: "Job Type"
+                  }
+                ),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  "select",
+                  {
+                    value: jobDetails.type,
+                    onChange: (e) => setJobDetails({ ...jobDetails, type: e.target.value }),
+                    style: {
+                      width: "100%",
+                      padding: "8px 12px",
+                      borderRadius: 6,
+                      border: "1px solid #E5E7EB",
+                      fontSize: "0.9rem",
+                      background: "#FFFFFF"
+                    },
+                    children: jobTypes.map((type) => /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: type, children: type.charAt(0).toUpperCase() + type.slice(1) }, type))
+                  }
+                )
+              ] })
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { marginBottom: 12 }, children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "label",
+                {
+                  style: {
+                    display: "block",
+                    fontSize: "0.9rem",
+                    fontWeight: 600,
+                    color: "#374151",
+                    marginBottom: 4
+                  },
+                  children: "Salary Range (Optional)"
+                }
+              ),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "input",
+                {
+                  type: "text",
+                  value: jobDetails.salary,
+                  onChange: (e) => setJobDetails({ ...jobDetails, salary: e.target.value }),
+                  placeholder: "e.g., $120K - $150K",
+                  style: {
+                    width: "100%",
+                    padding: "8px 12px",
+                    borderRadius: 6,
+                    border: "1px solid #E5E7EB",
+                    fontSize: "0.9rem"
+                  }
+                }
+              )
+            ] })
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "uswift-card", style: { marginBottom: 16 }, children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "label",
+              {
+                style: {
+                  fontWeight: 600,
+                  display: "block",
+                  marginBottom: 8,
+                  color: "#374151"
+                },
+                children: "Job Description:"
+              }
+            ),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "textarea",
+              {
+                value: jobDescription,
+                onChange: (e) => setJobDescription(e.target.value),
+                placeholder: "Paste the complete job description here...",
+                rows: 8,
+                style: {
+                  width: "100%",
+                  padding: 12,
+                  borderRadius: 8,
+                  border: "1px solid #E5E7EB",
+                  fontSize: "0.9rem",
+                  resize: "vertical"
+                }
+              }
+            )
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "uswift-card", style: { marginBottom: 16 }, children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "label",
+              {
+                style: {
+                  fontWeight: 600,
+                  display: "block",
+                  marginBottom: 8,
+                  color: "#374151"
+                },
+                children: "Your Profile/Skills (Optional):"
+              }
+            ),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "textarea",
+              {
+                value: userProfile,
+                onChange: (e) => setUserProfile(e.target.value),
+                placeholder: "Describe your skills, experience, and qualifications to get personalized analysis...",
+                rows: 4,
+                style: {
+                  width: "100%",
+                  padding: 12,
+                  borderRadius: 8,
+                  border: "1px solid #E5E7EB",
+                  fontSize: "0.9rem",
+                  resize: "vertical"
+                }
+              }
+            )
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            "button",
+            {
+              onClick: handleAnalyze,
+              disabled: isLoading || !jobDescription.trim(),
+              className: "uswift-btn",
+              style: {
+                width: "100%",
+                opacity: isLoading || !jobDescription.trim() ? 0.6 : 1,
+                cursor: isLoading || !jobDescription.trim() ? "not-allowed" : "pointer"
+              },
+              children: isLoading ? /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                "div",
+                {
+                  style: {
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gap: 8
+                  },
+                  children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(
+                      "div",
+                      {
+                        style: {
+                          width: 16,
+                          height: 16,
+                          border: "2px solid #ffffff",
+                          borderTop: "2px solid transparent",
+                          borderRadius: "50%",
+                          animation: "spin 1s linear infinite"
+                        }
+                      }
+                    ),
+                    "Analyzing Job..."
+                  ]
+                }
+              ) : "Analyze Job"
+            }
+          ),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(
+            "div",
+            {
+              style: {
+                marginTop: 16,
+                padding: 12,
+                background: "#F8F9FA",
+                borderRadius: 8,
+                fontSize: "0.8rem",
+                color: "#6B7280"
+              },
+              children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Pro Tips:" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("ul", { style: { margin: "8px 0 0 16px", padding: 0 }, children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Include your skills section for personalized matching analysis" }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "The more detailed the job description, the better the analysis" }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Look for key requirements, responsibilities, and qualifications" }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Consider both technical skills and soft skills mentioned" })
+                ] })
+              ]
+            }
+          )
+        ] }),
+        activeTab === "analysis" && result && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(
+            "div",
+            {
+              style: {
+                display: "flex",
+                alignItems: "center",
+                gap: 16,
+                marginBottom: 20,
+                padding: 20,
+                background: "#F8F9FA",
+                borderRadius: 8
+              },
+              children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { textAlign: "center" }, children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                    "div",
+                    {
+                      style: {
+                        fontSize: "2.5rem",
+                        fontWeight: 700,
+                        color: getMatchColor(result.overallMatch),
+                        marginBottom: 8
+                      },
+                      children: [
+                        result.overallMatch,
+                        "/100"
+                      ]
+                    }
+                  ),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(
+                    "div",
+                    {
+                      style: {
+                        fontSize: "1rem",
+                        color: "#6B7280",
+                        fontWeight: 600
+                      },
+                      children: getMatchLabel(result.overallMatch)
+                    }
+                  )
+                ] }),
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { flex: 1 }, children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(
+                    "h3",
+                    {
+                      style: {
+                        margin: "0 0 8px 0",
+                        fontSize: "1.2rem",
+                        color: "#111827"
+                      },
+                      children: "Job Match Analysis"
+                    }
+                  ),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("p", { style: { margin: 0, fontSize: "0.9rem", color: "#6B7280" }, children: "Based on requirements analysis and market standards" })
+                ] })
+              ]
+            }
+          ),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "uswift-card", style: { marginBottom: 16 }, children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "h3",
+              {
+                style: {
+                  fontSize: "1.1rem",
+                  fontWeight: 600,
+                  color: "#111827",
+                  marginBottom: 12
+                },
+                children: "Key Requirements"
+              }
+            ),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { style: { display: "flex", gap: 4, flexWrap: "wrap" }, children: result.keyRequirements.map((req, index) => /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "span",
+              {
+                style: {
+                  background: "#DBEAFE",
+                  color: "#1E40AF",
+                  padding: "6px 12px",
+                  borderRadius: 6,
+                  fontSize: "0.8rem",
+                  fontWeight: 500,
+                  display: "inline-block",
+                  marginBottom: 4
+                },
+                children: req
+              },
+              index
+            )) })
+          ] }),
+          result.matchingSkills.length > 0 && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "uswift-card", style: { marginBottom: 16 }, children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "h3",
+              {
+                style: {
+                  fontSize: "1.1rem",
+                  fontWeight: 600,
+                  color: "#111827",
+                  marginBottom: 12
+                },
+                children: "Matching Skills"
+              }
+            ),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { style: { display: "flex", gap: 4, flexWrap: "wrap" }, children: result.matchingSkills.map((skill, index) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
+              "span",
+              {
+                style: {
+                  background: "#D1FAE5",
+                  color: "#065F46",
+                  padding: "4px 8px",
+                  borderRadius: 4,
+                  fontSize: "0.8rem",
+                  fontWeight: 500
+                },
+                children: [
+                  "✓ ",
+                  skill
+                ]
+              },
+              index
+            )) })
+          ] }),
+          result.missingSkills.length > 0 && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "uswift-card", style: { marginBottom: 16 }, children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "h3",
+              {
+                style: {
+                  fontSize: "1.1rem",
+                  fontWeight: 600,
+                  color: "#111827",
+                  marginBottom: 12
+                },
+                children: "Beneficial Skills (Not Required)"
+              }
+            ),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { style: { display: "flex", gap: 4, flexWrap: "wrap" }, children: result.missingSkills.map((skill, index) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
+              "span",
+              {
+                style: {
+                  background: "#FEF3C7",
+                  color: "#92400E",
+                  padding: "4px 8px",
+                  borderRadius: 4,
+                  fontSize: "0.8rem",
+                  fontWeight: 500
+                },
+                children: [
+                  "+ ",
+                  skill
+                ]
+              },
+              index
+            )) })
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "uswift-card", style: { marginBottom: 16 }, children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "h3",
+              {
+                style: {
+                  fontSize: "1.1rem",
+                  fontWeight: 600,
+                  color: "#111827",
+                  marginBottom: 12
+                },
+                children: "💰 Salary Insights"
+              }
+            ),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "p",
+              {
+                style: {
+                  fontSize: "0.9rem",
+                  lineHeight: 1.6,
+                  color: "#4B5563",
+                  margin: 0
+                },
+                children: result.salaryInsights
+              }
+            )
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "uswift-card", style: { marginBottom: 16 }, children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "h3",
+              {
+                style: {
+                  fontSize: "1.1rem",
+                  fontWeight: 600,
+                  color: "#111827",
+                  marginBottom: 12
+                },
+                children: "🏢 Company Culture Indicators"
+              }
+            ),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "p",
+              {
+                style: {
+                  fontSize: "0.9rem",
+                  lineHeight: 1.6,
+                  color: "#4B5563",
+                  margin: 0
+                },
+                children: result.companyCulture
+              }
+            )
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "uswift-card", style: { marginBottom: 16 }, children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "h3",
+              {
+                style: {
+                  fontSize: "1.1rem",
+                  fontWeight: 600,
+                  color: "#111827",
+                  marginBottom: 12
+                },
+                children: "🎯 Application Tips"
+              }
+            ),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("ul", { style: { margin: 0, paddingLeft: 20 }, children: result.applicationTips.map((tip, index) => /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "li",
+              {
+                style: {
+                  fontSize: "0.9rem",
+                  color: "#4B5563",
+                  marginBottom: 8
+                },
+                children: tip
+              },
+              index
+            )) })
+          ] }),
+          result.recommendations.length > 0 && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "uswift-card", style: { marginBottom: 16 }, children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "h3",
+              {
+                style: {
+                  fontSize: "1.1rem",
+                  fontWeight: 600,
+                  color: "#111827",
+                  marginBottom: 12
+                },
+                children: "💡 Recommendations"
+              }
+            ),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("ul", { style: { margin: 0, paddingLeft: 20 }, children: result.recommendations.map((rec, index) => /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "li",
+              {
+                style: {
+                  fontSize: "0.9rem",
+                  color: "#4B5563",
+                  marginBottom: 8
+                },
+                children: rec
+              },
+              index
+            )) })
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { display: "flex", gap: 8 }, children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "button",
+              {
+                onClick: () => copyToClipboard(`
 Job Analysis Report
 ==================
 
@@ -5032,38 +5575,43 @@ ${result.applicationTips.map((tip) => `• ${tip}`).join("\n")}
 Recommendations:
 ${result.recommendations.map((rec) => `• ${rec}`).join("\n")}
               `),
-        className: "uswift-btn",
-        style: { flex: 1 }
-      },
-      "Copy Full Report"
-    ), /* @__PURE__ */ React.createElement(
-      "button",
-      {
-        onClick: () => setActiveTab("input"),
-        style: {
-          flex: 1,
-          background: "#F3F4F6",
-          color: "#6B7280",
-          border: "1px solid #E5E7EB",
-          borderRadius: 8,
-          padding: "12px",
-          cursor: "pointer"
-        }
-      },
-      "Analyze Another Job"
-    ))),
-    /* @__PURE__ */ React.createElement(
-      "div",
-      {
-        style: {
-          marginTop: 16,
-          textAlign: "center",
-          fontSize: "0.8rem",
-          color: "#6B7280"
-        }
-      },
-      "Powered by Mistral AI • Smart job analysis and career insights"
-    )
+                className: "uswift-btn",
+                style: { flex: 1 },
+                children: "Copy Full Report"
+              }
+            ),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "button",
+              {
+                onClick: () => setActiveTab("input"),
+                style: {
+                  flex: 1,
+                  background: "#F3F4F6",
+                  color: "#6B7280",
+                  border: "1px solid #E5E7EB",
+                  borderRadius: 8,
+                  padding: "12px",
+                  cursor: "pointer"
+                },
+                children: "Analyze Another Job"
+              }
+            )
+          ] })
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          "div",
+          {
+            style: {
+              marginTop: 16,
+              textAlign: "center",
+              fontSize: "0.8rem",
+              color: "#6B7280"
+            },
+            children: "Powered by Mistral AI • Smart job analysis and career insights"
+          }
+        )
+      ]
+    }
   );
 }
 
@@ -5287,7 +5835,7 @@ Format the response clearly with proper sections and structure.`;
   const getDifficultyLabel = (difficulty) => {
     return difficulty.charAt(0).toUpperCase() + difficulty.slice(1);
   };
-  return /* @__PURE__ */ React.createElement(
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs(
     "div",
     {
       style: {
@@ -5296,467 +5844,527 @@ Format the response clearly with proper sections and structure.`;
         padding: "2rem",
         minWidth: 350,
         minHeight: 520
-      }
-    },
-    /* @__PURE__ */ React.createElement(
-      "div",
-      {
-        className: "uswift-gradient",
-        style: {
-          height: 8,
-          borderRadius: 8,
-          marginBottom: 16
-        }
-      }
-    ),
-    /* @__PURE__ */ React.createElement(
-      "div",
-      {
-        style: {
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          marginBottom: 16
-        }
       },
-      /* @__PURE__ */ React.createElement(
-        "h2",
-        {
-          style: {
-            fontSize: "1.4rem",
-            fontWeight: 700,
-            color: "#111827",
-            margin: 0
-          }
-        },
-        "Interview Preparation"
-      ),
-      activeTab !== "input" && /* @__PURE__ */ React.createElement(
-        "button",
-        {
-          onClick: () => setActiveTab("input"),
-          style: {
-            background: "#EDE9FE",
-            color: "#6D28D9",
-            border: "none",
-            borderRadius: 8,
-            padding: "6px 12px",
-            cursor: "pointer",
-            fontSize: "0.8rem"
-          }
-        },
-        "← Back to Input"
-      )
-    ),
-    /* @__PURE__ */ React.createElement(
-      "div",
-      {
-        style: {
-          display: "flex",
-          marginBottom: 16,
-          borderBottom: "1px solid #E5E7EB"
-        }
-      },
-      /* @__PURE__ */ React.createElement(
-        "button",
-        {
-          onClick: () => setActiveTab("input"),
-          style: {
-            background: "none",
-            border: "none",
-            padding: "12px 16px",
-            cursor: "pointer",
-            fontSize: "0.9rem",
-            fontWeight: activeTab === "input" ? 600 : 400,
-            color: activeTab === "input" ? "#6D28D9" : "#6B7280",
-            borderBottom: activeTab === "input" ? "2px solid #6D28D9" : "none"
-          }
-        },
-        "Input"
-      ),
-      /* @__PURE__ */ React.createElement(
-        "button",
-        {
-          onClick: () => setActiveTab("questions"),
-          disabled: !result,
-          style: {
-            background: "none",
-            border: "none",
-            padding: "12px 16px",
-            cursor: result ? "pointer" : "not-allowed",
-            fontSize: "0.9rem",
-            fontWeight: activeTab === "questions" ? 600 : 400,
-            color: activeTab === "questions" ? "#6D28D9" : "#6B7280",
-            borderBottom: activeTab === "questions" ? "2px solid #6D28D9" : "none",
-            opacity: result ? 1 : 0.5
-          }
-        },
-        "Questions"
-      ),
-      /* @__PURE__ */ React.createElement(
-        "button",
-        {
-          onClick: () => setActiveTab("tips"),
-          disabled: !result,
-          style: {
-            background: "none",
-            border: "none",
-            padding: "12px 16px",
-            cursor: result ? "pointer" : "not-allowed",
-            fontSize: "0.9rem",
-            fontWeight: activeTab === "tips" ? 600 : 400,
-            color: activeTab === "tips" ? "#6D28D9" : "#6B7280",
-            borderBottom: activeTab === "tips" ? "2px solid #6D28D9" : "none",
-            opacity: result ? 1 : 0.5
-          }
-        },
-        "Tips & Plan"
-      )
-    ),
-    activeTab === "input" && /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { className: "uswift-card", style: { marginBottom: 16 } }, /* @__PURE__ */ React.createElement(
-      "label",
-      {
-        style: {
-          fontWeight: 600,
-          display: "block",
-          marginBottom: 8,
-          color: "#374151"
-        }
-      },
-      "Job Description:"
-    ), /* @__PURE__ */ React.createElement(
-      "textarea",
-      {
-        value: jobDescription,
-        onChange: (e) => setJobDescription(e.target.value),
-        placeholder: "Paste the job description to generate relevant interview questions...",
-        rows: 6,
-        style: {
-          width: "100%",
-          padding: 12,
-          borderRadius: 8,
-          border: "1px solid #E5E7EB",
-          fontSize: "0.9rem",
-          resize: "vertical"
-        }
-      }
-    )), /* @__PURE__ */ React.createElement("div", { className: "uswift-card", style: { marginBottom: 16 } }, /* @__PURE__ */ React.createElement(
-      "label",
-      {
-        style: {
-          fontWeight: 600,
-          display: "block",
-          marginBottom: 8,
-          color: "#374151"
-        }
-      },
-      "Your Experience Level:"
-    ), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 8, flexWrap: "wrap" } }, experienceLevels.map((level) => /* @__PURE__ */ React.createElement(
-      "button",
-      {
-        key: level.value,
-        onClick: () => setExperienceLevel(level.value),
-        style: {
-          background: experienceLevel === level.value ? "#6D28D9" : "#F3F4F6",
-          color: experienceLevel === level.value ? "#FFFFFF" : "#6B7280",
-          border: "none",
-          borderRadius: 6,
-          padding: "8px 16px",
-          cursor: "pointer",
-          fontSize: "0.8rem",
-          fontWeight: 500,
-          minWidth: 120,
-          textAlign: "left"
-        },
-        title: level.description
-      },
-      /* @__PURE__ */ React.createElement("div", { style: { fontWeight: 600 } }, level.label),
-      /* @__PURE__ */ React.createElement("div", { style: { fontSize: "0.7rem", opacity: 0.8 } }, level.description)
-    )))), /* @__PURE__ */ React.createElement("div", { className: "uswift-card", style: { marginBottom: 16 } }, /* @__PURE__ */ React.createElement(
-      "label",
-      {
-        style: {
-          fontWeight: 600,
-          display: "block",
-          marginBottom: 8,
-          color: "#374151"
-        }
-      },
-      "Focus Areas (Optional):"
-    ), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 4, flexWrap: "wrap" } }, commonFocusAreas.map((area) => /* @__PURE__ */ React.createElement(
-      "button",
-      {
-        key: area,
-        onClick: () => toggleFocusArea(area),
-        style: {
-          background: focusAreas.includes(area) ? "#6D28D9" : "#F3F4F6",
-          color: focusAreas.includes(area) ? "#FFFFFF" : "#6B7280",
-          border: "none",
-          borderRadius: 6,
-          padding: "6px 12px",
-          cursor: "pointer",
-          fontSize: "0.8rem",
-          fontWeight: 500
-        }
-      },
-      focusAreas.includes(area) ? "✓" : "+",
-      " ",
-      area
-    )))), /* @__PURE__ */ React.createElement(
-      "button",
-      {
-        onClick: handleGenerate,
-        disabled: isLoading || !jobDescription.trim(),
-        className: "uswift-btn",
-        style: {
-          width: "100%",
-          opacity: isLoading || !jobDescription.trim() ? 0.6 : 1,
-          cursor: isLoading || !jobDescription.trim() ? "not-allowed" : "pointer"
-        }
-      },
-      isLoading ? /* @__PURE__ */ React.createElement(
-        "div",
-        {
-          style: {
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            gap: 8
-          }
-        },
-        /* @__PURE__ */ React.createElement(
+      children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
           "div",
           {
+            className: "uswift-gradient",
             style: {
-              width: 16,
-              height: 16,
-              border: "2px solid #ffffff",
-              borderTop: "2px solid transparent",
-              borderRadius: "50%",
-              animation: "spin 1s linear infinite"
+              height: 8,
+              borderRadius: 8,
+              marginBottom: 16
             }
           }
         ),
-        "Generating Interview Prep..."
-      ) : "Generate Interview Preparation"
-    ), /* @__PURE__ */ React.createElement(
-      "div",
-      {
-        style: {
-          marginTop: 16,
-          padding: 12,
-          background: "#F8F9FA",
-          borderRadius: 8,
-          fontSize: "0.8rem",
-          color: "#6B7280"
-        }
-      },
-      /* @__PURE__ */ React.createElement("strong", null, "Interview Preparation Tips:"),
-      /* @__PURE__ */ React.createElement("ul", { style: { margin: "8px 0 0 16px", padding: 0 } }, /* @__PURE__ */ React.createElement("li", null, "Use the STAR method (Situation, Task, Action, Result) for behavioral questions"), /* @__PURE__ */ React.createElement("li", null, "Practice coding problems on platforms like LeetCode"), /* @__PURE__ */ React.createElement("li", null, "Research the company and prepare thoughtful questions"), /* @__PURE__ */ React.createElement("li", null, "Review your resume and be ready to discuss any experience"))
-    )),
-    activeTab === "questions" && result && /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { style: { maxHeight: 400, overflowY: "auto" } }, result.questions.map((question) => /* @__PURE__ */ React.createElement(
-      "div",
-      {
-        key: question.id,
-        className: "uswift-card",
-        style: { marginBottom: 12 }
-      },
-      /* @__PURE__ */ React.createElement(
-        "div",
-        {
-          style: {
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "flex-start",
-            marginBottom: 8
-          }
-        },
-        /* @__PURE__ */ React.createElement(
-          "h4",
-          {
-            style: {
-              fontSize: "0.9rem",
-              fontWeight: 600,
-              color: "#111827",
-              margin: 0,
-              flex: 1,
-              marginRight: 12
-            }
-          },
-          question.question
-        ),
-        /* @__PURE__ */ React.createElement(
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(
           "div",
           {
-            style: { display: "flex", gap: 4, alignItems: "center" }
-          },
-          /* @__PURE__ */ React.createElement(
-            "span",
-            {
-              style: {
-                background: "#EDE9FE",
-                color: "#6D28D9",
-                padding: "2px 6px",
-                borderRadius: 4,
-                fontSize: "0.7rem",
-                fontWeight: 500
-              }
+            style: {
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              marginBottom: 16
             },
-            question.category
+            children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "h2",
+                {
+                  style: {
+                    fontSize: "1.4rem",
+                    fontWeight: 700,
+                    color: "#111827",
+                    margin: 0
+                  },
+                  children: "Interview Preparation"
+                }
+              ),
+              activeTab !== "input" && /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "button",
+                {
+                  onClick: () => setActiveTab("input"),
+                  style: {
+                    background: "#EDE9FE",
+                    color: "#6D28D9",
+                    border: "none",
+                    borderRadius: 8,
+                    padding: "6px 12px",
+                    cursor: "pointer",
+                    fontSize: "0.8rem"
+                  },
+                  children: "← Back to Input"
+                }
+              )
+            ]
+          }
+        ),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(
+          "div",
+          {
+            style: {
+              display: "flex",
+              marginBottom: 16,
+              borderBottom: "1px solid #E5E7EB"
+            },
+            children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "button",
+                {
+                  onClick: () => setActiveTab("input"),
+                  style: {
+                    background: "none",
+                    border: "none",
+                    padding: "12px 16px",
+                    cursor: "pointer",
+                    fontSize: "0.9rem",
+                    fontWeight: activeTab === "input" ? 600 : 400,
+                    color: activeTab === "input" ? "#6D28D9" : "#6B7280",
+                    borderBottom: activeTab === "input" ? "2px solid #6D28D9" : "none"
+                  },
+                  children: "Input"
+                }
+              ),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "button",
+                {
+                  onClick: () => setActiveTab("questions"),
+                  disabled: !result,
+                  style: {
+                    background: "none",
+                    border: "none",
+                    padding: "12px 16px",
+                    cursor: result ? "pointer" : "not-allowed",
+                    fontSize: "0.9rem",
+                    fontWeight: activeTab === "questions" ? 600 : 400,
+                    color: activeTab === "questions" ? "#6D28D9" : "#6B7280",
+                    borderBottom: activeTab === "questions" ? "2px solid #6D28D9" : "none",
+                    opacity: result ? 1 : 0.5
+                  },
+                  children: "Questions"
+                }
+              ),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "button",
+                {
+                  onClick: () => setActiveTab("tips"),
+                  disabled: !result,
+                  style: {
+                    background: "none",
+                    border: "none",
+                    padding: "12px 16px",
+                    cursor: result ? "pointer" : "not-allowed",
+                    fontSize: "0.9rem",
+                    fontWeight: activeTab === "tips" ? 600 : 400,
+                    color: activeTab === "tips" ? "#6D28D9" : "#6B7280",
+                    borderBottom: activeTab === "tips" ? "2px solid #6D28D9" : "none",
+                    opacity: result ? 1 : 0.5
+                  },
+                  children: "Tips & Plan"
+                }
+              )
+            ]
+          }
+        ),
+        activeTab === "input" && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "uswift-card", style: { marginBottom: 16 }, children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "label",
+              {
+                style: {
+                  fontWeight: 600,
+                  display: "block",
+                  marginBottom: 8,
+                  color: "#374151"
+                },
+                children: "Job Description:"
+              }
+            ),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "textarea",
+              {
+                value: jobDescription,
+                onChange: (e) => setJobDescription(e.target.value),
+                placeholder: "Paste the job description to generate relevant interview questions...",
+                rows: 6,
+                style: {
+                  width: "100%",
+                  padding: 12,
+                  borderRadius: 8,
+                  border: "1px solid #E5E7EB",
+                  fontSize: "0.9rem",
+                  resize: "vertical"
+                }
+              }
+            )
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "uswift-card", style: { marginBottom: 16 }, children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "label",
+              {
+                style: {
+                  fontWeight: 600,
+                  display: "block",
+                  marginBottom: 8,
+                  color: "#374151"
+                },
+                children: "Your Experience Level:"
+              }
+            ),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { style: { display: "flex", gap: 8, flexWrap: "wrap" }, children: experienceLevels.map((level) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
+              "button",
+              {
+                onClick: () => setExperienceLevel(level.value),
+                style: {
+                  background: experienceLevel === level.value ? "#6D28D9" : "#F3F4F6",
+                  color: experienceLevel === level.value ? "#FFFFFF" : "#6B7280",
+                  border: "none",
+                  borderRadius: 6,
+                  padding: "8px 16px",
+                  cursor: "pointer",
+                  fontSize: "0.8rem",
+                  fontWeight: 500,
+                  minWidth: 120,
+                  textAlign: "left"
+                },
+                title: level.description,
+                children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("div", { style: { fontWeight: 600 }, children: level.label }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("div", { style: { fontSize: "0.7rem", opacity: 0.8 }, children: level.description })
+                ]
+              },
+              level.value
+            )) })
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "uswift-card", style: { marginBottom: 16 }, children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "label",
+              {
+                style: {
+                  fontWeight: 600,
+                  display: "block",
+                  marginBottom: 8,
+                  color: "#374151"
+                },
+                children: "Focus Areas (Optional):"
+              }
+            ),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { style: { display: "flex", gap: 4, flexWrap: "wrap" }, children: commonFocusAreas.map((area) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
+              "button",
+              {
+                onClick: () => toggleFocusArea(area),
+                style: {
+                  background: focusAreas.includes(area) ? "#6D28D9" : "#F3F4F6",
+                  color: focusAreas.includes(area) ? "#FFFFFF" : "#6B7280",
+                  border: "none",
+                  borderRadius: 6,
+                  padding: "6px 12px",
+                  cursor: "pointer",
+                  fontSize: "0.8rem",
+                  fontWeight: 500
+                },
+                children: [
+                  focusAreas.includes(area) ? "✓" : "+",
+                  " ",
+                  area
+                ]
+              },
+              area
+            )) })
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            "button",
+            {
+              onClick: handleGenerate,
+              disabled: isLoading || !jobDescription.trim(),
+              className: "uswift-btn",
+              style: {
+                width: "100%",
+                opacity: isLoading || !jobDescription.trim() ? 0.6 : 1,
+                cursor: isLoading || !jobDescription.trim() ? "not-allowed" : "pointer"
+              },
+              children: isLoading ? /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                "div",
+                {
+                  style: {
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gap: 8
+                  },
+                  children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(
+                      "div",
+                      {
+                        style: {
+                          width: 16,
+                          height: 16,
+                          border: "2px solid #ffffff",
+                          borderTop: "2px solid transparent",
+                          borderRadius: "50%",
+                          animation: "spin 1s linear infinite"
+                        }
+                      }
+                    ),
+                    "Generating Interview Prep..."
+                  ]
+                }
+              ) : "Generate Interview Preparation"
+            }
           ),
-          /* @__PURE__ */ React.createElement(
-            "span",
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(
+            "div",
             {
               style: {
-                background: getDifficultyColor(question.difficulty),
-                color: "#FFFFFF",
-                padding: "2px 6px",
-                borderRadius: 4,
-                fontSize: "0.7rem",
-                fontWeight: 500
-              }
-            },
-            getDifficultyLabel(question.difficulty)
+                marginTop: 16,
+                padding: 12,
+                background: "#F8F9FA",
+                borderRadius: 8,
+                fontSize: "0.8rem",
+                color: "#6B7280"
+              },
+              children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Interview Preparation Tips:" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("ul", { style: { margin: "8px 0 0 16px", padding: 0 }, children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Use the STAR method (Situation, Task, Action, Result) for behavioral questions" }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Practice coding problems on platforms like LeetCode" }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Research the company and prepare thoughtful questions" }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Review your resume and be ready to discuss any experience" })
+                ] })
+              ]
+            }
           )
+        ] }),
+        activeTab === "questions" && result && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { style: { maxHeight: 400, overflowY: "auto" }, children: result.questions.map((question) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
+          "div",
+          {
+            className: "uswift-card",
+            style: { marginBottom: 12 },
+            children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                "div",
+                {
+                  style: {
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "flex-start",
+                    marginBottom: 8
+                  },
+                  children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(
+                      "h4",
+                      {
+                        style: {
+                          fontSize: "0.9rem",
+                          fontWeight: 600,
+                          color: "#111827",
+                          margin: 0,
+                          flex: 1,
+                          marginRight: 12
+                        },
+                        children: question.question
+                      }
+                    ),
+                    /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                      "div",
+                      {
+                        style: { display: "flex", gap: 4, alignItems: "center" },
+                        children: [
+                          /* @__PURE__ */ jsxRuntimeExports.jsx(
+                            "span",
+                            {
+                              style: {
+                                background: "#EDE9FE",
+                                color: "#6D28D9",
+                                padding: "2px 6px",
+                                borderRadius: 4,
+                                fontSize: "0.7rem",
+                                fontWeight: 500
+                              },
+                              children: question.category
+                            }
+                          ),
+                          /* @__PURE__ */ jsxRuntimeExports.jsx(
+                            "span",
+                            {
+                              style: {
+                                background: getDifficultyColor(question.difficulty),
+                                color: "#FFFFFF",
+                                padding: "2px 6px",
+                                borderRadius: 4,
+                                fontSize: "0.7rem",
+                                fontWeight: 500
+                              },
+                              children: getDifficultyLabel(question.difficulty)
+                            }
+                          )
+                        ]
+                      }
+                    )
+                  ]
+                }
+              ),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                "div",
+                {
+                  style: {
+                    fontSize: "0.85rem",
+                    color: "#4B5563",
+                    lineHeight: 1.5,
+                    marginBottom: 8
+                  },
+                  children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Suggested Answer:" }),
+                    " ",
+                    question.suggestedAnswer
+                  ]
+                }
+              ),
+              question.keyPoints.length > 0 && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { style: { fontSize: "0.8rem", color: "#374151" }, children: "Key Points:" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("ul", { style: { margin: "4px 0 0 16px", padding: 0 }, children: question.keyPoints.map((point, index) => /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  "li",
+                  {
+                    style: {
+                      fontSize: "0.8rem",
+                      color: "#6B7280",
+                      marginBottom: 4
+                    },
+                    children: point
+                  },
+                  index
+                )) })
+              ] })
+            ]
+          },
+          question.id
+        )) }) }),
+        activeTab === "tips" && result && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "uswift-card", style: { marginBottom: 16 }, children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "h3",
+              {
+                style: {
+                  fontSize: "1.1rem",
+                  fontWeight: 600,
+                  color: "#111827",
+                  marginBottom: 12
+                },
+                children: "💡 Overall Preparation Tips"
+              }
+            ),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("ul", { style: { margin: 0, paddingLeft: 20 }, children: result.overallTips.map((tip, index) => /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "li",
+              {
+                style: {
+                  fontSize: "0.9rem",
+                  color: "#4B5563",
+                  marginBottom: 8
+                },
+                children: tip
+              },
+              index
+            )) })
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "uswift-card", style: { marginBottom: 16 }, children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "h3",
+              {
+                style: {
+                  fontSize: "1.1rem",
+                  fontWeight: 600,
+                  color: "#111827",
+                  marginBottom: 12
+                },
+                children: "🏢 Company-Specific Advice"
+              }
+            ),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "p",
+              {
+                style: {
+                  fontSize: "0.9rem",
+                  lineHeight: 1.6,
+                  color: "#4B5563",
+                  margin: 0
+                },
+                children: result.companySpecificAdvice
+              }
+            )
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "uswift-card", style: { marginBottom: 16 }, children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "h3",
+              {
+                style: {
+                  fontSize: "1.1rem",
+                  fontWeight: 600,
+                  color: "#111827",
+                  marginBottom: 12
+                },
+                children: "📅 7-Day Preparation Plan"
+              }
+            ),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { style: { display: "flex", flexDirection: "column", gap: 8 }, children: result.preparationPlan.map((day, index) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
+              "div",
+              {
+                style: {
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 8,
+                  padding: 8,
+                  background: "#F8F9FA",
+                  borderRadius: 6
+                },
+                children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(
+                    "span",
+                    {
+                      style: {
+                        background: "#6D28D9",
+                        color: "#FFFFFF",
+                        width: 24,
+                        height: 24,
+                        borderRadius: "50%",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        fontSize: "0.8rem",
+                        fontWeight: 600
+                      },
+                      children: index + 1
+                    }
+                  ),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(
+                    "span",
+                    {
+                      style: {
+                        fontSize: "0.9rem",
+                        color: "#4B5563",
+                        flex: 1
+                      },
+                      children: day
+                    }
+                  )
+                ]
+              },
+              index
+            )) })
+          ] })
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          "div",
+          {
+            style: {
+              marginTop: 16,
+              textAlign: "center",
+              fontSize: "0.8rem",
+              color: "#6B7280"
+            },
+            children: "Powered by Mistral AI • Comprehensive interview preparation and practice questions"
+          }
         )
-      ),
-      /* @__PURE__ */ React.createElement(
-        "div",
-        {
-          style: {
-            fontSize: "0.85rem",
-            color: "#4B5563",
-            lineHeight: 1.5,
-            marginBottom: 8
-          }
-        },
-        /* @__PURE__ */ React.createElement("strong", null, "Suggested Answer:"),
-        " ",
-        question.suggestedAnswer
-      ),
-      question.keyPoints.length > 0 && /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("strong", { style: { fontSize: "0.8rem", color: "#374151" } }, "Key Points:"), /* @__PURE__ */ React.createElement("ul", { style: { margin: "4px 0 0 16px", padding: 0 } }, question.keyPoints.map((point, index) => /* @__PURE__ */ React.createElement(
-        "li",
-        {
-          key: index,
-          style: {
-            fontSize: "0.8rem",
-            color: "#6B7280",
-            marginBottom: 4
-          }
-        },
-        point
-      ))))
-    )))),
-    activeTab === "tips" && result && /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { className: "uswift-card", style: { marginBottom: 16 } }, /* @__PURE__ */ React.createElement(
-      "h3",
-      {
-        style: {
-          fontSize: "1.1rem",
-          fontWeight: 600,
-          color: "#111827",
-          marginBottom: 12
-        }
-      },
-      "💡 Overall Preparation Tips"
-    ), /* @__PURE__ */ React.createElement("ul", { style: { margin: 0, paddingLeft: 20 } }, result.overallTips.map((tip, index) => /* @__PURE__ */ React.createElement(
-      "li",
-      {
-        key: index,
-        style: {
-          fontSize: "0.9rem",
-          color: "#4B5563",
-          marginBottom: 8
-        }
-      },
-      tip
-    )))), /* @__PURE__ */ React.createElement("div", { className: "uswift-card", style: { marginBottom: 16 } }, /* @__PURE__ */ React.createElement(
-      "h3",
-      {
-        style: {
-          fontSize: "1.1rem",
-          fontWeight: 600,
-          color: "#111827",
-          marginBottom: 12
-        }
-      },
-      "🏢 Company-Specific Advice"
-    ), /* @__PURE__ */ React.createElement(
-      "p",
-      {
-        style: {
-          fontSize: "0.9rem",
-          lineHeight: 1.6,
-          color: "#4B5563",
-          margin: 0
-        }
-      },
-      result.companySpecificAdvice
-    )), /* @__PURE__ */ React.createElement("div", { className: "uswift-card", style: { marginBottom: 16 } }, /* @__PURE__ */ React.createElement(
-      "h3",
-      {
-        style: {
-          fontSize: "1.1rem",
-          fontWeight: 600,
-          color: "#111827",
-          marginBottom: 12
-        }
-      },
-      "📅 7-Day Preparation Plan"
-    ), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", flexDirection: "column", gap: 8 } }, result.preparationPlan.map((day, index) => /* @__PURE__ */ React.createElement(
-      "div",
-      {
-        key: index,
-        style: {
-          display: "flex",
-          alignItems: "center",
-          gap: 8,
-          padding: 8,
-          background: "#F8F9FA",
-          borderRadius: 6
-        }
-      },
-      /* @__PURE__ */ React.createElement(
-        "span",
-        {
-          style: {
-            background: "#6D28D9",
-            color: "#FFFFFF",
-            width: 24,
-            height: 24,
-            borderRadius: "50%",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            fontSize: "0.8rem",
-            fontWeight: 600
-          }
-        },
-        index + 1
-      ),
-      /* @__PURE__ */ React.createElement(
-        "span",
-        {
-          style: {
-            fontSize: "0.9rem",
-            color: "#4B5563",
-            flex: 1
-          }
-        },
-        day
-      )
-    ))))),
-    /* @__PURE__ */ React.createElement(
-      "div",
-      {
-        style: {
-          marginTop: 16,
-          textAlign: "center",
-          fontSize: "0.8rem",
-          color: "#6B7280"
-        }
-      },
-      "Powered by Mistral AI • Comprehensive interview preparation and practice questions"
-    )
+      ]
+    }
   );
 }
 
@@ -5829,7 +6437,7 @@ function Auth({ onAuthSuccess }) {
     }
   };
   if (authLoading) {
-    return /* @__PURE__ */ React.createElement("div", { style: { padding: "2rem", textAlign: "center" } }, /* @__PURE__ */ React.createElement(
+    return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { style: { padding: "2rem", textAlign: "center" }, children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
       "div",
       {
         style: {
@@ -5837,43 +6445,47 @@ function Auth({ onAuthSuccess }) {
           borderRadius: "1.5rem",
           padding: "2rem",
           minWidth: 350
-        }
-      },
-      /* @__PURE__ */ React.createElement(
-        "div",
-        {
-          className: "uswift-gradient",
-          style: { height: 8, borderRadius: 8, marginBottom: 24 }
-        }
-      ),
-      /* @__PURE__ */ React.createElement(
-        "div",
-        {
-          style: {
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            gap: 12
-          }
         },
-        /* @__PURE__ */ React.createElement(
-          "div",
-          {
-            style: {
-              width: 20,
-              height: 20,
-              border: "2px solid #6D28D9",
-              borderTop: "2px solid transparent",
-              borderRadius: "50%",
-              animation: "spin 1s linear infinite"
+        children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            "div",
+            {
+              className: "uswift-gradient",
+              style: { height: 8, borderRadius: 8, marginBottom: 24 }
             }
-          }
-        ),
-        /* @__PURE__ */ React.createElement("p", { style: { margin: 0, color: "#6D28D9", fontWeight: 600 } }, "Initializing...")
-      )
-    ));
+          ),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(
+            "div",
+            {
+              style: {
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: 12
+              },
+              children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  "div",
+                  {
+                    style: {
+                      width: 20,
+                      height: 20,
+                      border: "2px solid #6D28D9",
+                      borderTop: "2px solid transparent",
+                      borderRadius: "50%",
+                      animation: "spin 1s linear infinite"
+                    }
+                  }
+                ),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("p", { style: { margin: 0, color: "#6D28D9", fontWeight: 600 }, children: "Initializing..." })
+              ]
+            }
+          )
+        ]
+      }
+    ) });
   }
-  return /* @__PURE__ */ React.createElement(
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs(
     "div",
     {
       style: {
@@ -5881,226 +6493,245 @@ function Auth({ onAuthSuccess }) {
         borderRadius: "1.5rem",
         padding: "2rem",
         minWidth: 350
-      }
-    },
-    /* @__PURE__ */ React.createElement(
-      "div",
-      {
-        className: "uswift-gradient",
-        style: { height: 8, borderRadius: 8, marginBottom: 24 }
-      }
-    ),
-    /* @__PURE__ */ React.createElement(
-      "h2",
-      {
-        style: {
-          fontSize: "1.4rem",
-          fontWeight: 700,
-          color: "#111827",
-          marginBottom: 16,
-          textAlign: "center"
-        }
       },
-      isSignUp ? "Sign Up for Uswift" : "Sign In to Uswift"
-    ),
-    /* @__PURE__ */ React.createElement("form", { onSubmit: handleSubmit }, isSignUp && /* @__PURE__ */ React.createElement(
-      "input",
-      {
-        type: "text",
-        placeholder: "Full Name",
-        value: fullName,
-        onChange: (e) => setFullName(e.target.value),
-        style: {
-          width: "100%",
-          marginBottom: 12,
-          borderRadius: 8,
-          border: "1px solid #E5E7EB",
-          padding: 12,
-          fontSize: "1rem",
-          transition: "all 0.2s ease"
-        },
-        required: true
-      }
-    ), /* @__PURE__ */ React.createElement(
-      "input",
-      {
-        type: "email",
-        placeholder: "Email",
-        value: email,
-        onChange: (e) => setEmail(e.target.value),
-        style: {
-          width: "100%",
-          marginBottom: 12,
-          borderRadius: 8,
-          border: "1px solid #E5E7EB",
-          padding: 12,
-          fontSize: "1rem",
-          transition: "all 0.2s ease"
-        },
-        required: true
-      }
-    ), !isForgot && /* @__PURE__ */ React.createElement(
-      "input",
-      {
-        type: "password",
-        placeholder: "Password",
-        value: password,
-        onChange: (e) => setPassword(e.target.value),
-        style: {
-          width: "100%",
-          marginBottom: 16,
-          borderRadius: 8,
-          border: "1px solid #E5E7EB",
-          padding: 12,
-          fontSize: "1rem",
-          transition: "all 0.2s ease"
-        },
-        required: true
-      }
-    ), isForgot && /* @__PURE__ */ React.createElement(
-      "div",
-      {
-        style: { fontSize: "0.9rem", color: "#6B7280", marginBottom: 12 }
-      },
-      "Enter your email and we'll send a password reset link if an account exists."
-    ), error && /* @__PURE__ */ React.createElement(
-      "div",
-      {
-        style: {
-          color: "#DC2626",
-          fontSize: "0.9rem",
-          marginBottom: 12,
-          padding: "8px 12px",
-          background: "#FEF2F2",
-          border: "1px solid #FECACA",
-          borderRadius: 6
-        }
-      },
-      error
-    ), success && /* @__PURE__ */ React.createElement(
-      "div",
-      {
-        style: {
-          color: "#059669",
-          fontSize: "0.9rem",
-          marginBottom: 12,
-          padding: "8px 12px",
-          background: "#ECFDF5",
-          border: "1px solid #A7F3D0",
-          borderRadius: 6,
-          animation: "fadeIn 0.3s ease-in"
-        }
-      },
-      success,
-      pending && /* @__PURE__ */ React.createElement(
-        "div",
-        {
-          style: { fontSize: "0.85rem", color: "#065F46", marginTop: 8 }
-        },
-        "Verifying account... this may take a few seconds."
-      ),
-      !pending && success.includes("successfully") && /* @__PURE__ */ React.createElement(
-        "div",
-        {
-          style: { fontSize: "0.85rem", color: "#065F46", marginTop: 8 }
-        },
-        "Redirecting to dashboard..."
-      )
-    ), /* @__PURE__ */ React.createElement(
-      "button",
-      {
-        type: "submit",
-        className: "uswift-btn",
-        disabled: submitting,
-        style: {
-          width: "100%",
-          marginBottom: 16,
-          opacity: submitting ? 0.7 : 1,
-          cursor: submitting ? "not-allowed" : "pointer",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          gap: 8,
-          transition: "all 0.2s ease"
-        }
-      },
-      submitting && /* @__PURE__ */ React.createElement(
-        "div",
-        {
-          style: {
-            width: 16,
-            height: 16,
-            border: "2px solid #ffffff",
-            borderTop: "2px solid transparent",
-            borderRadius: "50%",
-            animation: "spin 1s linear infinite"
+      children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          "div",
+          {
+            className: "uswift-gradient",
+            style: { height: 8, borderRadius: 8, marginBottom: 24 }
           }
-        }
-      ),
-      submitting ? isSignUp ? "Creating Account..." : "Signing In..." : isSignUp ? "Sign Up" : "Sign In"
-    ), /* @__PURE__ */ React.createElement("div", { style: { textAlign: "center", marginTop: 8 } }, !isForgot ? /* @__PURE__ */ React.createElement(
-      "button",
-      {
-        type: "button",
-        onClick: () => {
-          setIsForgot(true);
-          setError("");
-          setSuccess("");
-        },
-        style: {
-          background: "none",
-          border: "none",
-          color: "#6D28D9",
-          cursor: "pointer",
-          textDecoration: "underline"
-        }
-      },
-      "Forgot password?"
-    ) : /* @__PURE__ */ React.createElement(
-      "button",
-      {
-        type: "button",
-        onClick: () => {
-          setIsForgot(false);
-          setError("");
-          setSuccess("");
-        },
-        style: {
-          background: "none",
-          border: "none",
-          color: "#6D28D9",
-          cursor: "pointer",
-          textDecoration: "underline"
-        }
-      },
-      "Back to sign in"
-    ))),
-    /* @__PURE__ */ React.createElement("p", { style: { textAlign: "center", color: "#4B5563" } }, isSignUp ? "Already have an account?" : "Don't have an account?", " ", /* @__PURE__ */ React.createElement(
-      "button",
-      {
-        onClick: () => {
-          setIsSignUp(!isSignUp);
-          setError("");
-          setSuccess("");
-        },
-        style: {
-          background: "none",
-          border: "none",
-          color: "#6D28D9",
-          textDecoration: "underline",
-          cursor: "pointer",
-          fontSize: "inherit",
-          transition: "color 0.2s ease"
-        },
-        onMouseEnter: (e) => {
-          e.currentTarget.style.color = "#5B21B6";
-        },
-        onMouseLeave: (e) => {
-          e.currentTarget.style.color = "#6D28D9";
-        }
-      },
-      isSignUp ? "Sign In" : "Sign Up"
-    ))
+        ),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          "h2",
+          {
+            style: {
+              fontSize: "1.4rem",
+              fontWeight: 700,
+              color: "#111827",
+              marginBottom: 16,
+              textAlign: "center"
+            },
+            children: isSignUp ? "Sign Up for Uswift" : "Sign In to Uswift"
+          }
+        ),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("form", { onSubmit: handleSubmit, children: [
+          isSignUp && /* @__PURE__ */ jsxRuntimeExports.jsx(
+            "input",
+            {
+              type: "text",
+              placeholder: "Full Name",
+              value: fullName,
+              onChange: (e) => setFullName(e.target.value),
+              style: {
+                width: "100%",
+                marginBottom: 12,
+                borderRadius: 8,
+                border: "1px solid #E5E7EB",
+                padding: 12,
+                fontSize: "1rem",
+                transition: "all 0.2s ease"
+              },
+              required: true
+            }
+          ),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            "input",
+            {
+              type: "email",
+              placeholder: "Email",
+              value: email,
+              onChange: (e) => setEmail(e.target.value),
+              style: {
+                width: "100%",
+                marginBottom: 12,
+                borderRadius: 8,
+                border: "1px solid #E5E7EB",
+                padding: 12,
+                fontSize: "1rem",
+                transition: "all 0.2s ease"
+              },
+              required: true
+            }
+          ),
+          !isForgot && /* @__PURE__ */ jsxRuntimeExports.jsx(
+            "input",
+            {
+              type: "password",
+              placeholder: "Password",
+              value: password,
+              onChange: (e) => setPassword(e.target.value),
+              style: {
+                width: "100%",
+                marginBottom: 16,
+                borderRadius: 8,
+                border: "1px solid #E5E7EB",
+                padding: 12,
+                fontSize: "1rem",
+                transition: "all 0.2s ease"
+              },
+              required: true
+            }
+          ),
+          isForgot && /* @__PURE__ */ jsxRuntimeExports.jsx(
+            "div",
+            {
+              style: { fontSize: "0.9rem", color: "#6B7280", marginBottom: 12 },
+              children: "Enter your email and we'll send a password reset link if an account exists."
+            }
+          ),
+          error && /* @__PURE__ */ jsxRuntimeExports.jsx(
+            "div",
+            {
+              style: {
+                color: "#DC2626",
+                fontSize: "0.9rem",
+                marginBottom: 12,
+                padding: "8px 12px",
+                background: "#FEF2F2",
+                border: "1px solid #FECACA",
+                borderRadius: 6
+              },
+              children: error
+            }
+          ),
+          success && /* @__PURE__ */ jsxRuntimeExports.jsxs(
+            "div",
+            {
+              style: {
+                color: "#059669",
+                fontSize: "0.9rem",
+                marginBottom: 12,
+                padding: "8px 12px",
+                background: "#ECFDF5",
+                border: "1px solid #A7F3D0",
+                borderRadius: 6,
+                animation: "fadeIn 0.3s ease-in"
+              },
+              children: [
+                success,
+                pending && /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  "div",
+                  {
+                    style: { fontSize: "0.85rem", color: "#065F46", marginTop: 8 },
+                    children: "Verifying account... this may take a few seconds."
+                  }
+                ),
+                !pending && success.includes("successfully") && /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  "div",
+                  {
+                    style: { fontSize: "0.85rem", color: "#065F46", marginTop: 8 },
+                    children: "Redirecting to dashboard..."
+                  }
+                )
+              ]
+            }
+          ),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(
+            "button",
+            {
+              type: "submit",
+              className: "uswift-btn",
+              disabled: submitting,
+              style: {
+                width: "100%",
+                marginBottom: 16,
+                opacity: submitting ? 0.7 : 1,
+                cursor: submitting ? "not-allowed" : "pointer",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: 8,
+                transition: "all 0.2s ease"
+              },
+              children: [
+                submitting && /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  "div",
+                  {
+                    style: {
+                      width: 16,
+                      height: 16,
+                      border: "2px solid #ffffff",
+                      borderTop: "2px solid transparent",
+                      borderRadius: "50%",
+                      animation: "spin 1s linear infinite"
+                    }
+                  }
+                ),
+                submitting ? isSignUp ? "Creating Account..." : "Signing In..." : isSignUp ? "Sign Up" : "Sign In"
+              ]
+            }
+          ),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { style: { textAlign: "center", marginTop: 8 }, children: !isForgot ? /* @__PURE__ */ jsxRuntimeExports.jsx(
+            "button",
+            {
+              type: "button",
+              onClick: () => {
+                setIsForgot(true);
+                setError("");
+                setSuccess("");
+              },
+              style: {
+                background: "none",
+                border: "none",
+                color: "#6D28D9",
+                cursor: "pointer",
+                textDecoration: "underline"
+              },
+              children: "Forgot password?"
+            }
+          ) : /* @__PURE__ */ jsxRuntimeExports.jsx(
+            "button",
+            {
+              type: "button",
+              onClick: () => {
+                setIsForgot(false);
+                setError("");
+                setSuccess("");
+              },
+              style: {
+                background: "none",
+                border: "none",
+                color: "#6D28D9",
+                cursor: "pointer",
+                textDecoration: "underline"
+              },
+              children: "Back to sign in"
+            }
+          ) })
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { style: { textAlign: "center", color: "#4B5563" }, children: [
+          isSignUp ? "Already have an account?" : "Don't have an account?",
+          " ",
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            "button",
+            {
+              onClick: () => {
+                setIsSignUp(!isSignUp);
+                setError("");
+                setSuccess("");
+              },
+              style: {
+                background: "none",
+                border: "none",
+                color: "#6D28D9",
+                textDecoration: "underline",
+                cursor: "pointer",
+                fontSize: "inherit",
+                transition: "color 0.2s ease"
+              },
+              onMouseEnter: (e) => {
+                e.currentTarget.style.color = "#5B21B6";
+              },
+              onMouseLeave: (e) => {
+                e.currentTarget.style.color = "#6D28D9";
+              },
+              children: isSignUp ? "Sign In" : "Sign Up"
+            }
+          )
+        ] })
+      ]
+    }
   );
 }
 
@@ -6323,7 +6954,7 @@ function Popup() {
     }
   };
   if (!isAuthenticated && !loading) {
-    return /* @__PURE__ */ React.createElement(
+    return /* @__PURE__ */ jsxRuntimeExports.jsx(
       Auth,
       {
         onAuthSuccess: async () => {
@@ -6339,7 +6970,7 @@ function Popup() {
     );
   }
   if (loading) {
-    return /* @__PURE__ */ React.createElement(
+    return /* @__PURE__ */ jsxRuntimeExports.jsx(
       "div",
       {
         style: {
@@ -6349,257 +6980,300 @@ function Popup() {
           display: "flex",
           alignItems: "center",
           justifyContent: "center"
-        }
-      },
-      /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement(
-        "div",
-        {
-          style: {
-            width: 40,
-            height: 40,
-            border: "4px solid #e5e7eb",
-            borderTop: "4px solid #6d28d9",
-            borderRadius: "50%",
-            animation: "spin 1s linear infinite",
-            margin: "0 auto 16px"
-          }
-        }
-      ), /* @__PURE__ */ React.createElement("p", { style: { color: "#6b7280", margin: 0 } }, "Loading..."))
+        },
+        children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            "div",
+            {
+              style: {
+                width: 40,
+                height: 40,
+                border: "4px solid #e5e7eb",
+                borderTop: "4px solid #6d28d9",
+                borderRadius: "50%",
+                animation: "spin 1s linear infinite",
+                margin: "0 auto 16px"
+              }
+            }
+          ),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { style: { color: "#6b7280", margin: 0 }, children: "Loading..." })
+        ] })
+      }
     );
   }
   if (page === "profile") {
-    return /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement(
-      "div",
-      {
-        style: {
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          margin: "1rem"
-        }
-      },
-      /* @__PURE__ */ React.createElement("button", { className: "uswift-btn", onClick: () => setPage("home") }, "← Back"),
-      /* @__PURE__ */ React.createElement(
-        "button",
+    return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsxs(
+        "div",
         {
-          onClick: signOut,
           style: {
-            background: "#EDE9FE",
-            color: "#6D28D9",
-            border: "none",
-            borderRadius: 8,
-            padding: "8px 12px",
-            cursor: "pointer"
-          }
-        },
-        "Sign Out"
-      )
-    ), /* @__PURE__ */ React.createElement(ProfileVault, null));
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            margin: "1rem"
+          },
+          children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("button", { className: "uswift-btn", onClick: () => setPage("home"), children: "← Back" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "button",
+              {
+                onClick: signOut,
+                style: {
+                  background: "#EDE9FE",
+                  color: "#6D28D9",
+                  border: "none",
+                  borderRadius: 8,
+                  padding: "8px 12px",
+                  cursor: "pointer"
+                },
+                children: "Sign Out"
+              }
+            )
+          ]
+        }
+      ),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(ProfileVault, {})
+    ] });
   }
   if (page === "tracker") {
-    return /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement(
-      "div",
-      {
-        style: {
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          margin: "1rem"
-        }
-      },
-      /* @__PURE__ */ React.createElement("button", { className: "uswift-btn", onClick: () => setPage("home") }, "← Back"),
-      /* @__PURE__ */ React.createElement(
-        "button",
+    return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsxs(
+        "div",
         {
-          onClick: signOut,
           style: {
-            background: "#EDE9FE",
-            color: "#6D28D9",
-            border: "none",
-            borderRadius: 8,
-            padding: "8px 12px",
-            cursor: "pointer"
-          }
-        },
-        "Sign Out"
-      )
-    ), /* @__PURE__ */ React.createElement(JobTracker, null));
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            margin: "1rem"
+          },
+          children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("button", { className: "uswift-btn", onClick: () => setPage("home"), children: "← Back" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "button",
+              {
+                onClick: signOut,
+                style: {
+                  background: "#EDE9FE",
+                  color: "#6D28D9",
+                  border: "none",
+                  borderRadius: 8,
+                  padding: "8px 12px",
+                  cursor: "pointer"
+                },
+                children: "Sign Out"
+              }
+            )
+          ]
+        }
+      ),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(JobTracker, {})
+    ] });
   }
   if (page === "chat") {
-    return /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement(
-      "div",
-      {
-        style: {
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          margin: "1rem"
-        }
-      },
-      /* @__PURE__ */ React.createElement("button", { className: "uswift-btn", onClick: () => setPage("home") }, "← Back"),
-      /* @__PURE__ */ React.createElement(
-        "button",
+    return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsxs(
+        "div",
         {
-          onClick: signOut,
           style: {
-            background: "#EDE9FE",
-            color: "#6D28D9",
-            border: "none",
-            borderRadius: 8,
-            padding: "8px 12px",
-            cursor: "pointer"
-          }
-        },
-        "Sign Out"
-      )
-    ), /* @__PURE__ */ React.createElement(ChatInterface, null));
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            margin: "1rem"
+          },
+          children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("button", { className: "uswift-btn", onClick: () => setPage("home"), children: "← Back" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "button",
+              {
+                onClick: signOut,
+                style: {
+                  background: "#EDE9FE",
+                  color: "#6D28D9",
+                  border: "none",
+                  borderRadius: 8,
+                  padding: "8px 12px",
+                  cursor: "pointer"
+                },
+                children: "Sign Out"
+              }
+            )
+          ]
+        }
+      ),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(ChatInterface, {})
+    ] });
   }
   if (page === "resume") {
-    return /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement(
-      "div",
-      {
-        style: {
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          margin: "1rem"
-        }
-      },
-      /* @__PURE__ */ React.createElement("button", { className: "uswift-btn", onClick: () => setPage("home") }, "← Back"),
-      /* @__PURE__ */ React.createElement(
-        "button",
+    return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsxs(
+        "div",
         {
-          onClick: signOut,
           style: {
-            background: "#EDE9FE",
-            color: "#6D28D9",
-            border: "none",
-            borderRadius: 8,
-            padding: "8px 12px",
-            cursor: "pointer"
-          }
-        },
-        "Sign Out"
-      )
-    ), /* @__PURE__ */ React.createElement(ResumeEnhancement, null));
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            margin: "1rem"
+          },
+          children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("button", { className: "uswift-btn", onClick: () => setPage("home"), children: "← Back" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "button",
+              {
+                onClick: signOut,
+                style: {
+                  background: "#EDE9FE",
+                  color: "#6D28D9",
+                  border: "none",
+                  borderRadius: 8,
+                  padding: "8px 12px",
+                  cursor: "pointer"
+                },
+                children: "Sign Out"
+              }
+            )
+          ]
+        }
+      ),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(ResumeEnhancement, {})
+    ] });
   }
   if (page === "cover-letter") {
-    return /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement(
-      "div",
-      {
-        style: {
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          margin: "1rem"
-        }
-      },
-      /* @__PURE__ */ React.createElement("button", { className: "uswift-btn", onClick: () => setPage("home") }, "← Back"),
-      /* @__PURE__ */ React.createElement(
-        "button",
+    return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsxs(
+        "div",
         {
-          onClick: signOut,
           style: {
-            background: "#EDE9FE",
-            color: "#6D28D9",
-            border: "none",
-            borderRadius: 8,
-            padding: "8px 12px",
-            cursor: "pointer"
-          }
-        },
-        "Sign Out"
-      )
-    ), /* @__PURE__ */ React.createElement(CoverLetterGenerator, null));
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            margin: "1rem"
+          },
+          children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("button", { className: "uswift-btn", onClick: () => setPage("home"), children: "← Back" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "button",
+              {
+                onClick: signOut,
+                style: {
+                  background: "#EDE9FE",
+                  color: "#6D28D9",
+                  border: "none",
+                  borderRadius: 8,
+                  padding: "8px 12px",
+                  cursor: "pointer"
+                },
+                children: "Sign Out"
+              }
+            )
+          ]
+        }
+      ),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(CoverLetterGenerator, {})
+    ] });
   }
   if (page === "files") {
-    return /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement(
-      "div",
-      {
-        style: {
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          margin: "1rem"
-        }
-      },
-      /* @__PURE__ */ React.createElement("button", { className: "uswift-btn", onClick: () => setPage("home") }, "← Back"),
-      /* @__PURE__ */ React.createElement(
-        "button",
+    return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsxs(
+        "div",
         {
-          onClick: signOut,
           style: {
-            background: "#EDE9FE",
-            color: "#6D28D9",
-            border: "none",
-            borderRadius: 8,
-            padding: "8px 12px",
-            cursor: "pointer"
-          }
-        },
-        "Sign Out"
-      )
-    ), /* @__PURE__ */ React.createElement(FileManager, null));
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            margin: "1rem"
+          },
+          children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("button", { className: "uswift-btn", onClick: () => setPage("home"), children: "← Back" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "button",
+              {
+                onClick: signOut,
+                style: {
+                  background: "#EDE9FE",
+                  color: "#6D28D9",
+                  border: "none",
+                  borderRadius: 8,
+                  padding: "8px 12px",
+                  cursor: "pointer"
+                },
+                children: "Sign Out"
+              }
+            )
+          ]
+        }
+      ),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(FileManager, {})
+    ] });
   }
   if (page === "job-analysis") {
-    return /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement(
-      "div",
-      {
-        style: {
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          margin: "1rem"
-        }
-      },
-      /* @__PURE__ */ React.createElement("button", { className: "uswift-btn", onClick: () => setPage("home") }, "← Back"),
-      /* @__PURE__ */ React.createElement(
-        "button",
+    return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsxs(
+        "div",
         {
-          onClick: signOut,
           style: {
-            background: "#EDE9FE",
-            color: "#6D28D9",
-            border: "none",
-            borderRadius: 8,
-            padding: "8px 12px",
-            cursor: "pointer"
-          }
-        },
-        "Sign Out"
-      )
-    ), /* @__PURE__ */ React.createElement(JobAnalysis, null));
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            margin: "1rem"
+          },
+          children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("button", { className: "uswift-btn", onClick: () => setPage("home"), children: "← Back" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "button",
+              {
+                onClick: signOut,
+                style: {
+                  background: "#EDE9FE",
+                  color: "#6D28D9",
+                  border: "none",
+                  borderRadius: 8,
+                  padding: "8px 12px",
+                  cursor: "pointer"
+                },
+                children: "Sign Out"
+              }
+            )
+          ]
+        }
+      ),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(JobAnalysis, {})
+    ] });
   }
   if (page === "interview-prep") {
-    return /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement(
-      "div",
-      {
-        style: {
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          margin: "1rem"
-        }
-      },
-      /* @__PURE__ */ React.createElement("button", { className: "uswift-btn", onClick: () => setPage("home") }, "← Back"),
-      /* @__PURE__ */ React.createElement(
-        "button",
+    return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsxs(
+        "div",
         {
-          onClick: signOut,
           style: {
-            background: "#EDE9FE",
-            color: "#6D28D9",
-            border: "none",
-            borderRadius: 8,
-            padding: "8px 12px",
-            cursor: "pointer"
-          }
-        },
-        "Sign Out"
-      )
-    ), /* @__PURE__ */ React.createElement(InterviewPrep, null));
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            margin: "1rem"
+          },
+          children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("button", { className: "uswift-btn", onClick: () => setPage("home"), children: "← Back" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "button",
+              {
+                onClick: signOut,
+                style: {
+                  background: "#EDE9FE",
+                  color: "#6D28D9",
+                  border: "none",
+                  borderRadius: 8,
+                  padding: "8px 12px",
+                  cursor: "pointer"
+                },
+                children: "Sign Out"
+              }
+            )
+          ]
+        }
+      ),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(InterviewPrep, {})
+    ] });
   }
-  return /* @__PURE__ */ React.createElement(
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs(
     "div",
     {
       style: {
@@ -6613,816 +7287,916 @@ function Popup() {
         border: "1px solid rgba(255, 255, 255, 0.8)",
         position: "relative",
         overflow: "hidden"
-      }
-    },
-    /* @__PURE__ */ React.createElement(
-      "div",
-      {
-        style: {
-          position: "absolute",
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          backgroundImage: `
+      },
+      children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          "div",
+          {
+            style: {
+              position: "absolute",
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              backgroundImage: `
             radial-gradient(circle at 25% 25%, rgba(99, 102, 241, 0.05) 0%, transparent 50%),
             radial-gradient(circle at 75% 75%, rgba(168, 85, 247, 0.05) 0%, transparent 50%)
           `,
-          pointerEvents: "none"
-        }
-      }
-    ),
-    /* @__PURE__ */ React.createElement(
-      "div",
-      {
-        style: {
-          background: "#FFFFFF",
-          borderRadius: "20px 20px 0 0",
-          padding: "2rem 2rem 1.5rem",
-          textAlign: "center",
-          color: "#1f2937",
-          position: "relative",
-          zIndex: 1,
-          boxShadow: "0 2px 8px rgba(0, 0, 0, 0.05)"
-        }
-      },
-      /* @__PURE__ */ React.createElement(
-        "div",
-        {
-          style: {
-            width: "60px",
-            height: "60px",
-            background: "linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%)",
-            borderRadius: "16px",
-            margin: "0 auto 1rem",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            border: "2px solid rgba(99, 102, 241, 0.2)"
-          }
-        },
-        /* @__PURE__ */ React.createElement("span", { style: { fontSize: "1.8rem" } }, "🚀")
-      ),
-      /* @__PURE__ */ React.createElement(
-        "h1",
-        {
-          style: {
-            fontSize: "1.8rem",
-            fontWeight: 800,
-            margin: "0 0 0.5rem 0",
-            color: "#1f2937"
-          }
-        },
-        "USwift"
-      ),
-      /* @__PURE__ */ React.createElement(
-        "p",
-        {
-          style: {
-            fontSize: "0.9rem",
-            margin: 0,
-            color: "#6b7280",
-            fontWeight: 500
-          }
-        },
-        "AI-Powered Career Excellence"
-      ),
-      /* @__PURE__ */ React.createElement(
-        "div",
-        {
-          style: {
-            marginTop: "1rem",
-            padding: "0.5rem 1rem",
-            background: "#f3f4f6",
-            borderRadius: "12px",
-            border: "1px solid #e5e7eb"
-          }
-        },
-        /* @__PURE__ */ React.createElement(
-          "div",
-          {
-            style: {
-              fontSize: "0.8rem",
-              color: "#374151",
-              fontWeight: 600
+              pointerEvents: "none"
             }
-          },
-          "Welcome back, ",
-          user?.email?.split("@")[0] || "Professional"
-        )
-      )
-    ),
-    /* @__PURE__ */ React.createElement("div", { style: { padding: "1.5rem 2rem", position: "relative", zIndex: 1 } }, /* @__PURE__ */ React.createElement("div", { style: { marginBottom: "2rem" } }, /* @__PURE__ */ React.createElement(
-      "h2",
-      {
-        style: {
-          fontSize: "1.2rem",
-          fontWeight: 700,
-          color: "#1f2937",
-          marginBottom: "1rem",
-          textAlign: "center"
-        }
-      },
-      "Quick Actions"
-    ), /* @__PURE__ */ React.createElement(
-      "div",
-      {
-        style: {
-          background: "linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%)",
-          borderRadius: "16px",
-          padding: "1.5rem",
-          marginBottom: "1.5rem",
-          border: "1px solid rgba(59, 130, 246, 0.1)",
-          position: "relative",
-          overflow: "hidden"
-        }
-      },
-      /* @__PURE__ */ React.createElement(
-        "div",
-        {
-          style: {
-            position: "absolute",
-            top: "-20px",
-            right: "-20px",
-            width: "60px",
-            height: "60px",
-            background: "radial-gradient(circle, rgba(59, 130, 246, 0.1) 0%, transparent 70%)",
-            borderRadius: "50%"
           }
-        }
-      ),
-      /* @__PURE__ */ React.createElement(
-        "div",
-        {
-          style: {
-            display: "flex",
-            alignItems: "center",
-            gap: "0.75rem",
-            marginBottom: "1rem"
-          }
-        },
-        /* @__PURE__ */ React.createElement(
-          "div",
-          {
-            style: {
-              width: "40px",
-              height: "40px",
-              background: "linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)",
-              borderRadius: "12px",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              boxShadow: "0 4px 12px rgba(59, 130, 246, 0.3)"
-            }
-          },
-          /* @__PURE__ */ React.createElement("span", { style: { fontSize: "1.2rem", color: "white" } }, "⚡")
         ),
-        /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement(
-          "h3",
-          {
-            style: {
-              fontSize: "1.1rem",
-              fontWeight: 700,
-              color: "#1e40af",
-              margin: 0
-            }
-          },
-          "Smart Auto-Apply"
-        ), /* @__PURE__ */ React.createElement(
-          "p",
-          {
-            style: {
-              fontSize: "0.85rem",
-              color: "#64748b",
-              margin: "0.25rem 0 0 0"
-            }
-          },
-          "Apply to jobs instantly with AI-optimized profiles"
-        ))
-      ),
-      /* @__PURE__ */ React.createElement(
-        "button",
-        {
-          onClick: handleAutoApply,
-          style: {
-            width: "100%",
-            background: "linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)",
-            color: "#ffffff",
-            border: "none",
-            borderRadius: "12px",
-            padding: "12px 20px",
-            fontSize: "0.95rem",
-            fontWeight: 600,
-            cursor: "pointer",
-            transition: "all 0.2s ease",
-            boxShadow: "0 4px 12px rgba(59, 130, 246, 0.3)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            gap: "8px"
-          },
-          onMouseEnter: (e) => {
-            e.currentTarget.style.transform = "translateY(-2px)";
-            e.currentTarget.style.boxShadow = "0 8px 20px rgba(59, 130, 246, 0.4)";
-          },
-          onMouseLeave: (e) => {
-            e.currentTarget.style.transform = "translateY(0)";
-            e.currentTarget.style.boxShadow = "0 4px 12px rgba(59, 130, 246, 0.3)";
-          }
-        },
-        /* @__PURE__ */ React.createElement("span", null, "🚀"),
-        "Auto-Apply to Job"
-      ),
-      autoStatus && /* @__PURE__ */ React.createElement(
-        "div",
-        {
-          style: {
-            marginTop: "1rem",
-            padding: "1rem",
-            borderRadius: "12px",
-            fontSize: "0.9rem",
-            background: autoStatus.status === "success" ? "linear-gradient(135deg, rgba(34, 197, 94, 0.1) 0%, rgba(34, 197, 94, 0.05) 100%)" : autoStatus.status === "error" ? "linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(239, 68, 68, 0.05) 100%)" : "linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(59, 130, 246, 0.05) 100%)",
-            color: autoStatus.status === "success" ? "#16a34a" : autoStatus.status === "error" ? "#dc2626" : "#1e40af",
-            border: `1px solid ${autoStatus.status === "success" ? "rgba(34, 197, 94, 0.3)" : autoStatus.status === "error" ? "rgba(239, 68, 68, 0.3)" : "rgba(59, 130, 246, 0.3)"}`
-          }
-        },
-        autoStatus.status === "pending" && /* @__PURE__ */ React.createElement(
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(
           "div",
           {
             style: {
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: "12px"
-            }
-          },
-          /* @__PURE__ */ React.createElement(
-            "div",
-            {
-              style: {
-                width: "20px",
-                height: "20px",
-                border: "3px solid rgba(59, 130, 246, 0.3)",
-                borderTop: "3px solid #3b82f6",
-                borderRadius: "50%",
-                animation: "spin 1s linear infinite"
+              background: "#FFFFFF",
+              borderRadius: "20px 20px 0 0",
+              padding: "2rem 2rem 1.5rem",
+              textAlign: "center",
+              color: "#1f2937",
+              position: "relative",
+              zIndex: 1,
+              boxShadow: "0 2px 8px rgba(0, 0, 0, 0.05)"
+            },
+            children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "div",
+                {
+                  style: {
+                    width: "60px",
+                    height: "60px",
+                    background: "linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%)",
+                    borderRadius: "16px",
+                    margin: "0 auto 1rem",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    border: "2px solid rgba(99, 102, 241, 0.2)"
+                  },
+                  children: /* @__PURE__ */ jsxRuntimeExports.jsx("span", { style: { fontSize: "1.8rem" }, children: "🚀" })
+                }
+              ),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "h1",
+                {
+                  style: {
+                    fontSize: "1.8rem",
+                    fontWeight: 800,
+                    margin: "0 0 0.5rem 0",
+                    color: "#1f2937"
+                  },
+                  children: "USwift"
+                }
+              ),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "p",
+                {
+                  style: {
+                    fontSize: "0.9rem",
+                    margin: 0,
+                    color: "#6b7280",
+                    fontWeight: 500
+                  },
+                  children: "AI-Powered Career Excellence"
+                }
+              ),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "div",
+                {
+                  style: {
+                    marginTop: "1rem",
+                    padding: "0.5rem 1rem",
+                    background: "#f3f4f6",
+                    borderRadius: "12px",
+                    border: "1px solid #e5e7eb"
+                  },
+                  children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                    "div",
+                    {
+                      style: {
+                        fontSize: "0.8rem",
+                        color: "#374151",
+                        fontWeight: 600
+                      },
+                      children: [
+                        "Welcome back, ",
+                        user?.email?.split("@")[0] || "Professional"
+                      ]
+                    }
+                  )
+                }
+              )
+            ]
+          }
+        ),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { padding: "1.5rem 2rem", position: "relative", zIndex: 1 }, children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { marginBottom: "2rem" }, children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "h2",
+              {
+                style: {
+                  fontSize: "1.2rem",
+                  fontWeight: 700,
+                  color: "#1f2937",
+                  marginBottom: "1rem",
+                  textAlign: "center"
+                },
+                children: "Quick Actions"
               }
+            ),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs(
+              "div",
+              {
+                style: {
+                  background: "linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%)",
+                  borderRadius: "16px",
+                  padding: "1.5rem",
+                  marginBottom: "1.5rem",
+                  border: "1px solid rgba(59, 130, 246, 0.1)",
+                  position: "relative",
+                  overflow: "hidden"
+                },
+                children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(
+                    "div",
+                    {
+                      style: {
+                        position: "absolute",
+                        top: "-20px",
+                        right: "-20px",
+                        width: "60px",
+                        height: "60px",
+                        background: "radial-gradient(circle, rgba(59, 130, 246, 0.1) 0%, transparent 70%)",
+                        borderRadius: "50%"
+                      }
+                    }
+                  ),
+                  /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                    "div",
+                    {
+                      style: {
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "0.75rem",
+                        marginBottom: "1rem"
+                      },
+                      children: [
+                        /* @__PURE__ */ jsxRuntimeExports.jsx(
+                          "div",
+                          {
+                            style: {
+                              width: "40px",
+                              height: "40px",
+                              background: "linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)",
+                              borderRadius: "12px",
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              boxShadow: "0 4px 12px rgba(59, 130, 246, 0.3)"
+                            },
+                            children: /* @__PURE__ */ jsxRuntimeExports.jsx("span", { style: { fontSize: "1.2rem", color: "white" }, children: "⚡" })
+                          }
+                        ),
+                        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+                          /* @__PURE__ */ jsxRuntimeExports.jsx(
+                            "h3",
+                            {
+                              style: {
+                                fontSize: "1.1rem",
+                                fontWeight: 700,
+                                color: "#1e40af",
+                                margin: 0
+                              },
+                              children: "Smart Auto-Apply"
+                            }
+                          ),
+                          /* @__PURE__ */ jsxRuntimeExports.jsx(
+                            "p",
+                            {
+                              style: {
+                                fontSize: "0.85rem",
+                                color: "#64748b",
+                                margin: "0.25rem 0 0 0"
+                              },
+                              children: "Apply to jobs instantly with AI-optimized profiles"
+                            }
+                          )
+                        ] })
+                      ]
+                    }
+                  ),
+                  /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                    "button",
+                    {
+                      onClick: handleAutoApply,
+                      style: {
+                        width: "100%",
+                        background: "linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)",
+                        color: "#ffffff",
+                        border: "none",
+                        borderRadius: "12px",
+                        padding: "12px 20px",
+                        fontSize: "0.95rem",
+                        fontWeight: 600,
+                        cursor: "pointer",
+                        transition: "all 0.2s ease",
+                        boxShadow: "0 4px 12px rgba(59, 130, 246, 0.3)",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        gap: "8px"
+                      },
+                      onMouseEnter: (e) => {
+                        e.currentTarget.style.transform = "translateY(-2px)";
+                        e.currentTarget.style.boxShadow = "0 8px 20px rgba(59, 130, 246, 0.4)";
+                      },
+                      onMouseLeave: (e) => {
+                        e.currentTarget.style.transform = "translateY(0)";
+                        e.currentTarget.style.boxShadow = "0 4px 12px rgba(59, 130, 246, 0.3)";
+                      },
+                      children: [
+                        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: "🚀" }),
+                        "Auto-Apply to Job"
+                      ]
+                    }
+                  ),
+                  autoStatus && /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                    "div",
+                    {
+                      style: {
+                        marginTop: "1rem",
+                        padding: "1rem",
+                        borderRadius: "12px",
+                        fontSize: "0.9rem",
+                        background: autoStatus.status === "success" ? "linear-gradient(135deg, rgba(34, 197, 94, 0.1) 0%, rgba(34, 197, 94, 0.05) 100%)" : autoStatus.status === "error" ? "linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(239, 68, 68, 0.05) 100%)" : "linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(59, 130, 246, 0.05) 100%)",
+                        color: autoStatus.status === "success" ? "#16a34a" : autoStatus.status === "error" ? "#dc2626" : "#1e40af",
+                        border: `1px solid ${autoStatus.status === "success" ? "rgba(34, 197, 94, 0.3)" : autoStatus.status === "error" ? "rgba(239, 68, 68, 0.3)" : "rgba(59, 130, 246, 0.3)"}`
+                      },
+                      children: [
+                        autoStatus.status === "pending" && /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                          "div",
+                          {
+                            style: {
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              gap: "12px"
+                            },
+                            children: [
+                              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                                "div",
+                                {
+                                  style: {
+                                    width: "20px",
+                                    height: "20px",
+                                    border: "3px solid rgba(59, 130, 246, 0.3)",
+                                    borderTop: "3px solid #3b82f6",
+                                    borderRadius: "50%",
+                                    animation: "spin 1s linear infinite"
+                                  }
+                                }
+                              ),
+                              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+                                /* @__PURE__ */ jsxRuntimeExports.jsx("div", { style: { fontWeight: 600, marginBottom: "4px" }, children: "🚀 Advanced Auto-Apply in Progress" }),
+                                /* @__PURE__ */ jsxRuntimeExports.jsx("div", { style: { fontSize: "0.8rem", opacity: 0.8 }, children: "Detecting job board, filling forms, uploading files..." })
+                              ] })
+                            ]
+                          }
+                        ),
+                        autoStatus.status === "success" && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+                          /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                            "div",
+                            {
+                              style: {
+                                display: "flex",
+                                alignItems: "center",
+                                gap: "8px",
+                                marginBottom: "8px",
+                                fontWeight: 600
+                              },
+                              children: [
+                                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: "✅" }),
+                                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: "Application Submitted Successfully!" })
+                              ]
+                            }
+                          ),
+                          /* @__PURE__ */ jsxRuntimeExports.jsx(
+                            "div",
+                            {
+                              style: {
+                                fontSize: "0.85rem",
+                                opacity: 0.9,
+                                marginBottom: "8px"
+                              },
+                              children: autoStatus.message
+                            }
+                          ),
+                          autoStatus.jobBoard && /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                            "div",
+                            {
+                              style: {
+                                fontSize: "0.75rem",
+                                opacity: 0.7,
+                                padding: "6px 12px",
+                                background: "rgba(255, 255, 255, 0.5)",
+                                borderRadius: "6px",
+                                display: "inline-block"
+                              },
+                              children: [
+                                "Platform: ",
+                                autoStatus.jobBoard
+                              ]
+                            }
+                          )
+                        ] }),
+                        autoStatus.status === "error" && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+                          /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                            "div",
+                            {
+                              style: {
+                                display: "flex",
+                                alignItems: "center",
+                                gap: "8px",
+                                marginBottom: "8px",
+                                fontWeight: 600
+                              },
+                              children: [
+                                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: "❌" }),
+                                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: "Auto-Apply Failed" })
+                              ]
+                            }
+                          ),
+                          /* @__PURE__ */ jsxRuntimeExports.jsx(
+                            "div",
+                            {
+                              style: {
+                                fontSize: "0.85rem",
+                                opacity: 0.9,
+                                marginBottom: "12px"
+                              },
+                              children: autoStatus.message
+                            }
+                          ),
+                          autoStatus.session && autoStatus.session.errors && autoStatus.session.errors.length > 0 && /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                            "div",
+                            {
+                              style: {
+                                fontSize: "0.75rem",
+                                opacity: 0.8,
+                                marginBottom: "12px",
+                                padding: "8px",
+                                background: "rgba(255, 255, 255, 0.3)",
+                                borderRadius: "6px"
+                              },
+                              children: [
+                                /* @__PURE__ */ jsxRuntimeExports.jsx("div", { style: { fontWeight: 600, marginBottom: "4px" }, children: "Issues detected:" }),
+                                autoStatus.session.errors.slice(0, 3).map((error, index) => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { marginBottom: "2px" }, children: [
+                                  "• ",
+                                  error
+                                ] }, index)),
+                                autoStatus.session.errors.length > 3 && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+                                  "... and ",
+                                  autoStatus.session.errors.length - 3,
+                                  " ",
+                                  "more"
+                                ] })
+                              ]
+                            }
+                          ),
+                          /* @__PURE__ */ jsxRuntimeExports.jsx(
+                            "button",
+                            {
+                              onClick: handleAutoApply,
+                              style: {
+                                background: "linear-gradient(135deg, #dc2626 0%, #b91c1c 100%)",
+                                color: "#ffffff",
+                                border: "none",
+                                borderRadius: "8px",
+                                padding: "8px 16px",
+                                fontSize: "0.85rem",
+                                fontWeight: 600,
+                                cursor: "pointer",
+                                boxShadow: "0 2px 8px rgba(220, 38, 38, 0.3)",
+                                transition: "all 0.2s ease"
+                              },
+                              onMouseEnter: (e) => {
+                                e.currentTarget.style.transform = "translateY(-1px)";
+                                e.currentTarget.style.boxShadow = "0 4px 12px rgba(220, 38, 38, 0.4)";
+                              },
+                              onMouseLeave: (e) => {
+                                e.currentTarget.style.transform = "translateY(0)";
+                                e.currentTarget.style.boxShadow = "0 2px 8px rgba(220, 38, 38, 0.3)";
+                              },
+                              children: "🔄 Retry Auto-Apply"
+                            }
+                          )
+                        ] })
+                      ]
+                    }
+                  )
+                ]
+              }
+            ),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { marginBottom: "2rem" }, children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "h3",
+                {
+                  style: {
+                    fontSize: "1rem",
+                    fontWeight: 600,
+                    color: "#374151",
+                    marginBottom: "1rem",
+                    textAlign: "center"
+                  },
+                  children: "Core Features"
+                }
+              ),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                "div",
+                {
+                  style: {
+                    display: "grid",
+                    gridTemplateColumns: "1fr 1fr",
+                    gap: "0.75rem"
+                  },
+                  children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                      "button",
+                      {
+                        onClick: () => setPage("profile"),
+                        style: {
+                          background: "#ffffff",
+                          border: "2px solid #e5e7eb",
+                          borderRadius: "12px",
+                          padding: "1rem",
+                          cursor: "pointer",
+                          transition: "all 0.2s ease",
+                          textAlign: "center",
+                          display: "flex",
+                          flexDirection: "column",
+                          alignItems: "center",
+                          gap: "0.5rem"
+                        },
+                        onMouseEnter: (e) => {
+                          e.currentTarget.style.borderColor = "#6366f1";
+                          e.currentTarget.style.transform = "translateY(-2px)";
+                          e.currentTarget.style.boxShadow = "0 8px 16px rgba(99, 102, 241, 0.15)";
+                        },
+                        onMouseLeave: (e) => {
+                          e.currentTarget.style.borderColor = "#e5e7eb";
+                          e.currentTarget.style.transform = "translateY(0)";
+                          e.currentTarget.style.boxShadow = "none";
+                        },
+                        children: [
+                          /* @__PURE__ */ jsxRuntimeExports.jsx(
+                            "div",
+                            {
+                              style: {
+                                width: "32px",
+                                height: "32px",
+                                background: "linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)",
+                                borderRadius: "8px",
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center"
+                              },
+                              children: /* @__PURE__ */ jsxRuntimeExports.jsx("span", { style: { fontSize: "1rem", color: "white" }, children: "📋" })
+                            }
+                          ),
+                          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+                            /* @__PURE__ */ jsxRuntimeExports.jsx(
+                              "div",
+                              {
+                                style: {
+                                  fontSize: "0.9rem",
+                                  fontWeight: 600,
+                                  color: "#1f2937"
+                                },
+                                children: "Profile Vault"
+                              }
+                            ),
+                            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { style: { fontSize: "0.75rem", color: "#6b7280" }, children: "Manage profiles" })
+                          ] })
+                        ]
+                      }
+                    ),
+                    /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                      "button",
+                      {
+                        onClick: () => setPage("tracker"),
+                        style: {
+                          background: "#ffffff",
+                          border: "2px solid #e5e7eb",
+                          borderRadius: "12px",
+                          padding: "1rem",
+                          cursor: "pointer",
+                          transition: "all 0.2s ease",
+                          textAlign: "center",
+                          display: "flex",
+                          flexDirection: "column",
+                          alignItems: "center",
+                          gap: "0.5rem"
+                        },
+                        onMouseEnter: (e) => {
+                          e.currentTarget.style.borderColor = "#f59e0b";
+                          e.currentTarget.style.transform = "translateY(-2px)";
+                          e.currentTarget.style.boxShadow = "0 8px 16px rgba(245, 158, 11, 0.15)";
+                        },
+                        onMouseLeave: (e) => {
+                          e.currentTarget.style.borderColor = "#e5e7eb";
+                          e.currentTarget.style.transform = "translateY(0)";
+                          e.currentTarget.style.boxShadow = "none";
+                        },
+                        children: [
+                          /* @__PURE__ */ jsxRuntimeExports.jsx(
+                            "div",
+                            {
+                              style: {
+                                width: "32px",
+                                height: "32px",
+                                background: "linear-gradient(135deg, #f59e0b 0%, #d97706 100%)",
+                                borderRadius: "8px",
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center"
+                              },
+                              children: /* @__PURE__ */ jsxRuntimeExports.jsx("span", { style: { fontSize: "1rem", color: "white" }, children: "📊" })
+                            }
+                          ),
+                          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+                            /* @__PURE__ */ jsxRuntimeExports.jsx(
+                              "div",
+                              {
+                                style: {
+                                  fontSize: "0.9rem",
+                                  fontWeight: 600,
+                                  color: "#1f2937"
+                                },
+                                children: "Job Tracker"
+                              }
+                            ),
+                            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { style: { fontSize: "0.75rem", color: "#6b7280" }, children: "Track applications" })
+                          ] })
+                        ]
+                      }
+                    )
+                  ]
+                }
+              )
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "h3",
+                {
+                  style: {
+                    fontSize: "1rem",
+                    fontWeight: 600,
+                    color: "#374151",
+                    marginBottom: "1rem",
+                    textAlign: "center"
+                  },
+                  children: "🤖 AI-Powered Tools"
+                }
+              ),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                "div",
+                {
+                  style: {
+                    display: "grid",
+                    gridTemplateColumns: "1fr 1fr",
+                    gap: "0.75rem",
+                    marginBottom: "1rem"
+                  },
+                  children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                      "button",
+                      {
+                        onClick: () => setPage("chat"),
+                        style: {
+                          background: "linear-gradient(135deg, #10b981 0%, #059669 100%)",
+                          border: "none",
+                          borderRadius: "12px",
+                          padding: "1rem",
+                          cursor: "pointer",
+                          transition: "all 0.2s ease",
+                          color: "white",
+                          textAlign: "center",
+                          display: "flex",
+                          flexDirection: "column",
+                          alignItems: "center",
+                          gap: "0.5rem",
+                          boxShadow: "0 4px 12px rgba(16, 185, 129, 0.3)"
+                        },
+                        onMouseEnter: (e) => {
+                          e.currentTarget.style.transform = "translateY(-2px)";
+                          e.currentTarget.style.boxShadow = "0 8px 20px rgba(16, 185, 129, 0.4)";
+                        },
+                        onMouseLeave: (e) => {
+                          e.currentTarget.style.transform = "translateY(0)";
+                          e.currentTarget.style.boxShadow = "0 4px 12px rgba(16, 185, 129, 0.3)";
+                        },
+                        children: [
+                          /* @__PURE__ */ jsxRuntimeExports.jsx(
+                            "div",
+                            {
+                              style: {
+                                width: "32px",
+                                height: "32px",
+                                background: "rgba(255, 255, 255, 0.2)",
+                                borderRadius: "8px",
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                backdropFilter: "blur(10px)"
+                              },
+                              children: /* @__PURE__ */ jsxRuntimeExports.jsx("span", { style: { fontSize: "1rem" }, children: "💬" })
+                            }
+                          ),
+                          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+                            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { style: { fontSize: "0.85rem", fontWeight: 600 }, children: "AI Assistant" }),
+                            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { style: { fontSize: "0.7rem", opacity: 0.9 }, children: "Career guidance" })
+                          ] })
+                        ]
+                      }
+                    ),
+                    /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                      "button",
+                      {
+                        onClick: () => setPage("resume"),
+                        style: {
+                          background: "linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)",
+                          border: "none",
+                          borderRadius: "12px",
+                          padding: "1rem",
+                          cursor: "pointer",
+                          transition: "all 0.2s ease",
+                          color: "white",
+                          textAlign: "center",
+                          display: "flex",
+                          flexDirection: "column",
+                          alignItems: "center",
+                          gap: "0.5rem",
+                          boxShadow: "0 4px 12px rgba(59, 130, 246, 0.3)"
+                        },
+                        onMouseEnter: (e) => {
+                          e.currentTarget.style.transform = "translateY(-2px)";
+                          e.currentTarget.style.boxShadow = "0 8px 20px rgba(59, 130, 246, 0.4)";
+                        },
+                        onMouseLeave: (e) => {
+                          e.currentTarget.style.transform = "translateY(0)";
+                          e.currentTarget.style.boxShadow = "0 4px 12px rgba(59, 130, 246, 0.3)";
+                        },
+                        children: [
+                          /* @__PURE__ */ jsxRuntimeExports.jsx(
+                            "div",
+                            {
+                              style: {
+                                width: "32px",
+                                height: "32px",
+                                background: "rgba(255, 255, 255, 0.2)",
+                                borderRadius: "8px",
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                backdropFilter: "blur(10px)"
+                              },
+                              children: /* @__PURE__ */ jsxRuntimeExports.jsx("span", { style: { fontSize: "1rem" }, children: "📄" })
+                            }
+                          ),
+                          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+                            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { style: { fontSize: "0.85rem", fontWeight: 600 }, children: "Resume AI" }),
+                            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { style: { fontSize: "0.7rem", opacity: 0.9 }, children: "Enhance & optimize" })
+                          ] })
+                        ]
+                      }
+                    )
+                  ]
+                }
+              ),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                "div",
+                {
+                  style: {
+                    display: "grid",
+                    gridTemplateColumns: "1fr 1fr 1fr",
+                    gap: "0.5rem"
+                  },
+                  children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                      "button",
+                      {
+                        onClick: () => setPage("cover-letter"),
+                        style: {
+                          background: "#ffffff",
+                          border: "2px solid #e5e7eb",
+                          borderRadius: "8px",
+                          padding: "0.75rem",
+                          cursor: "pointer",
+                          transition: "all 0.2s ease",
+                          textAlign: "center",
+                          display: "flex",
+                          flexDirection: "column",
+                          alignItems: "center",
+                          gap: "0.25rem"
+                        },
+                        onMouseEnter: (e) => {
+                          e.currentTarget.style.borderColor = "#8b5cf6";
+                          e.currentTarget.style.background = "#faf5ff";
+                        },
+                        onMouseLeave: (e) => {
+                          e.currentTarget.style.borderColor = "#e5e7eb";
+                          e.currentTarget.style.background = "#ffffff";
+                        },
+                        children: [
+                          /* @__PURE__ */ jsxRuntimeExports.jsx("span", { style: { fontSize: "1rem" }, children: "✍️" }),
+                          /* @__PURE__ */ jsxRuntimeExports.jsx(
+                            "span",
+                            {
+                              style: {
+                                fontSize: "0.7rem",
+                                fontWeight: 600,
+                                color: "#1f2937"
+                              },
+                              children: "Cover Letter"
+                            }
+                          )
+                        ]
+                      }
+                    ),
+                    /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                      "button",
+                      {
+                        onClick: () => setPage("files"),
+                        style: {
+                          background: "#ffffff",
+                          border: "2px solid #e5e7eb",
+                          borderRadius: "8px",
+                          padding: "0.75rem",
+                          cursor: "pointer",
+                          transition: "all 0.2s ease",
+                          textAlign: "center",
+                          display: "flex",
+                          flexDirection: "column",
+                          alignItems: "center",
+                          gap: "0.25rem"
+                        },
+                        onMouseEnter: (e) => {
+                          e.currentTarget.style.borderColor = "#f59e0b";
+                          e.currentTarget.style.background = "#fffbeb";
+                        },
+                        onMouseLeave: (e) => {
+                          e.currentTarget.style.borderColor = "#e5e7eb";
+                          e.currentTarget.style.background = "#ffffff";
+                        },
+                        children: [
+                          /* @__PURE__ */ jsxRuntimeExports.jsx("span", { style: { fontSize: "1rem" }, children: "📁" }),
+                          /* @__PURE__ */ jsxRuntimeExports.jsx(
+                            "span",
+                            {
+                              style: {
+                                fontSize: "0.7rem",
+                                fontWeight: 600,
+                                color: "#1f2937"
+                              },
+                              children: "File Manager"
+                            }
+                          )
+                        ]
+                      }
+                    ),
+                    /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                      "button",
+                      {
+                        onClick: () => setPage("job-analysis"),
+                        style: {
+                          background: "#ffffff",
+                          border: "2px solid #e5e7eb",
+                          borderRadius: "8px",
+                          padding: "0.75rem",
+                          cursor: "pointer",
+                          transition: "all 0.2s ease",
+                          textAlign: "center",
+                          display: "flex",
+                          flexDirection: "column",
+                          alignItems: "center",
+                          gap: "0.25rem"
+                        },
+                        onMouseEnter: (e) => {
+                          e.currentTarget.style.borderColor = "#ec4899";
+                          e.currentTarget.style.background = "#fdf2f8";
+                        },
+                        onMouseLeave: (e) => {
+                          e.currentTarget.style.borderColor = "#e5e7eb";
+                          e.currentTarget.style.background = "#ffffff";
+                        },
+                        children: [
+                          /* @__PURE__ */ jsxRuntimeExports.jsx("span", { style: { fontSize: "1rem" }, children: "🔍" }),
+                          /* @__PURE__ */ jsxRuntimeExports.jsx(
+                            "span",
+                            {
+                              style: {
+                                fontSize: "0.7rem",
+                                fontWeight: 600,
+                                color: "#1f2937"
+                              },
+                              children: "Job Analysis"
+                            }
+                          )
+                        ]
+                      }
+                    )
+                  ]
+                }
+              ),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                "button",
+                {
+                  onClick: () => setPage("interview-prep"),
+                  style: {
+                    marginTop: "0.75rem",
+                    width: "100%",
+                    background: "linear-gradient(135deg, #14b8a6 0%, #0d9488 100%)",
+                    border: "none",
+                    borderRadius: "12px",
+                    padding: "1rem",
+                    cursor: "pointer",
+                    transition: "all 0.2s ease",
+                    color: "white",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "0.75rem",
+                    boxShadow: "0 4px 12px rgba(20, 184, 166, 0.3)"
+                  },
+                  onMouseEnter: (e) => {
+                    e.currentTarget.style.transform = "translateY(-2px)";
+                    e.currentTarget.style.boxShadow = "0 8px 20px rgba(20, 184, 166, 0.4)";
+                  },
+                  onMouseLeave: (e) => {
+                    e.currentTarget.style.transform = "translateY(0)";
+                    e.currentTarget.style.boxShadow = "0 4px 12px rgba(20, 184, 166, 0.3)";
+                  },
+                  children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(
+                      "div",
+                      {
+                        style: {
+                          width: "40px",
+                          height: "40px",
+                          background: "rgba(255, 255, 255, 0.2)",
+                          borderRadius: "8px",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          backdropFilter: "blur(10px)"
+                        },
+                        children: /* @__PURE__ */ jsxRuntimeExports.jsx("span", { style: { fontSize: "1.2rem" }, children: "🎤" })
+                      }
+                    ),
+                    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { textAlign: "left", flex: 1 }, children: [
+                      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { style: { fontSize: "0.95rem", fontWeight: 600 }, children: "Interview Preparation" }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { style: { fontSize: "0.8rem", opacity: 0.9 }, children: "AI-powered practice questions & tips" })
+                    ] }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("span", { style: { fontSize: "1rem", opacity: 0.8 }, children: "→" })
+                  ]
+                }
+              )
+            ] })
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { style: { textAlign: "center", marginTop: "1.5rem" }, children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+            "button",
+            {
+              onClick: signOut,
+              style: {
+                background: "transparent",
+                color: "#6b7280",
+                border: "1px solid #d1d5db",
+                borderRadius: "8px",
+                padding: "8px 16px",
+                cursor: "pointer",
+                fontSize: "0.85rem",
+                fontWeight: 500,
+                transition: "all 0.2s ease"
+              },
+              onMouseEnter: (e) => {
+                e.currentTarget.style.borderColor = "#9ca3af";
+                e.currentTarget.style.color = "#4b5563";
+              },
+              onMouseLeave: (e) => {
+                e.currentTarget.style.borderColor = "#d1d5db";
+                e.currentTarget.style.color = "#6b7280";
+              },
+              children: "Sign Out"
             }
-          ),
-          /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { style: { fontWeight: 600, marginBottom: "4px" } }, "🚀 Advanced Auto-Apply in Progress"), /* @__PURE__ */ React.createElement("div", { style: { fontSize: "0.8rem", opacity: 0.8 } }, "Detecting job board, filling forms, uploading files..."))
-        ),
-        autoStatus.status === "success" && /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement(
-          "div",
-          {
-            style: {
-              display: "flex",
-              alignItems: "center",
-              gap: "8px",
-              marginBottom: "8px",
-              fontWeight: 600
-            }
-          },
-          /* @__PURE__ */ React.createElement("span", null, "✅"),
-          /* @__PURE__ */ React.createElement("span", null, "Application Submitted Successfully!")
-        ), /* @__PURE__ */ React.createElement(
-          "div",
-          {
-            style: {
-              fontSize: "0.85rem",
-              opacity: 0.9,
-              marginBottom: "8px"
-            }
-          },
-          autoStatus.message
-        ), autoStatus.jobBoard && /* @__PURE__ */ React.createElement(
-          "div",
-          {
-            style: {
-              fontSize: "0.75rem",
-              opacity: 0.7,
-              padding: "6px 12px",
-              background: "rgba(255, 255, 255, 0.5)",
-              borderRadius: "6px",
-              display: "inline-block"
-            }
-          },
-          "Platform: ",
-          autoStatus.jobBoard
-        )),
-        autoStatus.status === "error" && /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement(
-          "div",
-          {
-            style: {
-              display: "flex",
-              alignItems: "center",
-              gap: "8px",
-              marginBottom: "8px",
-              fontWeight: 600
-            }
-          },
-          /* @__PURE__ */ React.createElement("span", null, "❌"),
-          /* @__PURE__ */ React.createElement("span", null, "Auto-Apply Failed")
-        ), /* @__PURE__ */ React.createElement(
-          "div",
-          {
-            style: {
-              fontSize: "0.85rem",
-              opacity: 0.9,
-              marginBottom: "12px"
-            }
-          },
-          autoStatus.message
-        ), autoStatus.session && autoStatus.session.errors && autoStatus.session.errors.length > 0 && /* @__PURE__ */ React.createElement(
-          "div",
-          {
-            style: {
-              fontSize: "0.75rem",
-              opacity: 0.8,
-              marginBottom: "12px",
-              padding: "8px",
-              background: "rgba(255, 255, 255, 0.3)",
-              borderRadius: "6px"
-            }
-          },
-          /* @__PURE__ */ React.createElement("div", { style: { fontWeight: 600, marginBottom: "4px" } }, "Issues detected:"),
-          autoStatus.session.errors.slice(0, 3).map((error, index) => /* @__PURE__ */ React.createElement("div", { key: index, style: { marginBottom: "2px" } }, "• ", error)),
-          autoStatus.session.errors.length > 3 && /* @__PURE__ */ React.createElement("div", null, "... and ", autoStatus.session.errors.length - 3, " ", "more")
-        ), /* @__PURE__ */ React.createElement(
-          "button",
-          {
-            onClick: handleAutoApply,
-            style: {
-              background: "linear-gradient(135deg, #dc2626 0%, #b91c1c 100%)",
-              color: "#ffffff",
-              border: "none",
-              borderRadius: "8px",
-              padding: "8px 16px",
-              fontSize: "0.85rem",
-              fontWeight: 600,
-              cursor: "pointer",
-              boxShadow: "0 2px 8px rgba(220, 38, 38, 0.3)",
-              transition: "all 0.2s ease"
-            },
-            onMouseEnter: (e) => {
-              e.currentTarget.style.transform = "translateY(-1px)";
-              e.currentTarget.style.boxShadow = "0 4px 12px rgba(220, 38, 38, 0.4)";
-            },
-            onMouseLeave: (e) => {
-              e.currentTarget.style.transform = "translateY(0)";
-              e.currentTarget.style.boxShadow = "0 2px 8px rgba(220, 38, 38, 0.3)";
-            }
-          },
-          "🔄 Retry Auto-Apply"
-        ))
-      )
-    ), /* @__PURE__ */ React.createElement("div", { style: { marginBottom: "2rem" } }, /* @__PURE__ */ React.createElement(
-      "h3",
-      {
-        style: {
-          fontSize: "1rem",
-          fontWeight: 600,
-          color: "#374151",
-          marginBottom: "1rem",
-          textAlign: "center"
-        }
-      },
-      "Core Features"
-    ), /* @__PURE__ */ React.createElement(
-      "div",
-      {
-        style: {
-          display: "grid",
-          gridTemplateColumns: "1fr 1fr",
-          gap: "0.75rem"
-        }
-      },
-      /* @__PURE__ */ React.createElement(
-        "button",
-        {
-          onClick: () => setPage("profile"),
-          style: {
-            background: "#ffffff",
-            border: "2px solid #e5e7eb",
-            borderRadius: "12px",
-            padding: "1rem",
-            cursor: "pointer",
-            transition: "all 0.2s ease",
-            textAlign: "center",
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            gap: "0.5rem"
-          },
-          onMouseEnter: (e) => {
-            e.currentTarget.style.borderColor = "#6366f1";
-            e.currentTarget.style.transform = "translateY(-2px)";
-            e.currentTarget.style.boxShadow = "0 8px 16px rgba(99, 102, 241, 0.15)";
-          },
-          onMouseLeave: (e) => {
-            e.currentTarget.style.borderColor = "#e5e7eb";
-            e.currentTarget.style.transform = "translateY(0)";
-            e.currentTarget.style.boxShadow = "none";
-          }
-        },
-        /* @__PURE__ */ React.createElement(
-          "div",
-          {
-            style: {
-              width: "32px",
-              height: "32px",
-              background: "linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)",
-              borderRadius: "8px",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center"
-            }
-          },
-          /* @__PURE__ */ React.createElement("span", { style: { fontSize: "1rem", color: "white" } }, "📋")
-        ),
-        /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement(
-          "div",
-          {
-            style: {
-              fontSize: "0.9rem",
-              fontWeight: 600,
-              color: "#1f2937"
-            }
-          },
-          "Profile Vault"
-        ), /* @__PURE__ */ React.createElement("div", { style: { fontSize: "0.75rem", color: "#6b7280" } }, "Manage profiles"))
-      ),
-      /* @__PURE__ */ React.createElement(
-        "button",
-        {
-          onClick: () => setPage("tracker"),
-          style: {
-            background: "#ffffff",
-            border: "2px solid #e5e7eb",
-            borderRadius: "12px",
-            padding: "1rem",
-            cursor: "pointer",
-            transition: "all 0.2s ease",
-            textAlign: "center",
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            gap: "0.5rem"
-          },
-          onMouseEnter: (e) => {
-            e.currentTarget.style.borderColor = "#f59e0b";
-            e.currentTarget.style.transform = "translateY(-2px)";
-            e.currentTarget.style.boxShadow = "0 8px 16px rgba(245, 158, 11, 0.15)";
-          },
-          onMouseLeave: (e) => {
-            e.currentTarget.style.borderColor = "#e5e7eb";
-            e.currentTarget.style.transform = "translateY(0)";
-            e.currentTarget.style.boxShadow = "none";
-          }
-        },
-        /* @__PURE__ */ React.createElement(
-          "div",
-          {
-            style: {
-              width: "32px",
-              height: "32px",
-              background: "linear-gradient(135deg, #f59e0b 0%, #d97706 100%)",
-              borderRadius: "8px",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center"
-            }
-          },
-          /* @__PURE__ */ React.createElement("span", { style: { fontSize: "1rem", color: "white" } }, "📊")
-        ),
-        /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement(
-          "div",
-          {
-            style: {
-              fontSize: "0.9rem",
-              fontWeight: 600,
-              color: "#1f2937"
-            }
-          },
-          "Job Tracker"
-        ), /* @__PURE__ */ React.createElement("div", { style: { fontSize: "0.75rem", color: "#6b7280" } }, "Track applications"))
-      )
-    )), /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement(
-      "h3",
-      {
-        style: {
-          fontSize: "1rem",
-          fontWeight: 600,
-          color: "#374151",
-          marginBottom: "1rem",
-          textAlign: "center"
-        }
-      },
-      "🤖 AI-Powered Tools"
-    ), /* @__PURE__ */ React.createElement(
-      "div",
-      {
-        style: {
-          display: "grid",
-          gridTemplateColumns: "1fr 1fr",
-          gap: "0.75rem",
-          marginBottom: "1rem"
-        }
-      },
-      /* @__PURE__ */ React.createElement(
-        "button",
-        {
-          onClick: () => setPage("chat"),
-          style: {
-            background: "linear-gradient(135deg, #10b981 0%, #059669 100%)",
-            border: "none",
-            borderRadius: "12px",
-            padding: "1rem",
-            cursor: "pointer",
-            transition: "all 0.2s ease",
-            color: "white",
-            textAlign: "center",
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            gap: "0.5rem",
-            boxShadow: "0 4px 12px rgba(16, 185, 129, 0.3)"
-          },
-          onMouseEnter: (e) => {
-            e.currentTarget.style.transform = "translateY(-2px)";
-            e.currentTarget.style.boxShadow = "0 8px 20px rgba(16, 185, 129, 0.4)";
-          },
-          onMouseLeave: (e) => {
-            e.currentTarget.style.transform = "translateY(0)";
-            e.currentTarget.style.boxShadow = "0 4px 12px rgba(16, 185, 129, 0.3)";
-          }
-        },
-        /* @__PURE__ */ React.createElement(
-          "div",
-          {
-            style: {
-              width: "32px",
-              height: "32px",
-              background: "rgba(255, 255, 255, 0.2)",
-              borderRadius: "8px",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              backdropFilter: "blur(10px)"
-            }
-          },
-          /* @__PURE__ */ React.createElement("span", { style: { fontSize: "1rem" } }, "💬")
-        ),
-        /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { style: { fontSize: "0.85rem", fontWeight: 600 } }, "AI Assistant"), /* @__PURE__ */ React.createElement("div", { style: { fontSize: "0.7rem", opacity: 0.9 } }, "Career guidance"))
-      ),
-      /* @__PURE__ */ React.createElement(
-        "button",
-        {
-          onClick: () => setPage("resume"),
-          style: {
-            background: "linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)",
-            border: "none",
-            borderRadius: "12px",
-            padding: "1rem",
-            cursor: "pointer",
-            transition: "all 0.2s ease",
-            color: "white",
-            textAlign: "center",
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            gap: "0.5rem",
-            boxShadow: "0 4px 12px rgba(59, 130, 246, 0.3)"
-          },
-          onMouseEnter: (e) => {
-            e.currentTarget.style.transform = "translateY(-2px)";
-            e.currentTarget.style.boxShadow = "0 8px 20px rgba(59, 130, 246, 0.4)";
-          },
-          onMouseLeave: (e) => {
-            e.currentTarget.style.transform = "translateY(0)";
-            e.currentTarget.style.boxShadow = "0 4px 12px rgba(59, 130, 246, 0.3)";
-          }
-        },
-        /* @__PURE__ */ React.createElement(
-          "div",
-          {
-            style: {
-              width: "32px",
-              height: "32px",
-              background: "rgba(255, 255, 255, 0.2)",
-              borderRadius: "8px",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              backdropFilter: "blur(10px)"
-            }
-          },
-          /* @__PURE__ */ React.createElement("span", { style: { fontSize: "1rem" } }, "📄")
-        ),
-        /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { style: { fontSize: "0.85rem", fontWeight: 600 } }, "Resume AI"), /* @__PURE__ */ React.createElement("div", { style: { fontSize: "0.7rem", opacity: 0.9 } }, "Enhance & optimize"))
-      )
-    ), /* @__PURE__ */ React.createElement(
-      "div",
-      {
-        style: {
-          display: "grid",
-          gridTemplateColumns: "1fr 1fr 1fr",
-          gap: "0.5rem"
-        }
-      },
-      /* @__PURE__ */ React.createElement(
-        "button",
-        {
-          onClick: () => setPage("cover-letter"),
-          style: {
-            background: "#ffffff",
-            border: "2px solid #e5e7eb",
-            borderRadius: "8px",
-            padding: "0.75rem",
-            cursor: "pointer",
-            transition: "all 0.2s ease",
-            textAlign: "center",
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            gap: "0.25rem"
-          },
-          onMouseEnter: (e) => {
-            e.currentTarget.style.borderColor = "#8b5cf6";
-            e.currentTarget.style.background = "#faf5ff";
-          },
-          onMouseLeave: (e) => {
-            e.currentTarget.style.borderColor = "#e5e7eb";
-            e.currentTarget.style.background = "#ffffff";
-          }
-        },
-        /* @__PURE__ */ React.createElement("span", { style: { fontSize: "1rem" } }, "✍️"),
-        /* @__PURE__ */ React.createElement(
-          "span",
-          {
-            style: {
-              fontSize: "0.7rem",
-              fontWeight: 600,
-              color: "#1f2937"
-            }
-          },
-          "Cover Letter"
-        )
-      ),
-      /* @__PURE__ */ React.createElement(
-        "button",
-        {
-          onClick: () => setPage("files"),
-          style: {
-            background: "#ffffff",
-            border: "2px solid #e5e7eb",
-            borderRadius: "8px",
-            padding: "0.75rem",
-            cursor: "pointer",
-            transition: "all 0.2s ease",
-            textAlign: "center",
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            gap: "0.25rem"
-          },
-          onMouseEnter: (e) => {
-            e.currentTarget.style.borderColor = "#f59e0b";
-            e.currentTarget.style.background = "#fffbeb";
-          },
-          onMouseLeave: (e) => {
-            e.currentTarget.style.borderColor = "#e5e7eb";
-            e.currentTarget.style.background = "#ffffff";
-          }
-        },
-        /* @__PURE__ */ React.createElement("span", { style: { fontSize: "1rem" } }, "📁"),
-        /* @__PURE__ */ React.createElement(
-          "span",
-          {
-            style: {
-              fontSize: "0.7rem",
-              fontWeight: 600,
-              color: "#1f2937"
-            }
-          },
-          "File Manager"
-        )
-      ),
-      /* @__PURE__ */ React.createElement(
-        "button",
-        {
-          onClick: () => setPage("job-analysis"),
-          style: {
-            background: "#ffffff",
-            border: "2px solid #e5e7eb",
-            borderRadius: "8px",
-            padding: "0.75rem",
-            cursor: "pointer",
-            transition: "all 0.2s ease",
-            textAlign: "center",
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            gap: "0.25rem"
-          },
-          onMouseEnter: (e) => {
-            e.currentTarget.style.borderColor = "#ec4899";
-            e.currentTarget.style.background = "#fdf2f8";
-          },
-          onMouseLeave: (e) => {
-            e.currentTarget.style.borderColor = "#e5e7eb";
-            e.currentTarget.style.background = "#ffffff";
-          }
-        },
-        /* @__PURE__ */ React.createElement("span", { style: { fontSize: "1rem" } }, "🔍"),
-        /* @__PURE__ */ React.createElement(
-          "span",
-          {
-            style: {
-              fontSize: "0.7rem",
-              fontWeight: 600,
-              color: "#1f2937"
-            }
-          },
-          "Job Analysis"
-        )
-      )
-    ), /* @__PURE__ */ React.createElement(
-      "button",
-      {
-        onClick: () => setPage("interview-prep"),
-        style: {
-          marginTop: "0.75rem",
-          width: "100%",
-          background: "linear-gradient(135deg, #14b8a6 0%, #0d9488 100%)",
-          border: "none",
-          borderRadius: "12px",
-          padding: "1rem",
-          cursor: "pointer",
-          transition: "all 0.2s ease",
-          color: "white",
-          display: "flex",
-          alignItems: "center",
-          gap: "0.75rem",
-          boxShadow: "0 4px 12px rgba(20, 184, 166, 0.3)"
-        },
-        onMouseEnter: (e) => {
-          e.currentTarget.style.transform = "translateY(-2px)";
-          e.currentTarget.style.boxShadow = "0 8px 20px rgba(20, 184, 166, 0.4)";
-        },
-        onMouseLeave: (e) => {
-          e.currentTarget.style.transform = "translateY(0)";
-          e.currentTarget.style.boxShadow = "0 4px 12px rgba(20, 184, 166, 0.3)";
-        }
-      },
-      /* @__PURE__ */ React.createElement(
-        "div",
-        {
-          style: {
-            width: "40px",
-            height: "40px",
-            background: "rgba(255, 255, 255, 0.2)",
-            borderRadius: "8px",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            backdropFilter: "blur(10px)"
-          }
-        },
-        /* @__PURE__ */ React.createElement("span", { style: { fontSize: "1.2rem" } }, "🎤")
-      ),
-      /* @__PURE__ */ React.createElement("div", { style: { textAlign: "left", flex: 1 } }, /* @__PURE__ */ React.createElement("div", { style: { fontSize: "0.95rem", fontWeight: 600 } }, "Interview Preparation"), /* @__PURE__ */ React.createElement("div", { style: { fontSize: "0.8rem", opacity: 0.9 } }, "AI-powered practice questions & tips")),
-      /* @__PURE__ */ React.createElement("span", { style: { fontSize: "1rem", opacity: 0.8 } }, "→")
-    ))), /* @__PURE__ */ React.createElement("div", { style: { textAlign: "center", marginTop: "1.5rem" } }, /* @__PURE__ */ React.createElement(
-      "button",
-      {
-        onClick: signOut,
-        style: {
-          background: "transparent",
-          color: "#6b7280",
-          border: "1px solid #d1d5db",
-          borderRadius: "8px",
-          padding: "8px 16px",
-          cursor: "pointer",
-          fontSize: "0.85rem",
-          fontWeight: 500,
-          transition: "all 0.2s ease"
-        },
-        onMouseEnter: (e) => {
-          e.currentTarget.style.borderColor = "#9ca3af";
-          e.currentTarget.style.color = "#4b5563";
-        },
-        onMouseLeave: (e) => {
-          e.currentTarget.style.borderColor = "#d1d5db";
-          e.currentTarget.style.color = "#6b7280";
-        }
-      },
-      "Sign Out"
-    )))
+          ) })
+        ] })
+      ]
+    }
   );
 }
 
 client.createRoot(document.getElementById("root")).render(
-  /* @__PURE__ */ React.createElement(React.StrictMode, null, /* @__PURE__ */ React.createElement(Popup, null))
+  /* @__PURE__ */ jsxRuntimeExports.jsx(React.StrictMode, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(Popup, {}) })
 );
 try {
   getSupabaseClient();

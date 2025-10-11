@@ -1,6 +1,7 @@
 class SupabaseClient {
+  config;
+  authToken = null;
   constructor(config) {
-    this.authToken = null;
     this.config = config;
   }
   async signIn(email, password) {
@@ -348,10 +349,13 @@ class SupabaseClient {
   }
 }
 class QueryBuilder {
+  client;
+  tableName;
+  selectFields = "*";
+  filters = [];
+  limitValue;
+  singleResult = false;
   constructor(client, tableName) {
-    this.selectFields = "*";
-    this.filters = [];
-    this.singleResult = false;
     this.client = client;
     this.tableName = tableName;
   }
