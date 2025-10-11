@@ -13,6 +13,7 @@
     "package": "npm run build:prod && node scripts/package.js",
     "package:dev": "npm run build && node scripts/package.js",
     "validate": "node scripts/validate.js",
+    "verify": "node scripts/verify-config.js",
     "postbuild": "node scripts/postbuild.js",
     "watch": "vite build --watch",
     "lint": "tsc --noEmit && echo '✅ TypeScript check passed'",

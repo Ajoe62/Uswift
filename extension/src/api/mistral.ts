@@ -308,24 +308,19 @@ const getMistralConfig = (): MistralConfig => {
   // Try to get from global config first (Chrome extension environment)
   const globalConfig = (globalThis as any).EXTENSION_CONFIG;
 
-  if (globalConfig?.mistral) {
-    return {
-      apiKey: globalConfig.mistral.apiKey,
-      baseUrl: globalConfig.mistral.baseUrl,
-      chatUrl: "/v1/chat/completions",
-      embeddingsUrl: "/v1/embeddings",
-    };
-  }
+  // Priority order:
+  // 1. Vite environment variables (from .env file during build)
+  // 2. Global config (from config.js)
+  // 3. Default values
 
-  // Fallback to global variables (for Chrome extension environment)
   const apiKey =
-    (globalThis as any).VITE_MISTRAL_API_KEY ||
-    (globalThis as any).process?.env?.VITE_MISTRAL_API_KEY ||
-    "your-mistral-api-key-here"; // Fallback for development
+    import.meta.env.VITE_MISTRAL_API_KEY ||
+    globalConfig?.mistral?.apiKey ||
+    "";
 
   const baseUrl =
-    (globalThis as any).VITE_MISTRAL_BASE_URL ||
-    (globalThis as any).process?.env?.VITE_MISTRAL_BASE_URL ||
+    import.meta.env.VITE_MISTRAL_BASE_URL ||
+    globalConfig?.mistral?.baseUrl ||
     "https://api.mistral.ai";
 
   return {
@@ -346,13 +341,38 @@ export function getMistralClient(): MistralClient {
     // Validate configuration before creating client
     if (
       !DEFAULT_CONFIG.apiKey ||
-      DEFAULT_CONFIG.apiKey === "your-mistral-api-key-here"
+      DEFAULT_CONFIG.apiKey === "your-mistral-api-key-here" ||
+      DEFAULT_CONFIG.apiKey === ""
     ) {
       console.error(
-        "🚨 Mistral API Key not configured! Please set VITE_MISTRAL_API_KEY environment variable."
+        "🚨 Mistral API Key not configured!"
       );
+      console.error(
+        "📝 To fix this:"
+      );
+      console.error(
+        "   1. Get your API key from: https://console.mistral.ai/"
+      );
+      console.error(
+        "   2. Option A: Set it in extension/src/config.js (line 14)"
+      );
+      console.error(
+        "   3. Option B: Set VITE_MISTRAL_API_KEY in extension/.env"
+      );
+      console.error(
+        "   4. Rebuild the extension: cd extension && npm run build"
+      );
+      console.error(
+        "   5. Reload the extension in chrome://extensions/"
+      );
+
       throw new Error(
-        "Mistral API key not configured. Please check your environment variables."
+        "❌ Mistral API key not configured. AI features disabled.\n\n" +
+        "To enable AI features:\n" +
+        "1. Get your API key from https://console.mistral.ai/\n" +
+        "2. Set it in extension/src/config.js or extension/.env\n" +
+        "3. Rebuild the extension: npm run build\n" +
+        "4. Reload the extension in Chrome"
       );
     }
 
