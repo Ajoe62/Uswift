@@ -8,15 +8,24 @@ A comprehensive career management extension with AI-powered features.
 
 **This is required for AI chat features to work!**
 
-1. Get your API key from [Mistral AI](https://mistral.ai/)
-2. Open `src/config.js`
-3. Replace `"your-mistral-api-key-here"` with your actual API key:
+📖 **Detailed Setup Guide:** See [MISTRAL_API_SETUP.md](./MISTRAL_API_SETUP.md) for complete instructions.
+
+**Quick Setup:**
+
+1. Get your API key from [Mistral AI Console](https://console.mistral.ai/)
+2. Open `public/config.js`
+3. Replace the API key on line 17:
 
 ```javascript
 mistral: {
-  apiKey: "your-actual-api-key-here", // ← Replace this
+  apiKey: "7VOMtyR1Gv69ohW3czVXVAV3QtxzILkY", // ← Your actual API key here
   baseUrl: "https://api.mistral.ai",
 }
+```
+
+**Alternative:** Set environment variable in `.env`:
+```bash
+VITE_MISTRAL_API_KEY=your-actual-api-key-here
 ```
 
 ### 2. Build the Extension

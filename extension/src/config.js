@@ -11,7 +11,7 @@ const CONFIG = {
   mistral: {
     // ⚠️ IMPORTANT: Replace with your actual Mistral API key
     // Get your API key from: https://mistral.ai/
-    apiKey: "your-mistral-api-key-here",
+    apiKey: "7VOMtyR1Gv69ohW3czVXVAV3QtxzILkY",
     baseUrl: "https://api.mistral.ai",
   },
 
