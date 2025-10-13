@@ -1,21 +1,11 @@
 :root {
-  /* Modern Professional Color System */
-  --uswift-primary: #3B82F6;      /* Blue-500 */
-  --uswift-secondary: #8B5CF6;    /* Violet-500 */
-  --uswift-accent: #06B6D4;       /* Cyan-500 */
-  --uswift-dark: #1E293B;         /* Slate-800 */
-  --uswift-navy: #0F172A;         /* Slate-900 */
-
-  /* Legacy colors (for backwards compatibility) */
-  --uswift-blue: #3B82F6;
+  --uswift-blue: #1cb5e0;
+  --uswift-navy: #000851;
+  --uswift-accent: #14b8a6;
 }
 
 .bg-uswift-gradient {
-  background: linear-gradient(135deg, var(--uswift-primary) 0%, var(--uswift-secondary) 50%, var(--uswift-accent) 100%);
-}
-
-.bg-uswift-gradient-dark {
-  background: linear-gradient(135deg, var(--uswift-dark) 0%, var(--uswift-navy) 100%);
+  background: linear-gradient(90deg, var(--uswift-blue) 0%, var(--uswift-navy) 100%);
 }
 
 /* Magical card hover effect: subtle swell + springy transition */
@@ -25,7 +15,7 @@
 }
 .card-magic:hover {
   transform: translateY(-6px) scale(1.02);
-  box-shadow: 0 20px 30px -10px rgba(59, 130, 246, 0.25), 0 6px 12px -6px rgba(139, 92, 246, 0.15);
+  box-shadow: 0 20px 30px -10px rgba(0,0,0,0.15), 0 6px 12px -6px rgba(0,0,0,0.08);
 }
 .card-magic:active {
   transform: translateY(-2px) scale(0.995);
@@ -50,9 +40,10 @@
   position: absolute;
   inset: -2px;
   border-radius: 12px;
-  background: linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(139, 92, 246, 0.15), rgba(6, 182, 212, 0.1));
-  filter: blur(12px);
-  opacity: 0.6;
+  /* subtle two-stop gradient blending the new accent into the existing purple for depth */
+  background: linear-gradient(90deg, rgba(20,184,166,0.12), rgba(124,58,237,0.08));
+  filter: blur(8px);
+  opacity: 0.65;
   transition: opacity 300ms ease, transform 400ms cubic-bezier(.2,.9,.2,1);
   transform: scale(0.985);
   animation: pulseGlow 3.5s ease-in-out infinite;
@@ -65,9 +56,9 @@
 }
 
 @keyframes pulseGlow {
-  0% { opacity: 0.5; transform: scale(0.985); }
-  50% { opacity: 0.8; transform: scale(0.995); }
-  100% { opacity: 0.5; transform: scale(0.985); }
+  0% { opacity: 0.55; transform: scale(0.985); }
+  50% { opacity: 0.75; transform: scale(0.995); }
+  100% { opacity: 0.55; transform: scale(0.985); }
 }
 
 @media (prefers-reduced-motion: reduce) {
