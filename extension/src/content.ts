@@ -3,7 +3,7 @@
 
 console.log("ðŸš€ USwift Advanced Auto-Apply loaded");
 
-import { ADAPTERS, findFormFields, attachFileToInput } from "./adapters";
+import { ADAPTERS, attachFileToInput } from "./adapters";
 
 // Enhanced profile interface with additional fields
 interface Profile {
@@ -1225,7 +1225,7 @@ async function handleFileUploadsAdvanced(
             session.steps.push(`File uploaded successfully`);
           } else {
             session.errors.push(
-              `File upload failed: ${result.errors?.join(", ")}`
+              `File upload failed: ${result.details || 'Unknown error'}`
             );
           }
         } catch (error) {
@@ -1461,7 +1461,7 @@ async function waitForFormReady(
       }
 
       // Check for specific input fields
-      const fields = findFormFields();
+      const fields = findFormFieldsAdvanced();
       const hasRequiredFields =
         fields.firstName || fields.lastName || fields.email;
       if (hasRequiredFields) {
@@ -1489,7 +1489,7 @@ async function autoFillForm(
   session.steps.push("Starting form fill");
 
   try {
-    const fields = findFormFields();
+    const fields = findFormFieldsAdvanced();
     console.log("ðŸ” Detected fields:", Object.keys(fields));
 
     // Validate profile data
@@ -1571,9 +1571,9 @@ async function autoFillForm(
               console.log(`âœ… ${name} uploaded successfully`);
             } else {
               session.errors.push(
-                `${name} upload failed: ${result.errors?.join(", ")}`
+                `${name} upload failed: ${result.details || 'Unknown error'}`
               );
-              console.error(`âŒ ${name} upload failed:`, result.errors);
+              console.error(`âŒ ${name} upload failed:`, result.details);
             }
           } catch (e) {
             session.errors.push(`${name} upload error: ${e}`);
@@ -1603,7 +1603,7 @@ async function validateForm(jobBoard: string): Promise<string[]> {
   const errors: string[] = [];
 
   try {
-    const fields = findFormFields();
+    const fields = findFormFieldsAdvanced();
 
     // Check required fields
     const requiredFields = [
