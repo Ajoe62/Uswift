@@ -14,14 +14,14 @@ export default function RootLayout({
         <link rel="icon" href="/icon16.png" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </head>
-      <body className="bg-uswift-gradient min-h-screen" suppressHydrationWarning>
+      <body className="bg-white min-h-screen">
         <AuthProvider>
-          <div suppressHydrationWarning>
-            <Navbar />
-          </div>
-          {children}
-          <footer className="mt-12 p-4 text-center text-white opacity-80">
-            Uswift © 2025
+          <Navbar />
+          <main className="w-full max-w-screen-2xl mx-auto px-2 sm:px-4">
+            {children}
+          </main>
+          <footer className="mt-12 p-6 sm:p-8 text-center bg-gray-50 text-gray-600 border-t border-gray-200">
+            <p className="text-sm">© {new Date().getFullYear()} Uswift. All rights reserved.</p>
           </footer>
         </AuthProvider>
       </body>

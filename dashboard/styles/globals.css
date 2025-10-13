@@ -6,8 +6,8 @@
 
 /* Your custom styles */
 body {
-  background: linear-gradient(90deg, #1cb5e0 0%, #000851 100%);
-  color: #fff;
+  background: #FFFFFF; /* Pure white for clean professional look */
+  color: #111827; /* Gray-900 for strong readability */
   min-height: 100vh;
 }
 
@@ -46,4 +46,52 @@ body {
     opacity: 1;
     transform: none;
   }
+}
+
+/* Blue Fading Frame Effect - Synced with CTA Colors */
+.card-blue-frame {
+  position: relative;
+  border: 1px solid transparent;
+  background: white;
+  background-clip: padding-box;
+  box-shadow: 
+    0 1px 3px 0 rgb(0 0 0 / 0.1), 
+    0 1px 2px -1px rgb(0 0 0 / 0.1),
+    inset 0 0 0 1px rgba(37, 99, 235, 0.15); /* blue-600 with opacity */
+  transition: all 0.3s ease;
+}
+
+.card-blue-frame::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(135deg, 
+    rgba(37, 99, 235, 0.3) 0%,   /* blue-600 */
+    rgba(59, 130, 246, 0.15) 50%, /* blue-500 */
+    rgba(37, 99, 235, 0.3) 100%  /* blue-600 */
+  );
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  opacity: 0.8;
+  pointer-events: none;
+}
+
+.card-blue-frame:hover {
+  box-shadow: 
+    0 10px 15px -3px rgb(0 0 0 / 0.1), 
+    0 4px 6px -4px rgb(0 0 0 / 0.1),
+    inset 0 0 0 1px rgba(37, 99, 235, 0.3);
+}
+
+.card-blue-frame:hover::before {
+  background: linear-gradient(135deg, 
+    rgba(29, 78, 216, 0.5) 0%,   /* blue-700 */
+    rgba(37, 99, 235, 0.3) 50%,  /* blue-600 */
+    rgba(29, 78, 216, 0.5) 100%  /* blue-700 */
+  );
+  opacity: 1;
 }

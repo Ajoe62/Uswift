@@ -140,7 +140,7 @@ export function ModernShowcase(): React.ReactElement {
 export function SiteFooter(): React.ReactElement {
   return (
     <footer
-      className="bg-gray-900 text-gray-200"
+      className="bg-gray-50 text-gray-600 border-t border-gray-200"
       data-animate="reveal"
       aria-labelledby="footer-heading"
       role="contentinfo"
@@ -149,14 +149,14 @@ export function SiteFooter(): React.ReactElement {
         Footer
       </h2>
 
-      <div className="container mx-auto max-w-6xl px-4 py-8 sm:py-12"> {/* Changed: py-8 for mobile, sm:py-12 for larger screens */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8" data-animate="stagger" role="list"> {/* Changed: gap-6 for mobile, sm:gap-8 for larger screens */}
+      <div className="container mx-auto max-w-6xl px-4 py-8 sm:py-12">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8" data-animate="stagger" role="list">
           {/* About / CTA */}
           <div className="card" role="listitem">
-            <h4 className="text-base sm:text-lg font-semibold text-white"> {/* Changed: text-base for mobile, sm:text-lg for larger screens */}
+            <h4 className="text-base sm:text-lg font-semibold text-gray-900">
               Uswift
             </h4>
-            <p className="mt-2 text-xs sm:text-sm text-gray-400 max-w-sm"> {/* Changed: text-xs for mobile, sm:text-sm for larger screens */}
+            <p className="mt-2 text-xs sm:text-sm text-gray-600 max-w-sm">
               Job search automation built for privacy-first professionals. We keep your data secure and your applications efficient.
             </p>
 
@@ -164,50 +164,50 @@ export function SiteFooter(): React.ReactElement {
           </div>
 
           {/* Links */}
-          <div className="grid grid-cols-2 gap-4 sm:gap-6 md:col-span-1" role="listitem"> {/* Changed: gap-4 for mobile, sm:gap-6 for larger screens */}
+          <div className="grid grid-cols-2 gap-4 sm:gap-6 md:col-span-1" role="listitem">
             <div className="card">
-              <h5 className="text-xs sm:text-sm font-medium text-white"> {/* Changed: text-xs for mobile, sm:text-sm for larger screens */}
+              <h5 className="text-xs sm:text-sm font-medium text-gray-900">
                 Product
               </h5>
-              <ul className="mt-3 space-y-2 text-xs sm:text-sm text-gray-400"> {/* Changed: text-xs for mobile, sm:text-sm for larger screens */}
-                <li><a href="/features" className="hover:underline">Features</a></li>
-                <li><a href="/pricing" className="hover:underline">Pricing</a></li>
-                <li><a href="/how-it-works" className="hover:underline">How it works</a></li>
-                <li><a href="/trust" className="hover:underline">Trust</a></li>
+              <ul className="mt-3 space-y-2 text-xs sm:text-sm text-gray-600">
+                <li><a href="/features" className="hover:text-uswift-primary transition-colors">Features</a></li>
+                <li><a href="/pricing" className="hover:text-uswift-primary transition-colors">Pricing</a></li>
+                <li><a href="/how-it-works" className="hover:text-uswift-primary transition-colors">How it works</a></li>
+                <li><a href="/trust" className="hover:text-uswift-primary transition-colors">Trust</a></li>
               </ul>
             </div>
 
             <div className="card">
-              <h5 className="text-xs sm:text-sm font-medium text-white"> {/* Changed: text-xs for mobile, sm:text-sm for larger screens */}
+              <h5 className="text-xs sm:text-sm font-medium text-gray-900">
                 Company
               </h5>
-              <ul className="mt-3 space-y-2 text-xs sm:text-sm text-gray-400"> {/* Changed: text-xs for mobile, sm:text-sm for larger screens */}
-                <li><a href="/about" className="hover:underline">About</a></li>
-                <li><a href="/careers" className="hover:underline">Careers</a></li>
-                <li><a href="/blog" className="hover:underline">Blog</a></li>
-                <li><a href="/contact" className="hover:underline">Contact</a></li>
+              <ul className="mt-3 space-y-2 text-xs sm:text-sm text-gray-600">
+                <li><a href="/about" className="hover:text-uswift-primary transition-colors">About</a></li>
+                <li><a href="/careers" className="hover:text-uswift-primary transition-colors">Careers</a></li>
+                <li><a href="/blog" className="hover:text-uswift-primary transition-colors">Blog</a></li>
+                <li><a href="/contact" className="hover:text-uswift-primary transition-colors">Contact</a></li>
               </ul>
             </div>
           </div>
 
           {/* Social / Legal */}
           <div className="card" role="listitem">
-            <h5 className="text-xs sm:text-sm font-medium text-white"> {/* Changed: text-xs for mobile, sm:text-sm for larger screens */}
+            <h5 className="text-xs sm:text-sm font-medium text-gray-900">
               Connect
             </h5>
-            <div className="mt-3 flex items-center gap-2 sm:gap-3" aria-label="Social links"> {/* Changed: gap-2 for mobile, sm:gap-3 for larger screens */}
+            <div className="mt-3 flex items-center gap-2 sm:gap-3" aria-label="Social links">
               {/* ...social links unchanged... */}
             </div>
 
             <div className="mt-6 text-xs text-gray-500">
-              <a href="/privacy" className="hover:underline mr-3">Privacy</a>
-              <a href="/terms" className="hover:underline mr-3">Terms</a>
-              <a href="/security" className="hover:underline">Security</a>
+              <a href="/privacy" className="hover:text-uswift-primary transition-colors mr-3">Privacy</a>
+              <a href="/terms" className="hover:text-uswift-primary transition-colors mr-3">Terms</a>
+              <a href="/security" className="hover:text-uswift-primary transition-colors">Security</a>
             </div>
           </div>
         </div>
 
-        <div className="mt-8 border-t border-white/6 pt-6 text-xs sm:text-sm text-gray-500 flex flex-col md:flex-row items-center justify-between gap-2 sm:gap-4"> {/* Changed: text-xs for mobile, sm:text-sm for larger screens; gap-2 for mobile, sm:gap-4 for larger screens */}
+        <div className="mt-8 border-t border-gray-200 pt-6 text-xs sm:text-sm text-gray-500 flex flex-col md:flex-row items-center justify-between gap-2 sm:gap-4">
           <div>© {new Date().getFullYear()} Uswift — All rights reserved.</div>
           <div>Made with care · <a href="/contact" className="hover:underline">Contact us</a></div>
         </div>
