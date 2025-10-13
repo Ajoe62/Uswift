@@ -1,6 +1,6 @@
 # 🏗️ Uswift Extension - Build Guide
 
-Complete guide for building, packaging, and deploying the Uswift Chrome Extension.
+Complete guide here for building, packaging, and deploying the Uswift Chrome Extension.
 
 ---
 
