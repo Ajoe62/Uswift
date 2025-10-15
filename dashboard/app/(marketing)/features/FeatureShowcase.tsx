@@ -1,12 +1,15 @@
-import Card from "@/components/ui/Card"; // Changed: import only Card, no CardHeader or CardContent
-import {
-  Zap,
-  BrainCircuit,
-  Code,
-  Bot,
-  FileText,
-  ShieldCheck,
-} from "lucide-react";
+"use client";
+
+import Card from "@/components/ui/Card";
+import dynamic from "next/dynamic";
+
+// Dynamically import icons to reduce initial bundle size
+const Zap = dynamic(() => import("lucide-react").then((mod) => mod.Zap));
+const BrainCircuit = dynamic(() => import("lucide-react").then((mod) => mod.BrainCircuit));
+const Code = dynamic(() => import("lucide-react").then((mod) => mod.Code));
+const Bot = dynamic(() => import("lucide-react").then((mod) => mod.Bot));
+const FileText = dynamic(() => import("lucide-react").then((mod) => mod.FileText));
+const ShieldCheck = dynamic(() => import("lucide-react").then((mod) => mod.ShieldCheck));
 
 const features = [
   {

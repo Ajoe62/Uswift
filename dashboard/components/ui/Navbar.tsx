@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Link from "next/link";
 import { useAuth } from "@/lib/contexts/AuthContext";
 import CTAButton from "@/components/ui/CTAButton";
 
@@ -53,20 +54,20 @@ export default function Navbar() {
 
       {/* Navigation links - hidden on mobile, flex on tablet/desktop */}
       <div className="hidden sm:flex space-x-6 items-center">
-        <a href="/" className="text-gray-700 hover:text-uswift-primary transition-colors">
+        <Link href="/" className="text-gray-700 hover:text-uswift-primary transition-colors" prefetch={true}>
           Home
-        </a>
-        <a href="/features" className="text-gray-700 hover:text-uswift-primary transition-colors">
+        </Link>
+        <Link href="/features" className="text-gray-700 hover:text-uswift-primary transition-colors" prefetch={true}>
           Features
-        </a>
-        <a href="/pricing" className="text-gray-700 hover:text-uswift-primary transition-colors">
+        </Link>
+        <Link href="/pricing" className="text-gray-700 hover:text-uswift-primary transition-colors" prefetch={true}>
           Pricing
-        </a>
+        </Link>
         {user ? (
           <div className="flex items-center gap-4">
-            <a href="/dashboard" className="text-gray-700 hover:text-uswift-primary transition-colors">
+            <Link href="/dashboard" className="text-gray-700 hover:text-uswift-primary transition-colors" prefetch={true}>
               Dashboard
-            </a>
+            </Link>
             <button
               onClick={handleSignOut}
               className="text-gray-700 hover:text-uswift-primary transition-colors"
@@ -83,20 +84,20 @@ export default function Navbar() {
       {menuOpen && (
         <div className="absolute top-full left-0 w-full bg-white border-b border-gray-200 shadow-lg z-50 sm:hidden">
           <div className="flex flex-col gap-4 p-4">
-            <a href="/" className="text-gray-700 hover:text-uswift-primary transition-colors" onClick={() => setMenuOpen(false)}>
+            <Link href="/" className="text-gray-700 hover:text-uswift-primary transition-colors" onClick={() => setMenuOpen(false)} prefetch={true}>
               Home
-            </a>
-            <a href="/features" className="text-gray-700 hover:text-uswift-primary transition-colors" onClick={() => setMenuOpen(false)}>
+            </Link>
+            <Link href="/features" className="text-gray-700 hover:text-uswift-primary transition-colors" onClick={() => setMenuOpen(false)} prefetch={true}>
               Features
-            </a>
-            <a href="/pricing" className="text-gray-700 hover:text-uswift-primary transition-colors" onClick={() => setMenuOpen(false)}>
+            </Link>
+            <Link href="/pricing" className="text-gray-700 hover:text-uswift-primary transition-colors" onClick={() => setMenuOpen(false)} prefetch={true}>
               Pricing
-            </a>
+            </Link>
             {user ? (
               <>
-                <a href="/dashboard" className="text-gray-700 hover:text-uswift-primary transition-colors" onClick={() => setMenuOpen(false)}>
+                <Link href="/dashboard" className="text-gray-700 hover:text-uswift-primary transition-colors" onClick={() => setMenuOpen(false)} prefetch={true}>
                   Dashboard
-                </a>
+                </Link>
                 <button
                   onClick={handleSignOut}
                   className="text-gray-700 hover:text-uswift-primary text-left transition-colors"

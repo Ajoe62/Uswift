@@ -1,3 +1,6 @@
+"use client";
+
+import dynamic from "next/dynamic";
 import LandingHero from "@/components/LandingHero";
 import FeaturesSection from "@/components/FeaturesSection";
 import HowItWorks from "@/components/HowItWorks";
@@ -6,7 +9,11 @@ import TrustStats from "@/components/TrustStats";
 import Testimonials from "@/components/Testimonials";
 import { ModernShowcase, SiteFooter } from "@/components/ModernShowcaseAndFooter";
 import NewsletterForm from "@/components/NewsletterForm";
-import ScrollEffects from "@/components/ScrollEffects";
+
+// Lazy load ScrollEffects
+const ScrollEffects = dynamic(() => import("@/components/ScrollEffects"), {
+  ssr: false,
+});
 
 export default function HomePage() {
   return (
