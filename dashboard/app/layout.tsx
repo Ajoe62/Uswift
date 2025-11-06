@@ -22,7 +22,9 @@ export default function RootLayout({
             {children}
           </main>
           <footer className="mt-12 p-6 sm:p-8 text-center bg-gray-50 text-gray-600 border-t border-gray-200">
-            <p className="text-sm">© {new Date().getFullYear()} Uswift. All rights reserved.</p>
+            <p className="text-sm">
+              © {new Date().getFullYear()} Uswift. All rights reserved.
+            </p>
           </footer>
         </AuthProvider>
       </body>
