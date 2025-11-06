@@ -1210,7 +1210,10 @@ export const genericAdapter: BoardAdapter = {
         success: errors.length === 0,
         errors,
         warnings,
-        details: { platform: "Generic", fieldsFound: Object.keys(fields).length },
+        details: {
+          platform: "Generic",
+          fieldsFound: Object.keys(fields).length,
+        },
       };
     } catch (e) {
       return {
@@ -1279,7 +1282,10 @@ export const genericAdapter: BoardAdapter = {
           const buttonText = button.textContent?.toLowerCase() || "";
           if (buttonText.includes("apply") || buttonText.includes("submit")) {
             button.click();
-            return { success: true, details: { selector, platform: "Generic" } };
+            return {
+              success: true,
+              details: { selector, platform: "Generic" },
+            };
           }
         }
       }

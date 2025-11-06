@@ -1,17 +1,17 @@
-'use client'
+"use client";
 
-import React from 'react'
-import Image from 'next/image'
-import { StarIcon, UserCircleIcon } from '@heroicons/react/24/solid'
+import React from "react";
+import Image from "next/image";
+import { StarIcon, UserCircleIcon } from "@heroicons/react/24/solid";
 
 type Props = {
-  id?: string
-  name: string
-  role?: string
-  quote: string
-  avatar?: string
-  rating?: number
-}
+  id?: string;
+  name: string;
+  role?: string;
+  quote: string;
+  avatar?: string;
+  rating?: number;
+};
 
 const TestimonialCard = React.memo(function TestimonialCard({
   id,
@@ -21,8 +21,10 @@ const TestimonialCard = React.memo(function TestimonialCard({
   avatar,
   rating = 5,
 }: Props) {
-  const stars = Array.from({ length: 5 }).map((_, i) => i < rating)
-  const headingId = id ? `${id}-name` : `${name.replace(/\s+/g, '-').toLowerCase()}-name`
+  const stars = Array.from({ length: 5 }).map((_, i) => i < rating);
+  const headingId = id
+    ? `${id}-name`
+    : `${name.replace(/\s+/g, "-").toLowerCase()}-name`;
 
   return (
     <article
@@ -65,14 +67,21 @@ const TestimonialCard = React.memo(function TestimonialCard({
               <h4 id={headingId} className="font-semibold text-gray-900">
                 {name}
               </h4>
-              {role && <div className="text-xs sm:text-sm text-gray-500">{role}</div>}
+              {role && (
+                <div className="text-xs sm:text-sm text-gray-500">{role}</div>
+              )}
             </div>
 
-            <div className="flex items-center gap-1 mt-2 sm:mt-0" aria-hidden="true">
+            <div
+              className="flex items-center gap-1 mt-2 sm:mt-0"
+              aria-hidden="true"
+            >
               {stars.map((filled, i) => (
                 <StarIcon
                   key={i}
-                  className={`h-4 w-4 ${filled ? 'text-yellow-400' : 'text-gray-200'}`}
+                  className={`h-4 w-4 ${
+                    filled ? "text-yellow-400" : "text-gray-200"
+                  }`}
                   aria-hidden="true"
                 />
               ))}
@@ -82,7 +91,7 @@ const TestimonialCard = React.memo(function TestimonialCard({
         </div>
       </div>
     </article>
-  )
-})
+  );
+});
 
-export default TestimonialCard
+export default TestimonialCard;

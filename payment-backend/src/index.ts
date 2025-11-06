@@ -16,6 +16,7 @@ import checkoutRoutes from './routes/checkout';
 import entitlementsRoutes from './routes/entitlements';
 import webhookRoutes from './routes/webhooks';
 import adminRoutes from './routes/admin';
+import jobsRoutes from './routes/jobs';
 
 /**
  * Uswift Payment Backend
@@ -141,6 +142,7 @@ app.get('/health', (req, res) => {
 app.use('/api/checkout', checkoutRoutes);
 app.use('/api', entitlementsRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/jobs', jobsRoutes);
 
 // Webhook routes
 app.use('/webhooks', webhookRoutes);
@@ -168,6 +170,18 @@ async function startServer() {
       throw new Error('Database connection failed');
     }
 
+    // Test Redis connection and initialize queue/worker
+    const { testRedisConnection } = await import('./config/redis');
+    const redisConnected = await testRedisConnection();
+
+    if (!redisConnected) {
+      logger.warn('Redis connection failed - queue features will be unavailable');
+    } else {
+      // Initialize job worker
+      const { jobWorker } = await import('./workers/JobWorker');
+      logger.info('Job worker initialized and ready');
+    }
+
     // Start server
     const server = app.listen(config.port, () => {
       logger.info('Uswift Payment Backend started', {
@@ -190,6 +204,18 @@ async function startServer() {
         logger.info('HTTP server closed');
 
         try {
+          // Close queue and worker
+          if (redisConnected) {
+            const { jobWorker } = await import('./workers/JobWorker');
+            const { jobQueue } = await import('./queues/JobQueue');
+            const { closeRedisClient } = await import('./config/redis');
+
+            await jobWorker.close();
+            await jobQueue.close();
+            await closeRedisClient();
+            logger.info('Queue and worker closed');
+          }
+
           await db.close();
           logger.info('Database connections closed');
           process.exit(0);

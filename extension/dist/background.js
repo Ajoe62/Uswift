@@ -64,12 +64,13 @@ const scriptRel = (function detectScriptRel() {
 };
 
 class JobQueueService {
+  static instance;
+  processingQueue = /* @__PURE__ */ new Map();
+  rateLimitMap = /* @__PURE__ */ new Map();
+  // userId -> timestamps
+  maxAppliesPerHour = 20;
+  isProcessing = false;
   constructor() {
-    this.processingQueue = /* @__PURE__ */ new Map();
-    this.rateLimitMap = /* @__PURE__ */ new Map();
-    // userId -> timestamps
-    this.maxAppliesPerHour = 20;
-    this.isProcessing = false;
     this.startBackgroundProcessor();
   }
   static getInstance() {

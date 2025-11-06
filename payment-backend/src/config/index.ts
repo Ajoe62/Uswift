@@ -29,6 +29,21 @@ export const config = {
     ssl: process.env.DB_SSL === 'true',
   },
 
+  // Redis
+  redis: {
+    host: process.env.REDIS_HOST || 'localhost',
+    port: parseInt(process.env.REDIS_PORT || '6379'),
+    password: process.env.REDIS_PASSWORD || undefined,
+    db: parseInt(process.env.REDIS_DB || '0'),
+  },
+
+  // Queue settings
+  queue: {
+    workerConcurrency: parseInt(process.env.QUEUE_WORKER_CONCURRENCY || '5'),
+    rateLimitMax: parseInt(process.env.QUEUE_RATE_LIMIT_MAX || '10'),
+    rateLimitDuration: parseInt(process.env.QUEUE_RATE_LIMIT_DURATION || '60000'),
+  },
+
   // Authentication
   auth: {
     jwtSecret: process.env.JWT_SECRET || '',

@@ -70,7 +70,9 @@ export default function JobCard({ job, onUpdate, onDelete }: JobCardProps) {
       role="article"
       aria-labelledby={`job-${job.id}-title`}
     >
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-4"> {/* Changed: flex-col for mobile, sm:flex-row for desktop; gap-4 for spacing */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-4">
+        {" "}
+        {/* Changed: flex-col for mobile, sm:flex-row for desktop; gap-4 for spacing */}
         <div className="flex-1 w-full">
           {isEditing ? (
             <div className="space-y-3">
@@ -148,8 +150,13 @@ export default function JobCard({ job, onUpdate, onDelete }: JobCardProps) {
               >
                 {job.job_title}
               </h4>
-              <p className="text-gray-600 text-base sm:text-lg">{job.company_name}</p> {/* Changed: text-base for mobile, sm:text-lg for larger screens */}
-              <div className="flex flex-wrap items-center gap-2 mt-2"> {/* Changed: flex-wrap for better mobile layout */}
+              <p className="text-gray-600 text-base sm:text-lg">
+                {job.company_name}
+              </p>{" "}
+              {/* Changed: text-base for mobile, sm:text-lg for larger screens */}
+              <div className="flex flex-wrap items-center gap-2 mt-2">
+                {" "}
+                {/* Changed: flex-wrap for better mobile layout */}
                 <span
                   className={`px-2 py-1 rounded-full text-xs font-medium ${
                     statusColors[job.status]
@@ -157,13 +164,17 @@ export default function JobCard({ job, onUpdate, onDelete }: JobCardProps) {
                 >
                   {statusLabels[job.status]}
                 </span>
-                <span className="text-xs sm:text-sm text-gray-500"> {/* Changed: text-xs for mobile, sm:text-sm for larger screens */}
+                <span className="text-xs sm:text-sm text-gray-500">
+                  {" "}
+                  {/* Changed: text-xs for mobile, sm:text-sm for larger screens */}
                   Applied: {formatDate(job.applied_date)}
                 </span>
               </div>
               {job.notes && (
                 // Changed: text-xs for mobile, sm:text-sm for larger screens
-                                <p className="text-gray-700 mt-2 text-xs sm:text-sm">{job.notes}</p>
+                <p className="text-gray-700 mt-2 text-xs sm:text-sm">
+                  {job.notes}
+                </p>
               )}
               {job.application_url && (
                 <a
@@ -178,10 +189,17 @@ export default function JobCard({ job, onUpdate, onDelete }: JobCardProps) {
             </>
           )}
         </div>
-
-        <div className="flex flex-row sm:flex-col gap-2 w-full sm:w-auto"> {/* Changed: flex-row for mobile, sm:flex-col for desktop; w-full for mobile, sm:w-auto for desktop */}
+        <div className="flex flex-row sm:flex-col gap-2 w-full sm:w-auto">
+          {" "}
+          {/* Changed: flex-row for mobile, sm:flex-col for desktop; w-full for mobile, sm:w-auto for desktop */}
           {/* Status Quick Actions */}
-          <div className="flex flex-wrap gap-1 justify-start sm:justify-end" role="group" aria-label="Quick status actions"> {/* Changed: justify-start for mobile, sm:justify-end for desktop */}
+          <div
+            className="flex flex-wrap gap-1 justify-start sm:justify-end"
+            role="group"
+            aria-label="Quick status actions"
+          >
+            {" "}
+            {/* Changed: justify-start for mobile, sm:justify-end for desktop */}
             {Object.entries(statusLabels).map(([status, label]) => (
               <button
                 key={status}
@@ -202,9 +220,10 @@ export default function JobCard({ job, onUpdate, onDelete }: JobCardProps) {
               </button>
             ))}
           </div>
-
           {/* Action Buttons */}
-          <div className="flex gap-2 justify-start sm:justify-end"> {/* Changed: justify-start for mobile, sm:justify-end for desktop */}
+          <div className="flex gap-2 justify-start sm:justify-end">
+            {" "}
+            {/* Changed: justify-start for mobile, sm:justify-end for desktop */}
             <Button
               onClick={handleEdit}
               className="px-3 py-1 text-xs sm:text-sm" // Changed: text-xs for mobile, sm:text-sm for larger screens
