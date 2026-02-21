@@ -181,7 +181,7 @@ export class StripeGateway extends PaymentGateway {
 
       return {
         refundId: refund.id,
-        status: refund.status,
+        status: refund.status ?? 'pending',
         amount: refund.amount,
       };
     } catch (error: any) {

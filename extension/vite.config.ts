@@ -13,7 +13,7 @@ export default defineConfig(({ mode }) => {
       name: "copy-manifest",
       generateBundle() {
         // Copy manifest.json to dist after build
-        copyFileSync("manifest.json", "dist/manifest.json");
+        copyFileSync("public/manifest.json", "dist/manifest.json");
         console.log("✅ manifest.json copied to dist/");
       },
     },

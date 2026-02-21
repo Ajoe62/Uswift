@@ -1,20 +1,23 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useAuth } from "@/lib/contexts/AuthContext";
+import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { useAuthStore } from "@/stores/authStore";
 import CTAButton from "@/components/ui/CTAButton";
 
 export default function Navbar() {
   const [isLoaded, setIsLoaded] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false); // Added: state for hamburger menu
-  const { user, signOut } = useAuth();
+  const session = useAuthStore((state) => state.session);
+  const supabase = createClientComponentClient();
+  const user = session?.user ?? null;
 
   useEffect(() => {
     setIsLoaded(true);
   }, []);
 
   const handleSignOut = async () => {
-    await signOut();
+    await supabase.auth.signOut();
     setMenuOpen(false); // Close menu on sign out
   };
 

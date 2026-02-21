@@ -31,7 +31,7 @@ export interface CreateEntitlementInput {
 
 export interface EntitlementResponse {
   plan: 'free' | 'pro';
-  status: 'active' | 'past_due' | 'canceled' | 'none';
+  status: 'active' | 'past_due' | 'canceled' | 'expired' | 'none';
   currentPeriodEnd?: string;
   features: string[];
 }

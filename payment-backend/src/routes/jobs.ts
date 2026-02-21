@@ -1,11 +1,11 @@
-import express, { Request, Response } from 'express';
+import express, { Request, Response, Router } from 'express';
 import { jobService } from '../services/JobService';
 import { jobQueue } from '../queues/JobQueue';
 import { authenticateExtension } from '../middleware/auth';
 import { logger } from '../utils/logger';
 import { z } from 'zod';
 
-const router = express.Router();
+const router: Router = express.Router();
 
 /**
  * Job Routes

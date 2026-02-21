@@ -6,7 +6,7 @@ import { asyncHandler } from '../middleware/errorHandler';
 import { logger } from '../utils/logger';
 import { db } from '../config/database';
 
-const router = Router();
+const router: Router = Router();
 
 /**
  * POST /api/checkout/session

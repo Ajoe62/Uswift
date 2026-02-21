@@ -1,60 +1,79 @@
-"use client";
+'use client';
 
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { useAuth } from "@/lib/contexts/AuthContext";
-import { supabase } from "@/lib/supabaseClient";
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { useAuthStore } from '@/stores/authStore';
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 
 export default function SignInPage() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [message, setMessage] = useState("");
-  const [messageType, setMessageType] = useState<"error" | "success">("error");
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [message, setMessage] = useState('');
+  const [messageType, setMessageType] = useState<'error' | 'success'>('error');
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const { signIn, user, loading: authLoading } = useAuth();
+  
+  // Use Zustand store instead of useAuth
+  const { session, isLoading } = useAuthStore();
   const router = useRouter();
+  const supabase = createClientComponentClient();
 
   // Redirect if already authenticated
   useEffect(() => {
-    if (!authLoading && user) {
-      router.replace("/dashboard");
+    if (!isLoading && session) {
+      router.replace('/profile');
     }
-  }, [user, authLoading, router]);
+  }, [session, isLoading, router]);
 
   async function handleSignIn(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setLoading(true);
-    setMessage("");
+    setMessage('');
 
-    const { error } = await signIn(email, password);
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
     if (error) {
       setMessage(error.message);
-      setMessageType("error");
+      setMessageType('error');
+      setLoading(false);
     } else {
-      setMessage("Signed in successfully!");
-      setMessageType("success");
-      router.replace("/dashboard");
+      setMessage('Signed in successfully!');
+      setMessageType('success');
+      // The auth state change will be detected by Zustand and redirect automatically
+      setTimeout(() => {
+        router.replace('/profile');
+      }, 500);
     }
-    setLoading(false);
   }
 
   async function handleGoogleSignIn() {
     setLoading(true);
-    setMessage("");
+    setMessage('');
+    
     const { error } = await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: { redirectTo: window.location.origin + "/dashboard" },
+      provider: 'google',
+      options: { 
+        redirectTo: `${window.location.origin}/auth/callback`,
+        queryParams: {
+          access_type: 'offline',
+          prompt: 'consent',
+        }
+      },
     });
+
     if (error) {
       setMessage(error.message);
-      setMessageType("error");
+      setMessageType('error');
+      setLoading(false);
     }
-    setLoading(false);
+    // Don't set loading to false here - the redirect will happen
   }
 
   // Show loading state while checking authentication
-  if (authLoading) {
+  if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center px-4 py-8 bg-gradient-to-br from-blue-50 via-white to-purple-50">
         <div className="text-center">
@@ -89,7 +108,7 @@ export default function SignInPage() {
             type="button"
             onClick={handleGoogleSignIn}
             disabled={loading}
-            className="w-full flex items-center justify-center gap-3 px-4 py-3 bg-gray-50 border-2 border-gray-300 rounded-xl hover:bg-gray-100 hover:border-gray-400 transition-all duration-200 font-medium text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm hover:shadow-md"
+            className="w-full flex items-center justify-center gap-3 px-4 py-3 bg-white border-2 border-gray-300 rounded-xl hover:bg-gray-50 hover:border-gray-400 transition-all duration-200 font-medium text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm hover:shadow-md"
           >
             <svg className="w-5 h-5" viewBox="0 0 24 24">
               <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -148,7 +167,7 @@ export default function SignInPage() {
                 </div>
                 <input
                   id="password"
-                  type={showPassword ? "text" : "password"}
+                  type={showPassword ? 'text' : 'password'}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Enter your password"
@@ -176,7 +195,7 @@ export default function SignInPage() {
 
             {/* Forgot Password Link */}
             <div className="flex items-center justify-end">
-              <a href="/auth/forgot-password" className="text-sm font-medium text-blue-600 hover:text-blue-500 transition-colors">
+              <a href="/auth/reset-password" className="text-sm font-medium text-blue-600 hover:text-blue-500 transition-colors">
                 Forgot password?
               </a>
             </div>
@@ -185,7 +204,7 @@ export default function SignInPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-uswift-primary text-white font-medium rounded-xl hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-lg"
+              className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-blue-600 text-white font-medium rounded-xl hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-lg"
             >
               {loading ? (
                 <>
@@ -208,10 +227,10 @@ export default function SignInPage() {
 
           {/* Message Display */}
           {message && (
-            <div className={`mt-4 p-4 rounded-xl ${messageType === "error" ? "bg-red-50 text-red-700 border border-red-200" : "bg-green-50 text-green-700 border border-green-200"}`}>
+            <div className={`mt-4 p-4 rounded-xl ${messageType === 'error' ? 'bg-red-50 text-red-700 border border-red-200' : 'bg-green-50 text-green-700 border border-green-200'}`}>
               <div className="flex items-center gap-2">
-                {messageType === "error" ? (
-                  <svg className="w-5 h-5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                {messageType === 'error' ? (
+                  <svg className="w-5 w-5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
                   </svg>
                 ) : (
@@ -227,7 +246,7 @@ export default function SignInPage() {
 
         {/* Sign Up Link */}
         <p className="text-center mt-6 text-gray-600">
-          Don't have an account?{" "}
+          Don't have an account?{' '}
           <a href="/auth/signup" className="font-medium text-blue-600 hover:text-blue-500 transition-colors">
             Sign up for free
           </a>

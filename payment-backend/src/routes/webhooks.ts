@@ -3,7 +3,7 @@ import { PaymentGatewayFactory } from '../gateways/PaymentGateway';
 import { webhookHandler } from '../services/WebhookHandler';
 import { logger } from '../utils/logger';
 
-const router = Router();
+const router: Router = Router();
 
 /**
  * POST /webhooks/stripe

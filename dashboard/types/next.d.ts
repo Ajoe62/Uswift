@@ -27,10 +27,18 @@ declare module "next/image" {
 }
 
 declare module "next/server" {
+  interface RequestCookie {
+    name: string;
+    value: string;
+  }
+
   export class NextRequest extends Request {
     nextUrl: {
       pathname: string;
       searchParams: URLSearchParams;
+    };
+    cookies: {
+      getAll(): RequestCookie[];
     };
   }
 

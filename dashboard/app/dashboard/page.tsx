@@ -1,19 +1,27 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import DashboardStats from "@/components/DashboardStats";
-import { useAuth } from "@/lib/contexts/AuthContext";
+import { useAuthStore } from "@/stores/authStore";
 
 export default function DashboardHome() {
-  const { user } = useAuth();
+  const { session, isLoading } = useAuthStore();
+  const router = useRouter();
   const [currentTime, setCurrentTime] = useState(new Date());
 
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(new Date()), 60000);
     return () => clearInterval(timer);
   }, []);
+
+  // Redirect if not authenticated
+  useEffect(() => {
+    if (!isLoading && !session) {
+      router.push('/');
+    }
+  }, [session, isLoading, router]);
 
   const getGreeting = () => {
     const hour = currentTime.getHours();
@@ -23,14 +31,36 @@ export default function DashboardHome() {
   };
 
   const getUserDisplayName = () => {
-    if (user?.user_metadata?.full_name) {
-      return user.user_metadata.full_name;
+    if (!session?.user) return "User";
+    
+    if (session.user.user_metadata?.full_name) {
+      return session.user.user_metadata.full_name;
     }
-    if (user?.email) {
-      return user.email.split("@")[0];
+    if (session.user.email) {
+      return session.user.email.split("@")[0];
     }
     return "User";
   };
+
+  // Show loading state
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <svg className="animate-spin h-12 w-12 text-blue-600 mx-auto mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+          <p className="text-gray-600">Loading dashboard...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Don't render if no session
+  if (!session) {
+    return null;
+  }
 
   return (
     <section className="space-y-6">
@@ -58,7 +88,7 @@ export default function DashboardHome() {
               View Applications
             </Link>
             <Link
-              href="/dashboard/profile"
+              href="/profile"
               className="px-4 py-2 bg-gray-100 text-gray-900 rounded-lg font-medium hover:bg-gray-200 transition-colors"
             >
               Edit Profile
@@ -113,7 +143,7 @@ export default function DashboardHome() {
             <div className="flex-1 min-w-0">
               <p className="text-sm font-medium text-gray-500">Email Address</p>
               <p className="text-base font-semibold text-gray-900 truncate">
-                {user?.email || "Not set"}
+                {session.user.email || "Not set"}
               </p>
             </div>
           </div>
@@ -159,8 +189,8 @@ export default function DashboardHome() {
             <div className="flex-1 min-w-0">
               <p className="text-sm font-medium text-gray-500">Member Since</p>
               <p className="text-base font-semibold text-gray-900">
-                {user?.created_at
-                  ? new Date(user.created_at).toLocaleDateString("en-US", {
+                {session.user.created_at
+                  ? new Date(session.user.created_at).toLocaleDateString("en-US", {
                       year: "numeric",
                       month: "long",
                     })
@@ -187,8 +217,8 @@ export default function DashboardHome() {
             <div className="flex-1 min-w-0">
               <p className="text-sm font-medium text-gray-500">Last Sign In</p>
               <p className="text-base font-semibold text-gray-900">
-                {user?.last_sign_in_at
-                  ? new Date(user.last_sign_in_at).toLocaleDateString("en-US", {
+                {session.user.last_sign_in_at
+                  ? new Date(session.user.last_sign_in_at).toLocaleDateString("en-US", {
                       month: "short",
                       day: "numeric",
                       year: "numeric",
@@ -237,7 +267,7 @@ export default function DashboardHome() {
             </div>
           </Link>
           <Link
-            href="/dashboard/profile"
+            href="/profile"
             className="flex items-center gap-3 p-4 bg-purple-50 rounded-lg hover:bg-purple-100 transition-colors border border-purple-200"
           >
             <div className="w-10 h-10 rounded-lg bg-purple-600 flex items-center justify-center">

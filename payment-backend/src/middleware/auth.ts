@@ -124,6 +124,8 @@ export function optionalAuth(req: AuthRequest, res: Response, next: NextFunction
  * Generate JWT token for user
  */
 export function generateToken(userId: string, email: string, role?: string): string {
+  const expiresIn = config.auth.jwtExpiresIn as jwt.SignOptions['expiresIn'];
+
   return jwt.sign(
     {
       userId,
@@ -132,7 +134,7 @@ export function generateToken(userId: string, email: string, role?: string): str
     },
     config.auth.jwtSecret,
     {
-      expiresIn: config.auth.jwtExpiresIn,
+      expiresIn,
     }
   );
 }
