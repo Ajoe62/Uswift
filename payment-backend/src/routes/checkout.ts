@@ -1,12 +1,48 @@
+import crypto from 'crypto';
 import { Router } from 'express';
+import jwt from 'jsonwebtoken';
 import { PaymentGatewayFactory } from '../gateways/PaymentGateway';
 import { authenticateJWT, AuthRequest } from '../middleware/auth';
-import { validate, checkoutSessionSchema, portalSessionSchema, paymentIntentSchema } from '../middleware/validation';
+import {
+  validate,
+  checkoutSessionSchema,
+  portalSessionSchema,
+  paymentIntentSchema,
+  bridgeSessionSchema,
+  bridgeExchangeSchema,
+} from '../middleware/validation';
 import { asyncHandler } from '../middleware/errorHandler';
 import { logger } from '../utils/logger';
 import { db } from '../config/database';
+import { config } from '../config';
 
 const router: Router = Router();
+const BRIDGE_SESSION_TTL_MS = 5 * 60 * 1000;
+
+type BridgeSessionPurpose = 'checkout' | 'billing' | 'billing_return';
+type BridgeSessionRecord = {
+  token: string;
+  userId: string;
+  purpose: BridgeSessionPurpose;
+  expiresAt: number;
+};
+
+const bridgeSessions = new Map<string, BridgeSessionRecord>();
+const allowedRedirectOrigins = new Set([
+  config.appDomain,
+  ...(config.nodeEnv !== 'production'
+    ? ['http://localhost:3000', 'http://localhost:5173']
+    : []),
+]);
+
+function cleanupExpiredBridgeSessions(): void {
+  const now = Date.now();
+  for (const [state, session] of bridgeSessions.entries()) {
+    if (session.expiresAt <= now) {
+      bridgeSessions.delete(state);
+    }
+  }
+}
 
 function getAuthenticatedUserId(req: AuthRequest, bodyUserId: string): string | null {
   const tokenUserId = req.user?.userId;
@@ -20,6 +56,109 @@ function getAuthenticatedUserId(req: AuthRequest, bodyUserId: string): string | 
 
   return tokenUserId;
 }
+
+function validateRedirectUrl(value: string, fieldName: string): void {
+  let parsed: URL;
+  try {
+    parsed = new URL(value);
+  } catch {
+    throw new Error(`Invalid ${fieldName}`);
+  }
+
+  const isLocalDevHttp =
+    parsed.protocol === 'http:' &&
+    ['localhost', '127.0.0.1'].includes(parsed.hostname) &&
+    config.nodeEnv !== 'production';
+
+  if (parsed.protocol !== 'https:' && !isLocalDevHttp) {
+    throw new Error(`${fieldName} must use HTTPS`);
+  }
+
+  if (!allowedRedirectOrigins.has(parsed.origin) && !isLocalDevHttp) {
+    throw new Error(`${fieldName} origin is not allowed`);
+  }
+}
+
+function issueBridgeState(req: AuthRequest, userId: string, purpose: BridgeSessionPurpose): string {
+  if (!req.user?.userId || req.user.userId !== userId) {
+    throw new Error('User ID does not match authenticated user');
+  }
+
+  cleanupExpiredBridgeSessions();
+
+  const bridgeToken = jwt.sign(
+    {
+      userId: req.user.userId,
+      email: req.user.email,
+      role: req.user.role,
+      scope: 'payment_web_bridge',
+    },
+    config.auth.jwtSecret,
+    { expiresIn: '10m' }
+  );
+
+  const state = crypto.randomBytes(24).toString('hex');
+  bridgeSessions.set(state, {
+    token: bridgeToken,
+    userId,
+    purpose,
+    expiresAt: Date.now() + BRIDGE_SESSION_TTL_MS,
+  });
+
+  return state;
+}
+
+router.post(
+  '/bridge/session',
+  authenticateJWT,
+  validate(bridgeSessionSchema),
+  asyncHandler(async (req: AuthRequest, res) => {
+    const { userId, purpose = 'checkout' } = req.body as {
+      userId: string;
+      purpose?: BridgeSessionPurpose;
+    };
+
+    try {
+      const state = issueBridgeState(req, userId, purpose);
+      res.json({
+        success: true,
+        state,
+        expiresInSeconds: Math.floor(BRIDGE_SESSION_TTL_MS / 1000),
+      });
+    } catch (error: any) {
+      res.status(403).json({
+        error: 'BridgeSessionForbidden',
+        message: error.message || 'Unable to create bridge session',
+      });
+    }
+  })
+);
+
+router.post(
+  '/bridge/exchange',
+  validate(bridgeExchangeSchema),
+  asyncHandler(async (req, res) => {
+    cleanupExpiredBridgeSessions();
+    const { state } = req.body as { state: string };
+    const session = bridgeSessions.get(state);
+
+    if (!session) {
+      return res.status(404).json({
+        error: 'BridgeSessionNotFound',
+        message: 'Session state is invalid or expired',
+      });
+    }
+
+    bridgeSessions.delete(state);
+
+    res.json({
+      success: true,
+      token: session.token,
+      userId: session.userId,
+      purpose: session.purpose,
+    });
+  })
+);
 
 /**
  * POST /api/checkout/session
@@ -37,7 +176,9 @@ router.post(
       return res.status(403).json({ error: 'Forbidden', message: 'User ID does not match authenticated user' });
     }
 
-    // Verify user exists and get email
+    validateRedirectUrl(successUrl, 'successUrl');
+    validateRedirectUrl(cancelUrl, 'cancelUrl');
+
     const userQuery = await db.query('SELECT email, stripe_customer_id FROM users WHERE id = $1', [authenticatedUserId]);
 
     if (userQuery.rows.length === 0) {
@@ -45,12 +186,9 @@ router.post(
     }
 
     const user = userQuery.rows[0];
-
-    // Get payment gateway (default: Stripe)
     const gateway = PaymentGatewayFactory.getPrimary();
 
     try {
-      // Create checkout session
       const session = await gateway.createCheckoutSession({
         userId: authenticatedUserId,
         priceId,
@@ -101,7 +239,8 @@ router.post(
       return res.status(403).json({ error: 'Forbidden', message: 'User ID does not match authenticated user' });
     }
 
-    // Get user's Stripe customer ID
+    validateRedirectUrl(returnUrl, 'returnUrl');
+
     const userQuery = await db.query('SELECT stripe_customer_id FROM users WHERE id = $1', [authenticatedUserId]);
 
     if (userQuery.rows.length === 0) {
@@ -158,7 +297,6 @@ router.post(
       return res.status(403).json({ error: 'Forbidden', message: 'User ID does not match authenticated user' });
     }
 
-    // Get user email
     const userQuery = await db.query('SELECT email FROM users WHERE id = $1', [authenticatedUserId]);
 
     if (userQuery.rows.length === 0) {

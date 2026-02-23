@@ -9,25 +9,42 @@ export default function BillingPage() {
   const [loading, setLoading] = useState(true);
   const [entitlement, setEntitlement] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
-
-  const token = searchParams.get('token');
-  const userId = searchParams.get('userId');
+  const [token, setToken] = useState<string | null>(null);
+  const [userId, setUserId] = useState<string | null>(null);
+  const state = searchParams.get('state');
 
   useEffect(() => {
-    if (!token || !userId) {
-      setError('Missing authentication token');
-      setLoading(false);
-      return;
-    }
+    const initialize = async () => {
+      if (!state) {
+        setError('Missing secure session state');
+        setLoading(false);
+        return;
+      }
 
-    loadEntitlements();
-  }, [token, userId]);
+      try {
+        const bridgeResponse = await axios.post(`${API_URL}/api/checkout/bridge/exchange`, {
+          state,
+        });
+        const nextToken = bridgeResponse.data.token;
+        const nextUserId = bridgeResponse.data.userId;
 
-  const loadEntitlements = async () => {
+        setToken(nextToken);
+        setUserId(nextUserId);
+        await loadEntitlements(nextToken);
+      } catch (err: any) {
+        setError(err.response?.data?.message || 'Failed to initialize billing session');
+        setLoading(false);
+      }
+    };
+
+    initialize();
+  }, [state]);
+
+  const loadEntitlements = async (authToken: string) => {
     try {
       const response = await axios.get(`${API_URL}/api/entitlements`, {
         headers: {
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${authToken}`,
         },
       });
 
@@ -41,11 +58,27 @@ export default function BillingPage() {
 
   const openCustomerPortal = async () => {
     try {
+      if (!token || !userId) {
+        throw new Error('Missing billing session');
+      }
+
+      const bridgeResponse = await axios.post(
+        `${API_URL}/api/checkout/bridge/session`,
+        { userId, purpose: 'billing_return' },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      const returnUrl = `${window.location.origin}${window.location.pathname}?state=${encodeURIComponent(bridgeResponse.data.state)}`;
+
       const response = await axios.post(
         `${API_URL}/api/portal/session`,
         {
           userId,
-          returnUrl: window.location.href,
+          returnUrl,
         },
         {
           headers: {

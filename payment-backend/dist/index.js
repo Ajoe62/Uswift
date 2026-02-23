@@ -39,6 +39,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const cors_1 = __importDefault(require("cors"));
 const helmet_1 = __importDefault(require("helmet"));
+const url_1 = require("url");
 const config_1 = require("./config");
 const database_1 = require("./config/database");
 const logger_1 = require("./utils/logger");
@@ -95,14 +96,20 @@ const corsOptions = {
         // Allow requests with no origin (mobile apps, Postman, etc.)
         if (!origin)
             return callback(null, true);
-        // Check if origin is allowed
-        const allowedOrigins = config_1.config.corsOrigins;
-        // Allow chrome-extension:// origins
+        let normalizedOrigin;
         if (origin.startsWith('chrome-extension://')) {
-            return callback(null, true);
+            normalizedOrigin = origin.replace(/\/$/, '');
         }
-        // Check configured origins
-        if (allowedOrigins.some((allowed) => origin.includes(allowed))) {
+        else {
+            try {
+                normalizedOrigin = new url_1.URL(origin).origin;
+            }
+            catch {
+                return callback(new Error('Invalid Origin header'));
+            }
+        }
+        const allowedOrigins = new Set(config_1.config.corsOrigins.map((value) => value.trim()).filter(Boolean));
+        if (allowedOrigins.has(normalizedOrigin)) {
             return callback(null, true);
         }
         callback(new Error('Not allowed by CORS'));

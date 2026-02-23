@@ -52,6 +52,15 @@ export const portalSessionSchema = z.object({
   returnUrl: z.string().url('Invalid return URL'),
 });
 
+export const bridgeSessionSchema = z.object({
+  userId: z.string().uuid('Invalid user ID'),
+  purpose: z.enum(['checkout', 'billing', 'billing_return']).optional(),
+});
+
+export const bridgeExchangeSchema = z.object({
+  state: z.string().min(16, 'Invalid state token'),
+});
+
 export const paymentIntentSchema = z.object({
   userId: z.string().uuid('Invalid user ID'),
   priceId: z.string(),

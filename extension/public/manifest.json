@@ -14,14 +14,17 @@
   "background": { "service_worker": "background.js" },
   "content_scripts": [
     {
-      "matches": ["https://*/*"],
+      "matches": [
+        "https://*.linkedin.com/*",
+        "https://*.indeed.com/*",
+        "https://*.lever.co/*",
+        "https://boards.greenhouse.io/*",
+        "https://*.greenhouse.io/*",
+        "https://*.myworkdayjobs.com/*",
+        "https://*.workday.com/*",
+        "https://*.smartrecruiters.com/*"
+      ],
       "js": ["content.js"]
-    }
-  ],
-  "web_accessible_resources": [
-    {
-      "resources": ["config.js"],
-      "matches": ["<all_urls>"]
     }
   ],
   "icons": {

@@ -10,10 +10,10 @@ export default function SuccessPage() {
   const [entitlement, setEntitlement] = useState<any>(null);
 
   const sessionId = searchParams.get('session_id');
-  const userId = searchParams.get('userId');
+  const state = searchParams.get('state');
 
   useEffect(() => {
-    if (!userId) {
+    if (!state) {
       setStatus('error');
       return;
     }
@@ -22,9 +22,16 @@ export default function SuccessPage() {
     let attempts = 0;
     const maxAttempts = 20; // 20 seconds max
 
+    let token: string | null = null;
+
     const pollEntitlements = async () => {
       try {
-        const token = searchParams.get('token'); // Extension should pass JWT token
+        if (!token) {
+          const bridgeResponse = await axios.post(`${API_URL}/api/checkout/bridge/exchange`, {
+            state,
+          });
+          token = bridgeResponse.data.token;
+        }
 
         const response = await axios.get(`${API_URL}/api/entitlements`, {
           headers: {
@@ -63,7 +70,7 @@ export default function SuccessPage() {
 
     // Start polling after a brief delay to allow webhook processing
     setTimeout(pollEntitlements, 2000);
-  }, [userId, sessionId, searchParams]);
+  }, [sessionId, state]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-50 to-blue-50 p-4">

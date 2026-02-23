@@ -1,6 +1,7 @@
 import express, { Express } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
+import { URL } from 'url';
 import { config, validateConfig } from './config';
 import { db } from './config/database';
 import { logger } from './utils/logger';
@@ -66,16 +67,22 @@ const corsOptions = {
     // Allow requests with no origin (mobile apps, Postman, etc.)
     if (!origin) return callback(null, true);
 
-    // Check if origin is allowed
-    const allowedOrigins = config.corsOrigins;
-
-    // Allow chrome-extension:// origins
+    let normalizedOrigin: string;
     if (origin.startsWith('chrome-extension://')) {
-      return callback(null, true);
+      normalizedOrigin = origin.replace(/\/$/, '');
+    } else {
+      try {
+        normalizedOrigin = new URL(origin).origin;
+      } catch {
+        return callback(new Error('Invalid Origin header'));
+      }
     }
 
-    // Check configured origins
-    if (allowedOrigins.some((allowed) => origin.includes(allowed))) {
+    const allowedOrigins = new Set(
+      config.corsOrigins.map((value) => value.trim()).filter(Boolean)
+    );
+
+    if (allowedOrigins.has(normalizedOrigin)) {
       return callback(null, true);
     }
 

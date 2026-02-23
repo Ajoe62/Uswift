@@ -3,8 +3,20 @@
  * Handles communication with payment backend without loading remote JS
  */
 
-const API_URL = import.meta.env.VITE_BACKEND_API_URL || 'http://localhost:3000';
-const PAY_APP_URL = 'https://pay.uswift.app'; // Payment web app domain
+const IS_DEV = import.meta.env.DEV || import.meta.env.MODE === 'development';
+const API_URL =
+  import.meta.env.VITE_BACKEND_API_URL ||
+  (IS_DEV ? 'http://localhost:3000' : 'https://pay.uswift.app');
+const PAY_APP_URL = import.meta.env.VITE_PAY_APP_URL || 'https://pay.uswift.app';
+
+if (!IS_DEV) {
+  if (!API_URL.startsWith('https://')) {
+    throw new Error('VITE_BACKEND_API_URL must use HTTPS in production');
+  }
+  if (!PAY_APP_URL.startsWith('https://')) {
+    throw new Error('VITE_PAY_APP_URL must use HTTPS in production');
+  }
+}
 
 export interface CheckoutOptions {
   priceId: string;
@@ -73,6 +85,7 @@ class PaymentService {
     try {
       const token = await this.getAuthToken();
       const userId = await this.getUserId();
+      const bridgeState = await this.createBridgeState(token, userId, 'checkout');
 
       // Create checkout session via backend
       const response = await fetch(`${API_URL}/api/checkout/session`, {
@@ -85,7 +98,7 @@ class PaymentService {
           userId,
           priceId: options.priceId,
           mode: options.mode,
-          successUrl: `${PAY_APP_URL}/success?userId=${userId}&token=${token}`,
+          successUrl: `${PAY_APP_URL}/success?state=${encodeURIComponent(bridgeState)}`,
           cancelUrl: `${PAY_APP_URL}/cancel`,
           trialPeriodDays: options.trialPeriodDays,
           metadata: {
@@ -120,9 +133,10 @@ class PaymentService {
     try {
       const token = await this.getAuthToken();
       const userId = await this.getUserId();
+      const bridgeState = await this.createBridgeState(token, userId, 'billing');
 
       // Open billing page in our payment app
-      const billingUrl = `${PAY_APP_URL}/billing?userId=${userId}&token=${token}`;
+      const billingUrl = `${PAY_APP_URL}/billing?state=${encodeURIComponent(bridgeState)}`;
       await chrome.tabs.create({ url: billingUrl });
     } catch (error: any) {
       console.error('Failed to open billing portal:', error);
@@ -312,6 +326,33 @@ class PaymentService {
         });
       }
     });
+  }
+
+  private async createBridgeState(
+    token: string,
+    userId: string,
+    purpose: 'checkout' | 'billing'
+  ): Promise<string> {
+    const response = await fetch(`${API_URL}/api/checkout/bridge/session`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ userId, purpose }),
+    });
+
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({}));
+      throw new Error(error.message || 'Failed to create secure payment session');
+    }
+
+    const data = await response.json();
+    if (!data?.state) {
+      throw new Error('Invalid bridge session response');
+    }
+
+    return data.state;
   }
 }
 

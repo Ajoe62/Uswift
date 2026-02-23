@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.revokeEntitlementSchema = exports.grantEntitlementSchema = exports.validateLicenseSchema = exports.refundSchema = exports.paymentIntentSchema = exports.portalSessionSchema = exports.checkoutSessionSchema = void 0;
+exports.revokeEntitlementSchema = exports.grantEntitlementSchema = exports.validateLicenseSchema = exports.refundSchema = exports.paymentIntentSchema = exports.bridgeExchangeSchema = exports.bridgeSessionSchema = exports.portalSessionSchema = exports.checkoutSessionSchema = void 0;
 exports.validate = validate;
 const zod_1 = require("zod");
 const logger_1 = require("../utils/logger");
@@ -47,6 +47,13 @@ exports.checkoutSessionSchema = zod_1.z.object({
 exports.portalSessionSchema = zod_1.z.object({
     userId: zod_1.z.string().uuid('Invalid user ID'),
     returnUrl: zod_1.z.string().url('Invalid return URL'),
+});
+exports.bridgeSessionSchema = zod_1.z.object({
+    userId: zod_1.z.string().uuid('Invalid user ID'),
+    purpose: zod_1.z.enum(['checkout', 'billing', 'billing_return']).optional(),
+});
+exports.bridgeExchangeSchema = zod_1.z.object({
+    state: zod_1.z.string().min(16, 'Invalid state token'),
 });
 exports.paymentIntentSchema = zod_1.z.object({
     userId: zod_1.z.string().uuid('Invalid user ID'),

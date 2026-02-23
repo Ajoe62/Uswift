@@ -49,6 +49,23 @@ export declare const portalSessionSchema: z.ZodObject<{
     userId: string;
     returnUrl: string;
 }>;
+export declare const bridgeSessionSchema: z.ZodObject<{
+    userId: z.ZodString;
+    purpose: z.ZodOptional<z.ZodEnum<["checkout", "billing", "billing_return"]>>;
+}, "strip", z.ZodTypeAny, {
+    userId: string;
+    purpose?: "checkout" | "billing" | "billing_return" | undefined;
+}, {
+    userId: string;
+    purpose?: "checkout" | "billing" | "billing_return" | undefined;
+}>;
+export declare const bridgeExchangeSchema: z.ZodObject<{
+    state: z.ZodString;
+}, "strip", z.ZodTypeAny, {
+    state: string;
+}, {
+    state: string;
+}>;
 export declare const paymentIntentSchema: z.ZodObject<{
     userId: z.ZodString;
     priceId: z.ZodString;

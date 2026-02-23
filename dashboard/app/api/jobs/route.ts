@@ -2,11 +2,35 @@ import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs";
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 
+function toLegacyJobShape(row: any) {
+  return {
+    ...row,
+    company_name: row.company,
+    application_url: row.job_url,
+    applied_date: row.applied_at,
+    status: row.status === "interviewing" ? "interview" : row.status,
+  };
+}
+
+function toApplicationsInsert(body: any) {
+  return {
+    user_id: body.user_id,
+    company: body.company_name,
+    job_title: body.job_title,
+    status: body.status === "interview" ? "interviewing" : body.status || "applied",
+    notes: body.notes || null,
+    job_url: body.application_url || null,
+    applied_at: body.applied_date || new Date().toISOString().split("T")[0],
+  };
+}
+
 // GET /api/jobs - Fetch all job applications for the current user
 export async function GET(req: NextRequest) {
   try {
-    const cookieStore = cookies();
-    const supabase = createRouteHandlerClient({ cookies: () => cookieStore });
+    const cookieStore = await cookies();
+    const supabase = createRouteHandlerClient({
+      cookies: (() => cookieStore) as any,
+    });
 
     const {
       data: { user },
@@ -18,7 +42,7 @@ export async function GET(req: NextRequest) {
     }
 
     const { data: jobs, error } = await supabase
-      .from("job_applications")
+      .from("applications")
       .select("*")
       .eq("user_id", user.id)
       .order("created_at", { ascending: false });
@@ -31,7 +55,7 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    return NextResponse.json(jobs || []);
+    return NextResponse.json((jobs || []).map(toLegacyJobShape));
   } catch (error) {
     console.error("Server error:", error);
     return NextResponse.json(
@@ -44,8 +68,10 @@ export async function GET(req: NextRequest) {
 // POST /api/jobs - Create a new job application
 export async function POST(req: NextRequest) {
   try {
-    const cookieStore = cookies();
-    const supabase = createRouteHandlerClient({ cookies: () => cookieStore });
+    const cookieStore = await cookies();
+    const supabase = createRouteHandlerClient({
+      cookies: (() => cookieStore) as any,
+    });
 
     const {
       data: { user },
@@ -73,18 +99,18 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const newJob = {
+    const newJob = toApplicationsInsert({
       user_id: user.id,
       company_name,
       job_title,
-      status: status || "applied",
-      notes: notes || null,
-      application_url: application_url || null,
-      applied_date: applied_date || new Date().toISOString().split("T")[0],
-    };
+      status,
+      notes,
+      application_url,
+      applied_date,
+    });
 
     const { data: job, error } = await supabase
-      .from("job_applications")
+      .from("applications")
       .insert(newJob)
       .select()
       .single();
@@ -97,7 +123,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    return NextResponse.json(job, { status: 201 });
+    return NextResponse.json(toLegacyJobShape(job), { status: 201 });
   } catch (error) {
     console.error("Server error:", error);
     return NextResponse.json(

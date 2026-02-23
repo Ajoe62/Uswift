@@ -2,14 +2,26 @@ import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs";
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 
+function toLegacyJobShape(row: any) {
+  return {
+    ...row,
+    company_name: row.company,
+    application_url: row.job_url,
+    applied_date: row.applied_at,
+    status: row.status === "interviewing" ? "interview" : row.status,
+  };
+}
+
 // PUT /api/jobs/[id] - Update a job application
 export async function PUT(
   req: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
-    const cookieStore = cookies();
-    const supabase = createRouteHandlerClient({ cookies: () => cookieStore });
+    const cookieStore = await cookies();
+    const supabase = createRouteHandlerClient({
+      cookies: (() => cookieStore) as any,
+    });
 
     const {
       data: { user },
@@ -21,16 +33,17 @@ export async function PUT(
     }
 
     const body = await req.json();
-    const { company_name, job_title, status, notes, application_url } = body;
+    const { company_name, job_title, status, notes, application_url, applied_date } = body;
 
     const { data: job, error } = await supabase
-      .from("job_applications")
+      .from("applications")
       .update({
-        company_name,
+        company: company_name,
         job_title,
-        status,
+        status: status === "interview" ? "interviewing" : status,
         notes,
-        application_url,
+        job_url: application_url,
+        ...(applied_date ? { applied_at: applied_date } : {}),
       })
       .eq("id", params.id)
       .eq("user_id", user.id)
@@ -45,7 +58,7 @@ export async function PUT(
       );
     }
 
-    return NextResponse.json(job);
+    return NextResponse.json(toLegacyJobShape(job));
   } catch (error) {
     console.error("Server error:", error);
     return NextResponse.json(
@@ -61,8 +74,10 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   try {
-    const cookieStore = cookies();
-    const supabase = createRouteHandlerClient({ cookies: () => cookieStore });
+    const cookieStore = await cookies();
+    const supabase = createRouteHandlerClient({
+      cookies: (() => cookieStore) as any,
+    });
 
     const {
       data: { user },
@@ -74,7 +89,7 @@ export async function DELETE(
     }
 
     const { error } = await supabase
-      .from("job_applications")
+      .from("applications")
       .delete()
       .eq("id", params.id)
       .eq("user_id", user.id);

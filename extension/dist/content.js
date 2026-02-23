@@ -1,81 +1,28 @@
 async function attachFileToInput(input, fileUrl) {
-  const errors = [];
-  const warnings = [];
   try {
-    if (!fileUrl) {
-      return { success: false, errors: ["No file URL provided"] };
-    }
-    if (!input || input.type !== "file") {
-      return { success: false, errors: ["Invalid file input element"] };
-    }
-    const res = await fetch(fileUrl, {
-      mode: "cors",
-      headers: {
-        "Cache-Control": "no-cache"
-      }
-    });
-    if (!res.ok) {
-      return {
-        success: false,
-        errors: [`Failed to fetch file: ${res.status} ${res.statusText}`]
-      };
-    }
+    if (!fileUrl)
+      return { success: false, details: "no file url" };
+    const res = await fetch(fileUrl, { mode: "cors" });
+    if (!res.ok)
+      return { success: false, details: `fetch failed ${res.status}` };
     const blob = await res.blob();
     const disposition = res.headers.get("content-disposition") || "";
-    let filename = "document.pdf";
-    const filenameMatch = /filename\*=UTF-8''([^;]+)/i.exec(disposition) || /filename="?([^";]+)/i.exec(disposition);
-    if (filenameMatch && filenameMatch[1]) {
-      filename = decodeURIComponent(filenameMatch[1]);
-    }
-    const file = new File([blob], filename, {
-      type: blob.type || "application/pdf"
-    });
+    let filename = "file";
+    const m = /filename\*=UTF-8''([^;]+)/i.exec(disposition) || /filename="?([^";]+)/i.exec(disposition);
+    if (m && m[1])
+      filename = decodeURIComponent(m[1]);
+    const file = new File([blob], filename, { type: blob.type || "application/octet-stream" });
     try {
       const dt = new DataTransfer();
       dt.items.add(file);
-      Object.defineProperty(input, "files", {
-        value: dt.files,
-        writable: false
-      });
+      Object.defineProperty(input, "files", { value: dt.files, writable: false });
       input.dispatchEvent(new Event("change", { bubbles: true }));
-      if (input.files && input.files.length > 0) {
-        return {
-          success: true,
-          details: { strategy: "DataTransfer", filename }
-        };
-      }
+      return { success: true };
     } catch (e) {
-      errors.push(`DataTransfer failed: ${e}`);
+      return { success: false, details: e };
     }
-    try {
-      input.files = [file];
-      input.dispatchEvent(new Event("change", { bubbles: true }));
-      if (input.files && input.files.length > 0) {
-        warnings.push("Used fallback file assignment method");
-        return {
-          success: true,
-          warnings,
-          details: { strategy: "DirectAssignment", filename }
-        };
-      }
-    } catch (e) {
-      errors.push(`Direct assignment failed: ${e}`);
-    }
-    return {
-      success: false,
-      errors,
-      warnings,
-      details: {
-        filename,
-        attemptedStrategies: ["DataTransfer", "DirectAssignment"]
-      }
-    };
   } catch (e) {
-    return {
-      success: false,
-      errors: [`File attachment failed: ${e}`],
-      details: { fileUrl }
-    };
+    return { success: false, details: e };
   }
 }
 
@@ -910,7 +857,7 @@ async function handleFileUploadsAdvanced(profile, session) {
             session.steps.push(`File uploaded successfully`);
           } else {
             session.errors.push(
-              `File upload failed: ${result.errors?.join(", ")}`
+              `File upload failed: ${result.details || "Unknown error"}`
             );
           }
         } catch (error) {

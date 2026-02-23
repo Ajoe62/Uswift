@@ -4,8 +4,10 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(req: NextRequest) {
   try {
-    const cookieStore = cookies();
-    const supabase = createRouteHandlerClient({ cookies: () => cookieStore });
+    const cookieStore = await cookies();
+    const supabase = createRouteHandlerClient({
+      cookies: (() => cookieStore) as any,
+    });
 
     // Get the current user
     const {
@@ -19,7 +21,7 @@ export async function GET(req: NextRequest) {
 
     // Get statistics for the current user
     const { data: stats, error } = await supabase
-      .from("job_applications")
+      .from("applications")
       .select("status, created_at")
       .eq("user_id", user.id);
 
@@ -34,7 +36,9 @@ export async function GET(req: NextRequest) {
     // Calculate statistics
     const totalApplications = stats?.length || 0;
     const interviews =
-      stats?.filter((app: any) => app.status === "interview").length || 0;
+      stats?.filter(
+        (app: any) => app.status === "interview" || app.status === "interviewing"
+      ).length || 0;
     const offers = stats?.filter((app: any) => app.status === "offer").length || 0;
 
     // Calculate applications this month
