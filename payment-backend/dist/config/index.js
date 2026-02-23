@@ -7,8 +7,29 @@ exports.config = void 0;
 exports.validateConfig = validateConfig;
 const dotenv_1 = __importDefault(require("dotenv"));
 const path_1 = __importDefault(require("path"));
-// Load environment variables
-dotenv_1.default.config({ path: path_1.default.resolve(__dirname, '../../.env') });
+const fs_1 = __importDefault(require("fs"));
+// Load environment variables from common local-dev locations (first one found wins per key)
+const envCandidates = [
+    path_1.default.resolve(__dirname, '../../.env'),
+    path_1.default.resolve(__dirname, '../../.env.local'),
+    path_1.default.resolve(__dirname, '../../../.env'),
+    path_1.default.resolve(__dirname, '../../../.env.local'),
+];
+for (const envPath of envCandidates) {
+    if (fs_1.default.existsSync(envPath)) {
+        dotenv_1.default.config({ path: envPath, override: false });
+    }
+}
+const isDev = (process.env.NODE_ENV || 'development') !== 'production';
+// Provide safe local defaults so dev server can start without auth secrets configured.
+if (isDev) {
+    if (!process.env.JWT_SECRET) {
+        process.env.JWT_SECRET = 'dev-jwt-secret-change-me';
+    }
+    if (!process.env.EXTENSION_TOKEN_SECRET) {
+        process.env.EXTENSION_TOKEN_SECRET = 'dev-extension-token-secret-change-me';
+    }
+}
 exports.config = {
     // Server
     nodeEnv: process.env.NODE_ENV || 'development',
@@ -83,15 +104,17 @@ exports.config = {
 };
 // Validate required configuration
 function validateConfig() {
-    const required = [
-        'STRIPE_SECRET_KEY',
-        'STRIPE_WEBHOOK_SECRET',
-        'JWT_SECRET',
-        'EXTENSION_TOKEN_SECRET',
-    ];
+    const required = ['JWT_SECRET', 'EXTENSION_TOKEN_SECRET'];
     const missing = required.filter((key) => !process.env[key]);
     if (missing.length > 0) {
         throw new Error(`Missing required environment variables: ${missing.join(', ')}`);
+    }
+    const stripeMissing = ['STRIPE_SECRET_KEY', 'STRIPE_WEBHOOK_SECRET'].filter((key) => !process.env[key]);
+    if (stripeMissing.length > 0) {
+        if (process.env.NODE_ENV === 'production') {
+            throw new Error(`Missing required Stripe environment variables in production: ${stripeMissing.join(', ')}`);
+        }
+        console.warn(`Stripe is not fully configured for local development. Payment routes/webhooks will be disabled: ${stripeMissing.join(', ')}`);
     }
     // Warn about missing optional but recommended variables
     const recommended = ['PRICE_PRO_MONTHLY', 'PRICE_PRO_ANNUAL', 'ADMIN_API_KEY'];

@@ -2,7 +2,7 @@ import { Worker, Job as BullJob } from 'bullmq';
 import { getRedisConfig } from '../config/redis';
 import { jobService } from '../services/JobService';
 import { logger } from '../utils/logger';
-import { JobApplicationData } from '../queues/JobQueue';
+import type { JobApplicationData } from '../queues/JobQueue';
 
 /**
  * Job Worker

@@ -1,5 +1,5 @@
 import { Worker } from 'bullmq';
-import { JobApplicationData } from '../queues/JobQueue';
+import type { JobApplicationData } from '../queues/JobQueue';
 /**
  * Job Worker
  * Processes job applications with LLM orchestration

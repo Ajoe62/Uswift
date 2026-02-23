@@ -1,8 +1,32 @@
 import dotenv from 'dotenv';
 import path from 'path';
+import fs from 'fs';
 
-// Load environment variables
-dotenv.config({ path: path.resolve(__dirname, '../../.env') });
+// Load environment variables from common local-dev locations (first one found wins per key)
+const envCandidates = [
+  path.resolve(__dirname, '../../.env'),
+  path.resolve(__dirname, '../../.env.local'),
+  path.resolve(__dirname, '../../../.env'),
+  path.resolve(__dirname, '../../../.env.local'),
+];
+
+for (const envPath of envCandidates) {
+  if (fs.existsSync(envPath)) {
+    dotenv.config({ path: envPath, override: false });
+  }
+}
+
+const isDev = (process.env.NODE_ENV || 'development') !== 'production';
+
+// Provide safe local defaults so dev server can start without auth secrets configured.
+if (isDev) {
+  if (!process.env.JWT_SECRET) {
+    process.env.JWT_SECRET = 'dev-jwt-secret-change-me';
+  }
+  if (!process.env.EXTENSION_TOKEN_SECRET) {
+    process.env.EXTENSION_TOKEN_SECRET = 'dev-extension-token-secret-change-me';
+  }
+}
 
 export const config = {
   // Server
@@ -89,18 +113,31 @@ export const config = {
 
 // Validate required configuration
 export function validateConfig(): void {
-  const required = [
-    'STRIPE_SECRET_KEY',
-    'STRIPE_WEBHOOK_SECRET',
-    'JWT_SECRET',
-    'EXTENSION_TOKEN_SECRET',
-  ];
+  const required = ['JWT_SECRET', 'EXTENSION_TOKEN_SECRET'];
 
   const missing = required.filter((key) => !process.env[key]);
 
   if (missing.length > 0) {
     throw new Error(
       `Missing required environment variables: ${missing.join(', ')}`
+    );
+  }
+
+  const stripeMissing = ['STRIPE_SECRET_KEY', 'STRIPE_WEBHOOK_SECRET'].filter(
+    (key) => !process.env[key]
+  );
+
+  if (stripeMissing.length > 0) {
+    if (process.env.NODE_ENV === 'production') {
+      throw new Error(
+        `Missing required Stripe environment variables in production: ${stripeMissing.join(', ')}`
+      );
+    }
+
+    console.warn(
+      `Stripe is not fully configured for local development. Payment routes/webhooks will be disabled: ${stripeMissing.join(
+        ', '
+      )}`
     );
   }
 

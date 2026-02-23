@@ -52,7 +52,6 @@ const checkout_1 = __importDefault(require("./routes/checkout"));
 const entitlements_1 = __importDefault(require("./routes/entitlements"));
 const webhooks_1 = __importDefault(require("./routes/webhooks"));
 const admin_1 = __importDefault(require("./routes/admin"));
-const jobs_1 = __importDefault(require("./routes/jobs"));
 /**
  * Uswift Payment Backend
  * MV3-compliant, PCI SAQ A friendly payment system
@@ -129,12 +128,18 @@ app.use('/api', rateLimit_1.apiRateLimiter);
 // Gateway Initialization
 // ============================================================================
 // Register Stripe gateway
-const stripeGateway = new StripeGateway_1.StripeGateway(config_1.config.stripe.secretKey, config_1.config.stripe.webhookSecret);
-PaymentGateway_1.PaymentGatewayFactory.register('stripe', stripeGateway);
-logger_1.logger.info('Payment gateways initialized', {
-    primary: 'stripe',
-    secondary: config_1.config.features.secondaryGateway,
-});
+const stripeConfigured = Boolean(config_1.config.stripe.secretKey && config_1.config.stripe.webhookSecret);
+if (stripeConfigured) {
+    const stripeGateway = new StripeGateway_1.StripeGateway(config_1.config.stripe.secretKey, config_1.config.stripe.webhookSecret);
+    PaymentGateway_1.PaymentGatewayFactory.register('stripe', stripeGateway);
+    logger_1.logger.info('Payment gateways initialized', {
+        primary: 'stripe',
+        secondary: config_1.config.features.secondaryGateway,
+    });
+}
+else {
+    logger_1.logger.warn('Stripe gateway not initialized (missing Stripe env vars). Payment routes will be disabled.');
+}
 // ============================================================================
 // Routes
 // ============================================================================
@@ -147,12 +152,23 @@ app.get('/health', (req, res) => {
     });
 });
 // API routes
-app.use('/api/checkout', checkout_1.default);
+if (stripeConfigured) {
+    app.use('/api/checkout', checkout_1.default);
+}
+else {
+    app.use('/api/checkout', (_req, res) => {
+        res.status(503).json({
+            error: 'PaymentsDisabled',
+            message: 'Stripe is not configured on this server instance.',
+        });
+    });
+}
 app.use('/api', entitlements_1.default);
 app.use('/api/admin', admin_1.default);
-app.use('/api/jobs', jobs_1.default);
 // Webhook routes
-app.use('/webhooks', webhooks_1.default);
+if (stripeConfigured) {
+    app.use('/webhooks', webhooks_1.default);
+}
 // ============================================================================
 // Error Handling
 // ============================================================================
@@ -175,8 +191,17 @@ async function startServer() {
         const redisConnected = await testRedisConnection();
         if (!redisConnected) {
             logger_1.logger.warn('Redis connection failed - queue features will be unavailable');
+            app.use('/api/jobs', (_req, res) => {
+                res.status(503).json({
+                    error: 'QueueUnavailable',
+                    message: 'Redis is not available. Job queue routes are disabled.',
+                });
+            });
         }
         else {
+            // Register job routes only after Redis is confirmed available to avoid eager queue initialization noise.
+            const { default: jobsRoutes } = await Promise.resolve().then(() => __importStar(require('./routes/jobs')));
+            app.use('/api/jobs', jobsRoutes);
             // Initialize job worker
             const { jobWorker } = await Promise.resolve().then(() => __importStar(require('./workers/JobWorker')));
             logger_1.logger.info('Job worker initialized and ready');

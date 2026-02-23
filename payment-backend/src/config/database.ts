@@ -6,16 +6,29 @@ class Database {
   private pool: Pool;
 
   private constructor() {
+    const useSsl = process.env.DB_SSL === 'true';
+    const databaseUrl = process.env.DATABASE_URL?.trim();
+
+    const poolConfig =
+      databaseUrl
+        ? {
+            connectionString: databaseUrl,
+            ssl: useSsl ? { rejectUnauthorized: false } : false,
+          }
+        : {
+            host: process.env.DB_HOST || 'localhost',
+            port: parseInt(process.env.DB_PORT || '5432'),
+            database: process.env.DB_NAME || 'uswift_payments',
+            user: process.env.DB_USER || 'postgres',
+            password: process.env.DB_PASSWORD || 'password',
+            ssl: useSsl ? { rejectUnauthorized: false } : false,
+          };
+
     this.pool = new Pool({
-      host: process.env.DB_HOST || 'localhost',
-      port: parseInt(process.env.DB_PORT || '5432'),
-      database: process.env.DB_NAME || 'uswift_payments',
-      user: process.env.DB_USER || 'postgres',
-      password: process.env.DB_PASSWORD || 'password',
-      ssl: process.env.DB_SSL === 'true' ? { rejectUnauthorized: false } : false,
+      ...poolConfig,
       max: 20,
       idleTimeoutMillis: 30000,
-      connectionTimeoutMillis: 2000,
+      connectionTimeoutMillis: 5000,
     });
 
     // Handle pool errors
@@ -74,6 +87,18 @@ class Database {
       return true;
     } catch (error) {
       logger.error('Database connection test failed', { error });
+
+      const err = error as any;
+      if (
+        err?.code === 'ENOTFOUND' &&
+        typeof err?.hostname === 'string' &&
+        err.hostname.includes('.supabase.co')
+      ) {
+        logger.error(
+          'Supabase DB hostname could not be resolved by Node. This commonly happens with IPv6-only direct DB hosts on local Windows networks. Use the exact Session/Transaction Pooler connection string from Supabase Database settings in DATABASE_URL.',
+          { hostnameTried: err.hostname }
+        );
+      }
       return false;
     }
   }

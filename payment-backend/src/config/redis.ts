@@ -76,6 +76,15 @@ export const testRedisConnection = async (): Promise<boolean> => {
     return true;
   } catch (error) {
     logger.error('Redis connection test failed', { error });
+    // Prevent endless reconnect spam in local dev when Redis is intentionally absent.
+    if (redisClient) {
+      try {
+        redisClient.disconnect(false);
+      } catch {
+        // ignore disconnect cleanup errors
+      }
+      redisClient = null;
+    }
     return false;
   }
 };
