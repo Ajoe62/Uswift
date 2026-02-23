@@ -15,3 +15,6 @@ node_modules/
 */node_modules/
 **/node_modules/
 .next/
+
+# Local tooling binaries (keep local, do not commit)
+payment-backend/cloudflared.exe
