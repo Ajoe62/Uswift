@@ -102,10 +102,10 @@ export default function HomePage() {
   const router = useRouter();
 
   useEffect(() => {
-    // Redirect authenticated users to profile
+    // Redirect authenticated users to dashboard
     if (!isLoading && session) {
-      console.log('User authenticated, redirecting to profile...');
-      router.push('/profile');
+      console.log('User authenticated, redirecting to dashboard...');
+      router.push('/dashboard');
     }
   }, [session, isLoading, router]);
 

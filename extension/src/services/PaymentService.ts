@@ -241,7 +241,7 @@ class PaymentService {
         // Show notification
         chrome.notifications.create({
           type: 'basic',
-          iconUrl: '/icon-128.png',
+          iconUrl: 'icon128.png',
           title: 'Welcome to Uswift Pro! 🎉',
           message: 'Your Pro features are now active.',
         });

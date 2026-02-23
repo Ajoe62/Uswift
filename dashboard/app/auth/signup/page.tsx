@@ -23,7 +23,7 @@ export default function SignUpPage() {
   // Redirect if already authenticated
   useEffect(() => {
     if (!isLoading && session) {
-      router.replace('/profile');
+      router.replace('/dashboard');
     }
   }, [session, isLoading, router]);
 

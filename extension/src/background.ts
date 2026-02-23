@@ -116,7 +116,7 @@ async function handleApplyJob(
       // Show notification
       chrome.notifications.create({
         type: "basic",
-        iconUrl: "icons/icon48.png",
+        iconUrl: "icon48.png",
         title: "Job Application Queued",
         message: `${message.jobTitle || "Job"} at ${
           message.company || "company"
@@ -221,7 +221,7 @@ async function handleCancelJob(
       // Show notification
       chrome.notifications.create({
         type: "basic",
-        iconUrl: "icons/icon48.png",
+        iconUrl: "icon48.png",
         title: "Job Application Cancelled",
         message: "The job application has been removed from the queue.",
         priority: 0,

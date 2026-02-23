@@ -2,13 +2,7 @@
 
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-
-// Minimal local stub for useAuthStore to avoid missing-module error in this file.
-// Replace this with your real store implementation or restore the alias import.
-const useAuthStore = () => {
-  // session can be typed more specifically if available
-  return { session: null as any, isLoading: false };
-};
+import { useAuthStore } from '@/stores/authStore';
 
 const LoadingSpinner = () => (
   <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', background: '#f9fafb' }}>
@@ -33,7 +27,7 @@ export default function ProtectedLayout({
 
   useEffect(() => {
     if (!isLoading && !session) {
-      router.push('/');
+      router.push('/auth/signin');
     }
   }, [session, isLoading, router]);
 

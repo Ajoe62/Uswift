@@ -21,7 +21,7 @@ export default function SignInPage() {
   // Redirect if already authenticated
   useEffect(() => {
     if (!isLoading && session) {
-      router.replace('/profile');
+      router.replace('/dashboard');
     }
   }, [session, isLoading, router]);
 
@@ -44,7 +44,7 @@ export default function SignInPage() {
       setMessageType('success');
       // The auth state change will be detected by Zustand and redirect automatically
       setTimeout(() => {
-        router.replace('/profile');
+        router.replace('/dashboard');
       }, 500);
     }
   }
