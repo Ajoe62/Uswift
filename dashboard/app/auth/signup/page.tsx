@@ -1,64 +1,106 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { supabase } from "@/lib/supabaseClient";
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { useAuthStore } from '@/stores/authStore';
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 
 export default function SignUpPage() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [message, setMessage] = useState("");
-  const [messageType, setMessageType] = useState<"error" | "success">("error");
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [message, setMessage] = useState('');
+  const [messageType, setMessageType] = useState<'error' | 'success'>('error');
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  
+  // Use Zustand store instead of useAuth
+  const { session, isLoading } = useAuthStore();
   const router = useRouter();
+  const supabase = createClientComponentClient();
+
+  // Redirect if already authenticated
+  useEffect(() => {
+    if (!isLoading && session) {
+      router.replace('/dashboard');
+    }
+  }, [session, isLoading, router]);
 
   async function handleSignUp(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
-    setMessage("");
+    setMessage('');
 
     // Validation
     if (password.length < 8) {
-      setMessage("Password must be at least 8 characters long");
-      setMessageType("error");
+      setMessage('Password must be at least 8 characters long');
+      setMessageType('error');
       setLoading(false);
       return;
     }
 
     if (password !== confirmPassword) {
-      setMessage("Passwords do not match");
-      setMessageType("error");
+      setMessage('Passwords do not match');
+      setMessageType('error');
       setLoading(false);
       return;
     }
 
-    const { error } = await supabase.auth.signUp({ email, password });
+    const { error } = await supabase.auth.signUp({ 
+      email, 
+      password,
+      options: {
+        emailRedirectTo: `${window.location.origin}/auth/callback`,
+      }
+    });
+
     if (error) {
       setMessage(error.message);
-      setMessageType("error");
+      setMessageType('error');
     } else {
-      setMessage("Account created! Check your email to verify your account.");
-      setMessageType("success");
-      setTimeout(() => router.push("/auth/signin"), 3000);
+      setMessage('Account created! Check your email to verify your account.');
+      setMessageType('success');
+      setTimeout(() => router.push('/auth/signin'), 3000);
     }
     setLoading(false);
   }
 
   async function handleGoogleSignUp() {
     setLoading(true);
-    setMessage("");
+    setMessage('');
+    
     const { error } = await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: { redirectTo: window.location.origin + "/dashboard" },
+      provider: 'google',
+      options: { 
+        redirectTo: `${window.location.origin}/auth/callback`,
+        queryParams: {
+          access_type: 'offline',
+          prompt: 'consent',
+        }
+      },
     });
+
     if (error) {
       setMessage(error.message);
-      setMessageType("error");
+      setMessageType('error');
+      setLoading(false);
     }
-    setLoading(false);
+  }
+
+  // Show loading state while checking authentication
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center px-4 py-8 bg-gradient-to-br from-blue-50 via-white to-purple-50">
+        <div className="text-center">
+          <svg className="animate-spin h-12 w-12 text-blue-600 mx-auto mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+          <p className="text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -82,7 +124,7 @@ export default function SignUpPage() {
             type="button"
             onClick={handleGoogleSignUp}
             disabled={loading}
-            className="w-full flex items-center justify-center gap-3 px-4 py-3 border-2 border-gray-200 rounded-xl hover:bg-gray-50 hover:border-gray-300 transition-all duration-200 font-medium text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full flex items-center justify-center gap-3 px-4 py-3 bg-white border-2 border-gray-300 rounded-xl hover:bg-gray-50 hover:border-gray-400 transition-all duration-200 font-medium text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm hover:shadow-md"
           >
             <svg className="w-5 h-5" viewBox="0 0 24 24">
               <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -141,7 +183,7 @@ export default function SignUpPage() {
                 </div>
                 <input
                   id="password"
-                  type={showPassword ? "text" : "password"}
+                  type={showPassword ? 'text' : 'password'}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="At least 8 characters"
@@ -181,7 +223,7 @@ export default function SignUpPage() {
                 </div>
                 <input
                   id="confirmPassword"
-                  type={showConfirmPassword ? "text" : "password"}
+                  type={showConfirmPassword ? 'text' : 'password'}
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   placeholder="Confirm your password"
@@ -209,9 +251,9 @@ export default function SignUpPage() {
 
             {/* Terms Notice */}
             <p className="text-xs text-gray-500">
-              By creating an account, you agree to our{" "}
+              By creating an account, you agree to our{' '}
               <a href="#" className="text-blue-600 hover:text-blue-500">Terms of Service</a>
-              {" "}and{" "}
+              {' '}and{' '}
               <a href="#" className="text-blue-600 hover:text-blue-500">Privacy Policy</a>
             </p>
 
@@ -219,7 +261,7 @@ export default function SignUpPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-uswift-primary text-white font-medium rounded-xl hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-lg"
+              className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-blue-600 text-white font-medium rounded-xl hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-lg"
             >
               {loading ? (
                 <>
@@ -242,9 +284,9 @@ export default function SignUpPage() {
 
           {/* Message Display */}
           {message && (
-            <div className={`mt-4 p-4 rounded-xl ${messageType === "error" ? "bg-red-50 text-red-700 border border-red-200" : "bg-green-50 text-green-700 border border-green-200"}`}>
+            <div className={`mt-4 p-4 rounded-xl ${messageType === 'error' ? 'bg-red-50 text-red-700 border border-red-200' : 'bg-green-50 text-green-700 border border-green-200'}`}>
               <div className="flex items-center gap-2">
-                {messageType === "error" ? (
+                {messageType === 'error' ? (
                   <svg className="w-5 h-5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
                   </svg>
@@ -261,7 +303,7 @@ export default function SignUpPage() {
 
         {/* Sign In Link */}
         <p className="text-center mt-6 text-gray-600">
-          Already have an account?{" "}
+          Already have an account?{' '}
           <a href="/auth/signin" className="font-medium text-blue-600 hover:text-blue-500 transition-colors">
             Sign in
           </a>

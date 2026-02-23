@@ -1,14 +1,13 @@
-import { createMiddlewareClient } from "@supabase/auth-helpers-nextjs";
-import { NextResponse } from "next/server";
-import { NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
+
+function hasSupabaseAuthCookie(req: NextRequest): boolean {
+  return req.cookies
+    .getAll()
+    .some((cookie) => cookie.name.startsWith("sb-") && cookie.name.includes("auth-token"));
+}
 
 export async function middleware(req: NextRequest) {
-  const res = NextResponse.next();
-  const supabase = createMiddlewareClient({ req, res });
-
-  const {
-    data: { session },
-  } = await supabase.auth.getSession();
+  const isAuthenticated = hasSupabaseAuthCookie(req);
 
   // Protected routes
   const protectedRoutes = ["/dashboard"];
@@ -21,19 +20,19 @@ export async function middleware(req: NextRequest) {
     req.nextUrl.pathname.startsWith(route)
   );
 
-  if (isProtectedRoute && !session) {
+  if (isProtectedRoute && !isAuthenticated) {
     // Redirect to signin if not authenticated
     const redirectUrl = new URL("/auth/signin", req.url);
     redirectUrl.searchParams.set("redirectTo", req.nextUrl.pathname);
     return NextResponse.redirect(redirectUrl);
   }
 
-  if (isAuthRoute && session) {
+  if (isAuthRoute && isAuthenticated) {
     // Redirect to dashboard if already authenticated
     return NextResponse.redirect(new URL("/dashboard", req.url));
   }
 
-  return res;
+  return NextResponse.next();
 }
 
 export const config = {

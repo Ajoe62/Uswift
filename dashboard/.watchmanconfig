@@ -1,9 +1,3 @@
 {
-  "ignore_dirs": [
-    "node_modules",
-    ".next",
-    ".git",
-    "dist",
-    "coverage"
-  ]
+  "ignore_dirs": ["node_modules", ".next", ".git", "dist", "coverage"]
 }

@@ -113,16 +113,24 @@ app.use('/api', apiRateLimiter);
 // ============================================================================
 
 // Register Stripe gateway
-const stripeGateway = new StripeGateway(
-  config.stripe.secretKey,
-  config.stripe.webhookSecret
+const stripeConfigured = Boolean(
+  config.stripe.secretKey && config.stripe.webhookSecret
 );
-PaymentGatewayFactory.register('stripe', stripeGateway);
 
-logger.info('Payment gateways initialized', {
-  primary: 'stripe',
-  secondary: config.features.secondaryGateway,
-});
+if (stripeConfigured) {
+  const stripeGateway = new StripeGateway(
+    config.stripe.secretKey,
+    config.stripe.webhookSecret
+  );
+  PaymentGatewayFactory.register('stripe', stripeGateway);
+
+  logger.info('Payment gateways initialized', {
+    primary: 'stripe',
+    secondary: config.features.secondaryGateway,
+  });
+} else {
+  logger.warn('Stripe gateway not initialized (missing Stripe env vars). Payment routes will be disabled.');
+}
 
 // ============================================================================
 // Routes
@@ -138,12 +146,22 @@ app.get('/health', (req, res) => {
 });
 
 // API routes
-app.use('/api/checkout', checkoutRoutes);
+if (stripeConfigured) {
+  app.use('/api/checkout', checkoutRoutes);
+} else {
+  app.use('/api/checkout', (_req, res) => {
+    res.status(503).json({
+      error: 'PaymentsDisabled',
+      message: 'Stripe is not configured on this server instance.',
+    });
+  });
+}
 app.use('/api', entitlementsRoutes);
 app.use('/api/admin', adminRoutes);
-
 // Webhook routes
-app.use('/webhooks', webhookRoutes);
+if (stripeConfigured) {
+  app.use('/webhooks', webhookRoutes);
+}
 
 // ============================================================================
 // Error Handling
@@ -168,6 +186,28 @@ async function startServer() {
       throw new Error('Database connection failed');
     }
 
+    // Test Redis connection and initialize queue/worker
+    const { testRedisConnection } = await import('./config/redis');
+    const redisConnected = await testRedisConnection();
+
+    if (!redisConnected) {
+      logger.warn('Redis connection failed - queue features will be unavailable');
+      app.use('/api/jobs', (_req, res) => {
+        res.status(503).json({
+          error: 'QueueUnavailable',
+          message: 'Redis is not available. Job queue routes are disabled.',
+        });
+      });
+    } else {
+      // Register job routes only after Redis is confirmed available to avoid eager queue initialization noise.
+      const { default: jobsRoutes } = await import('./routes/jobs');
+      app.use('/api/jobs', jobsRoutes);
+
+      // Initialize job worker
+      const { jobWorker } = await import('./workers/JobWorker');
+      logger.info('Job worker initialized and ready');
+    }
+
     // Start server
     const server = app.listen(config.port, () => {
       logger.info('Uswift Payment Backend started', {
@@ -190,6 +230,18 @@ async function startServer() {
         logger.info('HTTP server closed');
 
         try {
+          // Close queue and worker
+          if (redisConnected) {
+            const { jobWorker } = await import('./workers/JobWorker');
+            const { jobQueue } = await import('./queues/JobQueue');
+            const { closeRedisClient } = await import('./config/redis');
+
+            await jobWorker.close();
+            await jobQueue.close();
+            await closeRedisClient();
+            logger.info('Queue and worker closed');
+          }
+
           await db.close();
           logger.info('Database connections closed');
           process.exit(0);

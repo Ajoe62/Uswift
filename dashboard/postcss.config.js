@@ -3,7 +3,7 @@
 module.exports = {
   // Next.js expects PostCSS plugin names as strings in the `plugins` object.
   plugins: {
-    '@tailwindcss/postcss': {},
+    "@tailwindcss/postcss": {},
     autoprefixer: {},
   },
 };

@@ -40,7 +40,7 @@ const nextConfig = {
         config.stats = 'errors-warnings';
       }
     }
-    
+
     return config;
   },
   
@@ -55,7 +55,13 @@ const nextConfig = {
   
   // Image optimization
   images: {
-    unoptimized: true, // Faster dev, optimize in production if needed
+    formats: ["image/avif", "image/webp"], // Modern formats for better compression
+    deviceSizes: [640, 750, 828, 1080, 1200, 1920], // Responsive breakpoints
+    imageSizes: [16, 32, 48, 64, 96, 128, 256, 384], // Fixed sizes for smaller images
+    minimumCacheTTL: 60, // Cache optimized images for 60 seconds
+    dangerouslyAllowSVG: true,
+    contentDispositionType: "attachment",
+    contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
   },
 
   // Suppress the specific warnings
@@ -69,6 +75,16 @@ const nextConfig = {
   experimental: {
     // Enable if you want to use the latest Turbopack features
     optimizePackageImports: ['lucide-react', 'react-icons'],
+  },
+  // Permanent redirect from root to /home
+  async redirects() {
+    return [
+      {
+        source: "/",
+        destination: "/home",
+        permanent: true,
+      },
+    ];
   },
 };
 

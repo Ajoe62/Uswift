@@ -1,10 +1,12 @@
-import { supabase } from "@/lib/supabaseClient";
+import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs";
+import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
-import type { JobApplication } from "@/lib/types";
 
 // GET /api/jobs - Fetch all job applications for the current user
 export async function GET(req: NextRequest) {
   try {
+    const cookieStore = cookies();
+    const supabase = createRouteHandlerClient({ cookies: () => cookieStore });
 
     const {
       data: { user },
@@ -42,6 +44,8 @@ export async function GET(req: NextRequest) {
 // POST /api/jobs - Create a new job application
 export async function POST(req: NextRequest) {
   try {
+    const cookieStore = cookies();
+    const supabase = createRouteHandlerClient({ cookies: () => cookieStore });
 
     const {
       data: { user },

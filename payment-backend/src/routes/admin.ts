@@ -7,7 +7,7 @@ import { entitlementService } from '../services/EntitlementService';
 import { db } from '../config/database';
 import { logger } from '../utils/logger';
 
-const router = Router();
+const router: Router = Router();
 
 // All admin routes require admin API key
 router.use(authenticateAdmin);

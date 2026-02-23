@@ -1,4 +1,5 @@
-import { supabase } from "@/lib/supabaseClient";
+import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs";
+import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 
 // PUT /api/jobs/[id] - Update a job application
@@ -7,6 +8,8 @@ export async function PUT(
   { params }: { params: { id: string } }
 ) {
   try {
+    const cookieStore = cookies();
+    const supabase = createRouteHandlerClient({ cookies: () => cookieStore });
 
     const {
       data: { user },
@@ -58,6 +61,8 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   try {
+    const cookieStore = cookies();
+    const supabase = createRouteHandlerClient({ cookies: () => cookieStore });
 
     const {
       data: { user },

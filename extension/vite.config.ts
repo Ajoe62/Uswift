@@ -1,15 +1,19 @@
-import { defineConfig } from "vite";
+import { defineConfig, loadEnv } from "vite";
 import react from "@vitejs/plugin-react";
 import { resolve } from "path";
 import { copyFileSync } from "fs";
 
-export default defineConfig({
+export default defineConfig(({ mode }) => {
+  // Load env file based on `mode` in the current working directory
+  const env = loadEnv(mode, process.cwd(), '');
+
+  return {
   plugins: [
     {
       name: "copy-manifest",
       generateBundle() {
         // Copy manifest.json to dist after build
-        copyFileSync("manifest.json", "dist/manifest.json");
+        copyFileSync("public/manifest.json", "dist/manifest.json");
         console.log("✅ manifest.json copied to dist/");
       },
     },
@@ -50,22 +54,23 @@ export default defineConfig({
     ),
     // Expose environment variables to extension
     "import.meta.env.VITE_MISTRAL_API_KEY": JSON.stringify(
-      process.env.VITE_MISTRAL_API_KEY || ""
+      env.VITE_MISTRAL_API_KEY || ""
     ),
     "import.meta.env.VITE_MISTRAL_BASE_URL": JSON.stringify(
-      process.env.VITE_MISTRAL_BASE_URL || "https://api.mistral.ai"
+      env.VITE_MISTRAL_BASE_URL || "https://api.mistral.ai"
     ),
     "import.meta.env.VITE_SUPABASE_URL": JSON.stringify(
-      process.env.VITE_SUPABASE_URL || ""
+      env.VITE_SUPABASE_URL || ""
     ),
     "import.meta.env.VITE_SUPABASE_ANON_KEY": JSON.stringify(
-      process.env.VITE_SUPABASE_ANON_KEY || ""
+      env.VITE_SUPABASE_ANON_KEY || ""
     ),
     "import.meta.env.VITE_BACKEND_API_URL": JSON.stringify(
-      process.env.VITE_BACKEND_API_URL || ""
+      env.VITE_BACKEND_API_URL || ""
     ),
     "import.meta.env.VITE_DEBUG_MODE": JSON.stringify(
-      process.env.VITE_DEBUG_MODE === "true"
+      env.VITE_DEBUG_MODE === "true"
     ),
   },
+  };
 });

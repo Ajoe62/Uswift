@@ -2159,8 +2159,7 @@ Please provide:
   }
 }
 const getMistralConfig = () => {
-  const globalConfig = globalThis.EXTENSION_CONFIG;
-  const apiKey = globalConfig?.mistral?.apiKey || "";
+  const apiKey = "7VOMtyR1Gv69ohW3czVXVAV3QtxzILkY"  ;
   const baseUrl = "https://api.mistral.ai"  ;
   return {
     apiKey,

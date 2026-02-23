@@ -5,7 +5,7 @@ import { asyncHandler } from '../middleware/errorHandler';
 import { entitlementService } from '../services/EntitlementService';
 import { logger } from '../utils/logger';
 
-const router = Router();
+const router: Router = Router();
 
 /**
  * GET /api/entitlements
