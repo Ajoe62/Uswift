@@ -1,1 +1,10 @@
-.vercel
+# Local envs
+.env.local
+.env*.local
+
+# Build / dependencies
+.next/
+node_modules/
+
+# Vercel local project link/config
+.vercel/
