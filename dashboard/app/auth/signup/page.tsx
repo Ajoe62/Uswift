@@ -20,10 +20,18 @@ export default function SignUpPage() {
   const router = useRouter();
   const supabase = createClientComponentClient();
 
+  function getRedirectTarget(): string {
+    if (typeof window === 'undefined') return '/dashboard';
+    const params = new URLSearchParams(window.location.search);
+    const redirectTo = params.get('redirectTo');
+    if (!redirectTo || !redirectTo.startsWith('/')) return '/dashboard';
+    return redirectTo;
+  }
+
   // Redirect if already authenticated
   useEffect(() => {
     if (!isLoading && session) {
-      router.replace('/dashboard');
+      router.replace(getRedirectTarget());
     }
   }, [session, isLoading, router]);
 
@@ -69,11 +77,17 @@ export default function SignUpPage() {
   async function handleGoogleSignUp() {
     setLoading(true);
     setMessage('');
+
+    const redirectTarget = getRedirectTarget();
+    const callbackUrl = new URL('/auth/callback', window.location.origin);
+    if (redirectTarget !== '/dashboard') {
+      callbackUrl.searchParams.set('redirectTo', redirectTarget);
+    }
     
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: { 
-        redirectTo: `${window.location.origin}/auth/callback`,
+        redirectTo: callbackUrl.toString(),
         queryParams: {
           access_type: 'offline',
           prompt: 'consent',
