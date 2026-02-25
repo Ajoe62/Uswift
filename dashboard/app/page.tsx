@@ -2,7 +2,7 @@
 
 import { useAuthStore } from '@/stores/authStore';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect } from 'react';
 
 const LoadingSpinner = () => (
@@ -100,14 +100,22 @@ const SignInComponent = () => {
 export default function HomePage() {
   const { session, isLoading } = useAuthStore();
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   useEffect(() => {
+    const code = searchParams.get('code');
+    if (code) {
+      const next = `/auth/callback?${searchParams.toString()}`;
+      router.replace(next);
+      return;
+    }
+
     // Redirect authenticated users to dashboard
     if (!isLoading && session) {
       console.log('User authenticated, redirecting to dashboard...');
       router.push('/dashboard');
     }
-  }, [session, isLoading, router]);
+  }, [session, isLoading, router, searchParams]);
 
   // Show loading while checking auth state
   if (isLoading) {
