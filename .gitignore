@@ -18,3 +18,5 @@ node_modules/
 
 # Local tooling binaries (keep local, do not commit)
 payment-backend/cloudflared.exe
+
+.vercel
