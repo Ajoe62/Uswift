@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/stores/authStore';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { buildOAuthCallbackUrl, sanitizeRedirectPath } from '@/lib/auth/oauth';
 
 export default function SignInPage() {
   const [email, setEmail] = useState('');
@@ -21,9 +22,7 @@ export default function SignInPage() {
   function getRedirectTarget(): string {
     if (typeof window === 'undefined') return '/dashboard';
     const params = new URLSearchParams(window.location.search);
-    const redirectTo = params.get('redirectTo');
-    if (!redirectTo || !redirectTo.startsWith('/')) return '/dashboard';
-    return redirectTo;
+    return sanitizeRedirectPath(params.get('redirectTo'));
   }
 
   // Redirect if already authenticated
@@ -73,15 +72,10 @@ export default function SignInPage() {
     setMessage('');
     
     const redirectTarget = getRedirectTarget();
-    const callbackUrl = new URL('/auth/callback', window.location.origin);
-    if (redirectTarget !== '/dashboard') {
-      callbackUrl.searchParams.set('redirectTo', redirectTarget);
-    }
-
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: { 
-        redirectTo: callbackUrl.toString(),
+        redirectTo: buildOAuthCallbackUrl(window.location.origin, redirectTarget),
         queryParams: {
           access_type: 'offline',
           prompt: 'consent',

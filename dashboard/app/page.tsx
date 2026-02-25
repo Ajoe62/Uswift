@@ -4,6 +4,7 @@ import { useAuthStore } from '@/stores/authStore';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
+import { buildOAuthCallbackUrl } from '@/lib/auth/oauth';
 
 const LoadingSpinner = () => (
   <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', background: '#f9fafb' }}>
@@ -28,7 +29,7 @@ const SignInComponent = () => {
     await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: { 
-        redirectTo: `${window.location.origin}/auth/callback`,
+        redirectTo: buildOAuthCallbackUrl(window.location.origin),
         queryParams: {
           access_type: 'offline',
           prompt: 'consent',
@@ -104,7 +105,8 @@ export default function HomePage() {
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const code = params.get('code');
-    if (code) {
+    const error = params.get('error');
+    if (code || error) {
       const next = `/auth/callback?${params.toString()}`;
       router.replace(next);
       return;

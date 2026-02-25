@@ -25,6 +25,7 @@
     "start:dev": "npm run dev",
     "lint": "eslint . --ext .ts,.tsx",
     "type-check": "tsc --noEmit",
+    "verify:oauth": "node scripts/verify-oauth-config.js",
     "clean": "rimraf .next",
     "clean:install": "rimraf node_modules package-lock.json && npm install",
     "fix:lock": "rimraf package-lock.json node_modules && npm install"
