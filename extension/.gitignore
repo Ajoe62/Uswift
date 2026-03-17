@@ -35,6 +35,8 @@ releases/build-info.json
 # Build artifacts
 *.tsbuildinfo
 .cache/
+coverage/
+.vitest/
 
 # Temporary files
 *.tmp

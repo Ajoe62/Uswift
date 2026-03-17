@@ -7,6 +7,7 @@ window.EXTENSION_CONFIG = {
   supabase: {
     url: "",
     anonKey: "",
+    passwordResetRedirectUrl: "",
   },
 
   mistral: {

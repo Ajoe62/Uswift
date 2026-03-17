@@ -335,56 +335,65 @@ const DEFAULT_CONFIG: MistralConfig = getMistralConfig();
 
 // Create and export singleton instance
 let mistralClient: MistralClient | null = null;
+let mistralConfigError: string | null = null;
+let hasLoggedConfigError = false;
+
+export const MISTRAL_SETUP_HINT =
+  "AI features are disabled. Set VITE_MISTRAL_API_KEY in extension/.env or set mistral.apiKey in extension/public/config.js, then rebuild and reload the extension.";
+
+const getMistralConfigError = (config: MistralConfig): string | null => {
+  if (
+    !config.apiKey ||
+    config.apiKey === "your-mistral-api-key-here" ||
+    config.apiKey.trim() === ""
+  ) {
+    return (
+      "Mistral API key not configured.\n\n" +
+      "To enable AI features:\n" +
+      "1. Get your API key from https://console.mistral.ai/\n" +
+      "2. Set VITE_MISTRAL_API_KEY in extension/.env or set mistral.apiKey in extension/public/config.js\n" +
+      "3. Rebuild the extension: npm run build\n" +
+      "4. Reload the extension in chrome://extensions/"
+    );
+  }
+
+  return null;
+};
+
+export function getMistralClientOrNull(): MistralClient | null {
+  if (mistralClient) {
+    return mistralClient;
+  }
+
+  mistralConfigError = getMistralConfigError(DEFAULT_CONFIG);
+  if (mistralConfigError) {
+    if (!hasLoggedConfigError) {
+      console.error(mistralConfigError);
+      hasLoggedConfigError = true;
+    }
+    return null;
+  }
+
+  console.log("Initializing Mistral client with config:", {
+    baseUrl: DEFAULT_CONFIG.baseUrl,
+    hasApiKey: !!DEFAULT_CONFIG.apiKey,
+    apiKeyLength: DEFAULT_CONFIG.apiKey.length,
+  });
+
+  mistralClient = new MistralClient(DEFAULT_CONFIG);
+  return mistralClient;
+}
+
+export function getMistralConfigStatus(): string | null {
+  return mistralConfigError || getMistralConfigError(DEFAULT_CONFIG);
+}
 
 export function getMistralClient(): MistralClient {
-  if (!mistralClient) {
-    // Validate configuration before creating client
-    if (
-      !DEFAULT_CONFIG.apiKey ||
-      DEFAULT_CONFIG.apiKey === "your-mistral-api-key-here" ||
-      DEFAULT_CONFIG.apiKey === ""
-    ) {
-      console.error(
-        "🚨 Mistral API Key not configured!"
-      );
-      console.error(
-        "📝 To fix this:"
-      );
-      console.error(
-        "   1. Get your API key from: https://console.mistral.ai/"
-      );
-      console.error(
-        "   2. Option A: Set it in extension/src/config.js (line 14)"
-      );
-      console.error(
-        "   3. Option B: Set VITE_MISTRAL_API_KEY in extension/.env"
-      );
-      console.error(
-        "   4. Rebuild the extension: cd extension && npm run build"
-      );
-      console.error(
-        "   5. Reload the extension in chrome://extensions/"
-      );
-
-      throw new Error(
-        "❌ Mistral API key not configured. AI features disabled.\n\n" +
-        "To enable AI features:\n" +
-        "1. Get your API key from https://console.mistral.ai/\n" +
-        "2. Set it in extension/src/config.js or extension/.env\n" +
-        "3. Rebuild the extension: npm run build\n" +
-        "4. Reload the extension in Chrome"
-      );
-    }
-
-    console.log("✅ Initializing Mistral client with config:", {
-      baseUrl: DEFAULT_CONFIG.baseUrl,
-      hasApiKey: !!DEFAULT_CONFIG.apiKey,
-      apiKeyLength: DEFAULT_CONFIG.apiKey.length,
-    });
-
-    mistralClient = new MistralClient(DEFAULT_CONFIG);
+  const client = getMistralClientOrNull();
+  if (!client) {
+    throw new Error(getMistralConfigStatus() || MISTRAL_SETUP_HINT);
   }
-  return mistralClient;
+  return client;
 }
 
 export { MistralClient };

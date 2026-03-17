@@ -224,15 +224,38 @@ class SupabaseClient {
     this.authToken = null;
     await this.clearSession();
   }
-  async resetPassword(email) {
+  async updatePassword(newPassword, options = {}) {
+    const accessToken = options.accessToken || this.authToken;
+    if (!accessToken) {
+      return {
+        ok: false,
+        error: { message: "Missing recovery session. Open the reset email link again." }
+      };
+    }
+    this.authToken = accessToken;
     try {
-      const res = await fetch(`${this.config.url}/auth/v1/recover`, {
-        method: "POST",
+      if (options.accessToken) {
+        const session = {
+          access_token: options.accessToken,
+          refresh_token: options.refreshToken,
+          token_type: options.tokenType || "bearer"
+        };
+        if (typeof options.expiresAt === "number") {
+          session.expires_at = options.expiresAt * 1e3;
+        } else if (typeof options.expiresIn === "number") {
+          session.expires_in = options.expiresIn;
+          session.expires_at = Date.now() + options.expiresIn * 1e3;
+        }
+        await this.saveSession(session);
+      }
+      const res = await fetch(`${this.config.url}/auth/v1/user`, {
+        method: "PUT",
         headers: {
           apikey: this.config.anonKey,
+          Authorization: `Bearer ${accessToken}`,
           "Content-Type": "application/json"
         },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({ password: newPassword }),
         mode: "cors"
       });
       const data = await res.json().catch(async () => {
@@ -242,7 +265,46 @@ class SupabaseClient {
       if (res.ok) {
         return {
           ok: true,
-          message: data?.message || "If an account exists, a password reset email has been sent."
+          user: data || null,
+          message: "Password updated successfully."
+        };
+      }
+      return {
+        ok: false,
+        error: {
+          status: res.status,
+          message: data?.error || data?.message || `HTTP ${res.status}`,
+          payload: data
+        }
+      };
+    } catch (err) {
+      return { ok: false, error: { message: err?.message || String(err) } };
+    }
+  }
+  async resetPassword(email) {
+    try {
+      const redirectTo = resolvePasswordResetRedirectUrl();
+      const payload = { email };
+      if (redirectTo)
+        payload.redirect_to = redirectTo;
+      const res = await fetch(`${this.config.url}/auth/v1/recover`, {
+        method: "POST",
+        headers: {
+          apikey: this.config.anonKey,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(payload),
+        mode: "cors"
+      });
+      const data = await res.json().catch(async () => {
+        const txt = await res.text().catch(() => "");
+        return { error: `HTTP ${res.status} - ${txt}` };
+      });
+      if (res.ok) {
+        return {
+          ok: true,
+          message: data?.message || "If an account exists, a password reset email has been sent.",
+          redirectTo
         };
       }
       return {
@@ -460,10 +522,28 @@ class QueryBuilder {
 let singleton = null;
 function resolveConfig() {
   try {
-    const url = typeof import.meta !== "undefined" && {"VITE_MISTRAL_API_KEY":"7VOMtyR1Gv69ohW3czVXVAV3QtxzILkY","VITE_MISTRAL_BASE_URL":"https://api.mistral.ai","VITE_MISTRAL_CHAT_API_URL":"https://api.mistral.ai/v1/chat/completions","VITE_MISTRAL_FILES_API_URL":"https://api.mistral.ai/v1/files","VITE_MISTRAL_EMBEDDINGS_API_URL":"https://api.mistral.ai/v1/embeddings","VITE_MISTRAL_PROXY_URL":"http://localhost:3000/api/mistral","VITE_SUPABASE_URL":"https://sigoorxtktxtbcneodux.supabase.co","VITE_SUPABASE_ANON_KEY":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNpZ29vcnh0a3R4dGJjbmVvZHV4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU0NzMwOTMsImV4cCI6MjA3MTA0OTA5M30.x1e1_9GNoNtQUF4EPYlSAf0HWfrwUzQAuwiWTnMhbN8","VITE_BACKEND_API_URL":"http://localhost:3000","VITE_GOOGLE_CLIENT_ID":"987654321-hijklmn.apps.googleusercontent.com","VITE_DEBUG_MODE":false,"BASE_URL":"/","MODE":"production","DEV":false,"PROD":true,"SSR":false} && "https://sigoorxtktxtbcneodux.supabase.co" || window.SUPABASE_CONFIG?.url;
-    const anonKey = typeof import.meta !== "undefined" && {"VITE_MISTRAL_API_KEY":"7VOMtyR1Gv69ohW3czVXVAV3QtxzILkY","VITE_MISTRAL_BASE_URL":"https://api.mistral.ai","VITE_MISTRAL_CHAT_API_URL":"https://api.mistral.ai/v1/chat/completions","VITE_MISTRAL_FILES_API_URL":"https://api.mistral.ai/v1/files","VITE_MISTRAL_EMBEDDINGS_API_URL":"https://api.mistral.ai/v1/embeddings","VITE_MISTRAL_PROXY_URL":"http://localhost:3000/api/mistral","VITE_SUPABASE_URL":"https://sigoorxtktxtbcneodux.supabase.co","VITE_SUPABASE_ANON_KEY":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNpZ29vcnh0a3R4dGJjbmVvZHV4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU0NzMwOTMsImV4cCI6MjA3MTA0OTA5M30.x1e1_9GNoNtQUF4EPYlSAf0HWfrwUzQAuwiWTnMhbN8","VITE_BACKEND_API_URL":"http://localhost:3000","VITE_GOOGLE_CLIENT_ID":"987654321-hijklmn.apps.googleusercontent.com","VITE_DEBUG_MODE":false,"BASE_URL":"/","MODE":"production","DEV":false,"PROD":true,"SSR":false} && "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNpZ29vcnh0a3R4dGJjbmVvZHV4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU0NzMwOTMsImV4cCI6MjA3MTA0OTA5M30.x1e1_9GNoNtQUF4EPYlSAf0HWfrwUzQAuwiWTnMhbN8" || window.SUPABASE_CONFIG?.anonKey || window.SUPABASE_CONFIG?.ANON_KEY;
+    const url = typeof import.meta !== "undefined" && {"VITE_MISTRAL_API_KEY":"7VOMtyR1Gv69ohW3czVXVAV3QtxzILkY","VITE_MISTRAL_BASE_URL":"https://api.mistral.ai","VITE_MISTRAL_CHAT_API_URL":"https://api.mistral.ai/v1/chat/completions","VITE_MISTRAL_FILES_API_URL":"https://api.mistral.ai/v1/files","VITE_MISTRAL_EMBEDDINGS_API_URL":"https://api.mistral.ai/v1/embeddings","VITE_MISTRAL_PROXY_URL":"http://localhost:3000/api/mistral","VITE_SUPABASE_URL":"https://sigoorxtktxtbcneodux.supabase.co","VITE_SUPABASE_ANON_KEY":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNpZ29vcnh0a3R4dGJjbmVvZHV4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU0NzMwOTMsImV4cCI6MjA3MTA0OTA5M30.x1e1_9GNoNtQUF4EPYlSAf0HWfrwUzQAuwiWTnMhbN8","VITE_PASSWORD_RESET_REDIRECT_URL":"https://uswift-ai.vercel.app/auth/reset-password","VITE_DEBUG_MODE":false,"BASE_URL":"/","MODE":"production","DEV":false,"PROD":true,"SSR":false,"VITE_BACKEND_API_URL":""} && "https://sigoorxtktxtbcneodux.supabase.co" || window.SUPABASE_CONFIG?.url;
+    const anonKey = typeof import.meta !== "undefined" && {"VITE_MISTRAL_API_KEY":"7VOMtyR1Gv69ohW3czVXVAV3QtxzILkY","VITE_MISTRAL_BASE_URL":"https://api.mistral.ai","VITE_MISTRAL_CHAT_API_URL":"https://api.mistral.ai/v1/chat/completions","VITE_MISTRAL_FILES_API_URL":"https://api.mistral.ai/v1/files","VITE_MISTRAL_EMBEDDINGS_API_URL":"https://api.mistral.ai/v1/embeddings","VITE_MISTRAL_PROXY_URL":"http://localhost:3000/api/mistral","VITE_SUPABASE_URL":"https://sigoorxtktxtbcneodux.supabase.co","VITE_SUPABASE_ANON_KEY":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNpZ29vcnh0a3R4dGJjbmVvZHV4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU0NzMwOTMsImV4cCI6MjA3MTA0OTA5M30.x1e1_9GNoNtQUF4EPYlSAf0HWfrwUzQAuwiWTnMhbN8","VITE_PASSWORD_RESET_REDIRECT_URL":"https://uswift-ai.vercel.app/auth/reset-password","VITE_DEBUG_MODE":false,"BASE_URL":"/","MODE":"production","DEV":false,"PROD":true,"SSR":false,"VITE_BACKEND_API_URL":""} && "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNpZ29vcnh0a3R4dGJjbmVvZHV4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU0NzMwOTMsImV4cCI6MjA3MTA0OTA5M30.x1e1_9GNoNtQUF4EPYlSAf0HWfrwUzQAuwiWTnMhbN8" || window.SUPABASE_CONFIG?.anonKey || window.SUPABASE_CONFIG?.ANON_KEY;
     if (url && anonKey)
       return { url, anonKey };
+  } catch (e) {
+  }
+  return null;
+}
+function resolvePasswordResetRedirectUrl() {
+  try {
+    const envRedirect = typeof import.meta !== "undefined" && {"VITE_MISTRAL_API_KEY":"7VOMtyR1Gv69ohW3czVXVAV3QtxzILkY","VITE_MISTRAL_BASE_URL":"https://api.mistral.ai","VITE_MISTRAL_CHAT_API_URL":"https://api.mistral.ai/v1/chat/completions","VITE_MISTRAL_FILES_API_URL":"https://api.mistral.ai/v1/files","VITE_MISTRAL_EMBEDDINGS_API_URL":"https://api.mistral.ai/v1/embeddings","VITE_MISTRAL_PROXY_URL":"http://localhost:3000/api/mistral","VITE_SUPABASE_URL":"https://sigoorxtktxtbcneodux.supabase.co","VITE_SUPABASE_ANON_KEY":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNpZ29vcnh0a3R4dGJjbmVvZHV4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU0NzMwOTMsImV4cCI6MjA3MTA0OTA5M30.x1e1_9GNoNtQUF4EPYlSAf0HWfrwUzQAuwiWTnMhbN8","VITE_PASSWORD_RESET_REDIRECT_URL":"https://uswift-ai.vercel.app/auth/reset-password","VITE_DEBUG_MODE":false,"BASE_URL":"/","MODE":"production","DEV":false,"PROD":true,"SSR":false,"VITE_BACKEND_API_URL":""} && "https://uswift-ai.vercel.app/auth/reset-password";
+    if (envRedirect)
+      return envRedirect;
+    const runtimeRedirect = window.SUPABASE_CONFIG?.passwordResetRedirectUrl || window.EXTENSION_CONFIG?.supabase?.passwordResetRedirectUrl;
+    if (runtimeRedirect)
+      return runtimeRedirect;
+    if (typeof window !== "undefined") {
+      if (window.location.protocol === "chrome-extension:") {
+        return "https://uswift-ai.vercel.app/auth/reset-password";
+      }
+      return `${window.location.origin}/auth/reset-password`;
+    }
   } catch (e) {
   }
   return null;
@@ -494,4 +574,4 @@ try {
   console.error(e);
 }
 
-export { getSupabaseClient };
+export { getSupabaseClient as g };

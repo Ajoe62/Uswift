@@ -29,7 +29,9 @@
 
     if (config.mistral?.apiKey === "your-mistral-api-key-here") {
       console.error("🚨 CRITICAL: Mistral API key not configured!");
-      console.log("   📝 Fix: Update src/config.js with your actual API key");
+      console.log(
+        "   📝 Fix: Set VITE_MISTRAL_API_KEY in extension/.env or set mistral.apiKey in extension/public/config.js"
+      );
       console.log("   🔗 Get key from: https://mistral.ai/");
     }
   } else {

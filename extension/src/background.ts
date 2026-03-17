@@ -1,5 +1,7 @@
 // Entry point for Chrome extension background tasks
 import { jobQueueService, JobApplication } from "./services/JobQueueService";
+import { getSupabaseClient } from "./supabaseClient";
+import { exposeConfigToGlobal } from "./config/validateEnv";
 
 console.log("🚀 Uswift Background Worker initialized");
 
@@ -262,44 +264,24 @@ chrome.alarms.create("processQueue", {
  * Initialize Supabase client in background (if configured)
  */
 try {
-  import("./supabaseClient")
-    .then(({ getSupabaseClient }) => {
-      try {
-        const client = getSupabaseClient();
-        if (client) {
-          console.log("✅ Supabase client initialized in background");
-        } else {
-          console.warn("⚠️ Supabase client not configured");
-        }
-      } catch (e) {
-        console.warn("⚠️ Supabase background init skipped:", e);
-      }
-    })
-    .catch(() => {
-      console.warn("⚠️ Failed to load Supabase module");
-    });
+  const client = getSupabaseClient();
+  if (client) {
+    console.log("✅ Supabase client initialized in background");
+  } else {
+    console.warn("⚠️ Supabase client not configured");
+  }
 } catch (e) {
-  console.warn("⚠️ Supabase initialization error:", e);
+  console.warn("⚠️ Supabase background init skipped:", e);
 }
 
 /**
  * Initialize environment configuration
  */
 try {
-  import("./config/validateEnv")
-    .then(({ exposeConfigToGlobal }) => {
-      try {
-        exposeConfigToGlobal();
-        console.log("✅ Environment configuration loaded");
-      } catch (e) {
-        console.error("❌ Failed to validate environment:", e);
-      }
-    })
-    .catch(() => {
-      console.warn("⚠️ Failed to load environment configuration");
-    });
+  exposeConfigToGlobal();
+  console.log("✅ Environment configuration loaded");
 } catch (e) {
-  console.warn("⚠️ Environment configuration error:", e);
+  console.error("❌ Failed to validate environment:", e);
 }
 
 console.log("✅ Uswift Background Worker ready");

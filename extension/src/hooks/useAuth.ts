@@ -62,8 +62,10 @@ export function useAuth() {
           if (userProfile) {
             setUser(userProfile);
             setPending(false);
-            // Force a session save to ensure persistence
-            (await supabase.saveSession) && supabase.saveSession(result);
+            // Force a session save to ensure persistence.
+            if (typeof supabase.saveSession === "function") {
+              await supabase.saveSession(result);
+            }
             return { user: userProfile, error: null };
           }
           await new Promise((r) => setTimeout(r, 500));
@@ -102,10 +104,40 @@ export function useAuth() {
         return { user: null, error: "Signed up but verification timed out" };
       } else if (result.error) {
         return { user: null, error: result.error };
+      } else if (result.message) {
+        // Typical flow when email confirmation is enabled.
+        return { user: null, error: null, message: result.message };
       }
       return { user: null, error: "Sign up failed" };
     } catch (error) {
       return { user: null, error };
+    }
+  };
+
+  const resetPassword = async (email: string) => {
+    try {
+      const supabase = getSupabaseClient();
+      if (!supabase) {
+        throw new Error("Supabase not initialized");
+      }
+
+      const result = await supabase.resetPassword(email);
+      if (result?.ok) {
+        return {
+          error: null,
+          message:
+            result.message ||
+            "If an account exists, password reset instructions have been sent.",
+        };
+      }
+
+      return {
+        error:
+          result?.error?.message ||
+          "Failed to send password reset email. Please try again.",
+      };
+    } catch (error: any) {
+      return { error: error?.message || String(error) };
     }
   };
 
@@ -149,6 +181,7 @@ export function useAuth() {
     signIn,
     signUp,
     signOut,
+    resetPassword,
     refreshAuth,
     isAuthenticated: !!user,
   };

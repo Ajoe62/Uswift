@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { getMistralClient } from "./api/mistral";
+import React, { useState, useMemo } from "react";
+import { getMistralClientOrNull, MISTRAL_SETUP_HINT } from "./api/mistral";
 import "./index.css";
 
 interface InterviewQuestion {
@@ -29,7 +29,7 @@ export default function InterviewPrep() {
   const [activeTab, setActiveTab] = useState<"input" | "questions" | "tips">(
     "input"
   );
-  const mistralClient = getMistralClient();
+  const mistralClient = useMemo(() => getMistralClientOrNull(), []);
 
   const experienceLevels = [
     {
@@ -66,6 +66,10 @@ export default function InterviewPrep() {
   ];
 
   const handleGenerate = async () => {
+    if (!mistralClient) {
+      alert(MISTRAL_SETUP_HINT);
+      return;
+    }
     if (!jobDescription.trim()) {
       alert("Please enter a job description");
       return;
@@ -368,6 +372,22 @@ Format the response clearly with proper sections and structure.`;
         )}
       </div>
 
+      {!mistralClient && (
+        <div
+          style={{
+            marginBottom: 16,
+            padding: 12,
+            borderRadius: 8,
+            background: "#FEF2F2",
+            border: "1px solid #FCA5A5",
+            color: "#991B1B",
+            fontSize: "0.8rem",
+          }}
+        >
+          {MISTRAL_SETUP_HINT}
+        </div>
+      )}
+
       {/* Tab Navigation */}
       <div
         style={{
@@ -539,13 +559,16 @@ Format the response clearly with proper sections and structure.`;
           {/* Generate Button */}
           <button
             onClick={handleGenerate}
-            disabled={isLoading || !jobDescription.trim()}
+            disabled={isLoading || !jobDescription.trim() || !mistralClient}
             className="uswift-btn"
             style={{
               width: "100%",
-              opacity: isLoading || !jobDescription.trim() ? 0.6 : 1,
+              opacity:
+                isLoading || !jobDescription.trim() || !mistralClient ? 0.6 : 1,
               cursor:
-                isLoading || !jobDescription.trim() ? "not-allowed" : "pointer",
+                isLoading || !jobDescription.trim() || !mistralClient
+                  ? "not-allowed"
+                  : "pointer",
             }}
           >
             {isLoading ? (

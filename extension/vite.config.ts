@@ -65,6 +65,9 @@ export default defineConfig(({ mode }) => {
     "import.meta.env.VITE_SUPABASE_ANON_KEY": JSON.stringify(
       env.VITE_SUPABASE_ANON_KEY || ""
     ),
+    "import.meta.env.VITE_PASSWORD_RESET_REDIRECT_URL": JSON.stringify(
+      env.VITE_PASSWORD_RESET_REDIRECT_URL || ""
+    ),
     "import.meta.env.VITE_BACKEND_API_URL": JSON.stringify(
       env.VITE_BACKEND_API_URL || ""
     ),

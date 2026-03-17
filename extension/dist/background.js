@@ -1,67 +1,4 @@
-import { getSupabaseClient } from './supabaseClient.js';
-
-const scriptRel = (function detectScriptRel() {
-    const relList = typeof document !== 'undefined' && document.createElement('link').relList;
-    return relList && relList.supports && relList.supports('modulepreload')
-        ? 'modulepreload'
-        : 'preload';
-})();const assetsURL = function(dep) { return "/"+dep };const seen = {};const __vitePreload = function preload(baseModule, deps, importerUrl) {
-    // @ts-expect-error true will be replaced with boolean later
-    if (!true || !deps || deps.length === 0) {
-        return baseModule();
-    }
-    const links = document.getElementsByTagName('link');
-    return Promise.all(deps.map((dep) => {
-        // @ts-expect-error assetsURL is declared before preload.toString()
-        dep = assetsURL(dep);
-        if (dep in seen)
-            return;
-        seen[dep] = true;
-        const isCss = dep.endsWith('.css');
-        const cssSelector = isCss ? '[rel="stylesheet"]' : '';
-        const isBaseRelative = !!importerUrl;
-        // check if the file is already preloaded by SSR markup
-        if (isBaseRelative) {
-            // When isBaseRelative is true then we have `importerUrl` and `dep` is
-            // already converted to an absolute URL by the `assetsURL` function
-            for (let i = links.length - 1; i >= 0; i--) {
-                const link = links[i];
-                // The `links[i].href` is an absolute URL thanks to browser doing the work
-                // for us. See https://html.spec.whatwg.org/multipage/common-dom-interfaces.html#reflecting-content-attributes-in-idl-attributes:idl-domstring-5
-                if (link.href === dep && (!isCss || link.rel === 'stylesheet')) {
-                    return;
-                }
-            }
-        }
-        else if (document.querySelector(`link[href="${dep}"]${cssSelector}`)) {
-            return;
-        }
-        const link = document.createElement('link');
-        link.rel = isCss ? 'stylesheet' : scriptRel;
-        if (!isCss) {
-            link.as = 'script';
-            link.crossOrigin = '';
-        }
-        link.href = dep;
-        document.head.appendChild(link);
-        if (isCss) {
-            return new Promise((res, rej) => {
-                link.addEventListener('load', res);
-                link.addEventListener('error', () => rej(new Error(`Unable to preload CSS for ${dep}`)));
-            });
-        }
-    }))
-        .then(() => baseModule())
-        .catch((err) => {
-        const e = new Event('vite:preloadError', { cancelable: true });
-        // @ts-expect-error custom payload
-        e.payload = err;
-        window.dispatchEvent(e);
-        if (!e.defaultPrevented) {
-            throw err;
-        }
-    });
-};
+import { g as getSupabaseClient } from './supabaseClient.js';
 
 class JobQueueService {
   static instance;
@@ -447,6 +384,176 @@ class JobQueueService {
 }
 const jobQueueService = JobQueueService.getInstance();
 
+function getEnvVar(key, defaultValue) {
+  if (typeof import.meta !== "undefined" && {"VITE_MISTRAL_API_KEY":"7VOMtyR1Gv69ohW3czVXVAV3QtxzILkY","VITE_MISTRAL_BASE_URL":"https://api.mistral.ai","VITE_MISTRAL_CHAT_API_URL":"https://api.mistral.ai/v1/chat/completions","VITE_MISTRAL_FILES_API_URL":"https://api.mistral.ai/v1/files","VITE_MISTRAL_EMBEDDINGS_API_URL":"https://api.mistral.ai/v1/embeddings","VITE_MISTRAL_PROXY_URL":"http://localhost:3000/api/mistral","VITE_SUPABASE_URL":"https://sigoorxtktxtbcneodux.supabase.co","VITE_SUPABASE_ANON_KEY":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNpZ29vcnh0a3R4dGJjbmVvZHV4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU0NzMwOTMsImV4cCI6MjA3MTA0OTA5M30.x1e1_9GNoNtQUF4EPYlSAf0HWfrwUzQAuwiWTnMhbN8","VITE_PASSWORD_RESET_REDIRECT_URL":"https://uswift-ai.vercel.app/auth/reset-password","VITE_DEBUG_MODE":false,"BASE_URL":"/","MODE":"production","DEV":false,"PROD":true,"SSR":false,"VITE_BACKEND_API_URL":""}) {
+    const value = {"VITE_MISTRAL_API_KEY":"7VOMtyR1Gv69ohW3czVXVAV3QtxzILkY","VITE_MISTRAL_BASE_URL":"https://api.mistral.ai","VITE_MISTRAL_CHAT_API_URL":"https://api.mistral.ai/v1/chat/completions","VITE_MISTRAL_FILES_API_URL":"https://api.mistral.ai/v1/files","VITE_MISTRAL_EMBEDDINGS_API_URL":"https://api.mistral.ai/v1/embeddings","VITE_MISTRAL_PROXY_URL":"http://localhost:3000/api/mistral","VITE_SUPABASE_URL":"https://sigoorxtktxtbcneodux.supabase.co","VITE_SUPABASE_ANON_KEY":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNpZ29vcnh0a3R4dGJjbmVvZHV4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU0NzMwOTMsImV4cCI6MjA3MTA0OTA5M30.x1e1_9GNoNtQUF4EPYlSAf0HWfrwUzQAuwiWTnMhbN8","VITE_PASSWORD_RESET_REDIRECT_URL":"https://uswift-ai.vercel.app/auth/reset-password","VITE_DEBUG_MODE":false,"BASE_URL":"/","MODE":"production","DEV":false,"PROD":true,"SSR":false,"VITE_BACKEND_API_URL":""}[key];
+    if (value !== void 0)
+      return value;
+  }
+  if (typeof process !== "undefined" && process.env && process.env[key]) {
+    return process.env[key] || "";
+  }
+  return defaultValue || "";
+}
+function isValidApiKey(key) {
+  if (!key || key.trim() === "")
+    return false;
+  if (key.includes("your-") || key.includes("here"))
+    return false;
+  if (key.length < 10)
+    return false;
+  return true;
+}
+function isValidUrl(url) {
+  if (!url || url.trim() === "")
+    return false;
+  try {
+    new URL(url);
+    return true;
+  } catch {
+    return false;
+  }
+}
+function validateEnv() {
+  const errors = [];
+  const warnings = [];
+  const mistralApiKey = getEnvVar("VITE_MISTRAL_API_KEY");
+  const mistralBaseUrl = getEnvVar(
+    "VITE_MISTRAL_BASE_URL",
+    "https://api.mistral.ai"
+  );
+  const supabaseUrl = getEnvVar("VITE_SUPABASE_URL");
+  const supabaseAnonKey = getEnvVar("VITE_SUPABASE_ANON_KEY");
+  const backendApiUrl = getEnvVar("VITE_BACKEND_API_URL");
+  const debugMode = getEnvVar("VITE_DEBUG_MODE", "false") === "true";
+  const enableAutoApply = getEnvVar("VITE_ENABLE_AUTO_APPLY", "true") === "true";
+  const enableAiFeatures = getEnvVar("VITE_ENABLE_AI_FEATURES", "true") === "true";
+  const enableFileUploads = getEnvVar("VITE_ENABLE_FILE_UPLOADS", "true") === "true";
+  const enableCloudSync = getEnvVar("VITE_ENABLE_CLOUD_SYNC", "true") === "true";
+  const aiRateLimit = parseInt(getEnvVar("VITE_AI_RATE_LIMIT", "10"), 10);
+  const autoApplyRateLimit = parseInt(
+    getEnvVar("VITE_AUTO_APPLY_RATE_LIMIT", "20"),
+    10
+  );
+  if (!isValidApiKey(mistralApiKey)) {
+    errors.push(
+      "❌ VITE_MISTRAL_API_KEY is missing or invalid. Get your API key from https://console.mistral.ai/"
+    );
+  }
+  if (!isValidUrl(mistralBaseUrl)) {
+    errors.push(
+      "❌ VITE_MISTRAL_BASE_URL is invalid. Should be https://api.mistral.ai"
+    );
+  }
+  if (!isValidUrl(supabaseUrl)) {
+    errors.push(
+      "❌ VITE_SUPABASE_URL is missing or invalid. Get it from https://app.supabase.com/"
+    );
+  }
+  if (!isValidApiKey(supabaseAnonKey)) {
+    errors.push(
+      "❌ VITE_SUPABASE_ANON_KEY is missing or invalid. Get it from your Supabase project settings."
+    );
+  }
+  if (backendApiUrl && !isValidUrl(backendApiUrl)) {
+    warnings.push("⚠️ VITE_BACKEND_API_URL is set but appears invalid");
+  }
+  if (enableAiFeatures && !isValidApiKey(mistralApiKey)) {
+    warnings.push(
+      "⚠️ AI features are enabled but Mistral API key is not configured"
+    );
+  }
+  if (enableCloudSync && (!isValidUrl(supabaseUrl) || !isValidApiKey(supabaseAnonKey))) {
+    warnings.push(
+      "⚠️ Cloud sync is enabled but Supabase configuration is incomplete"
+    );
+  }
+  if (isNaN(aiRateLimit) || aiRateLimit <= 0) {
+    warnings.push("⚠️ VITE_AI_RATE_LIMIT is invalid, using default: 10");
+  }
+  if (isNaN(autoApplyRateLimit) || autoApplyRateLimit <= 0) {
+    warnings.push(
+      "⚠️ VITE_AUTO_APPLY_RATE_LIMIT is invalid, using default: 20"
+    );
+  }
+  const config = {
+    mistral: {
+      apiKey: mistralApiKey,
+      baseUrl: mistralBaseUrl
+    },
+    supabase: {
+      url: supabaseUrl,
+      anonKey: supabaseAnonKey
+    },
+    backend: backendApiUrl ? { apiUrl: backendApiUrl } : void 0,
+    debug: debugMode,
+    features: {
+      autoApply: enableAutoApply,
+      aiFeatures: enableAiFeatures,
+      fileUploads: enableFileUploads,
+      cloudSync: enableCloudSync
+    },
+    rateLimits: {
+      aiCallsPerMinute: aiRateLimit,
+      autoApplyPerHour: autoApplyRateLimit
+    }
+  };
+  if (debugMode) {
+    console.group("🔧 Environment Configuration");
+    console.log("Mistral API:", isValidApiKey(mistralApiKey) ? "✅" : "❌");
+    console.log("Supabase:", isValidUrl(supabaseUrl) ? "✅" : "❌");
+    console.log("Features:", config.features);
+    console.log("Rate Limits:", config.rateLimits);
+    if (errors.length > 0) {
+      console.error("Errors:", errors);
+    }
+    if (warnings.length > 0) {
+      console.warn("Warnings:", warnings);
+    }
+    console.groupEnd();
+  }
+  return {
+    valid: errors.length === 0,
+    errors,
+    warnings,
+    config: errors.length === 0 ? config : void 0
+  };
+}
+function getValidatedConfig() {
+  const result = validateEnv();
+  if (!result.valid) {
+    const errorMessage = [
+      "❌ Extension configuration is invalid:",
+      "",
+      ...result.errors,
+      "",
+      "Please update your .env file with valid credentials.",
+      "See .env.example for reference."
+    ].join("\n");
+    console.error(errorMessage);
+    throw new Error("Invalid extension configuration");
+  }
+  if (result.warnings.length > 0) {
+    console.warn("Extension configuration warnings:");
+    result.warnings.forEach((warning) => console.warn(warning));
+  }
+  return result.config;
+}
+function exposeConfigToGlobal() {
+  try {
+    const config = getValidatedConfig();
+    globalThis.EXTENSION_CONFIG = config;
+    if (typeof window !== "undefined") {
+      window.EXTENSION_CONFIG = config;
+    }
+  } catch (error) {
+    console.error("Failed to initialize extension configuration:", error);
+  }
+}
+if (typeof window !== "undefined") {
+  exposeConfigToGlobal();
+}
+
 console.log("🚀 Uswift Background Worker initialized");
 chrome.runtime.onInstalled.addListener(() => {
   console.log("✅ Uswift Job Board Auto-Apply extension installed.");
@@ -631,35 +738,19 @@ chrome.alarms.create("processQueue", {
   periodInMinutes: 5
 });
 try {
-  __vitePreload(() => import('./supabaseClient.js'),true?[]:void 0).then(({ getSupabaseClient }) => {
-    try {
-      const client = getSupabaseClient();
-      if (client) {
-        console.log("✅ Supabase client initialized in background");
-      } else {
-        console.warn("⚠️ Supabase client not configured");
-      }
-    } catch (e) {
-      console.warn("⚠️ Supabase background init skipped:", e);
-    }
-  }).catch(() => {
-    console.warn("⚠️ Failed to load Supabase module");
-  });
+  const client = getSupabaseClient();
+  if (client) {
+    console.log("✅ Supabase client initialized in background");
+  } else {
+    console.warn("⚠️ Supabase client not configured");
+  }
 } catch (e) {
-  console.warn("⚠️ Supabase initialization error:", e);
+  console.warn("⚠️ Supabase background init skipped:", e);
 }
 try {
-  __vitePreload(() => import('./validateEnv.js'),true?[]:void 0).then(({ exposeConfigToGlobal }) => {
-    try {
-      exposeConfigToGlobal();
-      console.log("✅ Environment configuration loaded");
-    } catch (e) {
-      console.error("❌ Failed to validate environment:", e);
-    }
-  }).catch(() => {
-    console.warn("⚠️ Failed to load environment configuration");
-  });
+  exposeConfigToGlobal();
+  console.log("✅ Environment configuration loaded");
 } catch (e) {
-  console.warn("⚠️ Environment configuration error:", e);
+  console.error("❌ Failed to validate environment:", e);
 }
 console.log("✅ Uswift Background Worker ready");

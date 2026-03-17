@@ -3,8 +3,6 @@ import "./index.css";
 import { useAuth } from "./hooks/useAuth";
 import { getSupabaseClient } from "./supabaseClient";
 
-declare const supabase: any;
-
 type JobStatus = "applied" | "interviewing" | "offer" | "rejected" | "archived";
 
 interface JobApplication {
@@ -24,9 +22,7 @@ const JobTracker: React.FC = () => {
     if (err instanceof Error) throw err;
     throw new Error(String(err));
   };
-  const { user, isAuthenticated } = useAuth
-    ? useAuth()
-    : { user: null, isAuthenticated: false };
+  const { user, isAuthenticated } = useAuth();
   const [applications, setApplications] = useState<JobApplication[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
@@ -205,6 +201,28 @@ const JobTracker: React.FC = () => {
     }
   };
 
+  const deleteFromSupabase = async (id: string) => {
+    const client = getSupabaseClient();
+    if (client) {
+      await client.makeRequest(`applications?id=eq.${id}`, {
+        method: "DELETE",
+      });
+      return true;
+    }
+
+    // Fallback to legacy global supabase instance, if present.
+    if (typeof (window as any).supabase !== "undefined") {
+      const { error } = await (window as any).supabase
+        .from("applications")
+        .delete()
+        .eq("id", id);
+      if (error) throwNormalized(error);
+      return true;
+    }
+
+    return false;
+  };
+
   const saveToChrome = (apps: JobApplication[]) => {
     if (
       typeof chrome !== "undefined" &&
@@ -291,13 +309,15 @@ const JobTracker: React.FC = () => {
     if (!confirm("Are you sure you want to delete this application?")) return;
     if (isAuthenticated && user) {
       try {
-        const { error } = await supabase
-          .from("applications")
-          .delete()
-          .eq("id", id);
-        if (error) throwNormalized(error);
+        const deleted = await deleteFromSupabase(id);
+        if (!deleted) {
+          alert("Cloud delete is not configured. Please check Supabase setup.");
+          return;
+        }
       } catch (error) {
         console.error("Error deleting from Supabase:", error);
+        alert("Failed to delete application from cloud. Please try again.");
+        return;
       }
     }
     const updatedApps = applications.filter((app) => app.id !== id);

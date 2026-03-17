@@ -1,5 +1,5 @@
-import React, { useState, useRef, useEffect } from "react";
-import { getMistralClient } from "./api/mistral";
+import React, { useState, useRef, useEffect, useMemo } from "react";
+import { getMistralClientOrNull, MISTRAL_SETUP_HINT } from "./api/mistral";
 import "./index.css";
 
 interface ChatMessage {
@@ -102,7 +102,8 @@ export default function ChatInterface() {
   const [isLoading, setIsLoading] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string>("All");
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const mistralClient = getMistralClient();
+  const mistralClient = useMemo(() => getMistralClientOrNull(), []);
+  const isAiReady = Boolean(mistralClient);
 
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
@@ -121,6 +122,19 @@ export default function ChatInterface() {
 
   const sendMessage = async (content: string) => {
     if (!content.trim() || isLoading) return;
+    if (!mistralClient) {
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: `assistant-config-${Date.now()}`,
+          role: "assistant",
+          content: MISTRAL_SETUP_HINT,
+          timestamp: new Date(),
+        },
+      ]);
+      return;
+    }
+    const client = mistralClient;
 
     // Add user message
     const userMessage: ChatMessage = {
@@ -145,7 +159,7 @@ export default function ChatInterface() {
 
     try {
       // Get AI response
-      const response = await mistralClient.chatWithPrompt(content, {
+      const response = await client.chatWithPrompt(content, {
         model: "mistral-small",
         max_tokens: 1024,
         temperature: 0.7,
@@ -265,6 +279,21 @@ export default function ChatInterface() {
 
       {/* Quick Prompts */}
       <div style={{ marginBottom: 16 }}>
+        {!isAiReady && (
+          <div
+            style={{
+              marginBottom: 12,
+              padding: 12,
+              borderRadius: 8,
+              background: "#FEF2F2",
+              border: "1px solid #FCA5A5",
+              color: "#991B1B",
+              fontSize: "0.8rem",
+            }}
+          >
+            {MISTRAL_SETUP_HINT}
+          </div>
+        )}
         <div
           style={{
             display: "flex",
@@ -307,16 +336,16 @@ export default function ChatInterface() {
             <button
               key={prompt.id}
               onClick={() => handleQuickPrompt(prompt)}
-              disabled={isLoading}
+              disabled={isLoading || !isAiReady}
               style={{
                 background: "#F8F9FA",
                 border: "1px solid #E5E7EB",
                 borderRadius: 8,
                 padding: "8px 12px",
-                cursor: isLoading ? "not-allowed" : "pointer",
+                cursor: isLoading || !isAiReady ? "not-allowed" : "pointer",
                 fontSize: "0.8rem",
                 color: "#4B5563",
-                opacity: isLoading ? 0.6 : 1,
+                opacity: isLoading || !isAiReady ? 0.6 : 1,
                 transition: "all 0.2s ease",
                 flex: "1 1 auto",
                 minWidth: 120,
@@ -326,13 +355,13 @@ export default function ChatInterface() {
                 textOverflow: "ellipsis",
               }}
               onMouseEnter={(e) => {
-                if (!isLoading) {
+                if (!isLoading && isAiReady) {
                   e.currentTarget.style.background = "#EDE9FE";
                   e.currentTarget.style.borderColor = "#6D28D9";
                 }
               }}
               onMouseLeave={(e) => {
-                if (!isLoading) {
+                if (!isLoading && isAiReady) {
                   e.currentTarget.style.background = "#F8F9FA";
                   e.currentTarget.style.borderColor = "#E5E7EB";
                 }
@@ -424,7 +453,7 @@ export default function ChatInterface() {
             }
           }}
           placeholder="Ask me anything about your career..."
-          disabled={isLoading}
+          disabled={isLoading || !isAiReady}
           style={{
             flex: 1,
             padding: "12px 16px",
@@ -432,18 +461,20 @@ export default function ChatInterface() {
             border: "1px solid #E5E7EB",
             fontSize: "0.9rem",
             outline: "none",
-            opacity: isLoading ? 0.6 : 1,
+            opacity: isLoading || !isAiReady ? 0.6 : 1,
           }}
         />
         <button
           onClick={() => sendMessage(inputMessage)}
-          disabled={isLoading || !inputMessage.trim()}
+          disabled={isLoading || !inputMessage.trim() || !isAiReady}
           className="uswift-btn"
           style={{
             padding: "12px 16px",
-            opacity: isLoading || !inputMessage.trim() ? 0.6 : 1,
+            opacity: isLoading || !inputMessage.trim() || !isAiReady ? 0.6 : 1,
             cursor:
-              isLoading || !inputMessage.trim() ? "not-allowed" : "pointer",
+              isLoading || !inputMessage.trim() || !isAiReady
+                ? "not-allowed"
+                : "pointer",
             minWidth: 60,
           }}
         >

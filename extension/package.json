@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "npm run clean && tsc && vite build",
-    "build:prod": "npm run clean && NODE_ENV=production tsc && vite build",
+    "build:prod": "npm run clean && tsc && vite build --mode production",
     "preview": "vite preview",
     "type-check": "tsc --noEmit",
     "clean": "node -e \"const fs = require('fs'); if (fs.existsSync('dist')) fs.rmSync('dist', { recursive: true, force: true }); console.log('✅ Cleaned dist directory');\"",
@@ -14,6 +14,9 @@
     "package:dev": "npm run build && node scripts/package.js",
     "validate": "node scripts/validate.js",
     "verify": "node scripts/verify-config.js",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
     "postbuild": "node scripts/postbuild.js",
     "watch": "vite build --watch",
     "lint": "tsc --noEmit && echo '✅ TypeScript check passed'",
@@ -24,12 +27,18 @@
     "react-dom": "^18.2.0"
   },
   "devDependencies": {
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^14.3.1",
+    "@testing-library/user-event": "^14.6.1",
     "@types/chrome": "^0.0.268",
     "@types/node": "^20.19.19",
     "@types/react": "^18.2.0",
     "@types/react-dom": "^18.2.0",
     "@vitejs/plugin-react": "^4.7.0",
+    "@vitest/coverage-v8": "^4.0.18",
+    "jsdom": "^28.1.0",
     "typescript": "^5.0.0",
-    "vite": "^4.4.0"
+    "vite": "^4.4.0",
+    "vitest": "^4.0.18"
   }
 }

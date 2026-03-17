@@ -37,7 +37,7 @@ The Uswift extension uses Mistral AI to power several intelligent features:
    ```
 3. Replace `"your-api-key-here"` with your actual API key:
    ```javascript
-   apiKey: "7VOMtyR1Gv69ohW3czVXVAV3QtxzILkY",
+   apiKey: "your-mistral-api-key-here",
    ```
 4. Save the file
 5. Rebuild the extension:

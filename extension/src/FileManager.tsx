@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import { getMistralClient } from "./api/mistral";
+import React, { useState, useEffect, useMemo } from "react";
+import { getMistralClientOrNull, MISTRAL_SETUP_HINT } from "./api/mistral";
 import "./index.css";
 
 interface FileItem {
@@ -29,7 +29,7 @@ export default function FileManager() {
   );
   const [fileType, setFileType] = useState<FileItem["type"]>("resume");
   const [dragActive, setDragActive] = useState(false);
-  const mistralClient = getMistralClient();
+  const mistralClient = useMemo(() => getMistralClientOrNull(), []);
 
   // Load files from Chrome storage on mount
   useEffect(() => {
@@ -140,6 +140,10 @@ export default function FileManager() {
   };
 
   const analyzeFile = async (file: FileItem) => {
+    if (!mistralClient) {
+      alert(MISTRAL_SETUP_HINT);
+      return;
+    }
     setIsLoading(true);
     try {
       let analysisPrompt = "";
@@ -356,6 +360,23 @@ ${file.content}`;
         </div>
       </div>
 
+      {!mistralClient && (
+        <div
+          style={{
+            marginBottom: 16,
+            padding: 12,
+            borderRadius: 8,
+            background: "#FEF2F2",
+            border: "1px solid #FCA5A5",
+            color: "#991B1B",
+            fontSize: "0.8rem",
+          }}
+        >
+          File upload and storage still work. AI analysis is disabled until
+          Mistral is configured. {MISTRAL_SETUP_HINT}
+        </div>
+      )}
+
       {/* Tab Navigation */}
       <div
         style={{
@@ -396,18 +417,18 @@ ${file.content}`;
         </button>
         <button
           onClick={() => setActiveTab("analyze")}
-          disabled={!selectedFile}
+          disabled={!selectedFile || !mistralClient}
           style={{
             background: "none",
             border: "none",
             padding: "12px 16px",
-            cursor: selectedFile ? "pointer" : "not-allowed",
+            cursor: selectedFile && mistralClient ? "pointer" : "not-allowed",
             fontSize: "0.9rem",
             fontWeight: activeTab === "analyze" ? 600 : 400,
             color: activeTab === "analyze" ? "#6D28D9" : "#6B7280",
             borderBottom:
               activeTab === "analyze" ? "2px solid #6D28D9" : "none",
-            opacity: selectedFile ? 1 : 0.5,
+            opacity: selectedFile && mistralClient ? 1 : 0.5,
           }}
         >
           Analyze
@@ -625,15 +646,16 @@ ${file.content}`;
                   <div style={{ display: "flex", gap: 4 }}>
                     <button
                       onClick={() => analyzeFile(file)}
-                      disabled={isLoading}
+                      disabled={isLoading || !mistralClient}
                       style={{
                         background: "#10B981",
                         color: "#FFFFFF",
                         border: "none",
                         borderRadius: 4,
                         padding: "4px 8px",
-                        cursor: "pointer",
+                        cursor: isLoading || !mistralClient ? "not-allowed" : "pointer",
                         fontSize: "0.7rem",
+                        opacity: isLoading || !mistralClient ? 0.6 : 1,
                       }}
                     >
                       Analyze

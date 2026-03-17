@@ -18,7 +18,7 @@ A comprehensive career management extension with AI-powered features.
 
 ```javascript
 mistral: {
-  apiKey: "7VOMtyR1Gv69ohW3czVXVAV3QtxzILkY", // ← Your actual API key here
+  apiKey: "your-mistral-api-key-here", // ← Your actual API key here
   baseUrl: "https://api.mistral.ai",
 }
 ```
@@ -59,7 +59,7 @@ npm run build
 
 If you're seeing "Sorry, I encountered an error while processing your request":
 
-1. **Check API Key**: Verify your Mistral API key is correctly set in `src/config.js`
+1. **Check API Key**: Verify your Mistral API key is correctly set in `public/config.js` or `.env`
 2. **Console Logs**: Open DevTools (F12) → Console tab to see detailed error messages
 3. **Network Tab**: Check if API requests are being made and their responses
 
@@ -166,7 +166,7 @@ Example output:
 
 ### Common Issues
 
-- **"Mistral API key not configured"**: Update `src/config.js` with your actual API key
+- **"Mistral API key not configured"**: Set `VITE_MISTRAL_API_KEY` in `.env` or set `mistral.apiKey` in `public/config.js`, then rebuild
 - **"Network error"**: Check your internet connection and Mistral API status
 - **"HTTP 401"**: Invalid API key - verify it's correct and active
 - **"HTTP 429"**: Rate limit exceeded - wait a few minutes before trying again
@@ -183,6 +183,7 @@ You can also use environment variables instead of hardcoding the API key:
 # Create .env file in extension root
 VITE_MISTRAL_API_KEY=your-actual-api-key-here
 VITE_MISTRAL_BASE_URL=https://api.mistral.ai
+VITE_PASSWORD_RESET_REDIRECT_URL=https://uswift-ai.vercel.app/auth/reset-password
 ```
 
 ### Building for Development

@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { getMistralClient } from "./api/mistral";
+import React, { useState, useMemo } from "react";
+import { getMistralClientOrNull, MISTRAL_SETUP_HINT } from "./api/mistral";
 import "./index.css";
 
 interface CoverLetterResult {
@@ -20,7 +20,7 @@ export default function CoverLetterGenerator() {
   const [isLoading, setIsLoading] = useState(false);
   const [result, setResult] = useState<CoverLetterResult | null>(null);
   const [activeTab, setActiveTab] = useState<"input" | "result">("input");
-  const mistralClient = getMistralClient();
+  const mistralClient = useMemo(() => getMistralClientOrNull(), []);
 
   const toneOptions = [
     {
@@ -41,6 +41,10 @@ export default function CoverLetterGenerator() {
   ];
 
   const handleGenerate = async () => {
+    if (!mistralClient) {
+      alert(MISTRAL_SETUP_HINT);
+      return;
+    }
     if (!resumeContent.trim() || !jobDescription.trim()) {
       alert("Please fill in both resume and job description");
       return;
@@ -197,6 +201,22 @@ export default function CoverLetterGenerator() {
           </button>
         )}
       </div>
+
+      {!mistralClient && (
+        <div
+          style={{
+            marginBottom: 16,
+            padding: 12,
+            borderRadius: 8,
+            background: "#FEF2F2",
+            border: "1px solid #FCA5A5",
+            color: "#991B1B",
+            fontSize: "0.8rem",
+          }}
+        >
+          {MISTRAL_SETUP_HINT}
+        </div>
+      )}
 
       {/* Tab Navigation */}
       <div
@@ -399,17 +419,26 @@ export default function CoverLetterGenerator() {
           <button
             onClick={handleGenerate}
             disabled={
-              isLoading || !resumeContent.trim() || !jobDescription.trim()
+              isLoading ||
+              !resumeContent.trim() ||
+              !jobDescription.trim() ||
+              !mistralClient
             }
             className="uswift-btn"
             style={{
               width: "100%",
               opacity:
-                isLoading || !resumeContent.trim() || !jobDescription.trim()
+                isLoading ||
+                !resumeContent.trim() ||
+                !jobDescription.trim() ||
+                !mistralClient
                   ? 0.6
                   : 1,
               cursor:
-                isLoading || !resumeContent.trim() || !jobDescription.trim()
+                isLoading ||
+                !resumeContent.trim() ||
+                !jobDescription.trim() ||
+                !mistralClient
                   ? "not-allowed"
                   : "pointer",
             }}

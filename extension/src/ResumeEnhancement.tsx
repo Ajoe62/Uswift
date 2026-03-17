@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { getMistralClient } from "./api/mistral";
+import React, { useState, useMemo } from "react";
+import { getMistralClientOrNull, MISTRAL_SETUP_HINT } from "./api/mistral";
 import "./index.css";
 
 interface EnhancementResult {
@@ -18,9 +18,13 @@ export default function ResumeEnhancement() {
   const [enhancementType, setEnhancementType] = useState<
     "general" | "job-specific"
   >("general");
-  const mistralClient = getMistralClient();
+  const mistralClient = useMemo(() => getMistralClientOrNull(), []);
 
   const handleEnhance = async () => {
+    if (!mistralClient) {
+      alert(MISTRAL_SETUP_HINT);
+      return;
+    }
     if (!resumeContent.trim()) {
       alert("Please enter your resume content");
       return;
@@ -200,6 +204,22 @@ export default function ResumeEnhancement() {
         )}
       </div>
 
+      {!mistralClient && (
+        <div
+          style={{
+            marginBottom: 16,
+            padding: 12,
+            borderRadius: 8,
+            background: "#FEF2F2",
+            border: "1px solid #FCA5A5",
+            color: "#991B1B",
+            fontSize: "0.8rem",
+          }}
+        >
+          {MISTRAL_SETUP_HINT}
+        </div>
+      )}
+
       {/* Tab Navigation */}
       <div
         style={{
@@ -356,13 +376,16 @@ export default function ResumeEnhancement() {
           {/* Enhance Button */}
           <button
             onClick={handleEnhance}
-            disabled={isLoading || !resumeContent.trim()}
+            disabled={isLoading || !resumeContent.trim() || !mistralClient}
             className="uswift-btn"
             style={{
               width: "100%",
-              opacity: isLoading || !resumeContent.trim() ? 0.6 : 1,
+              opacity:
+                isLoading || !resumeContent.trim() || !mistralClient ? 0.6 : 1,
               cursor:
-                isLoading || !resumeContent.trim() ? "not-allowed" : "pointer",
+                isLoading || !resumeContent.trim() || !mistralClient
+                  ? "not-allowed"
+                  : "pointer",
             }}
           >
             {isLoading ? (

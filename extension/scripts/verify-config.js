@@ -84,24 +84,7 @@ if (fs.existsSync(publicConfigPath)) {
   hasErrors = true;
 }
 
-// Check 3: Verify src/config.js (legacy)
-console.log('\n📄 Checking src/config.js (legacy)...');
-const srcConfigPath = path.join(__dirname, '..', 'src', 'config.js');
-
-if (fs.existsSync(srcConfigPath)) {
-  console.log('  ℹ️  src/config.js found (legacy, public/config.js takes precedence)');
-  const configContent = fs.readFileSync(srcConfigPath, 'utf8');
-
-  const mistralKeyMatch = configContent.match(/apiKey:\s*["']([^"']+)["']/);
-  if (mistralKeyMatch) {
-    const key = mistralKeyMatch[1];
-    if (key && key !== 'your-mistral-api-key-here' && key.length > 20) {
-      console.log('  ℹ️  API key configured in src/config.js');
-    }
-  }
-}
-
-// Check 4: Verify dist folder
+// Check 3: Verify dist folder
 console.log('\n📦 Checking build output...');
 const distPath = path.join(__dirname, '..', 'dist');
 
@@ -152,7 +135,7 @@ if (fs.existsSync(distPath)) {
   hasWarnings = true;
 }
 
-// Check 5: Verify package.json scripts
+// Check 4: Verify package.json scripts
 console.log('\n📋 Checking package.json scripts...');
 const packageJsonPath = path.join(__dirname, '..', 'package.json');
 
@@ -176,7 +159,7 @@ if (hasErrors) {
   console.log('❌ CONFIGURATION INCOMPLETE');
   console.log('\n🔧 To fix:');
   console.log('  1. Get Mistral API key from: https://console.mistral.ai/');
-  console.log('  2. Add it to public/config.js (line 17)');
+  console.log('  2. Add it to extension/.env (VITE_MISTRAL_API_KEY) or public/config.js');
   console.log('  3. Run: npm run build');
   console.log('  4. Reload extension in chrome://extensions/');
   console.log('\n📖 See MISTRAL_API_SETUP.md for detailed instructions');

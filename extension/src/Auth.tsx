@@ -1,13 +1,13 @@
 import React, { useState } from "react";
 import { useAuth } from "./hooks/useAuth";
-import "./index.css";
 
 interface AuthProps {
   onAuthSuccess?: () => void;
 }
 
 export default function Auth({ onAuthSuccess }: AuthProps) {
-  const { signIn, signUp, loading: authLoading, pending } = useAuth();
+  const { signIn, signUp, resetPassword, loading: authLoading, pending } =
+    useAuth();
   const [isSignUp, setIsSignUp] = useState(false);
   const [isForgot, setIsForgot] = useState(false);
   const [email, setEmail] = useState("");
@@ -28,12 +28,7 @@ export default function Auth({ onAuthSuccess }: AuthProps) {
       if (isSignUp) {
         result = await signUp(email, password, { full_name: fullName });
       } else if (isForgot) {
-        // The current useAuth does not expose resetPassword; provide a local UX-friendly response.
-        // If you later add resetPassword to the hook, replace this branch with a call to it.
-        result = {
-          message:
-            "If an account with that email exists, password reset instructions have been sent.",
-        };
+        result = await resetPassword(email);
       } else {
         result = await signIn(email, password);
       }
@@ -293,9 +288,13 @@ export default function Auth({ onAuthSuccess }: AuthProps) {
           {submitting
             ? isSignUp
               ? "Creating Account..."
+              : isForgot
+              ? "Sending Reset Link..."
               : "Signing In..."
             : isSignUp
             ? "Sign Up"
+            : isForgot
+            ? "Send Reset Link"
             : "Sign In"}
         </button>
 

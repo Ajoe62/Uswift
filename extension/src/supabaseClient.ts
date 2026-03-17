@@ -8,6 +8,14 @@ type SupabaseConfig = {
   anonKey: string;
 };
 
+type PasswordUpdateOptions = {
+  accessToken?: string;
+  refreshToken?: string;
+  expiresAt?: number;
+  expiresIn?: number;
+  tokenType?: string;
+};
+
 class SupabaseClient {
   config: SupabaseConfig;
   authToken: string | null = null;
@@ -276,15 +284,82 @@ class SupabaseClient {
     await this.clearSession();
   }
 
+  async updatePassword(newPassword: string, options: PasswordUpdateOptions = {}) {
+    const accessToken = options.accessToken || this.authToken;
+    if (!accessToken) {
+      return {
+        ok: false,
+        error: { message: "Missing recovery session. Open the reset email link again." },
+      };
+    }
+
+    this.authToken = accessToken;
+    try {
+      if (options.accessToken) {
+        const session: any = {
+          access_token: options.accessToken,
+          refresh_token: options.refreshToken,
+          token_type: options.tokenType || "bearer",
+        };
+        if (typeof options.expiresAt === "number") {
+          session.expires_at = options.expiresAt * 1000;
+        } else if (typeof options.expiresIn === "number") {
+          session.expires_in = options.expiresIn;
+          session.expires_at = Date.now() + options.expiresIn * 1000;
+        }
+        await this.saveSession(session);
+      }
+
+      const res = await fetch(`${this.config.url}/auth/v1/user`, {
+        method: "PUT",
+        headers: {
+          apikey: this.config.anonKey,
+          Authorization: `Bearer ${accessToken}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ password: newPassword }),
+        mode: "cors",
+      });
+
+      const data = await res.json().catch(async () => {
+        const txt = await res.text().catch(() => "");
+        return { error: `HTTP ${res.status} - ${txt}` };
+      });
+
+      if (res.ok) {
+        return {
+          ok: true,
+          user: data || null,
+          message: "Password updated successfully.",
+        };
+      }
+
+      return {
+        ok: false,
+        error: {
+          status: res.status,
+          message: data?.error || data?.message || `HTTP ${res.status}`,
+          payload: data,
+        },
+      };
+    } catch (err: any) {
+      return { ok: false, error: { message: err?.message || String(err) } };
+    }
+  }
+
   async resetPassword(email: string) {
     try {
+      const redirectTo = resolvePasswordResetRedirectUrl();
+      const payload: Record<string, string> = { email };
+      if (redirectTo) payload.redirect_to = redirectTo;
+
       const res = await fetch(`${this.config.url}/auth/v1/recover`, {
         method: "POST",
         headers: {
           apikey: this.config.anonKey,
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify(payload),
         mode: "cors",
       });
 
@@ -299,6 +374,7 @@ class SupabaseClient {
           message:
             data?.message ||
             "If an account exists, a password reset email has been sent.",
+          redirectTo,
         };
       }
 
@@ -572,6 +648,32 @@ function resolveConfig(): SupabaseConfig | null {
       (window as any).SUPABASE_CONFIG?.anonKey ||
       (window as any).SUPABASE_CONFIG?.ANON_KEY;
     if (url && anonKey) return { url, anonKey };
+  } catch (e) {
+    // ignore
+  }
+  return null;
+}
+
+function resolvePasswordResetRedirectUrl(): string | null {
+  try {
+    // @ts-ignore
+    const envRedirect =
+      typeof import.meta !== "undefined" &&
+      (import.meta as any).env &&
+      (import.meta as any).env.VITE_PASSWORD_RESET_REDIRECT_URL;
+    if (envRedirect) return envRedirect;
+
+    const runtimeRedirect =
+      (window as any).SUPABASE_CONFIG?.passwordResetRedirectUrl ||
+      (window as any).EXTENSION_CONFIG?.supabase?.passwordResetRedirectUrl;
+    if (runtimeRedirect) return runtimeRedirect;
+
+    if (typeof window !== "undefined") {
+      if (window.location.protocol === "chrome-extension:") {
+        return "https://uswift-ai.vercel.app/auth/reset-password";
+      }
+      return `${window.location.origin}/auth/reset-password`;
+    }
   } catch (e) {
     // ignore
   }
